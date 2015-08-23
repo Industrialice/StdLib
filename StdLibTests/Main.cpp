@@ -365,6 +365,17 @@ ALIGNED_PRE( 16 ) struct TestStruct
 
 int __cdecl main()
 {
+    CVec < i32 > test;
+    for( i32 index = 0; index < 10; ++index )
+    {
+        test.PushBack( index );
+    }
+
+    for( auto it = test.CBeginRev(); it != test.CEndRev(); ++it )
+    {
+        ::printf( "%i\n", *it );
+    }
+
     //Files::EnumFilesRecursively( "D:\\music\\", "*.wma", EnumFilesCallback, 0 );
 
     /*CTC tc;
@@ -409,7 +420,7 @@ int __cdecl main()
 
     //GLFuncsCreate();
 
-    Fix( TextFixerMode::codeSpaces );
+    //Fix( TextFixerMode::codeSpaces );
 
     //Words();
 

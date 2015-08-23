@@ -261,7 +261,7 @@ void Fix( TextFixerMode::mode_t fixMode )
 {
     printf( "file or folder: " );
     char buf[ 256 ];
-    scanf( "%s", buf );
+    scanf_s( "%s", buf );
 
     Files::CFileEnumInfo info;
 

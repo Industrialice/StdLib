@@ -681,6 +681,7 @@ namespace Funcs
 
     template < typename X > X ChangeEndianness( X val )
     {
+        STATIC_CHECK( TypeDesc < X >::is_pod, "val is not a POD type in ChangeEndianness" );
         if( sizeof(val) == 8 )
         {
             return INT64_CHANGE_ENDIANNESS( val );
@@ -729,13 +730,13 @@ namespace Funcs
         return val;
     }
 
-    template < typename X > X CondReset( X val, bln is_reset )  //  set value to 0 if is_reset is true
+    template < typename X > X CondReset( X val, bln is_reset )  //  set the value to 0 if is_reset is true
     {
         typename IntWithSize < sizeof(X) * 8 >::uint_t test = *(typename IntWithSize < sizeof(X) * 8 >::uint_t *)&val & (*(ui8 *)&is_reset - 1);
         return *(X *)&test;
     }
 
-    template < typename X > X CondLeave( X val, bln is_reset )  //  leave value unchanged if is_reset is true
+    template < typename X > X CondLeave( X val, bln is_reset )  //  leave the value unchanged if is_reset is true
     {
         typename IntWithSize < sizeof(X) * 8 >::uint_t test = *(typename IntWithSize < sizeof(X) * 8 >::uint_t *)&val & -*(ui8 *)&is_reset;
         return *(X *)&test;

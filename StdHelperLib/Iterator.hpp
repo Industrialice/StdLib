@@ -17,15 +17,25 @@ namespace Type
     };
 }
 
-template < typename type, typename RetType, uiw step > class _IterRandomConst
+template < typename type, iw step > class _IterRandomConst
 {
-    typedef _IterRandomConst < type, RetType, step > ownType;
+    typedef _IterRandomConst < type, step > ownType;
 
 protected:
     type *_str;
 
 public:
     static const Type::type_t iteratorType = Type::Random;
+
+    _IterRandomConst()
+    {
+        DBGCODE( _str = 0; )
+    }
+
+    _IterRandomConst( const type *source )
+    {
+        _str = (type *)source;
+    }
 
     const type &operator *() const
     {
@@ -49,7 +59,7 @@ public:
         return *this;
     }
 
-    RetType operator ++ (int)
+    ownType operator ++ (int)
     {
         ASSUME( _str );
         ownType temp = *this;
@@ -64,7 +74,7 @@ public:
         return *this;
     }
 
-    RetType operator -- (int)
+    ownType operator -- (int)
     {
         ASSUME( _str );
         ownType temp = *this;
@@ -72,19 +82,19 @@ public:
         return temp;
     }
 
-    RetType operator + ( size_t addition ) const
+    ownType operator + ( size_t addition ) const
     {
         return ownType( _str + (addition * step) );
     }
 
-    friend RetType operator + ( size_t addition, const ownType &it )
+    friend ownType operator + ( size_t addition, const ownType &it )
     {
         return ownType( it._str + (addition * step) );
     }
 
-    RetType operator - ( size_t subtraction ) const
+    ownType operator - ( size_t subtraction ) const
     {
-        return RetType( _str - (subtraction * step) );
+        return ownType( _str - (subtraction * step) );
     }
 
     size_t operator - ( const ownType& subtraction ) const
@@ -145,10 +155,20 @@ public:
     }
 };
 
-template < typename type, typename RetType, uiw step > class _IterRandom : public _IterRandomConst < type, RetType, step >
+template < typename type, iw step > class _IterRandom : public _IterRandomConst < type, step >
 {
 public:
-    using _IterRandomConst < type, RetType, step >::_str;
+    using _IterRandomConst < type, step >::_str;
+
+    _IterRandom()
+    {
+        DBGCODE( _str = 0; )
+    }
+
+    _IterRandom( type *source )
+    {
+        _str = source;
+    }
 
     type &operator *()
     {
@@ -166,7 +186,7 @@ public:
     }
 };
 
-  }
-}
+  }  //  namespace Iterator
+}  //  namespace StdLib
 
 #endif __ITERATOR_HPP__

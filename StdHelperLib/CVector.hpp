@@ -443,47 +443,10 @@ protected:
     using baseType::_count;
 
 public:
-    class Iter;
-
-    class IterConst : public Iterator::_IterRandomConst < const X, IterConst, 1 >
-    {
-        using Iterator::_IterRandomConst < const X, IterConst, 1 >::_str;
-
-    public:
-        IterConst()
-        {}
-
-        IterConst( const X *source )
-        {
-            _str = source;
-        }
-
-        IterConst( const Iter &iter )
-        {
-            _str = iter._str;
-        }
-    };
-
-    class Iter : public Iterator::_IterRandom < X, Iter, 1 >
-    {
-        using Iterator::_IterRandom < X, Iter, 1 >::_str;
-
-    public:
-        Iter()
-        {}
-
-        Iter( X *source )
-        {
-            _str = source;
-        }
-
-        operator IterConst() const
-        {
-            return IterConst( _str );
-        }
-
-        friend class IterConst;
-    };
+    typedef Iterator::_IterRandom < X, 1 > Iter;
+    typedef Iterator::_IterRandom < X, -1 > IterRev;
+    typedef Iterator::_IterRandomConst < const X, 1 > IterConst;
+    typedef Iterator::_IterRandomConst < const X, -1 > IterRevConst;
 
     _CBaseVecStatic()
     {
@@ -570,6 +533,36 @@ public:
     IterConst CEnd() const
     {
         return IterConst( this->_GetArr() + _count );
+    }
+
+    IterRev BeginRev()
+    {
+        return IterRev( this->_GetArr() + _count - 1 );
+    }
+
+    IterRevConst BeginRev() const
+    {
+        return IterRevConst( this->_GetArr() + _count - 1 );
+    }
+
+    IterRevConst CBeginRev() const
+    {
+        return IterRevConst( this->_GetArr() + _count - 1 );
+    }
+
+    IterRev EndRev()
+    {
+        return IterRev( this->_GetArr() - 1 );
+    }
+
+    IterRevConst EndRev() const
+    {
+        return IterRevConst( this->_GetArr() - 1 );
+    }
+
+    IterRevConst CEndRev() const
+    {
+        return IterRevConst( this->_GetArr() - 1 );
     }
 
     X &Get( count_type index )
