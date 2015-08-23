@@ -15,7 +15,7 @@ int WINAPI MessageBoxA( HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType )
 WINUSERAPI HWND WINAPI FindWindowA( LPCSTR lpClassName, LPCSTR lpWindowName );
 HWND WINAPI CreateWindowExA( DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam );
 #ifndef CRITICAL_SECTION_NO_DEBUG_INFO
-	#define CRITICAL_SECTION_NO_DEBUG_INFO 0
+    #define CRITICAL_SECTION_NO_DEBUG_INFO 0
 #endif
 WINBASEAPI BOOL WINAPI InitializeCriticalSectionEx( LPCRITICAL_SECTION lpCriticalSection, DWORD dwSpinCount, DWORD Flags );
 WINBASEAPI BOOL WINAPI SetFilePointerEx( HANDLE hFile, LARGE_INTEGER liDistanceToMove, PLARGE_INTEGER lpNewFilePointer, DWORD dwMoveMethod );

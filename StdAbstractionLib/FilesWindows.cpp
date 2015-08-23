@@ -11,9 +11,9 @@
 
 NOINLINE bln Files::DeleteFile( const char *cp_pnn, SError *po_error )
 {
-	ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
+    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
 
-	bln funcResult = ::DeleteFileA( cp_pnn ) != 0;
+    bln funcResult = ::DeleteFileA( cp_pnn ) != 0;
     if( po_error )
     {
         if( !funcResult )
@@ -42,7 +42,7 @@ NOINLINE bln Files::DeleteFile( const char *cp_pnn, SError *po_error )
 
 NOINLINE bln Files::DeleteFolder( const char *cp_path, SError *po_error )
 {
-	ASSUME( cp_path && _StrLen( cp_path ) + 2 < MAX_PATH );
+    ASSUME( cp_path && _StrLen( cp_path ) + 2 < MAX_PATH );
 
     char a_buf[ MAX_PATH ];
     uiw cpy = Funcs::StrCpyAndCountWONull( a_buf, cp_path );
@@ -64,28 +64,28 @@ NOINLINE bln Files::DeleteFolder( const char *cp_path, SError *po_error )
     {
         goto toExit;
     }
-	do
-	{
-		if( _StrEqual( o_find.cFileName, "." ) || _StrEqual( o_find.cFileName, ".." ) )
-		{
-			continue;
-		}
+    do
+    {
+        if( _StrEqual( o_find.cFileName, "." ) || _StrEqual( o_find.cFileName, ".." ) )
+        {
+            continue;
+        }
 
-		_StrCpy( a_buf + cpy, o_find.cFileName );
-		if( o_find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-		{
-			if( !DeleteFolder( a_buf, po_error ) )
-			{
-			    ::FindClose( h_find );
-				goto toExit;
-			}
-		}
-		else if( !DeleteFile( a_buf, po_error ) )
-		{
-			::FindClose( h_find );
-			goto toExit;
-		}
-	} while( ::FindNextFileA( h_find, &o_find ) );
+        _StrCpy( a_buf + cpy, o_find.cFileName );
+        if( o_find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+        {
+            if( !DeleteFolder( a_buf, po_error ) )
+            {
+                ::FindClose( h_find );
+                goto toExit;
+            }
+        }
+        else if( !DeleteFile( a_buf, po_error ) )
+        {
+            ::FindClose( h_find );
+            goto toExit;
+        }
+    } while( ::FindNextFileA( h_find, &o_find ) );
 
     ::FindClose( h_find );
 
@@ -103,38 +103,38 @@ toExit:
 bln Files::IsFileOrFolderExists( const char *cp_papn )
 {
     ASSUME( cp_papn && _StrLen( cp_papn ) < MAX_PATH );
-	DWORD attribs = ::GetFileAttributesA( cp_papn );
-	return attribs != INVALID_FILE_ATTRIBUTES;
+    DWORD attribs = ::GetFileAttributesA( cp_papn );
+    return attribs != INVALID_FILE_ATTRIBUTES;
 }
 
 NOINLINE bln Files::IsFileExists( const char *cp_pnn )
 {
-	ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
-	DWORD attribs = ::GetFileAttributesA( cp_pnn );
-	if( attribs == INVALID_FILE_ATTRIBUTES )
-	{
-		return false;
-	}
-	if( attribs & FILE_ATTRIBUTE_DIRECTORY )
-	{
-		return false;
-	}
-	return true;
+    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
+    DWORD attribs = ::GetFileAttributesA( cp_pnn );
+    if( attribs == INVALID_FILE_ATTRIBUTES )
+    {
+        return false;
+    }
+    if( attribs & FILE_ATTRIBUTE_DIRECTORY )
+    {
+        return false;
+    }
+    return true;
 }
 
 NOINLINE bln Files::IsFolderExists( const char *cp_path )
 {
-	ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH );
-	DWORD attribs = ::GetFileAttributesA( cp_path );
-	if( attribs == INVALID_FILE_ATTRIBUTES )
-	{
-		return false;
-	}
-	if( attribs & FILE_ATTRIBUTE_DIRECTORY )
-	{
-		return true;
-	}
-	return false;
+    ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH );
+    DWORD attribs = ::GetFileAttributesA( cp_path );
+    if( attribs == INVALID_FILE_ATTRIBUTES )
+    {
+        return false;
+    }
+    if( attribs & FILE_ATTRIBUTE_DIRECTORY )
+    {
+        return true;
+    }
+    return false;
 }
 
 NOINLINE bln Files::IsFileReadOnlyGet( const char *cp_pnn )
@@ -174,16 +174,16 @@ NOINLINE bln Files::IsFileReadOnlySet( const char *cp_pnn, bln is_ro )
 
 bln Files::IsAbsolutePath( const char *pnn, uiw parseLen /* = uiw_max */ )
 {
-	return Funcs::IsChrAlpha( pnn[ 0 ] ) && pnn[ 1 ] == ':' && (pnn[ 2 ] == '/' || pnn[ 2 ] == '\\');
+    return Funcs::IsChrAlpha( pnn[ 0 ] ) && pnn[ 1 ] == ':' && (pnn[ 2 ] == '/' || pnn[ 2 ] == '\\');
 }
 
 NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, SError *po_error )
 {
-	ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH) );
+    ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH) );
 
-	char a_buf[ MAX_PATH ];
+    char a_buf[ MAX_PATH ];
     uiw len = Funcs::StrCpyAndCountWONull( a_buf, cp_where );
-	_StrCpy( a_buf + len, cp_name );
+    _StrCpy( a_buf + len, cp_name );
     bln funcResult = false;
     SError o_error = Error::Get( Error::Ok );
 
@@ -277,23 +277,23 @@ NOINLINE uiw Files::ExtractExtensionFromString( const char *cp_str, char *RSTR p
 
 NOINLINE uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char a_procedPath[ MAX_PATH ] )
 {
-	#ifdef WINCE
-		return Funcs::StrCpyAndCount( a_procedPath, cp_sourcePath );
-	#else
-		return ::GetFullPathNameA( cp_sourcePath, MAX_PATH, a_procedPath, 0 );
-	#endif
+    #ifdef WINCE
+        return Funcs::StrCpyAndCount( a_procedPath, cp_sourcePath );
+    #else
+        return ::GetFullPathNameA( cp_sourcePath, MAX_PATH, a_procedPath, 0 );
+    #endif
 }
 
 struct CFileEnumerator : public Files::CFileEnumInfo
 {
-	NOINLINE bln EnumFirstFile( const char *path, const char *mask )
-	{
-		ASSUME( path && mask );
+    NOINLINE bln EnumFirstFile( const char *path, const char *mask )
+    {
+        ASSUME( path && mask );
 
-		if( _handle != INVALID_HANDLE_VALUE )
-		{
-			::FindClose( _handle );
-		}
+        if( _handle != INVALID_HANDLE_VALUE )
+        {
+            ::FindClose( _handle );
+        }
 
         for( _pathLen = 0; path[ _pathLen ]; ++_pathLen )
         {
@@ -309,34 +309,34 @@ struct CFileEnumerator : public Files::CFileEnumInfo
             _pnn[ _pathLen++ ] = '\\';
         }
 
-		_StrCpy( _pnn + _pathLen, mask );
+        _StrCpy( _pnn + _pathLen, mask );
 
-		WIN32_FIND_DATAA findData;
-        
-		_handle = ::FindFirstFileA( _pnn, &findData );
+        WIN32_FIND_DATAA findData;
 
-		if( _handle == INVALID_HANDLE_VALUE )
-		{
+        _handle = ::FindFirstFileA( _pnn, &findData );
+
+        if( _handle == INVALID_HANDLE_VALUE )
+        {
             *this = CFileEnumerator();
-			return false;
-		}
+            return false;
+        }
 
-		if( _StrEqual( findData.cFileName, "." ) )
-		{
-			if( !::FindNextFileA( _handle, &findData ) )
-			{
+        if( _StrEqual( findData.cFileName, "." ) )
+        {
+            if( !::FindNextFileA( _handle, &findData ) )
+            {
                 *this = CFileEnumerator();
-				return false;
-			}
-			if( _StrEqual( findData.cFileName, ".." ) )
-			{
-				if( !::FindNextFileA( _handle, &findData ) )
-				{
+                return false;
+            }
+            if( _StrEqual( findData.cFileName, ".." ) )
+            {
+                if( !::FindNextFileA( _handle, &findData ) )
+                {
                     *this = CFileEnumerator();
-					return false;
-				}
-			}
-		}
+                    return false;
+                }
+            }
+        }
 
         _StrCpy( _pnn + _pathLen, findData.cFileName );
         if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
@@ -344,39 +344,39 @@ struct CFileEnumerator : public Files::CFileEnumInfo
             _StrCat( _pnn + _pathLen, "\\" );
         }
 
-		return true;
-	}
+        return true;
+    }
 
-	NOINLINE bln EnumNextFile()
-	{
-		ASSUME( _handle != INVALID_HANDLE_VALUE );
+    NOINLINE bln EnumNextFile()
+    {
+        ASSUME( _handle != INVALID_HANDLE_VALUE );
 
-		WIN32_FIND_DATAA findData;
+        WIN32_FIND_DATAA findData;
 
-		if( !::FindNextFileA( _handle, &findData ) )
-		{
+        if( !::FindNextFileA( _handle, &findData ) )
+        {
             *this = CFileEnumerator();
-			return false;
-		}
-	
+            return false;
+        }
+
         _StrCpy( _pnn + _pathLen, findData.cFileName );
-		if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+        if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
         {
             _StrCat( _pnn + _pathLen, "\\" );
         }
 
-		return true;
-	}
+        return true;
+    }
 };
-    
+
 bln Files::EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask )
 {
-	return ((CFileEnumerator *)info)->EnumFirstFile( path, mask );
+    return ((CFileEnumerator *)info)->EnumFirstFile( path, mask );
 }
 
 bln Files::EnumNextFile( CFileEnumInfo *info )
 {
-	return ((CFileEnumerator *)info)->EnumNextFile();
+    return ((CFileEnumerator *)info)->EnumNextFile();
 }
 
 void Files::EnumFilesRecursively( const char *path, const char *mask, EnumFilesCallback callback, void *argument )
@@ -411,7 +411,7 @@ void Files::EnumFilesRecursively( const char *path, const char *mask, EnumFilesC
 
 void Files::Private::CloseEnumHandle( fileEnumHandle handle )
 {
-	::FindClose( handle );
+    ::FindClose( handle );
 }
 
 #endif WINDOWS

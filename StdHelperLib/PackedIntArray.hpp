@@ -15,11 +15,11 @@ enum packiarr_OutOfRangeReaction { packiarr_OutOfRangeIgnore, packiarr_OutOfRang
 template < const uiw pack, bln is_signed, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeIgnore, const bln is_runtimeBoundsCheck = false, const bln is_debugOverflowCheck = false > class __packiarr_abstract__
 {
 protected:
-	typedef typename IntWithSizeAndSign
-		< pack <= 8 ? 8 :
-		pack <= 16 ? 16 :
-		pack <= 32 ? 32 : 64, 
-		is_signed >::type_t native_t;
+    typedef typename IntWithSizeAndSign
+        < pack <= 8 ? 8 :
+        pack <= 16 ? 16 :
+        pack <= 32 ? 32 : 64,
+        is_signed >::type_t native_t;
 
     enum PackType { PackNative, PackPower, PackOther };
 
@@ -72,7 +72,7 @@ public:
         {
             *(native_t *)&arr[ index ] = value;
         }
-        else 
+        else
         {
             unative_t procedValue;
             if( !is_signed )
@@ -123,7 +123,7 @@ public:
         {
             return *(native_t *)&arr[ index ];
         }
-        else 
+        else
         {
             unative_t value;
             if( packType == PackPower )
@@ -181,13 +181,13 @@ public:
 
 template < const uiw cells, const uiw pack, bln is_signed, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeIgnore, const bln is_runtimeBoundsCheck = false, const bln is_debugOverflowCheck = false > class packiarr_static : public __packiarr_abstract__ < pack, is_signed, oorr, is_runtimeBoundsCheck, is_debugOverflowCheck >
 {
-	typedef __packiarr_abstract__ < pack, is_signed, oorr, is_runtimeBoundsCheck, is_debugOverflowCheck > parentType;
-	typedef typename parentType::native_t native_t;
-	typedef typename parentType::unative_t unative_t;
-	using parentType::nativeBits;
+    typedef __packiarr_abstract__ < pack, is_signed, oorr, is_runtimeBoundsCheck, is_debugOverflowCheck > parentType;
+    typedef typename parentType::native_t native_t;
+    typedef typename parentType::unative_t unative_t;
+    using parentType::nativeBits;
 
     static const uiw arrSize = ((cells * pack + (nativeBits - 1)) & ~(nativeBits - 1)) / nativeBits;
-	CStaticVec < unative_t, arrSize > _arr;
+    CStaticVec < unative_t, arrSize > _arr;
 
 public:
     packiarr_static()
@@ -195,12 +195,12 @@ public:
 
     packiarr_static( uiw cellsToFill, native_t value )
     {
-		ASSUME( cellsToFill <= cells );
-		for( uiw index = 0; index < cellsToFill; ++index )
-		{
-			parentType::Set( _arr.Data(), index, value );
-		}
-	}
+        ASSUME( cellsToFill <= cells );
+        for( uiw index = 0; index < cellsToFill; ++index )
+        {
+            parentType::Set( _arr.Data(), index, value );
+        }
+    }
 
     void Set( const uiw index, native_t value )
     {
@@ -234,32 +234,32 @@ public:
 
 template < const uiw pack, bln is_signed, typename reservator = Reservator::Half <>, typename allocator = Allocator::Simple, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeIgnore, const bln is_runtimeBoundsCheck = false, const bln is_debugOverflowCheck = false > class packiarr_dynamic : public __packiarr_abstract__ < pack, is_signed, oorr, is_runtimeBoundsCheck, is_debugOverflowCheck >
 {
-	typedef __packiarr_abstract__ < pack, is_signed, oorr, is_runtimeBoundsCheck, is_debugOverflowCheck > parentType;
-	typedef typename parentType::native_t native_t;
-	typedef typename parentType::unative_t unative_t;
-	using parentType::nativeBits;
-	
-	CVec < unative_t, reservator, Sem_POD, allocator > _arr;
+    typedef __packiarr_abstract__ < pack, is_signed, oorr, is_runtimeBoundsCheck, is_debugOverflowCheck > parentType;
+    typedef typename parentType::native_t native_t;
+    typedef typename parentType::unative_t unative_t;
+    using parentType::nativeBits;
 
-	uiw _cells;
+    CVec < unative_t, reservator, Sem_POD, allocator > _arr;
+
+    uiw _cells;
 
 public:
     ~packiarr_dynamic()
     {}
 
     packiarr_dynamic() : _cells( 0 )
-	{}
+    {}
 
     explicit packiarr_dynamic( uiw cells ) : _arr( ComputeArrSize( cells ) ), _cells( cells )
     {}
 
     packiarr_dynamic( uiw cells, native_t value ) : _arr( ComputeArrSize( cells ) )
     {
-		for( _cells = 0; _cells < cells; ++_cells )
-		{
-			parentType::Set( _arr.Data(), _cells, value );
-		}
-	}
+        for( _cells = 0; _cells < cells; ++_cells )
+        {
+            parentType::Set( _arr.Data(), _cells, value );
+        }
+    }
 
     void Set( const uiw index, native_t value )
     {
@@ -296,33 +296,33 @@ public:
         {
             return;
         }
-		_arr.Resize( ComputeArrSize( cells ) );
+        _arr.Resize( ComputeArrSize( cells ) );
         _cells = cells;
     }
 
-	void PushBack( native_t value )
-	{
-		_arr.Resize( ComputeArrSize( _cells + 1 ) );
-		parentType::Set( _arr.Data(), _cells, value );
-		++_cells;
-	}
+    void PushBack( native_t value )
+    {
+        _arr.Resize( ComputeArrSize( _cells + 1 ) );
+        parentType::Set( _arr.Data(), _cells, value );
+        ++_cells;
+    }
 
-	void PopBack()
-	{
-		ASSUME( _cells );
-		--_cells;
-	}
+    void PopBack()
+    {
+        ASSUME( _cells );
+        --_cells;
+    }
 
     void Add( uiw cells )
     {
-		_cells += cells;
-		_arr.Resize( ComputeArrSize( _cells ) );
+        _cells += cells;
+        _arr.Resize( ComputeArrSize( _cells ) );
     }
 
     void Add( uiw cells, native_t setValue )
     {
-		uiw newCells = _cells + cells;
-		_arr.Resize( ComputeArrSize( newCells ) );
+        uiw newCells = _cells + cells;
+        _arr.Resize( ComputeArrSize( newCells ) );
         for( ; _cells < newCells; ++_cells )
         {
             Set( _cells, setValue );

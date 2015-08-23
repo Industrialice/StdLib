@@ -16,8 +16,8 @@ template < typename X, typename reservator, typename allocator, typename count_t
 protected:
     typedef CBaseVector < X, reservator, allocator, count_type, tis_selfManaged, static_size > parentType;
 
-	using parentType::_arr;
-	using parentType::_count;
+    using parentType::_arr;
+    using parentType::_count;
     DBGCODE( using parentType::_is_constructed; );
 
 public:
@@ -52,7 +52,7 @@ public:
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == true, "type X is not a pod, disable pod checking for prevent this error" );
         #endif
     }
-    
+
     _CVectorBasis( const X &source, count_type reserve )
     {
         #ifdef ISPOD_SUPPORTED
@@ -101,9 +101,9 @@ public:
     _CVectorBasis &PushBackArr( const X *arr, count_type count )
     {
         this->_ProcReservationUp( _count + count );
-		_MemCpy( _arr + _count, arr, sizeof(X) * count );
-		_count += count;
-		return *this;
+        _MemCpy( _arr + _count, arr, sizeof(X) * count );
+        _count += count;
+        return *this;
     }
 
     _CVectorBasis &PushBackVec( const ownType &o_vec )
@@ -136,9 +136,9 @@ public:
     {
         this->_ProcReservationUp( _count + count );
         _MemMove( _arr + count, _arr, sizeof(X) * _count );
-		_MemCpy( _arr, arr, sizeof(X) * count );
-		_count += count;
-		return *this;
+        _MemCpy( _arr, arr, sizeof(X) * count );
+        _count += count;
+        return *this;
     }
 
     _CVectorBasis &PushFrontVec( const ownType &o_vec )
@@ -353,10 +353,10 @@ public:
 
 template < typename X, uiw static_size, typename count_type = uiw, bln tis_selfManaged = true, bln tis_checkForPod = true > class CVectorStatic : public Private::_CVectorBasis < X, void, void, count_type, tis_selfManaged, static_size, tis_checkForPod >
 {
-	typedef Private::_CVectorBasis < X, void, void, count_type, tis_selfManaged, static_size, tis_checkForPod > parentType;
+    typedef Private::_CVectorBasis < X, void, void, count_type, tis_selfManaged, static_size, tis_checkForPod > parentType;
 
-	using parentType::_arr;
-	using parentType::_count;
+    using parentType::_arr;
+    using parentType::_count;
     DBGCODE( using parentType::_is_constructed; );
 
 public:
@@ -367,7 +367,7 @@ public:
     explicit CVectorStatic( count_type reserve ) : parentType( reserve ) {  /*  void  */  }
 
     explicit CVectorStatic( CNoInit ) : parentType( CNoInit() ) {  /*  void  */  }
-    
+
     CVectorStatic( const X &source, count_type reserve ) : parentType( source, reserve ) {  /*  void  */  }
 
     CVectorStatic( const ownType &source )
@@ -408,10 +408,10 @@ public:
 
 template < typename X, typename reservator = void, typename allocator = Allocator::Simple < X >, typename count_type = uiw, bln tis_selfManaged = true, bln tis_checkForPod = true > class CVector : public Private::_CVectorBasis < X, reservator, allocator, count_type, tis_selfManaged, 0, tis_checkForPod >
 {
-	typedef Private::_CVectorBasis < X, reservator, allocator, count_type, tis_selfManaged, 0, tis_checkForPod > parentType;
+    typedef Private::_CVectorBasis < X, reservator, allocator, count_type, tis_selfManaged, 0, tis_checkForPod > parentType;
 
-	using parentType::_arr;
-	using parentType::_count;
+    using parentType::_arr;
+    using parentType::_count;
     DBGCODE( using parentType::_is_constructed; );
 
 public:
@@ -422,7 +422,7 @@ public:
     explicit CVector( count_type reserve ) : parentType( reserve ) {  /*  void  */  }
 
     explicit CVector( CNoInit ) : parentType( CNoInit() ) {  /*  void  */  }
-    
+
     CVector( const X &source, count_type reserve ) : parentType( source, reserve ) {  /*  void  */  }
 
     CVector( const ownType &source )

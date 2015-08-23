@@ -79,42 +79,42 @@ NOINLINE filehdl FileIO::Open( const char *cp_pnn, OpenMode::OpenMode_t openMode
     }
     if( procMode & ProcMode::Write )
     {
-    	if( procMode & ProcMode::Read )
-    	{
-    		flags |= O_RDWR;
-    	}
-    	else
-    	{
-    		if( procMode & ProcMode::SequentialScan )
-    		{
-    		  	goto toExit;
-    		}
-    		flags |= O_WRONLY;
-    	}
+        if( procMode & ProcMode::Read )
+        {
+            flags |= O_RDWR;
+        }
+        else
+        {
+            if( procMode & ProcMode::SequentialScan )
+            {
+                  goto toExit;
+            }
+            flags |= O_WRONLY;
+        }
     }
     else
     {
-    	if( procMode & ProcMode::Append )
-    	{
-    		goto toExit;
-    	}
-    	if( procMode & ProcMode::Read )
-    	{
-    		flags |= O_RDONLY;
-    	}
-		else
-		{
-			goto toExit;
-		}
+        if( procMode & ProcMode::Append )
+        {
+            goto toExit;
+        }
+        if( procMode & ProcMode::Read )
+        {
+            flags |= O_RDONLY;
+        }
+        else
+        {
+            goto toExit;
+        }
     }
 
     if( openMode == OpenMode::CreateIfNotExists )
     {
-    	flags |= O_CREAT;
+        flags |= O_CREAT;
     }
     else if( openMode == OpenMode::CreateAlways )
     {
-    	flags |= O_CREAT | O_TRUNC;
+        flags |= O_CREAT | O_TRUNC;
     }
     else  //  if( openMode == OpenMode::OpenExisting )
     {
@@ -132,12 +132,12 @@ NOINLINE filehdl FileIO::Open( const char *cp_pnn, OpenMode::OpenMode_t openMode
 
     if( procMode & ProcMode::Append )
     {
-    	seekResult = ::lseek64( file, 0, SEEK_END );
-    	if( seekResult == -1 )
-    	{
-    	    o_error = Error::Get( Error::Unknown );
-    	    goto toExit;
-    	}
+        seekResult = ::lseek64( file, 0, SEEK_END );
+        if( seekResult == -1 )
+        {
+            o_error = Error::Get( Error::Unknown );
+            goto toExit;
+        }
     }
 
     po_file = (SFile *)::malloc( sizeof(SFile) );

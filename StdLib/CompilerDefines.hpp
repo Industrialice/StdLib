@@ -18,13 +18,13 @@
     MSVC++ 5.0  _MSC_VER == 1100
     */
 
-	#if _MSC_VER >= 1600  /*  TODO: exact version(s)  */
-		#include <xkeycheck.h>
-	#endif
+    #if _MSC_VER >= 1600  /*  TODO: exact version(s)  */
+        #include <xkeycheck.h>
+    #endif
 
-	#define REMOVE_COMMA
+    #define REMOVE_COMMA
     #define ALIGNED_PRE( al ) __declspec(align(al))
-	#define ALIGNED_POST( al )
+    #define ALIGNED_POST( al )
     #define SYMBOLEXPORT __declspec(dllexport)
     #define SYMBOLIMPORT __declspec(dllimport)
     #define FUNCNAME __FUNCSIG__
@@ -52,13 +52,13 @@
 
     #if _MSC_VER >= 1300  //  Visual Studio 2003
         #define COUNTER_SUPPORTED
-		#define SWAP_SUPPORTED
-		#define ALIGNOF( what ) __alignof( what )
-		#define NATIVE_ALIGNOF
+        #define SWAP_SUPPORTED
+        #define ALIGNOF( what ) __alignof( what )
+        #define NATIVE_ALIGNOF
     #endif
 
     #if _MSC_VER >= 1400  //  Visual Studio 2005
-		#define DEFINE_VARARGS_SUPPORTED
+        #define DEFINE_VARARGS_SUPPORTED
         #define OVERRIDE_SUPPORTED
         #define NOINLINE __declspec(noinline)
     #else
@@ -71,28 +71,28 @@
 
     #if _MSC_VER >= 1600  //  Visual Studio 2010
         #define STATIC_ASSERTION_SUPPORTED
-		#define MOVABLE_SUPPORTED
+        #define MOVABLE_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1700  //  Visual Studio 2012
         #define FINAL_SUPPORTED
-		#define DEFAULT_FUNC_PARAMS_SUPPORTED
+        #define DEFAULT_FUNC_PARAMS_SUPPORTED
         #define NULLPTR_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1800  //  Visual Studio 2013
-		#define VAR_TEMPLATES_SUPPORTED
+        #define VAR_TEMPLATES_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1900  //  Visual Studio 2015
-		//#define NOEXEPT noexept
+        //#define NOEXEPT noexept
         #define CONSTEXPR_SUPPORTED
     #endif
 
-	#define INT64_NUMBER __int64
-	#define UINT64_NUMBER unsigned __int64
-	#define ASINT64( number ) number##I64
-	#define ASUINT64( number ) number##UI64
+    #define INT64_NUMBER __int64
+    #define UINT64_NUMBER unsigned __int64
+    #define ASINT64( number ) number##I64
+    #define ASUINT64( number ) number##UI64
 
     #if defined(_M_IX86) || defined(_M_AMD64)
         #define LITTLE_ENDIAN
@@ -105,10 +105,10 @@
     #endif
 
     #if defined(_M_IX86) || defined(_M_AMD64) || defined(_M_ARM) || defined(_M_ARMT)
-		
-		#if _MSC_VER >= 1700
-			#include <intrin.h>
-		#endif
+
+        #if _MSC_VER >= 1700
+            #include <intrin.h>
+        #endif
 
         #define ROTATE32R( val, shift ) _rotr( val, shift )
         #define ROTATE32L( val, shift ) _rotl( val, shift )
@@ -132,9 +132,9 @@
 
 #elif defined(__GNUC__)
 
-	#define REMOVE_COMMA ##
+    #define REMOVE_COMMA ##
     #define ALIGNED_PRE( al )
-	#define ALIGNED_POST( al ) __attribute__((aligned(al)))
+    #define ALIGNED_POST( al ) __attribute__((aligned(al)))
     #ifdef WINDOWS
         #define SYMBOLEXPORT __attribute__(dllexport)
         #define SYMBOLIMPORT __attribute__(dllimport)
@@ -165,11 +165,11 @@
         #define ISPOD_SUPPORTED  /*  TODO: 4.4 is not for sure  */
     #endif
 
-	/*  TODO: actual checks  */
-	#define MOVABLE_SUPPORTED
-	#define VAR_TEMPLATES_SUPPORTED
-	#define DEFAULT_FUNC_PARAMS_SUPPORTED
-	#define DEFINE_VARARGS_SUPPORTED
+    /*  TODO: actual checks  */
+    #define MOVABLE_SUPPORTED
+    #define VAR_TEMPLATES_SUPPORTED
+    #define DEFAULT_FUNC_PARAMS_SUPPORTED
+    #define DEFINE_VARARGS_SUPPORTED
     #define NULLPTR_SUPPORTED
 
     #if GCC_VERSION >= 40500
@@ -194,15 +194,15 @@
         #define FINAL_SUPPORTED
     #endif
 
-	#define INT64_NUMBER long long
-	#define UINT64_NUMBER unsigned long long
-	#define ASINT64( number ) number##LL
-	#define ASUINT64( number ) number##ULL
+    #define INT64_NUMBER long long
+    #define UINT64_NUMBER unsigned long long
+    #define ASINT64( number ) number##LL
+    #define ASUINT64( number ) number##ULL
 
     #define ZERO_LENGTH_ARRAYS_SUPPORTED
 
     /*  not sure about minimal versions  */
-	/*  most significant non-zero bit and least significant  */
+    /*  most significant non-zero bit and least significant  */
     #define MSNZB32( tosearch, result ) ASSUME( tosearch != 0 ); *result = (31 - __builtin_clz( tosearch ))
     #define LSNZB32( tosearch, result ) ASSUME( tosearch != 0 ); *result = __builtin_ctz( tosearch )
 
@@ -253,35 +253,35 @@
 #endif
 
 #ifndef MSNZB32
-	#define MSNZB32( tosearch, result ) for( ui32 index = 31; ; --index ) { ASSUME( tosearch != 0 ); if( tosearch & 1 << index ) return index; }
+    #define MSNZB32( tosearch, result ) for( ui32 index = 31; ; --index ) { ASSUME( tosearch != 0 ); if( tosearch & 1 << index ) return index; }
 #endif
 #ifndef LSNZB32
     #define LSNZB32( tosearch, result ) for( ui32 index = 0; ; ++index ) { ASSUME( tosearch != 0 ); if( tosearch & 1 << index ) return index; }
 #endif
 #ifndef MSNZB64
-	#define MSNZB64( tosearch, result ) for( ui32 index = 63; ; --index ) { ASSUME( tosearch != 0 ); if( tosearch & 1ULL << index ) return index; }
+    #define MSNZB64( tosearch, result ) for( ui32 index = 63; ; --index ) { ASSUME( tosearch != 0 ); if( tosearch & 1ULL << index ) return index; }
 #endif
 #ifndef LSNZB64
     #define LSNZB64( tosearch, result ) for( ui32 index = 0; ; ++index ) { ASSUME( tosearch != 0 ); if( tosearch & 1ULL << index ) return index; }
 #endif
 
 #ifndef ALIGNOF
-	template <typename type>
-	struct __AlignmentCheck
-	{
-		char c;
-		type t;
-	};
-	#define ALIGNOF( type ) offsetof(__AlignmentCheck<type>, t)
+    template <typename type>
+    struct __AlignmentCheck
+    {
+        char c;
+        type t;
+    };
+    #define ALIGNOF( type ) offsetof(__AlignmentCheck<type>, t)
 #endif
 
 #ifndef NOEXEPT
-	#define NOEXEPT
+    #define NOEXEPT
 #endif
 
 /*  TODO: wtf  */
 #if defined(ISPOD_SUPPORTED) && defined(WINCE)
-	#undef ISPOD_SUPPORTED
+    #undef ISPOD_SUPPORTED
 #endif
 
 #endif __COMPILER_DEFINES_HPP__

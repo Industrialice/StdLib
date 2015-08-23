@@ -51,10 +51,10 @@
 
 #ifdef DEFINE_VARARGS_SUPPORTED
 
-	#define CONSTS( name, ... ) enum name { __VA_ARGS__ };
+    #define CONSTS( name, ... ) enum name { __VA_ARGS__ };
 
-	#define CONSTS_OPED( name, ... ) CONSTS( name, __VA_ARGS__ ); \
-		CONSTS_OPS( name )
+    #define CONSTS_OPED( name, ... ) CONSTS( name, __VA_ARGS__ ); \
+        CONSTS_OPS( name )
 
 #endif
 
@@ -74,7 +74,7 @@ public: \
     \
     void *GetVal() const \
     { \
-    	return _void; \
+        return _void; \
     } \
     \
     bln operator == ( const name &test ) const \
@@ -94,13 +94,13 @@ public: \
 };
 
 #ifdef DEFINE_VARARGS_SUPPORTED
-	#ifdef DEBUG
-		#define DBGCODE( ... ) __VA_ARGS__
-		#define RELCODE( ... )
-	#else
-		#define DBGCODE( ... )
-		#define RELCODE( ... ) __VA_ARGS__
-	#endif
+    #ifdef DEBUG
+        #define DBGCODE( ... ) __VA_ARGS__
+        #define RELCODE( ... )
+    #else
+        #define DBGCODE( ... )
+        #define RELCODE( ... ) __VA_ARGS__
+    #endif
 #endif
 
 #define NOT_IMPLEMENTED DBGBREAK
@@ -115,7 +115,7 @@ public: \
             #define STATIC_CHECK( what, str ) typedef char CONCAT( __a, __COUNTER__ )[ (what) != 0 ]
         #else
             //#error no static check for this condition
-			#define STATIC_CHECK( what, str )  /*  TODO: real check  */
+            #define STATIC_CHECK( what, str )  /*  TODO: real check  */
         #endif
     #endif
 #endif

@@ -16,39 +16,39 @@ namespace StdLib
 
 static void FORCEINLINE WriteToBuffer( FileIO::Private::CFileBasis *file, const void *what, ui32 howMuch )
 {
-	_MemCpy( file->buffer + file->bufferPos, what, howMuch );
-	file->stats.bytesToBufferWritten += howMuch;
-	++file->stats.writesToBufferCount;
-	file->bufferPos += howMuch;
+    _MemCpy( file->buffer + file->bufferPos, what, howMuch );
+    file->stats.bytesToBufferWritten += howMuch;
+    ++file->stats.writesToBufferCount;
+    file->bufferPos += howMuch;
 }
 
 static void FORCEINLINE ReadFromBuffer( FileIO::Private::CFileBasis *file, void *target, ui32 howMuch )
 {
-	_MemCpy( target, file->buffer + file->bufferPos, howMuch );
-	file->stats.bytesFromBufferReaded += howMuch;
-	++file->stats.readsFromBufferCount;
-	file->bufferPos += howMuch;
+    _MemCpy( target, file->buffer + file->bufferPos, howMuch );
+    file->stats.bytesFromBufferReaded += howMuch;
+    ++file->stats.readsFromBufferCount;
+    file->bufferPos += howMuch;
 }
 
 void FileIO::Private::Initialize( CFileBasis *file )
 {
-	file->handle = fileHandle_undefined;
-	_Clear( &file->stats );
-	file->buffer = 0;
-	file->is_customBuffer = false;
-	file->bufferSize = 0;
-	file->bufferPos = 0;
-	file->readBufferCurrentSize = 0;
-	file->is_reading = false;
+    file->handle = fileHandle_undefined;
+    _Clear( &file->stats );
+    file->buffer = 0;
+    file->is_customBuffer = false;
+    file->bufferSize = 0;
+    file->bufferPos = 0;
+    file->readBufferCurrentSize = 0;
+    file->is_reading = false;
 }
 
 void FileIO::Private::Destroy( CFileBasis *file )
 {
-	Close( file );
-	if( file->is_customBuffer )
-	{
-		::free( file->buffer );
-	}
+    Close( file );
+    if( file->is_customBuffer )
+    {
+        ::free( file->buffer );
+    }
 }
 
 const char *const *FileIO::Private::GetErrorsDesc()
@@ -67,25 +67,25 @@ NOINLINE bln FileIO::Private::Write( CFileBasis *file, const void *cp_source, ui
         {
             return false;
         }
-		file->is_reading = false;
+        file->is_reading = false;
 
         if( file->bufferSize - file->bufferPos < len )
         {
-			ui32 cpyLen = file->bufferSize - file->bufferPos;
-			WriteToBuffer( file, cp_source, cpyLen );
+            ui32 cpyLen = file->bufferSize - file->bufferPos;
+            WriteToBuffer( file, cp_source, cpyLen );
             if( !Flush( file ) )
             {
                 return false;
             }
 
-			len -= cpyLen;
-			cp_source = (byte *)cp_source + cpyLen;
-			if( len >= file->bufferSize )
-			{
-				return WriteToFile( file, cp_source, len );
-			}
+            len -= cpyLen;
+            cp_source = (byte *)cp_source + cpyLen;
+            if( len >= file->bufferSize )
+            {
+                return WriteToFile( file, cp_source, len );
+            }
         }
-		WriteToBuffer( file, cp_source, len );
+        WriteToBuffer( file, cp_source, len );
         return true;
     }
     ++file->stats.unbufferedWrites;
@@ -103,20 +103,20 @@ NOINLINE bln FileIO::Private::Read( CFileBasis *file, void *p_target, ui32 len, 
         {
             return false;
         }
-		file->is_reading = true;
-    
+        file->is_reading = true;
+
         if( file->readBufferCurrentSize - file->bufferPos < len )
         {
-			ui32 cpyLen = file->readBufferCurrentSize - file->bufferPos;
-			ReadFromBuffer( file, p_target, cpyLen );
-			DSA( p_readed, cpyLen );
-			len -= cpyLen;
-			p_target = (byte *)p_target + cpyLen;
+            ui32 cpyLen = file->readBufferCurrentSize - file->bufferPos;
+            ReadFromBuffer( file, p_target, cpyLen );
+            DSA( p_readed, cpyLen );
+            len -= cpyLen;
+            p_target = (byte *)p_target + cpyLen;
 
-			if( len >= file->bufferSize )
-			{
-				return ReadFromFile( file, p_target, len, p_readed );
-			}
+            if( len >= file->bufferSize )
+            {
+                return ReadFromFile( file, p_target, len, p_readed );
+            }
 
             file->readBufferCurrentSize = 0;
             if( !ReadFromFile( file, file->buffer, file->bufferSize, &file->readBufferCurrentSize ) )
@@ -127,11 +127,11 @@ NOINLINE bln FileIO::Private::Read( CFileBasis *file, void *p_target, ui32 len, 
         }
 
         ui32 cpyLen = Funcs::Min < ui32 >( file->readBufferCurrentSize - file->bufferPos, len );
-		ReadFromBuffer( file, p_target, cpyLen );
+        ReadFromBuffer( file, p_target, cpyLen );
         if( p_readed )
-		{
-			*p_readed += cpyLen;
-		}
+        {
+            *p_readed += cpyLen;
+        }
         return true;
     }
     ++file->stats.unbufferedReads;
@@ -153,45 +153,45 @@ NOINLINE bln FileIO::Private::BufferSet( CFileBasis *file, void *buffer, ui32 si
     {
         return false;
     }
-	if( buffer )
-	{
+    if( buffer )
+    {
         if( file->is_customBuffer )
         {
             ::free( file->buffer );
-			file->is_customBuffer = false;
-		}
-		file->buffer = (byte *)buffer;
-	}
-	else
-	{
+            file->is_customBuffer = false;
+        }
+        file->buffer = (byte *)buffer;
+    }
+    else
+    {
         if( file->is_customBuffer )
         {
-			if( size == 0 )
-			{
-				::free( file->buffer );
-				file->buffer = 0;
-			}
-			else
-			{
-				file->buffer = (byte *)::realloc( file->buffer, size );
-			}
-		}
-		else
-		{
-			if( size )
-			{
-				file->buffer = (byte *)::malloc( size );
-				file->is_customBuffer = true;
-			}
-			else
-			{
-				file->buffer = 0;
-			}
-		}
-	}
-	file->bufferPos = 0;
-	file->readBufferCurrentSize = 0;
-	file->bufferSize = size;
+            if( size == 0 )
+            {
+                ::free( file->buffer );
+                file->buffer = 0;
+            }
+            else
+            {
+                file->buffer = (byte *)::realloc( file->buffer, size );
+            }
+        }
+        else
+        {
+            if( size )
+            {
+                file->buffer = (byte *)::malloc( size );
+                file->is_customBuffer = true;
+            }
+            else
+            {
+                file->buffer = 0;
+            }
+        }
+    }
+    file->bufferPos = 0;
+    file->readBufferCurrentSize = 0;
+    file->bufferSize = size;
     return true;
 }
 

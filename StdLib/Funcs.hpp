@@ -28,19 +28,19 @@ namespace StdLib {
 #define DSA( pointer, assigning ) if( pointer ) *(pointer) = (assigning)
 
 #ifdef DEFINE_VARARGS_SUPPORTED
-	#ifdef DEBUG
-		typedef uiw va_return;
-		const va_return va_return_whatever = uiw_max;
-	#define VC( func, arg0, ... ) { CAny anys[] = { arg0 __VA_ARGS__ }; va_return ret = func( arg0 __VA_ARGS__ ); if( ret != va_return_whatever && ret != COUNTOF( anys ) ) DBGBREAK; }
-	#else
-		typedef void va_return;
-		#define va_return_whatever
-		#define VC( func, arg0, ... ) func( arg0 __VA_ARGS__ )
-	#endif
+    #ifdef DEBUG
+        typedef uiw va_return;
+        const va_return va_return_whatever = uiw_max;
+    #define VC( func, arg0, ... ) { CAny anys[] = { arg0 __VA_ARGS__ }; va_return ret = func( arg0 __VA_ARGS__ ); if( ret != va_return_whatever && ret != COUNTOF( anys ) ) DBGBREAK; }
+    #else
+        typedef void va_return;
+        #define va_return_whatever
+        #define VC( func, arg0, ... ) func( arg0 __VA_ARGS__ )
+    #endif
 #else
-	typedef void va_return;
-	#define va_return_whatever
-	#define VC( func, arg ) func arg
+    typedef void va_return;
+    #define va_return_whatever
+    #define VC( func, arg ) func arg
 #endif
 
 namespace Funcs
@@ -177,7 +177,7 @@ namespace Funcs
     #define _StrNCpy( dest, source, count ) (::strncpy( dest, source, count ), count)
     #define _StrNCpyCS( dest, source, minus ) (::strncpy( dest, source, sizeof(source) - minus ), sizeof(source) - minus)
 //    #define _StrNCpyCSC( dest, source, minus, counter ) (::strncpy( dest, source, sizeof(source) - minus ), counter += (sizeof(source) - minus), sizeof(source) - minus)
-	EXTERNAL void StrConnect( char *RSTR p_dest, const char *cp_first, const char *cp_second );
+    EXTERNAL void StrConnect( char *RSTR p_dest, const char *cp_first, const char *cp_second );
     EXTERNAL void StrCpyWONull( char *RSTR p_dest, const char *cp_source );
     EXTERNAL void StrCpyWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
     EXTERNAL uiw StrCpyAndCount( char *RSTR p_dest, const char *cp_source );
@@ -256,7 +256,7 @@ namespace Funcs
     EXTERNAL uiw F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf );
 
     EXTERNAL va_return MemoryDistribute( const void *cp_mem, uiw memSize, ui32 distribsCount, void **pp_distrib0, ui32 distrib0Size, ... );
-	
+
     EXTERNAL va_return PrintToStrArgList( char *p_str, uiw maxLen, uiw *printedLen, const char *cp_fmt, va_list args );
     EXTERNAL va_return PrintToStr( char *p_str, uiw maxLen, uiw *printedLen, const char *cp_fmt, ... );
 
@@ -388,15 +388,15 @@ namespace Funcs
 
     template < typename X, typename Y > X BinCopy( const Y &source )
     {
-    	ASSUME( sizeof(X) == sizeof(Y) );
-    	return *(X *)&source;
+        ASSUME( sizeof(X) == sizeof(Y) );
+        return *(X *)&source;
     }
 
     template < typename X, typename Y > X BinAssign( X *target, const Y &source )
     {
-    	ASSUME( target && sizeof(X) == sizeof(Y) );
+        ASSUME( target && sizeof(X) == sizeof(Y) );
         *target = *(X *)&source;
-    	return *target;
+        return *target;
     }
 
     template < typename X > X MaxValue( ui32 bits )
@@ -731,13 +731,13 @@ namespace Funcs
 
     template < typename X > X CondReset( X val, bln is_reset )  //  set value to 0 if is_reset is true
     {
-    	typename IntWithSize < sizeof(X) * 8 >::uint_t test = *(typename IntWithSize < sizeof(X) * 8 >::uint_t *)&val & (*(ui8 *)&is_reset - 1);
+        typename IntWithSize < sizeof(X) * 8 >::uint_t test = *(typename IntWithSize < sizeof(X) * 8 >::uint_t *)&val & (*(ui8 *)&is_reset - 1);
         return *(X *)&test;
     }
 
     template < typename X > X CondLeave( X val, bln is_reset )  //  leave value unchanged if is_reset is true
     {
-    	typename IntWithSize < sizeof(X) * 8 >::uint_t test = *(typename IntWithSize < sizeof(X) * 8 >::uint_t *)&val & -*(ui8 *)&is_reset;
+        typename IntWithSize < sizeof(X) * 8 >::uint_t test = *(typename IntWithSize < sizeof(X) * 8 >::uint_t *)&val & -*(ui8 *)&is_reset;
         return *(X *)&test;
     }
 }

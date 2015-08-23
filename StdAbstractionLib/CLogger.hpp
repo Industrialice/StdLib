@@ -35,8 +35,8 @@ public:
     void IsOnSet( bln is_on );
     bln IsOnGet() const;
     bln IsOnToggle();  //  return new state
-	bln IsMultithreadedGet() const;
-	void IsMitlithreadedSet( bln is_multithreaded );
+    bln IsMultithreadedGet() const;
+    void IsMitlithreadedSet( bln is_multithreaded );
     const char *NameGet() const;
     static CLogger *Create( const char *cp_name, bln is_on, bln is_multithreaded, ui32 bufferSize = 2048 );
     static void Delete( CLogger *po_logger );

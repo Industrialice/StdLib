@@ -618,50 +618,50 @@ M3x2::M3x2()
 
 M3x2::M3x2( f32 e00, f32 e01, f32 e10, f32 e11, f32 e20, f32 e21 )
 {
-	this->e00 = e00;
-	this->e01 = e01;
+    this->e00 = e00;
+    this->e01 = e01;
 
-	this->e10 = e10;
-	this->e11 = e11;
+    this->e10 = e10;
+    this->e11 = e11;
 
-	this->e20 = e20;
-	this->e21 = e21;
+    this->e20 = e20;
+    this->e21 = e21;
 }
 
 M3x2::M3x2( const Vec2 &o_row0, const Vec2 &o_row1, const Vec2 &o_row2 )
 {
-	this->e00 = o_row0.x;
-	this->e01 = o_row0.y;
+    this->e00 = o_row0.x;
+    this->e01 = o_row0.y;
 
-	this->e10 = o_row1.x;
-	this->e11 = o_row1.y;
+    this->e10 = o_row1.x;
+    this->e11 = o_row1.y;
 
-	this->e20 = o_row2.x;
-	this->e21 = o_row2.y;
+    this->e20 = o_row2.x;
+    this->e21 = o_row2.y;
 }
 
 M3x2::M3x2( const M4x4 &o_m )
 {
-	this->e00 = o_m.e00;
-	this->e01 = o_m.e01;
+    this->e00 = o_m.e00;
+    this->e01 = o_m.e01;
 
-	this->e10 = o_m.e10;
-	this->e11 = o_m.e11;
+    this->e10 = o_m.e10;
+    this->e11 = o_m.e11;
 
-	this->e20 = o_m.e20;
-	this->e21 = o_m.e21;
+    this->e20 = o_m.e20;
+    this->e21 = o_m.e21;
 }
-    
+
 f32 *M3x2::operator []( uiw index )
 {
-	ASSUME( index < 3 );
-	return this->m[ index ];
+    ASSUME( index < 3 );
+    return this->m[ index ];
 }
 
 const f32 *M3x2::operator []( uiw index ) const
 {
-	ASSUME( index < 3 );
-	return this->m[ index ];
+    ASSUME( index < 3 );
+    return this->m[ index ];
 }
 
 //////////  M2x2  //////////
@@ -896,7 +896,7 @@ const f32 &Vec4::operator []( uiw index ) const
 
 //////////  I32Color  //////////
 
-I32Color::I32Color() 
+I32Color::I32Color()
 {
 }
 

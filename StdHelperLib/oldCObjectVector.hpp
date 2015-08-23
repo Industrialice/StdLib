@@ -16,18 +16,18 @@ template < typename X, typename reservator, typename allocator, typename count_t
 protected:
     typedef CBaseVector < X, reservator, allocator, count_type, tis_selfManaged, static_size > parentType;
 
-	using parentType::_arr;
-	using parentType::_count;
+    using parentType::_arr;
+    using parentType::_count;
     DBGCODE( using parentType::_is_constructed; );
 
-	void MoveElements( count_type targetIndex, count_type sourceIndex, count_type count )
-	{
-		for( ; count; --count )
-		{
-			new (&_arr[ targetIndex++ ]) X( _arr[ sourceIndex ] );
-			_arr[ sourceIndex++ ].~X();
-		}
-	}
+    void MoveElements( count_type targetIndex, count_type sourceIndex, count_type count )
+    {
+        for( ; count; --count )
+        {
+            new (&_arr[ targetIndex++ ]) X( _arr[ sourceIndex ] );
+            _arr[ sourceIndex++ ].~X();
+        }
+    }
 
 public:
     typedef _CObjectVectorBasis < X, reservator, allocator, count_type, tis_selfManaged, static_size, tis_checkForPod > ownType;
@@ -65,7 +65,7 @@ public:
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == false, "you should not use object vectors for pod types" );
         #endif
     }
-    
+
     _CObjectVectorBasis( const X &source, count_type reserve )
     {
         #ifdef ISPOD_SUPPORTED
@@ -173,7 +173,7 @@ public:
     _CObjectVectorBasis &PushFront( const X &val )
     {
         this->_ProcReservationUp( _count + 1 );
-		MoveElements( 1, 0, _count );
+        MoveElements( 1, 0, _count );
         new (_arr) X( val );
         ++_count;
         return *this;
@@ -182,7 +182,7 @@ public:
     _CObjectVectorBasis &PushFrontEmpty()
     {
         this->_ProcReservationUp( _count + 1 );
-		MoveElements( 1, 0, _count );
+        MoveElements( 1, 0, _count );
         new (_arr) X();
         ++_count;
         return *this;
@@ -191,7 +191,7 @@ public:
     _CObjectVectorBasis &PushFrontArr( const X *arr, count_type count )
     {
         this->_ProcReservationUp( _count + count );
-		MoveElements( count, 0, _count );
+        MoveElements( count, 0, _count );
         for( uiw cpyIndex = 0; cpyIndex < count; ++cpyIndex )
         {
             new (_arr + cpyIndex) X( arr[ cpyIndex ] );
@@ -203,7 +203,7 @@ public:
     _CObjectVectorBasis &PushFrontVec( const ownType &o_vec )
     {
         this->_ProcReservationUp( _count + o_vec.Size() );
-		MoveElements( o_vec.Size(), 0, _count );
+        MoveElements( o_vec.Size(), 0, _count );
         for( uiw cpyIndex = 0; cpyIndex < o_vec.Size(); ++cpyIndex )
         {
             new (_arr + cpyIndex) X( o_vec[ cpyIndex ] );
@@ -264,7 +264,7 @@ public:
         ASSUME( _count );
         --_count;
         _arr[ 0 ].~X();
-		MoveElements( 0, 1, _count );
+        MoveElements( 0, 1, _count );
         this->_ProcReservationDown( _count );
         return *this;
     }
@@ -275,7 +275,7 @@ public:
         {
             --_count;
             _arr[ 0 ].~X();
-			MoveElements( 0, 1, _count );
+            MoveElements( 0, 1, _count );
             this->_ProcReservationDown( _count );
         }
         return *this;
@@ -289,7 +289,7 @@ public:
             _arr[ index ].~X();
         }
         _count -= count;
-		MoveElements( 0, count, _count );
+        MoveElements( 0, count, _count );
         this->_ProcReservationDown( _count );
         return *this;
     }
@@ -311,7 +311,7 @@ public:
                 _arr[ index ].~X();
             }
             _count -= count;
-			MoveElements( 0, count, _count );
+            MoveElements( 0, count, _count );
         }
         this->_ProcReservationDown( _count );
         return *this;
@@ -320,7 +320,7 @@ public:
     _CObjectVectorBasis &Insert( count_type index, const X &val )
     {
         this->_ProcReservationUp( _count + 1 );
-		MoveElements( index + 1, index, _count - index );
+        MoveElements( index + 1, index, _count - index );
         new (_arr + index) X( val );
         ++_count;
         return *this;
@@ -329,7 +329,7 @@ public:
     _CObjectVectorBasis &InsertDefault( count_type index )
     {
         this->_ProcReservationUp( _count + 1 );
-		MoveElements( index + 1, index, _count - index );
+        MoveElements( index + 1, index, _count - index );
         new (_arr + index) X();
         ++_count;
         return *this;
@@ -338,7 +338,7 @@ public:
     _CObjectVectorBasis &InsertDefaultArr( count_type index, count_type count )
     {
         this->_ProcReservationUp( _count + count );
-		MoveElements( index + count, index, _count - index );
+        MoveElements( index + count, index, _count - index );
         for( uiw cpyIndex = 0; cpyIndex < count; ++cpyIndex )
         {
             new (_arr + cpyIndex) X();
@@ -350,7 +350,7 @@ public:
     _CObjectVectorBasis &InsertArr( count_type index, const X *arr, count_type count )
     {
         this->_ProcReservationUp( _count + count );
-		MoveElements( index + count, index, _count - index );
+        MoveElements( index + count, index, _count - index );
         for( uiw cpyIndex = 0; cpyIndex < count; ++cpyIndex )
         {
             new (_arr + index + cpyIndex) X( arr[ cpyIndex ] );
@@ -362,7 +362,7 @@ public:
     _CObjectVectorBasis &InsertVec( count_type index, const ownType &o_vec )
     {
         this->_ProcReservationUp( _count + o_vec.Size() );
-		MoveElements( index + o_vec.Size(), index, _count - index );
+        MoveElements( index + o_vec.Size(), index, _count - index );
         for( uiw cpyIndex = 0; cpyIndex < o_vec.Size(); ++cpyIndex )
         {
             new (_arr + index + cpyIndex) X( o_vec[ cpyIndex ] );
@@ -424,7 +424,7 @@ public:
         {
             _arr[ startIndex ].~X();
         }
-		MoveElements( start, start + count, _count - start - count );
+        MoveElements( start, start + count, _count - start - count );
         _count -= count;
         this->_ProcReservationDown( _count );
         return *this;
@@ -435,10 +435,10 @@ public:
 
 template < typename X, uiw static_size, typename count_type = uiw, bln tis_selfManaged = true, bln tis_checkForPod = false > class CObjectVectorStatic : public Private::_CObjectVectorBasis < X, void, void, count_type, tis_selfManaged, static_size, tis_checkForPod >
 {
-	typedef Private::_CObjectVectorBasis < X, void, void, count_type, tis_selfManaged, static_size, tis_checkForPod > parentType;
+    typedef Private::_CObjectVectorBasis < X, void, void, count_type, tis_selfManaged, static_size, tis_checkForPod > parentType;
 
-	using parentType::_arr;
-	using parentType::_count;
+    using parentType::_arr;
+    using parentType::_count;
     DBGCODE( using parentType::_is_constructed; );
 
 public:
@@ -449,7 +449,7 @@ public:
     explicit CObjectVectorStatic( count_type reserve ) : parentType( reserve ) {  /*  void  */  }
 
     explicit CObjectVectorStatic( CNoInit ) : parentType( CNoInit() ) {  /*  void  */  }
-    
+
     CObjectVectorStatic( const X &source, count_type reserve ) : parentType( source, reserve ) {  /*  void  */  }
 
     CObjectVectorStatic( const ownType &source )
@@ -505,10 +505,10 @@ public:
 
 template < typename X, typename reservator = void, typename allocator = Allocator::Simple < X >, typename count_type = uiw, bln tis_selfManaged = true, bln tis_checkForPod = false > class CObjectVector : public Private::_CObjectVectorBasis < X, reservator, allocator, count_type, tis_selfManaged, 0, tis_checkForPod >
 {
-	typedef Private::_CObjectVectorBasis < X, reservator, allocator, count_type, tis_selfManaged, 0, tis_checkForPod > parentType;
+    typedef Private::_CObjectVectorBasis < X, reservator, allocator, count_type, tis_selfManaged, 0, tis_checkForPod > parentType;
 
-	using parentType::_arr;
-	using parentType::_count;
+    using parentType::_arr;
+    using parentType::_count;
     DBGCODE( using parentType::_is_constructed; );
 
 public:
@@ -519,7 +519,7 @@ public:
     explicit CObjectVector( count_type reserve ) : parentType( reserve ) {  /*  void  */  }
 
     explicit CObjectVector( CNoInit ) : parentType( CNoInit() ) {  /*  void  */  }
-    
+
     CObjectVector( const X &source, count_type reserve ) : parentType( source, reserve ) {  /*  void  */  }
 
     CObjectVector( const ownType &source )

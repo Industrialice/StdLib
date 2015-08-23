@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 
+#include "TextFixer.hpp"
 #include <Misc.hpp>
 //#include <FileIO.hpp>
 //#include <Files.hpp>
@@ -147,98 +148,98 @@ namespace LiceMath
 {
     static void M4x4InverseTranspose( m4x4 *RSTR pout, const m4x4 *pm )
     {
-	    f32 SubFactor00 = pm->m[2][2] * pm->m[3][3] - pm->m[3][2] * pm->m[2][3];
-	    f32 SubFactor01 = pm->m[2][1] * pm->m[3][3] - pm->m[3][1] * pm->m[2][3];
-	    f32 SubFactor02 = pm->m[2][1] * pm->m[3][2] - pm->m[3][1] * pm->m[2][2];
-	    f32 SubFactor03 = pm->m[2][0] * pm->m[3][3] - pm->m[3][0] * pm->m[2][3];
-	    f32 SubFactor04 = pm->m[2][0] * pm->m[3][2] - pm->m[3][0] * pm->m[2][2];
-	    f32 SubFactor05 = pm->m[2][0] * pm->m[3][1] - pm->m[3][0] * pm->m[2][1];
-	    f32 SubFactor06 = pm->m[1][2] * pm->m[3][3] - pm->m[3][2] * pm->m[1][3];
-	    f32 SubFactor07 = pm->m[1][1] * pm->m[3][3] - pm->m[3][1] * pm->m[1][3];
-	    f32 SubFactor08 = pm->m[1][1] * pm->m[3][2] - pm->m[3][1] * pm->m[1][2];
-	    f32 SubFactor09 = pm->m[1][0] * pm->m[3][3] - pm->m[3][0] * pm->m[1][3];
-	    f32 SubFactor10 = pm->m[1][0] * pm->m[3][2] - pm->m[3][0] * pm->m[1][2];
-	    f32 SubFactor11 = pm->m[1][1] * pm->m[3][3] - pm->m[3][1] * pm->m[1][3];
-	    f32 SubFactor12 = pm->m[1][0] * pm->m[3][1] - pm->m[3][0] * pm->m[1][1];
-	    f32 SubFactor13 = pm->m[1][2] * pm->m[2][3] - pm->m[2][2] * pm->m[1][3];
-	    f32 SubFactor14 = pm->m[1][1] * pm->m[2][3] - pm->m[2][1] * pm->m[1][3];
-	    f32 SubFactor15 = pm->m[1][1] * pm->m[2][2] - pm->m[2][1] * pm->m[1][2];
-	    f32 SubFactor16 = pm->m[1][0] * pm->m[2][3] - pm->m[2][0] * pm->m[1][3];
-	    f32 SubFactor17 = pm->m[1][0] * pm->m[2][2] - pm->m[2][0] * pm->m[1][2];
-	    f32 SubFactor18 = pm->m[1][0] * pm->m[2][1] - pm->m[2][0] * pm->m[1][1];
+        f32 SubFactor00 = pm->m[2][2] * pm->m[3][3] - pm->m[3][2] * pm->m[2][3];
+        f32 SubFactor01 = pm->m[2][1] * pm->m[3][3] - pm->m[3][1] * pm->m[2][3];
+        f32 SubFactor02 = pm->m[2][1] * pm->m[3][2] - pm->m[3][1] * pm->m[2][2];
+        f32 SubFactor03 = pm->m[2][0] * pm->m[3][3] - pm->m[3][0] * pm->m[2][3];
+        f32 SubFactor04 = pm->m[2][0] * pm->m[3][2] - pm->m[3][0] * pm->m[2][2];
+        f32 SubFactor05 = pm->m[2][0] * pm->m[3][1] - pm->m[3][0] * pm->m[2][1];
+        f32 SubFactor06 = pm->m[1][2] * pm->m[3][3] - pm->m[3][2] * pm->m[1][3];
+        f32 SubFactor07 = pm->m[1][1] * pm->m[3][3] - pm->m[3][1] * pm->m[1][3];
+        f32 SubFactor08 = pm->m[1][1] * pm->m[3][2] - pm->m[3][1] * pm->m[1][2];
+        f32 SubFactor09 = pm->m[1][0] * pm->m[3][3] - pm->m[3][0] * pm->m[1][3];
+        f32 SubFactor10 = pm->m[1][0] * pm->m[3][2] - pm->m[3][0] * pm->m[1][2];
+        f32 SubFactor11 = pm->m[1][1] * pm->m[3][3] - pm->m[3][1] * pm->m[1][3];
+        f32 SubFactor12 = pm->m[1][0] * pm->m[3][1] - pm->m[3][0] * pm->m[1][1];
+        f32 SubFactor13 = pm->m[1][2] * pm->m[2][3] - pm->m[2][2] * pm->m[1][3];
+        f32 SubFactor14 = pm->m[1][1] * pm->m[2][3] - pm->m[2][1] * pm->m[1][3];
+        f32 SubFactor15 = pm->m[1][1] * pm->m[2][2] - pm->m[2][1] * pm->m[1][2];
+        f32 SubFactor16 = pm->m[1][0] * pm->m[2][3] - pm->m[2][0] * pm->m[1][3];
+        f32 SubFactor17 = pm->m[1][0] * pm->m[2][2] - pm->m[2][0] * pm->m[1][2];
+        f32 SubFactor18 = pm->m[1][0] * pm->m[2][1] - pm->m[2][0] * pm->m[1][1];
 
-	    pout->m[0][0] = + (pm->m[1][1] * SubFactor00 - pm->m[1][2] * SubFactor01 + pm->m[1][3] * SubFactor02);
-	    pout->m[0][1] = - (pm->m[1][0] * SubFactor00 - pm->m[1][2] * SubFactor03 + pm->m[1][3] * SubFactor04);
-	    pout->m[0][2] = + (pm->m[1][0] * SubFactor01 - pm->m[1][1] * SubFactor03 + pm->m[1][3] * SubFactor05);
-	    pout->m[0][3] = - (pm->m[1][0] * SubFactor02 - pm->m[1][1] * SubFactor04 + pm->m[1][2] * SubFactor05);
+        pout->m[0][0] = + (pm->m[1][1] * SubFactor00 - pm->m[1][2] * SubFactor01 + pm->m[1][3] * SubFactor02);
+        pout->m[0][1] = - (pm->m[1][0] * SubFactor00 - pm->m[1][2] * SubFactor03 + pm->m[1][3] * SubFactor04);
+        pout->m[0][2] = + (pm->m[1][0] * SubFactor01 - pm->m[1][1] * SubFactor03 + pm->m[1][3] * SubFactor05);
+        pout->m[0][3] = - (pm->m[1][0] * SubFactor02 - pm->m[1][1] * SubFactor04 + pm->m[1][2] * SubFactor05);
 
-	    pout->m[1][0] = - (pm->m[0][1] * SubFactor00 - pm->m[0][2] * SubFactor01 + pm->m[0][3] * SubFactor02);
-	    pout->m[1][1] = + (pm->m[0][0] * SubFactor00 - pm->m[0][2] * SubFactor03 + pm->m[0][3] * SubFactor04);
-	    pout->m[1][2] = - (pm->m[0][0] * SubFactor01 - pm->m[0][1] * SubFactor03 + pm->m[0][3] * SubFactor05);
-	    pout->m[1][3] = + (pm->m[0][0] * SubFactor02 - pm->m[0][1] * SubFactor04 + pm->m[0][2] * SubFactor05);
+        pout->m[1][0] = - (pm->m[0][1] * SubFactor00 - pm->m[0][2] * SubFactor01 + pm->m[0][3] * SubFactor02);
+        pout->m[1][1] = + (pm->m[0][0] * SubFactor00 - pm->m[0][2] * SubFactor03 + pm->m[0][3] * SubFactor04);
+        pout->m[1][2] = - (pm->m[0][0] * SubFactor01 - pm->m[0][1] * SubFactor03 + pm->m[0][3] * SubFactor05);
+        pout->m[1][3] = + (pm->m[0][0] * SubFactor02 - pm->m[0][1] * SubFactor04 + pm->m[0][2] * SubFactor05);
 
-	    pout->m[2][0] = + (pm->m[0][1] * SubFactor06 - pm->m[0][2] * SubFactor07 + pm->m[0][3] * SubFactor08);
-	    pout->m[2][1] = - (pm->m[0][0] * SubFactor06 - pm->m[0][2] * SubFactor09 + pm->m[0][3] * SubFactor10);
-	    pout->m[2][2] = + (pm->m[0][0] * SubFactor11 - pm->m[0][1] * SubFactor09 + pm->m[0][3] * SubFactor12);
-	    pout->m[2][3] = - (pm->m[0][0] * SubFactor08 - pm->m[0][1] * SubFactor10 + pm->m[0][2] * SubFactor12);
+        pout->m[2][0] = + (pm->m[0][1] * SubFactor06 - pm->m[0][2] * SubFactor07 + pm->m[0][3] * SubFactor08);
+        pout->m[2][1] = - (pm->m[0][0] * SubFactor06 - pm->m[0][2] * SubFactor09 + pm->m[0][3] * SubFactor10);
+        pout->m[2][2] = + (pm->m[0][0] * SubFactor11 - pm->m[0][1] * SubFactor09 + pm->m[0][3] * SubFactor12);
+        pout->m[2][3] = - (pm->m[0][0] * SubFactor08 - pm->m[0][1] * SubFactor10 + pm->m[0][2] * SubFactor12);
 
-	    pout->m[3][0] = - (pm->m[0][1] * SubFactor13 - pm->m[0][2] * SubFactor14 + pm->m[0][3] * SubFactor15);
-	    pout->m[3][1] = + (pm->m[0][0] * SubFactor13 - pm->m[0][2] * SubFactor16 + pm->m[0][3] * SubFactor17);
-	    pout->m[3][2] = - (pm->m[0][0] * SubFactor14 - pm->m[0][1] * SubFactor16 + pm->m[0][3] * SubFactor18);
-	    pout->m[3][3] = + (pm->m[0][0] * SubFactor15 - pm->m[0][1] * SubFactor17 + pm->m[0][2] * SubFactor18);
+        pout->m[3][0] = - (pm->m[0][1] * SubFactor13 - pm->m[0][2] * SubFactor14 + pm->m[0][3] * SubFactor15);
+        pout->m[3][1] = + (pm->m[0][0] * SubFactor13 - pm->m[0][2] * SubFactor16 + pm->m[0][3] * SubFactor17);
+        pout->m[3][2] = - (pm->m[0][0] * SubFactor14 - pm->m[0][1] * SubFactor16 + pm->m[0][3] * SubFactor18);
+        pout->m[3][3] = + (pm->m[0][0] * SubFactor15 - pm->m[0][1] * SubFactor17 + pm->m[0][2] * SubFactor18);
 
-	    f32 det = + pm->m[0][0] * pout->m[0][0] + pm->m[0][1] * pout->m[0][1] + pm->m[0][2] * pout->m[0][2] + pm->m[0][3] * pout->m[0][3];
+        f32 det = + pm->m[0][0] * pout->m[0][0] + pm->m[0][1] * pout->m[0][1] + pm->m[0][2] * pout->m[0][2] + pm->m[0][3] * pout->m[0][3];
         f32 revDet = 1.f / det;
 
-	    LiceMath::M4x4MultScalarInplace( pout, revDet );
+        LiceMath::M4x4MultScalarInplace( pout, revDet );
     }
 
     static void M4x4InverseTranspose4x3( m4x4 *RSTR pout, const m4x3 *pm )
     {
-	    f32 SubFactor00 = pm->m[2][2];
-	    f32 SubFactor01 = pm->m[2][1];
-	    f32 SubFactor02 = pm->m[2][1] * pm->m[3][2] - pm->m[3][1] * pm->m[2][2];
-	    f32 SubFactor03 = pm->m[2][0];
-	    f32 SubFactor04 = pm->m[2][0] * pm->m[3][2] - pm->m[3][0] * pm->m[2][2];
-	    f32 SubFactor05 = pm->m[2][0] * pm->m[3][1] - pm->m[3][0] * pm->m[2][1];
-	    f32 SubFactor06 = pm->m[1][2];
-	    f32 SubFactor07 = pm->m[1][1];
-	    f32 SubFactor08 = pm->m[1][1] * pm->m[3][2] - pm->m[3][1] * pm->m[1][2];
-	    f32 SubFactor09 = pm->m[1][0];
-	    f32 SubFactor10 = pm->m[1][0] * pm->m[3][2] - pm->m[3][0] * pm->m[1][2];
-	    f32 SubFactor11 = pm->m[1][1];
-	    f32 SubFactor12 = pm->m[1][0] * pm->m[3][1] - pm->m[3][0] * pm->m[1][1];
-	    f32 SubFactor13 = 0.f;
-	    f32 SubFactor14 = 0.f;
-	    f32 SubFactor15 = pm->m[1][1] * pm->m[2][2] - pm->m[2][1] * pm->m[1][2];
-	    f32 SubFactor16 = 0.f;
-	    f32 SubFactor17 = pm->m[1][0] * pm->m[2][2] - pm->m[2][0] * pm->m[1][2];
-	    f32 SubFactor18 = pm->m[1][0] * pm->m[2][1] - pm->m[2][0] * pm->m[1][1];
+        f32 SubFactor00 = pm->m[2][2];
+        f32 SubFactor01 = pm->m[2][1];
+        f32 SubFactor02 = pm->m[2][1] * pm->m[3][2] - pm->m[3][1] * pm->m[2][2];
+        f32 SubFactor03 = pm->m[2][0];
+        f32 SubFactor04 = pm->m[2][0] * pm->m[3][2] - pm->m[3][0] * pm->m[2][2];
+        f32 SubFactor05 = pm->m[2][0] * pm->m[3][1] - pm->m[3][0] * pm->m[2][1];
+        f32 SubFactor06 = pm->m[1][2];
+        f32 SubFactor07 = pm->m[1][1];
+        f32 SubFactor08 = pm->m[1][1] * pm->m[3][2] - pm->m[3][1] * pm->m[1][2];
+        f32 SubFactor09 = pm->m[1][0];
+        f32 SubFactor10 = pm->m[1][0] * pm->m[3][2] - pm->m[3][0] * pm->m[1][2];
+        f32 SubFactor11 = pm->m[1][1];
+        f32 SubFactor12 = pm->m[1][0] * pm->m[3][1] - pm->m[3][0] * pm->m[1][1];
+        f32 SubFactor13 = 0.f;
+        f32 SubFactor14 = 0.f;
+        f32 SubFactor15 = pm->m[1][1] * pm->m[2][2] - pm->m[2][1] * pm->m[1][2];
+        f32 SubFactor16 = 0.f;
+        f32 SubFactor17 = pm->m[1][0] * pm->m[2][2] - pm->m[2][0] * pm->m[1][2];
+        f32 SubFactor18 = pm->m[1][0] * pm->m[2][1] - pm->m[2][0] * pm->m[1][1];
 
-	    pout->m[0][0] = + (pm->m[1][1] * SubFactor00 - pm->m[1][2] * SubFactor01);
-	    pout->m[0][1] = - (pm->m[1][0] * SubFactor00 - pm->m[1][2] * SubFactor03);
-	    pout->m[0][2] = + (pm->m[1][0] * SubFactor01 - pm->m[1][1] * SubFactor03);
-	    pout->m[0][3] = - (pm->m[1][0] * SubFactor02 - pm->m[1][1] * SubFactor04 + pm->m[1][2] * SubFactor05);
+        pout->m[0][0] = + (pm->m[1][1] * SubFactor00 - pm->m[1][2] * SubFactor01);
+        pout->m[0][1] = - (pm->m[1][0] * SubFactor00 - pm->m[1][2] * SubFactor03);
+        pout->m[0][2] = + (pm->m[1][0] * SubFactor01 - pm->m[1][1] * SubFactor03);
+        pout->m[0][3] = - (pm->m[1][0] * SubFactor02 - pm->m[1][1] * SubFactor04 + pm->m[1][2] * SubFactor05);
 
-	    pout->m[1][0] = - (pm->m[0][1] * SubFactor00 - pm->m[0][2] * SubFactor01);
-	    pout->m[1][1] = + (pm->m[0][0] * SubFactor00 - pm->m[0][2] * SubFactor03);
-	    pout->m[1][2] = - (pm->m[0][0] * SubFactor01 - pm->m[0][1] * SubFactor03);
-	    pout->m[1][3] = + (pm->m[0][0] * SubFactor02 - pm->m[0][1] * SubFactor04 + pm->m[0][2] * SubFactor05);
+        pout->m[1][0] = - (pm->m[0][1] * SubFactor00 - pm->m[0][2] * SubFactor01);
+        pout->m[1][1] = + (pm->m[0][0] * SubFactor00 - pm->m[0][2] * SubFactor03);
+        pout->m[1][2] = - (pm->m[0][0] * SubFactor01 - pm->m[0][1] * SubFactor03);
+        pout->m[1][3] = + (pm->m[0][0] * SubFactor02 - pm->m[0][1] * SubFactor04 + pm->m[0][2] * SubFactor05);
 
-	    pout->m[2][0] = + (pm->m[0][1] * SubFactor06 - pm->m[0][2] * SubFactor07);
-	    pout->m[2][1] = - (pm->m[0][0] * SubFactor06 - pm->m[0][2] * SubFactor09);
-	    pout->m[2][2] = + (pm->m[0][0] * SubFactor11 - pm->m[0][1] * SubFactor09);
-	    pout->m[2][3] = - (pm->m[0][0] * SubFactor08 - pm->m[0][1] * SubFactor10 + pm->m[0][2] * SubFactor12);
+        pout->m[2][0] = + (pm->m[0][1] * SubFactor06 - pm->m[0][2] * SubFactor07);
+        pout->m[2][1] = - (pm->m[0][0] * SubFactor06 - pm->m[0][2] * SubFactor09);
+        pout->m[2][2] = + (pm->m[0][0] * SubFactor11 - pm->m[0][1] * SubFactor09);
+        pout->m[2][3] = - (pm->m[0][0] * SubFactor08 - pm->m[0][1] * SubFactor10 + pm->m[0][2] * SubFactor12);
 
-	    pout->m[3][0] = - (pm->m[0][1] * SubFactor13 - pm->m[0][2] * SubFactor14);
-	    pout->m[3][1] = + (pm->m[0][0] * SubFactor13 - pm->m[0][2] * SubFactor16);
-	    pout->m[3][2] = - (pm->m[0][0] * SubFactor14 - pm->m[0][1] * SubFactor16);
-	    pout->m[3][3] = + (pm->m[0][0] * SubFactor15 - pm->m[0][1] * SubFactor17 + pm->m[0][2] * SubFactor18);
+        pout->m[3][0] = - (pm->m[0][1] * SubFactor13 - pm->m[0][2] * SubFactor14);
+        pout->m[3][1] = + (pm->m[0][0] * SubFactor13 - pm->m[0][2] * SubFactor16);
+        pout->m[3][2] = - (pm->m[0][0] * SubFactor14 - pm->m[0][1] * SubFactor16);
+        pout->m[3][3] = + (pm->m[0][0] * SubFactor15 - pm->m[0][1] * SubFactor17 + pm->m[0][2] * SubFactor18);
 
-	    f32 det = + pm->m[0][0] * pout->m[0][0] + pm->m[0][1] * pout->m[0][1] + pm->m[0][2] * pout->m[0][2];
+        f32 det = + pm->m[0][0] * pout->m[0][0] + pm->m[0][1] * pout->m[0][1] + pm->m[0][2] * pout->m[0][2];
         f32 revDet = 1.f / det;
 
-	    LiceMath::M4x4MultScalarInplace( pout, revDet );
+        LiceMath::M4x4MultScalarInplace( pout, revDet );
     }
 }
 }
@@ -268,44 +269,44 @@ typedef void (*ActionFunc)();
 
 void NewLineFunc()
 {
-	::printf( "\n" );
+    ::printf( "\n" );
 }
 
 void NextLineFunc()
 {
-	COORD pos = { 30, CurLine++ };
-	::SetConsoleCursorPosition( ::GetStdHandle( STD_OUTPUT_HANDLE ), pos );
+    COORD pos = { 30, CurLine++ };
+    ::SetConsoleCursorPosition( ::GetStdHandle( STD_OUTPUT_HANDLE ), pos );
 }
 
 ActionFunc af = NewLineFunc;
 
 struct SS : CharMovable
 {
-	i32 v;
+    i32 v;
 
-	~SS()
-	{
-		::printf( "%sdestr of %i", modifier, v );
-		af();
-	}
+    ~SS()
+    {
+        ::printf( "%sdestr of %i", modifier, v );
+        af();
+    }
 
-	SS() : v( 0 )
-	{
-		::printf( "%sdef constr", modifier );
-		af();
-	}
+    SS() : v( 0 )
+    {
+        ::printf( "%sdef constr", modifier );
+        af();
+    }
 
-	SS( i32 source ) : v( source )
-	{
-		::printf( "%sconstr with %i", modifier, source );
-		af();
-	}
+    SS( i32 source ) : v( source )
+    {
+        ::printf( "%sconstr with %i", modifier, source );
+        af();
+    }
 
-	SS( const SS &source ) : v( source.v )
-	{
-		::printf( "%scopy of %i", modifier, source.v );
-		af();
-	}
+    SS( const SS &source ) : v( source.v )
+    {
+        ::printf( "%scopy of %i", modifier, source.v );
+        af();
+    }
 };
 #endif
 
@@ -314,8 +315,6 @@ struct SS : CharMovable
 #include <CThread.hpp>
 #include <FileIO.hpp>
 #include <Files.hpp>
-
-void Fix();
 
 void Words();
 
@@ -343,14 +342,14 @@ static void EnumFilesCallback( Files::CFileEnumInfo *info, void * )
     char name[ 256 ];
     Files::ExtractNameFromString( info->PNN(), name );
     ::printf( "%s\n", info->PNN() );
-    
-    /*STARTUPINFO si = {};
-	si.cb = sizeof(si);
 
-	PROCESS_INFORMATION pi = {};
+    /*STARTUPINFO si = {};
+    si.cb = sizeof(si);
+
+    PROCESS_INFORMATION pi = {};
 
     ::printf( "%s\n", buf );
-	BOOL result = ::CreateProcessA( 0, buf, 0, 0, FALSE, 0, 0, 0, &si, &pi );
+    BOOL result = ::CreateProcessA( 0, buf, 0, 0, FALSE, 0, 0, 0, &si, &pi );
     if( result == FALSE )
     {
         ::printf( "failed to create a process\n" );
@@ -359,60 +358,60 @@ static void EnumFilesCallback( Files::CFileEnumInfo *info, void * )
     ::WaitForSingleObject( pi.hProcess, 100 );*/
 }
 
-/*ALIGNED_PRE( 16 ) struct TestStruct
+ALIGNED_PRE( 16 ) struct TestStruct
 {
     int a;
-};*/
+};
 
 int __cdecl main()
 {
     //Files::EnumFilesRecursively( "D:\\music\\", "*.wma", EnumFilesCallback, 0 );
 
-	/*CTC tc;
-	tc.Set();
-	for( ; ; )
-	{
-		CThread::SleepCurrent( 1 );
-		::printf( "\b\b\b\b\b\b\b\b\b\b          \b\b\b\b\b\b\b\b\b\b" );
-		::printf( "%.4lf", tc.Get64() );
-	}*/
+    /*CTC tc;
+    tc.Set();
+    for( ; ; )
+    {
+        CThread::SleepCurrent( 1 );
+        ::printf( "\b\b\b\b\b\b\b\b\b\b          \b\b\b\b\b\b\b\b\b\b" );
+        ::printf( "%.4lf", tc.Get64() );
+    }*/
 
-	//system( "Cls" );
+    //system( "Cls" );
 
-	//char first[] = "310e120c1b4d635e5d5a06135d270a1f534811720a12130c4f295e55565301001c0f";
-	//char second[] = "Robot Roller-Derby Disco Dodgeball";
+    //char first[] = "310e120c1b4d635e5d5a06135d270a1f534811720a12130c4f295e55565301001c0f";
+    //char second[] = "Robot Roller-Derby Disco Dodgeball";
 
-	//for( int i = 0; second[ i ]; ++i )
-	//{
-	//	//Funcs::Swap( &first[ i * 2 ], &first[ i * 2 + 1 ] );
-	//	char one[ 32 ], two[ 32 ], three[ 32 ], four[ 32 ], indexBits[ 32 ];
-	//	char conv[ 3 ] = { first[ i * 2 ], first[ i * 2 + 1 ] };
-	//	ui32 inted = Funcs::StrHexToInt < ui32 >( conv );
-	//	Funcs::IntToStrBin < i8 >( first[ i * 2 ], one );
-	//	Funcs::IntToStrBin < i8 >( first[ i * 2 + 1 ], two );
-	//	Funcs::IntToStrBin < i8 >( inted, four );
-	//	Funcs::IntToStrBin < i8 >( second[ i ], three );
-	//	Funcs::IntToStrBin < i8 >( i, indexBits );
-	//	printf( "%2u/%s %c/0x%2x/%3u/%s = %c/0x%2x/%3u/%s %3i %i\n", i, indexBits, (inted == 10 ? '?' : inted), inted, inted, four, second[ i ], second[ i ], second[ i ], three, (i32)second[ i ] - (i32)inted, (i32)second[ i ] ^ (i32)inted );
-	//}
+    //for( int i = 0; second[ i ]; ++i )
+    //{
+    //    //Funcs::Swap( &first[ i * 2 ], &first[ i * 2 + 1 ] );
+    //    char one[ 32 ], two[ 32 ], three[ 32 ], four[ 32 ], indexBits[ 32 ];
+    //    char conv[ 3 ] = { first[ i * 2 ], first[ i * 2 + 1 ] };
+    //    ui32 inted = Funcs::StrHexToInt < ui32 >( conv );
+    //    Funcs::IntToStrBin < i8 >( first[ i * 2 ], one );
+    //    Funcs::IntToStrBin < i8 >( first[ i * 2 + 1 ], two );
+    //    Funcs::IntToStrBin < i8 >( inted, four );
+    //    Funcs::IntToStrBin < i8 >( second[ i ], three );
+    //    Funcs::IntToStrBin < i8 >( i, indexBits );
+    //    printf( "%2u/%s %c/0x%2x/%3u/%s = %c/0x%2x/%3u/%s %3i %i\n", i, indexBits, (inted == 10 ? '?' : inted), inted, inted, four, second[ i ], second[ i ], second[ i ], three, (i32)second[ i ] - (i32)inted, (i32)second[ i ] ^ (i32)inted );
+    //}
 
-	/*char str[] = "4f04421157430d";
-	int mults[] = { 111, 109, 49, 49, 49, 54, 99, 97 };
+    /*char str[] = "4f04421157430d";
+    int mults[] = { 111, 109, 49, 49, 49, 54, 99, 97 };
 
-	for( int i = 0; str[ i ]; i += 2 )
-	{
-		::printf( "%c", Funcs::StrHexToInt < ui32 >( &str[ i ], 2 ) ^ mults[ i / 2 ] );
-	}
+    for( int i = 0; str[ i ]; i += 2 )
+    {
+        ::printf( "%c", Funcs::StrHexToInt < ui32 >( &str[ i ], 2 ) ^ mults[ i / 2 ] );
+    }
 
-	::printf( "\n" );*/
+    ::printf( "\n" );*/
 
-	//GetSizes();
+    //GetSizes();
 
-	//GLFuncsCreate();
+    //GLFuncsCreate();
 
-	Fix();
+    Fix( TextFixerMode::codeSpaces );
 
-	//Words();
+    //Words();
 
 #if 0
     CString str( "fuck" );
@@ -433,10 +432,10 @@ int __cdecl main()
 
         ::printf( "%u\n", vec2.Size() );
         ::printf( "%i\n", vec2[ 0 ] );
-        
+
         ::printf( "%u\n%u\n", sizeof(vec), sizeof(vec2) );
     }
-#endif 
+#endif
 
 #if 0
     const ui32 count = 512;
@@ -599,9 +598,9 @@ int __cdecl main()
     f32 fval = 500.f;
     i32 val = *(i32 *)&fval;
     Funcs::IntToStrBin( val, a_buf, true, false );
-	::printf( "%s\n", a_buf );
+    ::printf( "%s\n", a_buf );
     VC( Funcs::PrintToStr, a_buf, 1023, "%f", fval );
-	::printf( "%s\n", a_buf );*/
+    ::printf( "%s\n", a_buf );*/
 
     /*const char *cp_bits = "0_01111110_00000000000000000000000";
     ::printf( "bits num = %u\n", _StrLen( cp_bits ) - 2 );
@@ -825,7 +824,7 @@ int __cdecl main()
         LiceMath::M4x4Translate3D( &o_trans, o_translatev.x, o_translatev.y, o_translatev.z );
         LiceMath::M4x4MultM4x4( &o_final, &o_scale, &o_rot );
         LiceMath::M4x4MultM4x4Inplace( &o_final, &o_trans );
-    
+
         cou += o_final[ i ][ i ];
     }
 
@@ -845,7 +844,7 @@ int __cdecl main()
         LiceMath::M4x4Scale3D( &o_final, o_scalev.x, o_scalev.y, o_scalev.z );
         LiceMath::M4x4RotateXYZTransformLastIden( &o_final, o_rotv.x, o_rotv.y, o_rotv.z );
         LiceMath::M4x4Translate3DTransformLastIden( &o_final, o_translatev.x, o_translatev.y, o_translatev.z );
-    
+
         cou += o_final[ i ][ i ];
     }
 
@@ -865,7 +864,7 @@ int __cdecl main()
         LiceMath::M4x3Scale3D( &o_final, o_scalev.x, o_scalev.y, o_scalev.z );
         LiceMath::M4x3RotateXYZTransform( &o_final, o_rotv.x, o_rotv.y, o_rotv.z );
         LiceMath::M4x3Translate3DTransform( &o_final, o_translatev.x, o_translatev.y, o_translatev.z );
-    
+
         cou += o_final[ i ][ i ];
     }
 
@@ -883,7 +882,7 @@ int __cdecl main()
 
         m4x3 o_final;
         LiceMath::M4x3Scale3DRotateXYZTranslate3DVec( &o_final, &o_scalev, &o_rotv, &o_translatev );
-    
+
         cou += o_final[ i ][ i ];
     }
 

@@ -7,15 +7,15 @@ namespace StdLib {
 
 template < typename X, typename freeTestType, freeTestType freeTestValue, uiw t_freeTestMemberOffset, uiw t_frameSize = 32, uiw t_initialFrames = 1, typename allocator = Allocator::Simple > class CFramedStore : CharMovable
 {
-	static bln _IsFree( const X *mem )
-	{
-		return *(freeTestType *)((byte *)mem + t_freeTestMemberOffset) == freeTestValue;
-	}
+    static bln _IsFree( const X *mem )
+    {
+        return *(freeTestType *)((byte *)mem + t_freeTestMemberOffset) == freeTestValue;
+    }
 
-	static void _SetFree( X *mem )
-	{
-		*(freeTestType *)((byte *)mem + t_freeTestMemberOffset) = freeTestValue;
-	}
+    static void _SetFree( X *mem )
+    {
+        *(freeTestType *)((byte *)mem + t_freeTestMemberOffset) = freeTestValue;
+    }
 
     struct SFrame
     {
@@ -48,16 +48,16 @@ public:
 
     X *Add()
     {
-		return new(AddUninit()) X();
+        return new(AddUninit()) X();
     }
 
     X *Add( const X &val )
     {
-		return new(AddUninit()) X( val );
+        return new(AddUninit()) X( val );
     }
 
-	X *AddUninit()
-	{
+    X *AddUninit()
+    {
         for( uiw frame = 0; frame < _o_frames.Size(); ++frame )
         {
             if( _o_frames[ frame ].used < t_frameSize )
@@ -78,7 +78,7 @@ public:
         ++_o_frames.Back().used;
 
         return &_o_frames.Back().p_mem[ 0 ];
-	}
+    }
 
     void Remove( X *p_val )
     {
@@ -89,7 +89,7 @@ public:
             {
                 ASSUME( !_IsFree( p_val ) );
                 p_val->~X();
-				_SetFree( p_val );
+                _SetFree( p_val );
                 --_o_frames[ frame ].used;
                 break;
             }
@@ -127,7 +127,7 @@ public:
 
     X &Enumerate( uiw *p_frame, uiw *p_index )
     {
-		ASSUME( p_frame && p_index );
+        ASSUME( p_frame && p_index );
 
         for( ; ; )
         {
@@ -139,11 +139,11 @@ public:
                 *p_index = 0;
                 ++*p_frame;
             }
-			if( frame == _o_frames.Size() )
-			{
-				*p_frame = uiw_max;
-				return _o_frames[ 0 ].p_mem[ 0 ];
-			}
+            if( frame == _o_frames.Size() )
+            {
+                *p_frame = uiw_max;
+                return _o_frames[ 0 ].p_mem[ 0 ];
+            }
             if( !_IsFree( &_o_frames[ frame ].p_mem[ index ] ) )
             {
                 return _o_frames[ frame ].p_mem[ index ];
@@ -163,11 +163,11 @@ public:
         {
             for( uiw index = 0; index < t_frameSize; ++index )
             {
-				if( !_IsFree( &_o_frames[ frame ].p_mem[ index ] ) )
-				{
-					_o_frames[ frame ].p_mem[ index ].~X();
-					_SetFree( &_o_frames[ frame ].p_mem[ index ] );
-				}
+                if( !_IsFree( &_o_frames[ frame ].p_mem[ index ] ) )
+                {
+                    _o_frames[ frame ].p_mem[ index ].~X();
+                    _SetFree( &_o_frames[ frame ].p_mem[ index ] );
+                }
             }
             _o_frames[ frame ].used = 0;
         }

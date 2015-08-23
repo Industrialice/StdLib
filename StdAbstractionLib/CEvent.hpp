@@ -5,22 +5,22 @@
 
 namespace StdLib
 {
-	class CEvent
-	{
-		eventHandle _handle;
+    class CEvent
+    {
+        eventHandle _handle;
 
-		CEvent( const CEvent & );
-		CEvent & operator = ( const CEvent & );
+        CEvent( const CEvent & );
+        CEvent & operator = ( const CEvent & );
 
-	public:
+    public:
 
-		~CEvent();
-		CEvent( bln isInitiallySignaling = false, bln isResetAfterWait = false );
+        ~CEvent();
+        CEvent( bln isInitiallySignaling = false, bln isResetAfterWait = false );
 
-		void WaitFor();
-		void Reset();
-		void Raise();
-	};
+        void WaitFor();
+        void Reset();
+        void Raise();
+    };
 }
 
 #endif __EVENT_HPP__

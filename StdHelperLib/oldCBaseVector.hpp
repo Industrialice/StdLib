@@ -201,8 +201,8 @@ protected:
 template < typename X, typename reservator, typename allocator, typename count_type, bln tis_selfManaged, count_type static_size > class CBaseVector : public _CBaseVertorBasis < X, reservator, allocator, count_type, static_size >
 {
 protected:
-	using _CBaseVertorBasis < X, reservator, allocator, count_type, static_size >::_arr;
-	using _CBaseVertorBasis < X, reservator, allocator, count_type, static_size >::_count;
+    using _CBaseVertorBasis < X, reservator, allocator, count_type, static_size >::_arr;
+    using _CBaseVertorBasis < X, reservator, allocator, count_type, static_size >::_count;
 
     DBGCODE( bln _is_constructed; );
 

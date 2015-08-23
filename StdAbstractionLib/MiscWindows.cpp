@@ -65,8 +65,8 @@ bln VirtualMem::Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
     DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !protect )
     {
-    	DBGBREAK;
-    	return false;
+        DBGBREAK;
+        return false;
     }
     return ::VirtualAlloc( p_mem, size, MEM_COMMIT, protect ) != 0;
 }
@@ -77,8 +77,8 @@ void *VirtualMem::Alloc( uiw size, PageMode::PageMode_t mode )
     DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !protect )
     {
-    	DBGBREAK;
-    	return false;
+        DBGBREAK;
+        return false;
     }
     return ::VirtualAlloc( 0, size, MEM_RESERVE | MEM_COMMIT, protect );
 }
@@ -130,30 +130,30 @@ toExit:
 
 bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
 {
-	ASSUME( p_mem && size && mode );
+    ASSUME( p_mem && size && mode );
     DWORD oldProtect;
     DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !protect )
     {
-    	DBGBREAK;
-    	return false;
+        DBGBREAK;
+        return false;
     }
     return ::VirtualProtect( p_mem, size, protect, &oldProtect ) != 0;
 }
 
 //  CTC
-	
+
 CTC::CTC( bln is_set /* = false */ )
 {
-	if( is_set )
-	{
-		Set();
-	}
-	else
-	{
-		_MemSet( &_tc, 0, sizeof(_tc) );
-		DBGCODE( _is_seted = false );
-	}
+    if( is_set )
+    {
+        Set();
+    }
+    else
+    {
+        _MemSet( &_tc, 0, sizeof(_tc) );
+        DBGCODE( _is_seted = false );
+    }
 }
 
 void CTC::Set()

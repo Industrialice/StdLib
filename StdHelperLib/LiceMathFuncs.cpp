@@ -21,7 +21,7 @@ colori32web LiceMath::ColorF128ToI32Web( const f128color *cpo_color )
 
 f96color LiceMath::ColorI32WebToF96( colori32web color )
 {
-	return f96color( COLORI32WEB_GETR( color ) / 255.f, COLORI32WEB_GETG( color ) / 255.f, COLORI32WEB_GETB( color ) / 255.f );
+    return f96color( COLORI32WEB_GETR( color ) / 255.f, COLORI32WEB_GETG( color ) / 255.f, COLORI32WEB_GETB( color ) / 255.f );
 }
 
 void LiceMath::ColorI32WebToF96Placed( colori32web color, f96color *po_out )
@@ -39,7 +39,7 @@ colori32web LiceMath::ColorF96ToI32Web( const f96color *cpo_color )
 void LiceMath::M4x4RotateX( m4x4 *m, f32 x )
 {
     m->e00 = 1; m->e01 = 0;          m->e02 = 0;         m->e03 = 0;
-	m->e10 = 0; m->e11 = cosf( x );  m->e12 = sinf( x ); m->e13 = 0;
+    m->e10 = 0; m->e11 = cosf( x );  m->e12 = sinf( x ); m->e13 = 0;
     m->e20 = 0; m->e21 = -sinf( x ); m->e22 = cosf( x ); m->e23 = 0;
     m->e30 = 0; m->e31 = 0;          m->e32 = 0;         m->e33 = 1;
 }
@@ -480,8 +480,8 @@ void LiceMath::M4x4Determinant( const m4x4 *m )
 
 void LiceMath::M4x3RotateX( m4x3 *m, f32 x )
 {
-	f32 cx = ::cosf( x );
-	f32 sx = ::sinf( x );
+    f32 cx = ::cosf( x );
+    f32 sx = ::sinf( x );
 
     m->e00 = 1; m->e01 = 0;   m->e02 = 0;
     m->e10 = 0; m->e11 = cx;  m->e12 = sx;
@@ -497,8 +497,8 @@ void LiceMath::M4x3RotateXDoNotIdentity( m4x3 *m, f32 x )
 
 void LiceMath::M4x3RotateY( m4x3 *m, f32 y )
 {
-	f32 cy = ::cosf( y );
-	f32 sy = ::sinf( y );
+    f32 cy = ::cosf( y );
+    f32 sy = ::sinf( y );
 
     m->e00 = cy; m->e01 = 0; m->e02 = -sy;
     m->e10 = 0;  m->e11 = 1; m->e12 = 0;
@@ -514,8 +514,8 @@ void LiceMath::M4x3RotateYDoNotIdentity( m4x3 *m, f32 y )
 
 void LiceMath::M4x3RotateZ( m4x3 *m, f32 z )
 {
-	f32 cz = ::cosf( z );
-	f32 sz = ::sinf( z );
+    f32 cz = ::cosf( z );
+    f32 sz = ::sinf( z );
 
     m->e00 = cz;  m->e01 = sz; m->e02 = 0;
     m->e10 = -sz; m->e11 = cz; m->e12 = 0;
@@ -525,8 +525,8 @@ void LiceMath::M4x3RotateZ( m4x3 *m, f32 z )
 
 void LiceMath::M4x3RotateZDoNotIdentity( m4x3 *m, f32 z )
 {
-	f32 cz = ::cosf( z );
-	f32 sz = ::sinf( z );
+    f32 cz = ::cosf( z );
+    f32 sz = ::sinf( z );
 
     m->e00 = cz;  m->e01 = sz;
     m->e10 = -sz; m->e11 = cz;
@@ -543,7 +543,7 @@ void LiceMath::M4x3RotateXYZ( m4x3 *m, f32 x, f32 y, f32 z )
 
 void LiceMath::M4x3RotateXYZDoNotIdentity( m4x3 *m, f32 x, f32 y, f32 z )
 {
-	f32 cx = ::cosf( x );
+    f32 cx = ::cosf( x );
     f32 cy = ::cosf( y );
     f32 cz = ::cosf( z );
 
@@ -614,11 +614,11 @@ void LiceMath::M4x3RotateXY( m4x3 *m, f32 x, f32 y )
 
 void LiceMath::M4x3RotateXYDoNotIdentity( m4x3 *m, f32 x, f32 y )
 {
-	f32 cx = ::cosf( x );
-	f32 cy = ::cosf( y );
+    f32 cx = ::cosf( x );
+    f32 cy = ::cosf( y );
 
-	f32 sx = ::sinf( x );
-	f32 sy = ::sinf( y );
+    f32 sx = ::sinf( x );
+    f32 sy = ::sinf( y );
 
     m->e00 = cy;
     m->e02 = -sy;
@@ -724,7 +724,7 @@ m3x4 *LiceMath::M4x3TransposeInplaceAs3x4( m4x3 *m )
     f32 e30 = m->e12;
     f32 e31 = m->e22;
 
-			      m->e01 = e01; m->e02 = e02;
+                  m->e01 = e01; m->e02 = e02;
     m->e10 = e10; m->e11 = e11; m->e12 = e12;
     m->e20 = e20; m->e21 = e21; m->e22 = e22;
     m->e30 = e30; m->e31 = e31;
@@ -821,9 +821,9 @@ void LiceMath::M4x3Translate3D( m4x3 *m, f32 x, f32 y, f32 z )
 void LiceMath::M4x3Translate3DTransform( m4x3 *RSTR m0, const m4x3 *m1, f32 x, f32 y, f32 z )
 {
     *m0 = *m1;
-	m0->e30 += x;
-	m0->e31 += y;
-	m0->e32 += z;
+    m0->e30 += x;
+    m0->e31 += y;
+    m0->e32 += z;
 }
 
 void LiceMath::M4x3Translate3DTransformInplace( m4x3 *m, f32 x, f32 y, f32 z )
@@ -851,8 +851,8 @@ void LiceMath::M4x3Translate2D( m4x3 *m, f32 x, f32 y )
 void LiceMath::M4x3Translate2DTransform( m4x3 *m0, const m4x3 *m1, f32 x, f32 y )
 {
     *m0 = *m1;
-	m0->e30 += x;
-	m0->e31 += y;
+    m0->e30 += x;
+    m0->e31 += y;
 }
 
 void LiceMath::M4x3Translate2DTransformInplace( m4x3 *m, f32 x, f32 y )
@@ -943,7 +943,7 @@ void LiceMath::M4x3Scale2DTransform( m4x3 *m, f32 x, f32 y )
 {
     m->e00 *= x; m->e01 *= y;
     m->e10 *= x; m->e11 *= y;
-	m->e20 *= x; m->e21 *= y;
+    m->e20 *= x; m->e21 *= y;
 }
 
 void LiceMath::M4x3Scale2DDoNotIdentity( m4x3 *m, f32 x, f32 y )
@@ -1023,7 +1023,7 @@ void LiceMath::M4x3SubtractInplace( m4x3 *RSTR m0, const m4x3 *m1 )
 
 void LiceMath::M4x3Determinant( const m4x3 *m )
 {
-	DBGBREAK;
+    DBGBREAK;
 }
 
 void LiceMath::M3x4MultScalar( m3x4 *RSTR m0, const m3x4 *m1, f32 scalar )
@@ -1205,7 +1205,7 @@ void LiceMath::M3x3RotateZ( m3x3 *m, f32 z )
 
 void LiceMath::M3x3RotateXYZ( m3x3 *m, f32 x, f32 y, f32 z )
 {
-	f32 cx = ::cosf( x );
+    f32 cx = ::cosf( x );
     f32 cy = ::cosf( y );
     f32 cz = ::cosf( z );
 
@@ -1228,116 +1228,116 @@ void LiceMath::M3x3RotateXYZ( m3x3 *m, f32 x, f32 y, f32 z )
 
 void LiceMath::M3x2Identity( m3x2 *m )
 {
-	m->e00 = 1; m->e01 = 0;
-	m->e10 = 0; m->e11 = 1;
-	m->e20 = 0; m->e21 = 0;
+    m->e00 = 1; m->e01 = 0;
+    m->e10 = 0; m->e11 = 1;
+    m->e20 = 0; m->e21 = 0;
 }
 
 void LiceMath::M3x2Transpose( m2x3 *RSTR m0, const m3x2 *m1 )
 {
-	m0->e00 = m1->e00; m0->e01 = m1->e10; m0->e02 = m1->e20;
-	m0->e10 = m1->e01; m0->e11 = m1->e11; m0->e12 = m1->e21;
+    m0->e00 = m1->e00; m0->e01 = m1->e10; m0->e02 = m1->e20;
+    m0->e10 = m1->e01; m0->e11 = m1->e11; m0->e12 = m1->e21;
 }
 
 void LiceMath::M3x2Translate( m3x2 *m, f32 x, f32 y )
 {
-	m->e00 = 1; m->e01 = 0;
-	m->e10 = 0; m->e11 = 1;
-	m->e20 = x; m->e21 = y;
+    m->e00 = 1; m->e01 = 0;
+    m->e10 = 0; m->e11 = 1;
+    m->e20 = x; m->e21 = y;
 }
 
 void LiceMath::M3x2RotateZ( m3x2 *m, f32 rot )
 {
-	m->e00 = cosf( rot );  m->e01 = sinf( rot );
-	m->e10 = -sinf( rot ); m->e11 = cosf( rot );
-	m->e20 = 0;            m->e21 = 0;
+    m->e00 = cosf( rot );  m->e01 = sinf( rot );
+    m->e10 = -sinf( rot ); m->e11 = cosf( rot );
+    m->e20 = 0;            m->e21 = 0;
 }
 
 void LiceMath::M3x2Scale( m3x2 *m, f32 x, f32 y )
 {
-	m->e00 = x; m->e01 = 0;
-	m->e10 = 0; m->e11 = y;
-	m->e20 = 0; m->e21 = 0;
+    m->e00 = x; m->e01 = 0;
+    m->e10 = 0; m->e11 = y;
+    m->e20 = 0; m->e21 = 0;
 }
 
 void LiceMath::M3x2ScaleRotateZ( m3x2 *m, f32 x, f32 y, f32 rot )
 {
-	m->e00 = cosf( rot ) * x;  m->e01 = sinf( rot ) * x;
-	m->e10 = -sinf( rot ) * y; m->e11 = cosf( rot ) * y;
-	m->e20 = 0;                m->e21 = 0;
+    m->e00 = cosf( rot ) * x;  m->e01 = sinf( rot ) * x;
+    m->e10 = -sinf( rot ) * y; m->e11 = cosf( rot ) * y;
+    m->e20 = 0;                m->e21 = 0;
 }
 
 void LiceMath::M3x2ScaleRotateZTranslate( m3x2 *m, f32 sx, f32 sy, f32 rot, f32 x, f32 y )
 {
-	m->e00 = cosf( rot ) * sx;  m->e01 = sinf( rot ) * sx;
-	m->e10 = -sinf( rot ) * sy; m->e11 = cosf( rot ) * sy;
-	m->e20 = x;                 m->e21 = y;
+    m->e00 = cosf( rot ) * sx;  m->e01 = sinf( rot ) * sx;
+    m->e10 = -sinf( rot ) * sy; m->e11 = cosf( rot ) * sy;
+    m->e20 = x;                 m->e21 = y;
 }
-	
+
 void LiceMath::M3x2Mult3x2( m3x2 *RSTR m0, const m3x2 *m1, const m3x2 *m2 )
 {
-	for( uiw h = 0; h < 3; ++h )
-	{
-		m0->m[ h ][ 0 ] = m1->m[ h ][ 0 ] * m2->m[ 0 ][ 0 ] +
-						  m1->m[ h ][ 1 ] * m2->m[ 1 ][ 0 ];
+    for( uiw h = 0; h < 3; ++h )
+    {
+        m0->m[ h ][ 0 ] = m1->m[ h ][ 0 ] * m2->m[ 0 ][ 0 ] +
+                          m1->m[ h ][ 1 ] * m2->m[ 1 ][ 0 ];
 
-		m0->m[ h ][ 1 ] = m1->m[ h ][ 0 ] * m2->m[ 0 ][ 1 ] +
-						  m1->m[ h ][ 1 ] * m2->m[ 1 ][ 1 ];
-	}
+        m0->m[ h ][ 1 ] = m1->m[ h ][ 0 ] * m2->m[ 0 ][ 1 ] +
+                          m1->m[ h ][ 1 ] * m2->m[ 1 ][ 1 ];
+    }
 
-	m0->m[ 2 ][ 0 ] += m2->m[ 2 ][ 0 ];
-	m0->m[ 2 ][ 1 ] += m2->m[ 2 ][ 1 ];
+    m0->m[ 2 ][ 0 ] += m2->m[ 2 ][ 0 ];
+    m0->m[ 2 ][ 1 ] += m2->m[ 2 ][ 1 ];
 }
 
 void LiceMath::M3x2Mult3x2( m3x3 *RSTR m0, const m3x2 *m1, const m3x2 *m2 )
 {
-	for( uiw h = 0; h < 3; ++h )
-	{
-		m0->m[ h ][ 0 ] = m1->m[ h ][ 0 ] * m2->m[ 0 ][ 0 ] +
-						  m1->m[ h ][ 1 ] * m2->m[ 1 ][ 0 ];
+    for( uiw h = 0; h < 3; ++h )
+    {
+        m0->m[ h ][ 0 ] = m1->m[ h ][ 0 ] * m2->m[ 0 ][ 0 ] +
+                          m1->m[ h ][ 1 ] * m2->m[ 1 ][ 0 ];
 
-		m0->m[ h ][ 1 ] = m1->m[ h ][ 0 ] * m2->m[ 0 ][ 1 ] +
-						  m1->m[ h ][ 1 ] * m2->m[ 1 ][ 1 ];
-	}
+        m0->m[ h ][ 1 ] = m1->m[ h ][ 0 ] * m2->m[ 0 ][ 1 ] +
+                          m1->m[ h ][ 1 ] * m2->m[ 1 ][ 1 ];
+    }
 
-	m0->m[ 2 ][ 0 ] += m2->m[ 2 ][ 0 ];
-	m0->m[ 2 ][ 1 ] += m2->m[ 2 ][ 1 ];
+    m0->m[ 2 ][ 0 ] += m2->m[ 2 ][ 0 ];
+    m0->m[ 2 ][ 1 ] += m2->m[ 2 ][ 1 ];
 
-	m0->m[ 0 ][ 2 ] = 0;
-	m0->m[ 1 ][ 2 ] = 0;
-	m0->m[ 2 ][ 2 ] = 1;
+    m0->m[ 0 ][ 2 ] = 0;
+    m0->m[ 1 ][ 2 ] = 0;
+    m0->m[ 2 ][ 2 ] = 1;
 }
 
 void LiceMath::M3x2Mult3x2Inplace( m3x2 *RSTR m0, const m3x2 *m1 )
 {
-	for( uiw h = 0; h < 3; ++h )
-	{
-		f32 el = m0->m[ h ][ 0 ] * m1->m[ 0 ][ 0 ] +
-				 m0->m[ h ][ 1 ] * m1->m[ 1 ][ 0 ];
+    for( uiw h = 0; h < 3; ++h )
+    {
+        f32 el = m0->m[ h ][ 0 ] * m1->m[ 0 ][ 0 ] +
+                 m0->m[ h ][ 1 ] * m1->m[ 1 ][ 0 ];
 
-		m0->m[ h ][ 1 ] = m0->m[ h ][ 0 ] * m1->m[ 0 ][ 1 ] +
-						  m0->m[ h ][ 1 ] * m1->m[ 1 ][ 1 ];
+        m0->m[ h ][ 1 ] = m0->m[ h ][ 0 ] * m1->m[ 0 ][ 1 ] +
+                          m0->m[ h ][ 1 ] * m1->m[ 1 ][ 1 ];
 
-		m0->m[ h ][ 0 ] = el;
-	}
+        m0->m[ h ][ 0 ] = el;
+    }
 
-	m0->m[ 2 ][ 0 ] += m1->m[ 2 ][ 0 ];
-	m0->m[ 2 ][ 1 ] += m1->m[ 2 ][ 1 ];
+    m0->m[ 2 ][ 0 ] += m1->m[ 2 ][ 0 ];
+    m0->m[ 2 ][ 1 ] += m1->m[ 2 ][ 1 ];
 }
 
 void LiceMath::Matrix2DTo3D( m4x3 *m0, const m3x2 *m1 )
 {
-	m0->e00 = m1->e00; m0->e01 = m1->e01; m0->e02 = 0;
-	m0->e10 = m1->e10; m0->e11 = m1->e11; m0->e12 = 0;
-	m0->e20 = 0;       m0->e21 = 0;       m0->e22 = 1;
-	m0->e30 = m1->e20; m0->e31 = m1->e21; m0->e32 = 0;
+    m0->e00 = m1->e00; m0->e01 = m1->e01; m0->e02 = 0;
+    m0->e10 = m1->e10; m0->e11 = m1->e11; m0->e12 = 0;
+    m0->e20 = 0;       m0->e21 = 0;       m0->e22 = 1;
+    m0->e30 = m1->e20; m0->e31 = m1->e21; m0->e32 = 0;
 }
-	
+
 void LiceMath::Matrix3DTo2D( m3x2 *m0, const m4x3 *m1 )
 {
-	m0->e00 = m1->e00; m0->e01 = m1->e01;
-	m0->e10 = m1->e10; m0->e11 = m1->e11;
-	m0->e20 = m1->e30; m0->e21 = m1->e31;
+    m0->e00 = m1->e00; m0->e01 = m1->e01;
+    m0->e10 = m1->e10; m0->e11 = m1->e11;
+    m0->e20 = m1->e30; m0->e21 = m1->e31;
 }
 
 void LiceMath::M2x2Identity( m2x2 *m )
@@ -1392,7 +1392,7 @@ void LiceMath::M2x2ScaleRotate( m2x2 *m, f32 x, f32 y, f32 radians )
 void LiceMath::M2x2ScaleTransform( m2x2 *m, f32 x, f32 y )
 {
     m->e00 *= x; m->e01 *= y;
-	m->e10 *= x; m->e11 *= y;
+    m->e10 *= x; m->e11 *= y;
 }
 
 void LiceMath::M2x2ShearingX( m2x2 *m, f32 x )
@@ -1545,7 +1545,7 @@ f32 LiceMath::Vec4Dot( const vec4 *v0, const vec4 *v1 )
 
 void LiceMath::Vec4Cross( vec4 *RSTR v0, const vec4 *v1, const vec4 *v2, const vec4 *cpo_v3 )
 {
-	DBGBREAK;
+    DBGBREAK;
 /*
     v0->x = v1->y * (v2->z * cpo_v3->w - cpo_v3->z * v2->w) - v1->z * (v2->y * cpo_v3->w - cpo_v3->y * v2->w) + v1->w * (v2->y * cpo_v3->z - cpo_v3->y * v2->z);
     v0->y = v1->z * (v2->x * cpo_v3->w - cpo_v3->x * v2->w) - v1->x * (v2->z * cpo_v3->w - cpo_v3->z * v2->w) - v1->w * (v2->x * cpo_v3->z - cpo_v3->x * v2->z);
@@ -1555,7 +1555,7 @@ void LiceMath::Vec4Cross( vec4 *RSTR v0, const vec4 *v1, const vec4 *v2, const v
 
 void LiceMath::Vec4CrossInplace( vec4 *RSTR v0, const vec4 *v1, const vec4 *v2 )
 {
-	DBGBREAK;
+    DBGBREAK;
     /*f32 x = v0->y * v1->z - v0->z * v1->y;
     f32 y = v0->z * v1->x - v0->x * v1->z;
     v0->z = v0->x * v1->y - v0->y * v1->x;
@@ -2174,7 +2174,7 @@ void LiceMath::Projection( m4x4 *m, f32 fovDegree, f32 nearPlane, f32 farPlane, 
     f32 q = farPlane / (farPlane - nearPlane);
     f32 w = 1.f / ::tanf( fovH * 0.5f );
     f32 h = 1.f / ::tanf( fovV * 0.5f );
-	f32 l = -q * nearPlane;
+    f32 l = -q * nearPlane;
 
     m->e00 = w; m->e01 = 0; m->e02 = 0; m->e03 = 0;
     m->e10 = 0; m->e11 = h; m->e12 = 0; m->e13 = 0;

@@ -1,12 +1,12 @@
 #ifndef __ALLOCATORS_HPP__
 #define __ALLOCATORS_HPP__
 
-namespace StdLib 
+namespace StdLib
 { namespace Allocator
   {
     struct Simple
     {
-		template < typename X >
+        template < typename X >
         static X *RSTR Alloc( uiw count )
         {
             if( count )
@@ -16,7 +16,7 @@ namespace StdLib
             return 0;
         }
 
-		template < typename X >
+        template < typename X >
         static X *Realloc( X *mem, uiw count )
         {
             if( mem || count )
@@ -27,13 +27,13 @@ namespace StdLib
             return 0;
         }
 
-		template < typename X >
+        template < typename X >
         static bln ReallocInplaceIfPossible( X *mem, uiw count )
         {
             return false;
         }
 
-		template < typename X >
+        template < typename X >
         static void Free( X *mem )
         {
             free( mem );

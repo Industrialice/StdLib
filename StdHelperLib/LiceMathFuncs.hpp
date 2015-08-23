@@ -135,19 +135,19 @@ namespace LiceMath
     void M3x3RotateZ( m3x3 *po_m, f32 z );
     void M3x3RotateXYZ( m3x3 *po_m, f32 x, f32 y, f32 z );
 
-	void M3x2Identity( m3x2 *po_m );
-	void M3x2Transpose( m2x3 *RSTR po_m0, const m3x2 *cpo_m1 );
-	void M3x2Translate( m3x2 *po_m, f32 x, f32 y );
-	void M3x2RotateZ( m3x2 *po_m, f32 rot );
-	void M3x2Scale( m3x2 *po_m, f32 x, f32 y );
-	void M3x2ScaleRotateZ( m3x2 *po_m, f32 x, f32 y, f32 rot );
-	void M3x2ScaleRotateZTranslate( m3x2 *po_m, f32 sx, f32 sy, f32 rot, f32 x, f32 y );
-	void M3x2Mult3x2( m3x2 *RSTR po_m0, const m3x2 *cpo_m1, const m3x2 *cpo_m2 );
-	void M3x2Mult3x2( m3x3 *RSTR po_m0, const m3x2 *cpo_m1, const m3x2 *cpo_m2 );
-	void M3x2Mult3x2Inplace( m3x2 *RSTR po_m0, const m3x2 *cpo_m1 );
+    void M3x2Identity( m3x2 *po_m );
+    void M3x2Transpose( m2x3 *RSTR po_m0, const m3x2 *cpo_m1 );
+    void M3x2Translate( m3x2 *po_m, f32 x, f32 y );
+    void M3x2RotateZ( m3x2 *po_m, f32 rot );
+    void M3x2Scale( m3x2 *po_m, f32 x, f32 y );
+    void M3x2ScaleRotateZ( m3x2 *po_m, f32 x, f32 y, f32 rot );
+    void M3x2ScaleRotateZTranslate( m3x2 *po_m, f32 sx, f32 sy, f32 rot, f32 x, f32 y );
+    void M3x2Mult3x2( m3x2 *RSTR po_m0, const m3x2 *cpo_m1, const m3x2 *cpo_m2 );
+    void M3x2Mult3x2( m3x3 *RSTR po_m0, const m3x2 *cpo_m1, const m3x2 *cpo_m2 );
+    void M3x2Mult3x2Inplace( m3x2 *RSTR po_m0, const m3x2 *cpo_m1 );
 
-	void Matrix2DTo3D( m4x3 *po_m0, const m3x2 *cpo_m1 );
-	void Matrix3DTo2D( m3x2 *po_m0, const m4x3 *cpo_m1 );
+    void Matrix2DTo3D( m4x3 *po_m0, const m3x2 *cpo_m1 );
+    void Matrix3DTo2D( m3x2 *po_m0, const m4x3 *cpo_m1 );
 
     void M2x2Identity( m2x2 *po_m );
     bln M2x2IsIdentity( const m2x2 *cpo_m );  //  without epsilon

@@ -7,29 +7,29 @@ namespace StdLib {
 
 class CThread
 {
-	DBGCODE( bln _is_created; )
-	threadHandle _thread;
+    DBGCODE( bln _is_created; )
+    threadHandle _thread;
 
-	CThread( const CThread & );
-	CThread & operator = ( const CThread & );
+    CThread( const CThread & );
+    CThread & operator = ( const CThread & );
 
 public:
-	enum Priority_t
-	{
-		PriorityIdle,
-		PriorityLowest,
-		PriorityBelowNormal,
-		PriorityNormal,
-		PriorityAboveNormal,
-		PriorityHighest,
-		PriorityTimeCritical
-	};
+    enum Priority_t
+    {
+        PriorityIdle,
+        PriorityLowest,
+        PriorityBelowNormal,
+        PriorityNormal,
+        PriorityAboveNormal,
+        PriorityHighest,
+        PriorityTimeCritical
+    };
 
-	~CThread();
-	CThread();
-	CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority );
-	void Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority );
-	static void SleepCurrent( ui32 msecs );
+    ~CThread();
+    CThread();
+    CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority );
+    void Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority );
+    static void SleepCurrent( ui32 msecs );
 };
 
 }  //  namespace StdLib

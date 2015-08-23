@@ -41,8 +41,8 @@ bln VirtualMem::Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !prot )
     {
-    	DBGBREAK;
-    	return false;
+        DBGBREAK;
+        return false;
     }
     return ::mprotect( p_mem, size, prot ) == 0;
 }
@@ -53,8 +53,8 @@ void *VirtualMem::Alloc( uiw size, PageMode::PageMode_t mode )
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !prot )
     {
-    	DBGBREAK;
-    	return false;
+        DBGBREAK;
+        return false;
     }
     return ::mmap( 0, size, prot, MAP_PRIVATE | MAP_ANON, -1, 0);
 }
@@ -73,33 +73,33 @@ ui32 VirtualMem::PageSize()
 VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_mem, uiw size, SError *po_error )
 {
     DSA( po_error, Error::Get( Error::Unsupported ) );
-	return PageMode::Error;
+    return PageMode::Error;
 }
 
 bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
 {
-	ASSUME( p_mem && size && mode );
+    ASSUME( p_mem && size && mode );
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !prot )
     {
-    	DBGBREAK;
-    	return false;
+        DBGBREAK;
+        return false;
     }
-	return ::mprotect( p_mem, size, prot ) == 0;
+    return ::mprotect( p_mem, size, prot ) == 0;
 }
 
 //  TC
-	
+
 CTC::CTC( bln is_set = false )
 {
-	if( is_set )
-	{
-		Set();
-	}
-	else
-	{
-		_MemSet( &tc, 0, sizeof(tc) );
-	}
+    if( is_set )
+    {
+        Set();
+    }
+    else
+    {
+        _MemSet( &tc, 0, sizeof(tc) );
+    }
 }
 
 void CTC::Set()
@@ -166,13 +166,13 @@ ui64 CTC::GetUSec64Set()
 NOINLINE f32 CTC::Compare32( const CTC &second ) const
 {
     CHECK( _is_seted && second._is_seted );
-	return 0;
+    return 0;
 }
 
 NOINLINE f64 CTC::Compare64( const CTC &second ) const
 {
     CHECK( _is_seted && second._is_seted );
-	return 0;
+    return 0;
 }
 
 ui64 CTC::CompareUSec64( const CTC &second ) const
@@ -183,7 +183,7 @@ ui64 CTC::CompareUSec64( const CTC &second ) const
 const tcs &CTC::TCSGet() const
 {
     CHECK( _is_seted );
-	return _tc;
+    return _tc;
 }
 
 #endif POSIX

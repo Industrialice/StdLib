@@ -112,12 +112,12 @@ f64 Funcs::RoundF64ToNearestStep( f64 val, f64 step )
 
 uiw Funcs::RoundUIDownToStep( uiw val, uiw step )
 {
-	return val - val % step;
+    return val - val % step;
 }
 
 uiw Funcs::RoundUIUpToStep( uiw val, uiw step )
 {
-	return val + (step - val % step);
+    return val + (step - val % step);
 }
 
 uiw Funcs::RoundUIToNearestStep( uiw val, uiw step )
@@ -125,7 +125,7 @@ uiw Funcs::RoundUIToNearestStep( uiw val, uiw step )
     uiw left = val % step;
     uiw low = val - left;
     uiw up = val + (step - left);
-	return left >= step / 2 ? up : low;
+    return left >= step / 2 ? up : low;
 }
 
 iw Funcs::RoundIDownToStep( iw val, iw step )
@@ -350,7 +350,7 @@ ui64 Funcs::CheckSum64( const byte *source, uiw len )
 uiw Funcs::CheckSumWord( const byte *source, uiw len )
 {
     ASSUME( source );
-	return WSC( Funcs::CheckSum32, Funcs::CheckSum64 )( source, len );
+    return WSC( Funcs::CheckSum32, Funcs::CheckSum64 )( source, len );
 }
 
 NOINLINE uiw Funcs::NormalizeMem32( ui32 val, char *p_buf )
@@ -406,7 +406,7 @@ NOINLINE uiw Funcs::NormalizeMem64( ui64 val, char *p_buf )
 uiw Funcs::NormalizeMemWord( uiw val, char *p_buf )
 {
     ASSUME( p_buf );
-	return WSC( Funcs::NormalizeMem32, Funcs::NormalizeMem64 )( val, p_buf );
+    return WSC( Funcs::NormalizeMem32, Funcs::NormalizeMem64 )( val, p_buf );
 }
 
 uiw Funcs::MemCpy( void *p_dest, const void *cp_source, uiw size )
@@ -516,7 +516,7 @@ bln Funcs::IsChrEqual( char one, char two )
 
 bln Funcs::IsChrEqualWOR( char one, char two )
 {
-	return ChrToLower( one ) == ChrToLower( two );
+    return ChrToLower( one ) == ChrToLower( two );
 }
 
 bln Funcs::IsStrHex( const char *cp_str, uiw maxLen /* = uiw_max */ )
@@ -824,7 +824,7 @@ bln Funcs::StrIEqual( const char *cp_one, const char *cp_two )
     ASSUME( cp_one && cp_two );
     while( *cp_one && *cp_two )
     {
-    	if( !Funcs::IsChrEqualWOR( *cp_one, *cp_two ) )
+        if( !Funcs::IsChrEqualWOR( *cp_one, *cp_two ) )
         {
             return false;
         }
@@ -840,7 +840,7 @@ bln Funcs::StrIEqualAdv( const char *cp_one, const char *cp_two, uiw count, char
     ASSUME( cp_one && cp_two );
     while( *cp_one && *cp_two && *cp_one != aes && *cp_two != aes )
     {
-    	if( !Funcs::IsChrEqualWOR( *cp_one, *cp_two ) )
+        if( !Funcs::IsChrEqualWOR( *cp_one, *cp_two ) )
         {
             return false;
         }
@@ -969,12 +969,12 @@ uiw Funcs::StrNCpy( char *p_dest, const char *cp_source, uiw count )
 
 void Funcs::StrConnect( char *RSTR p_dest, const char *cp_first, const char *cp_second )
 {
-	ASSUME( p_dest && cp_first && cp_second );
-	while( *cp_first )
-	{
-		*p_dest++ = *cp_first++;
-	}
-	_StrCpy( p_dest, cp_second );
+    ASSUME( p_dest && cp_first && cp_second );
+    while( *cp_first )
+    {
+        *p_dest++ = *cp_first++;
+    }
+    _StrCpy( p_dest, cp_second );
 }
 
 void Funcs::StrCpyWONull( char *p_dest, const char *cp_source )
@@ -1237,10 +1237,10 @@ char *Funcs::StrIChr( const char *cp_source, char symbol )
     symbol = ChrToLower( symbol );
     for( ; *cp_source; ++cp_source )
     {
-    	if( ChrToLower( *cp_source ) == symbol )
-    	{
-    		return (char *)cp_source;
-    	}
+        if( ChrToLower( *cp_source ) == symbol )
+        {
+            return (char *)cp_source;
+        }
     }
     return 0;
 }
@@ -1251,10 +1251,10 @@ char *Funcs::StrIChrAdv( const char *cp_source, char symbol, uiw count /* = uiw_
     symbol = ChrToLower( symbol );
     for( ; count && *cp_source && *cp_source != aes; --count, ++cp_source )
     {
-    	if( ChrToLower( *cp_source ) == symbol )
-    	{
-    		return (char *)cp_source;
-    	}
+        if( ChrToLower( *cp_source ) == symbol )
+        {
+            return (char *)cp_source;
+        }
     }
     return 0;
 }
@@ -1265,10 +1265,10 @@ char *Funcs::StrINotChr( const char *cp_source, char symbol )
     symbol = ChrToLower( symbol );
     for( ; *cp_source; ++cp_source )
     {
-    	if( ChrToLower( *cp_source ) != symbol )
-    	{
-    		return (char *)cp_source;
-    	}
+        if( ChrToLower( *cp_source ) != symbol )
+        {
+            return (char *)cp_source;
+        }
     }
     return 0;
 }
@@ -1279,10 +1279,10 @@ char *Funcs::StrINotChrAdv( const char *cp_source, char symbol, uiw count /* = u
     symbol = ChrToLower( symbol );
     for( ; count && *cp_source && *cp_source != aes; --count, ++cp_source )
     {
-    	if( ChrToLower( *cp_source ) != symbol )
-    	{
-    		return (char *)cp_source;
-    	}
+        if( ChrToLower( *cp_source ) != symbol )
+        {
+            return (char *)cp_source;
+        }
     }
     return 0;
 }
@@ -1297,10 +1297,10 @@ char *Funcs::StrIChrs( const char *cp_source, const char *cp_chars )
         for( ; *cp_charsIt; ++cp_charsIt )
         {
             char symbol = ChrToLower( *cp_charsIt );
-    	    if( sourceLower == symbol )
-    	    {
-    		    return (char *)cp_source;
-    	    }
+            if( sourceLower == symbol )
+            {
+                return (char *)cp_source;
+            }
         }
     }
     return 0;
@@ -1316,10 +1316,10 @@ char *Funcs::StrIChrsAdv( const char *cp_source, const char *cp_chars, uiw count
         for( ; *cp_charsIt; ++cp_charsIt )
         {
             char symbol = ChrToLower( *cp_charsIt );
-    	    if( sourceLower == symbol )
-    	    {
-    		    return (char *)cp_source;
-    	    }
+            if( sourceLower == symbol )
+            {
+                return (char *)cp_source;
+            }
         }
     }
     return 0;
@@ -1335,11 +1335,11 @@ char *Funcs::StrINotChrs( const char *cp_source, const char *cp_chars )
         for( ; *cp_charsIt; ++cp_charsIt )
         {
             char symbol = ChrToLower( *cp_charsIt );
-    	    if( sourceLower == symbol )
-    	    {
+            if( sourceLower == symbol )
+            {
                 goto noLuck;
-    	    }
-    		return (char *)cp_source;
+            }
+            return (char *)cp_source;
         }
         noLuck:;
     }
@@ -1356,11 +1356,11 @@ char *Funcs::StrINotChrsAdv( const char *cp_source, const char *cp_chars, uiw co
         for( ; *cp_charsIt; ++cp_charsIt )
         {
             char symbol = ChrToLower( *cp_charsIt );
-    	    if( sourceLower == symbol )
-    	    {
+            if( sourceLower == symbol )
+            {
                 goto noLuck;
-    	    }
-    		return (char *)cp_source;
+            }
+            return (char *)cp_source;
         }
         noLuck:;
     }
@@ -1382,11 +1382,11 @@ char *Funcs::StrChrMask( const char *cp_source, char mask, char symbol )
         }
         else
         {
-    	    if( *cp_source == symbol )
-    	    {
-    		    return (char *)cp_source;
-    	    }
-    	    ++cp_source;
+            if( *cp_source == symbol )
+            {
+                return (char *)cp_source;
+            }
+            ++cp_source;
         }
     }
     return 0;
@@ -1408,12 +1408,12 @@ char *Funcs::StrChrMaskAdv( const char *cp_source, char mask, char symbol, uiw c
         }
         else
         {
-    	    if( *cp_source == symbol )
-    	    {
-    		    return (char *)cp_source;
-    	    }
+            if( *cp_source == symbol )
+            {
+                return (char *)cp_source;
+            }
             --count;
-    	    ++cp_source;
+            ++cp_source;
         }
     }
     return 0;
@@ -1435,11 +1435,11 @@ char *Funcs::StrIChrMask( const char *cp_source, char mask, char symbol )
         }
         else
         {
-    	    if( ChrToLower( *cp_source ) == symbol )
-    	    {
-    		    return (char *)cp_source;
-    	    }
-    	    ++cp_source;
+            if( ChrToLower( *cp_source ) == symbol )
+            {
+                return (char *)cp_source;
+            }
+            ++cp_source;
         }
     }
     return 0;
@@ -1462,12 +1462,12 @@ char *Funcs::StrIChrMaskAdv( const char *cp_source, char mask, char symbol, uiw 
         }
         else
         {
-    	    if( ChrToLower( *cp_source ) == symbol )
-    	    {
-    		    return (char *)cp_source;
-    	    }
+            if( ChrToLower( *cp_source ) == symbol )
+            {
+                return (char *)cp_source;
+            }
             ++count;
-    	    ++cp_source;
+            ++cp_source;
         }
     }
     return 0;
@@ -1508,21 +1508,21 @@ char *Funcs::StrIStr( const char *cp_source, const char *cp_under )
     ASSUME( cp_source && cp_under );
     for( ; ; ++cp_source )
     {
-    	for( const char *cp_sourceTest = cp_source, *cp_underTest = cp_under; ; ++cp_sourceTest, ++cp_underTest )
-    	{
-    		if( !*cp_underTest )
-    		{
-    			return (char *)cp_source;
-    		}
-    		if( !*cp_sourceTest )
-    		{
-    			return 0;
-    		}
-    		if( !Funcs::IsChrEqualWOR( *cp_sourceTest, *cp_underTest ) )
-    		{
-    			break;
-    		}
-    	}
+        for( const char *cp_sourceTest = cp_source, *cp_underTest = cp_under; ; ++cp_sourceTest, ++cp_underTest )
+        {
+            if( !*cp_underTest )
+            {
+                return (char *)cp_source;
+            }
+            if( !*cp_sourceTest )
+            {
+                return 0;
+            }
+            if( !Funcs::IsChrEqualWOR( *cp_sourceTest, *cp_underTest ) )
+            {
+                break;
+            }
+        }
     }
     UNREACHABLE;
 }
@@ -1819,10 +1819,10 @@ template < typename X > NOINLINE bln StrDecToIntQuest( const char *cp_str, X *p_
     {
         if( !Funcs::IsChrDec( cp_str[ count ] ) )
         {
-        	/*if( cp_str[ count ] == '.' )
-        	{
-        		break;
-        	}*/
+            /*if( cp_str[ count ] == '.' )
+            {
+                break;
+            }*/
             return false;
         }
         uval += (cp_str[ count ] - '0') * mult;
@@ -1884,10 +1884,10 @@ template < typename X > NOINLINE bln StrDecToUIntQuest( const char *cp_str, X *p
     {
         if( !Funcs::IsChrDec( cp_str[ count ] ) )
         {
-        	/*if( cp_str[ count ] == '.' )
-        	{
-        		break;
-        	}*/
+            /*if( cp_str[ count ] == '.' )
+            {
+                break;
+            }*/
             return false;
         }
         val += (cp_str[ count ] - '0') * mult;
@@ -2115,13 +2115,13 @@ a - pointer, integer word as bin str
 b - boolean
 c - char
 d - f64
-e - 
+e -
 f - f32
-g - 
+g -
 h - integer 32 as hex str
 i - i32
 j - integer 64 as hex str
-k - 
+k -
 l -
 m - integer 64 as bin str
 n - integer 32 as bin str
@@ -2130,12 +2130,12 @@ p - pointer, integer word as hex str
 q - f64 rounded to i32
 r - f32 rounded to i32
 s - string
-t - 
+t -
 u - ui32
-v - 
+v -
 w - unsigned word
-x - 
-y - 
+x -
+y -
 z -
 */
 
@@ -2154,14 +2154,14 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
     switch( type )
     {
     case 's':  //  string [param]
-    	if( !*(char **)p_source )
-    	{
-    		len = _MemCpy( p_buf, "[null str]", sizeof("[null str]") - 1 );
-    	}
-    	else
-    	{
-    		len = Funcs::StrSafeCpyAndCountWONull( p_buf, *(char **)p_source, MIN( maxLen, param ) );
-    	}
+        if( !*(char **)p_source )
+        {
+            len = _MemCpy( p_buf, "[null str]", sizeof("[null str]") - 1 );
+        }
+        else
+        {
+            len = Funcs::StrSafeCpyAndCountWONull( p_buf, *(char **)p_source, MIN( maxLen, param ) );
+        }
         goto retLen;
     case 'f':  //  f32 [param]
     {
@@ -2297,7 +2297,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         len = 1;
         goto retLen;
     default:
-    	UNREACHABLE;
+        UNREACHABLE;
     }
 
 retBuf:
@@ -2354,10 +2354,10 @@ EXTERNAL va_return Funcs::PrintToStrArgList( char *p_str, uiw maxLen, uiw *print
 
     *p_currStr = '\0';
 
-	if( printedLen )
-	{
-		*printedLen = p_currStr - p_str;
-	}
+    if( printedLen )
+    {
+        *printedLen = p_currStr - p_str;
+    }
 
     DBGCODE( return argsProced );
 }
@@ -2369,7 +2369,7 @@ NOINLINE va_return Funcs::PrintToStr( char *p_str, uiw maxLen, uiw *printedLen, 
     va_list args;
     va_start( args, cp_fmt );
 
-	DBGCODE( va_return argsProced = 4 + ) Funcs::PrintToStrArgList( p_str, maxLen, printedLen, cp_fmt, args );
+    DBGCODE( va_return argsProced = 4 + ) Funcs::PrintToStrArgList( p_str, maxLen, printedLen, cp_fmt, args );
 
     va_end( args );
 

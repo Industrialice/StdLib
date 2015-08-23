@@ -41,7 +41,7 @@ class CTC
     DBGCODE( bln _is_seted; );
 
 public:
-	CTC( bln is_set = false );
+    CTC( bln is_set = false );
     void Set();
     f32 Get32() const;
     f64 Get64() const;

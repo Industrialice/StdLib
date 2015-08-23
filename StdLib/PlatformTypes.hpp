@@ -29,10 +29,10 @@ static const fileEnumHandle fileEnumHandle_undefined = 0;
 typedef pthread_t threadHandle;
 typedef struct
 {
-	pthread_mutex_t lock;
-	pthread_cond_t  cond;
-	bln             is_set;
-	bln             is_resetAfterWait;
+    pthread_mutex_t lock;
+    pthread_cond_t  cond;
+    bln             is_set;
+    bln             is_resetAfterWait;
 } eventHandle;
 typedef pthread_mutex_t mutexHandle;
 typedef int fileHandle;

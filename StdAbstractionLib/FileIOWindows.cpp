@@ -22,7 +22,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
 {
     ASSUME( cp_pnn && file );
 
-	file->handle = INVALID_HANDLE_VALUE;
+    file->handle = INVALID_HANDLE_VALUE;
 
     SError o_error = Error::Get( Error::InvalidArgument );
     DWORD dwFlagsAndAttributes = 0;
@@ -50,7 +50,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     }
     else if( procMode & ProcMode::SequentialScan )
     {
-    	goto toExit;
+        goto toExit;
     }
 
     if( openMode == OpenMode::CreateIfNotExists )
@@ -75,45 +75,45 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     h_file = ::CreateFileA( cp_pnn, dwDesiredAccess, FILE_SHARE_READ, 0, dwCreationDisposition, dwFlagsAndAttributes, 0 );
     if( h_file == INVALID_HANDLE_VALUE )
     {
-		DWORD error = ::GetLastError();
-		if( error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND )
-		{
-			o_error = Error::Get( Error::DoesNotExists );
-		}
-		else if( error == ERROR_ACCESS_DENIED || error == ERROR_WRITE_PROTECT || error == ERROR_SHARING_VIOLATION || error == ERROR_LOCK_VIOLATION )
-		{
-			o_error = Error::Get( Error::NoAccess );
-		}
-		else if( error == ERROR_NOT_ENOUGH_MEMORY || error == ERROR_OUTOFMEMORY )
-		{
-			o_error = Error::Get( Error::OutOfMemory );
-		}
-		else
-		{
-			o_error = Error::GetOther( FileError::CanNotOpenFile, Private::GetErrorsDesc() );
-		}
+        DWORD error = ::GetLastError();
+        if( error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND )
+        {
+            o_error = Error::Get( Error::DoesNotExists );
+        }
+        else if( error == ERROR_ACCESS_DENIED || error == ERROR_WRITE_PROTECT || error == ERROR_SHARING_VIOLATION || error == ERROR_LOCK_VIOLATION )
+        {
+            o_error = Error::Get( Error::NoAccess );
+        }
+        else if( error == ERROR_NOT_ENOUGH_MEMORY || error == ERROR_OUTOFMEMORY )
+        {
+            o_error = Error::Get( Error::OutOfMemory );
+        }
+        else
+        {
+            o_error = Error::GetOther( FileError::CanNotOpenFile, Private::GetErrorsDesc() );
+        }
         goto toExit;
     }
 
     if( procMode & ProcMode::Append )
     {
         if( !::SetFilePointer( h_file, 0, 0, FILE_END ) )
-		{
-			o_error = Error::Get( Error::Unknown );
-			BOOL result = ::CloseHandle( h_file );
-			ASSUME( result );
-			goto toExit;
-		}
+        {
+            o_error = Error::Get( Error::Unknown );
+            BOOL result = ::CloseHandle( h_file );
+            ASSUME( result );
+            goto toExit;
+        }
     }
 
     absPathLen = Files::AbsolutePath( cp_pnn, a_absPath ) + 1;
 
     //file->pnn.Assign( a_absPath, absPathLen );  //  TODO:
-	file->openMode = openMode;
+    file->openMode = openMode;
     file->procMode = procMode;
     file->handle = h_file;
-	file->bufferPos = 0;
-	file->readBufferCurrentSize = 0;
+    file->bufferPos = 0;
+    file->readBufferCurrentSize = 0;
 
     o_error = Error::Get( Error::Ok );
 
@@ -124,11 +124,11 @@ toExit:
 
 NOINLINE void FileIO::Private::Close( CFileBasis *file )
 {
-	ASSUME( file );
-	if( file->handle == INVALID_HANDLE_VALUE )
-	{
-		return;
-	}
+    ASSUME( file );
+    if( file->handle == INVALID_HANDLE_VALUE )
+    {
+        return;
+    }
     Flush( file );
     BOOL result = ::CloseHandle( file->handle );
     ASSUME( result );
@@ -137,7 +137,7 @@ NOINLINE void FileIO::Private::Close( CFileBasis *file )
 
 bln FileIO::Private::IsValid( const CFileBasis *file )
 {
-	ASSUME( file );
+    ASSUME( file );
     return file->handle != INVALID_HANDLE_VALUE;
 }
 
@@ -145,16 +145,16 @@ i64 FileIO::Private::OffsetGet( CFileBasis *file )
 {
     ASSUME( IsValid( file ) );
 
-	LARGE_INTEGER o_pos;
-	if( !::SetFilePointerEx( file->handle, LARGE_INTEGER(), &o_pos, FILE_CURRENT ) )
-	{
-		return -1;
-	}
+    LARGE_INTEGER o_pos;
+    if( !::SetFilePointerEx( file->handle, LARGE_INTEGER(), &o_pos, FILE_CURRENT ) )
+    {
+        return -1;
+    }
 
-	if( file->is_reading )
-	{
-		return o_pos.QuadPart - (LONGLONG)file->bufferPos;
-	}
+    if( file->is_reading )
+    {
+        return o_pos.QuadPart - (LONGLONG)file->bufferPos;
+    }
     return o_pos.QuadPart + (LONGLONG)file->bufferPos;
 }
 
@@ -196,11 +196,11 @@ NOINLINE i64 FileIO::Private::OffsetSet( CFileBasis *file, OffsetMode::OffsetMod
     }
     o_move.QuadPart = offset;
 
-	if( !::SetFilePointerEx( file->handle, o_move, &o_move, moveMethod ) )
-	{
-		o_error = Error::Get( Error::Unknown );
-		goto toExit;
-	}
+    if( !::SetFilePointerEx( file->handle, o_move, &o_move, moveMethod ) )
+    {
+        o_error = Error::Get( Error::Unknown );
+        goto toExit;
+    }
 
     result = o_move.QuadPart;
 
@@ -214,45 +214,45 @@ ui64 FileIO::Private::SizeGet( CFileBasis *file )
     ASSUME( IsValid( file ) );
     LARGE_INTEGER o_size;
     if( !::GetFileSizeEx( file->handle, &o_size ) )
-	{
-		return 0;
-	}
+    {
+        return 0;
+    }
     return o_size.QuadPart;
 }
 
 bln FileIO::Private::SizeSet( CFileBasis *file, ui64 newSize )
 {
     ASSUME( IsValid( file ) );
-	LARGE_INTEGER o_userOffset;
-	if( !::SetFilePointerEx( file->handle, LARGE_INTEGER(), &o_userOffset, FILE_BEGIN ) )
-	{
-		return false;
-	}
-	if( o_userOffset.QuadPart != newSize )
-	{
-		LARGE_INTEGER o_newOffset;
-		o_newOffset.QuadPart = newSize;
-		if( !::SetFilePointerEx( file->handle, LARGE_INTEGER(), &o_newOffset, FILE_BEGIN ) )
-		{
-			return false;
-		}
-	}
-	if( !::SetEndOfFile( file->handle ) )
-	{
-		return false;
-	}
-	ASSUME( o_userOffset.QuadPart >= 0 );
-	if( o_userOffset.QuadPart < newSize )
-	{
-		if( !::SetFilePointerEx( file->handle, LARGE_INTEGER(), &o_userOffset, FILE_BEGIN ) )
-		{
-			return false;
-		}
-	}
+    LARGE_INTEGER o_userOffset;
+    if( !::SetFilePointerEx( file->handle, LARGE_INTEGER(), &o_userOffset, FILE_BEGIN ) )
+    {
+        return false;
+    }
+    if( o_userOffset.QuadPart != newSize )
+    {
+        LARGE_INTEGER o_newOffset;
+        o_newOffset.QuadPart = newSize;
+        if( !::SetFilePointerEx( file->handle, LARGE_INTEGER(), &o_newOffset, FILE_BEGIN ) )
+        {
+            return false;
+        }
+    }
+    if( !::SetEndOfFile( file->handle ) )
+    {
+        return false;
+    }
+    ASSUME( o_userOffset.QuadPart >= 0 );
+    if( o_userOffset.QuadPart < newSize )
+    {
+        if( !::SetFilePointerEx( file->handle, LARGE_INTEGER(), &o_userOffset, FILE_BEGIN ) )
+        {
+            return false;
+        }
+    }
 
-	return true;
+    return true;
 }
-		
+
 FileIO::OpenMode::OpenMode_t FileIO::Private::OpenModeGet( const CFileBasis *file )
 {
     ASSUME( IsValid( file ) );
@@ -302,10 +302,10 @@ NOINLINE bln FileIO::Private::ReadFromFile( FileIO::Private::CFileBasis *file, v
         return false;
     }
     file->stats.bytesFromFileReaded += readed;
-	if( p_readed )
-	{
-		*p_readed += readed;
-	}
+    if( p_readed )
+    {
+        *p_readed += readed;
+    }
     return true;
 }
 
@@ -319,9 +319,9 @@ NOINLINE bln FileIO::Private::CancelCachedRead( FileIO::Private::CFileBasis *fil
     i32 move = (i32)file->bufferPos - (i32)file->readBufferCurrentSize;
     LARGE_INTEGER o_move;
     o_move.QuadPart = move;
-	BOOL result = ::SetFilePointerEx( file->handle, o_move, 0, FILE_CURRENT );
-	file->bufferPos = file->readBufferCurrentSize = file->bufferSize;
-	return result != FALSE;
+    BOOL result = ::SetFilePointerEx( file->handle, o_move, 0, FILE_CURRENT );
+    file->bufferPos = file->readBufferCurrentSize = file->bufferSize;
+    return result != FALSE;
 }
 
 #endif WINDOWS
