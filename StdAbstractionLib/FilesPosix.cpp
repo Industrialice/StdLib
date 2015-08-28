@@ -11,7 +11,7 @@
 #include <errno.h>
 #include <dirent.h>
 
-NOINLINE bln Files::DeleteFile( const char *cp_pnn, SError *po_error )
+NOINLINE bln Files::RemoveFile( const char *cp_pnn, SError *po_error )
 {
     ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
 
@@ -42,7 +42,7 @@ NOINLINE bln Files::DeleteFile( const char *cp_pnn, SError *po_error )
     return funcResult;
 }
 
-NOINLINE bln Files::DeleteFolder( const char *cp_path, SError *po_error )
+NOINLINE bln Files::RemoveFolder( const char *cp_path, SError *po_error )
 {
     ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH );
     DIR *p_dir;
@@ -87,7 +87,7 @@ NOINLINE bln Files::DeleteFolder( const char *cp_path, SError *po_error )
 
             if( S_ISDIR( o_stat.st_mode ) )
             {
-                if( !Files::DeleteFolder( a_buf, po_error ) )
+                if( !Files::RemoveFolder( a_buf, po_error ) )
                 {
                     ::closedir( p_dir );
                     goto toExit;
@@ -96,7 +96,7 @@ NOINLINE bln Files::DeleteFolder( const char *cp_path, SError *po_error )
             else
             {
                 ASSUME( S_ISREG( o_stat.st_mode ) );
-                if( !Files::DeleteFile( a_buf, po_error ) )
+                if( !Files::RemoveFile( a_buf, po_error ) )
                 {
                     ::closedir( p_dir );
                     goto toExit;

@@ -16,9 +16,9 @@ CEvent::CEvent( bln isInitiallySignaling /* = false */, bln isResetAfterWait /* 
     ASSUME( _handle != NULL );
 }
 
-void CEvent::WaitFor()
+void CEvent::WaitFor( ui32 timeout )
 {
-    DWORD result = ::WaitForSingleObject( _handle, INFINITE );
+    DWORD result = ::WaitForSingleObject( _handle, timeout );
     ASSUME( result != WAIT_FAILED );
 }
 

@@ -1,4 +1,4 @@
-#include <StdCoreLib.hpp>
+#include <StdAbstractionLib.hpp>
 
 #pragma comment( lib, "StdCoreLib.lib" )
 #pragma comment( lib, "StdHelperLib.lib" )
@@ -363,9 +363,26 @@ ALIGNED_PRE( 16 ) struct TestStruct
     int a;
 };
 
+void DeleteShit();
+
+void foo(const std::string &str) 
+{
+    ::printf( "%s\n", str.c_str() );
+}
+
+#include <memory>
+
 int __cdecl main()
 {
-    CVec < i32 > test;
+    StdAbstractionLib_Initialize();
+
+    //foo(false);
+
+    /*CStaticVec < TestStruct, 16 > vec;
+
+    ::printf( "%i\n%i\n", ALIGNOF( vec ), sizeof( vec ) );*/
+
+    /*CVec < i32 > test;
     for( i32 index = 0; index < 10; ++index )
     {
         test.PushBack( index );
@@ -375,6 +392,14 @@ int __cdecl main()
     {
         ::printf( "%i\n", *it );
     }
+
+    int temp = 5;
+    int &ref = temp;
+
+    TypeDesc < int [] >::type t2 = 5;
+    ::printf( "%s\n", TypeDesc < CVec < i32 > [] >::is_pod ? "is_pod == true" : "is_pod == false" );
+
+    ::printf( "%i\n", t2 );*/
 
     //Files::EnumFilesRecursively( "D:\\music\\", "*.wma", EnumFilesCallback, 0 );
 
@@ -420,9 +445,11 @@ int __cdecl main()
 
     //GLFuncsCreate();
 
-    //Fix( TextFixerMode::codeSpaces );
+    //Fix( TextFixerMode::fanfic );
 
     //Words();
+
+    DeleteShit();
 
 #if 0
     CString str( "fuck" );

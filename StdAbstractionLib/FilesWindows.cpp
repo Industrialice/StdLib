@@ -9,7 +9,7 @@
     #pragma optimize( "s", on )  //  TODO: global solution
 #endif
 
-NOINLINE bln Files::DeleteFile( const char *cp_pnn, SError *po_error )
+NOINLINE bln Files::RemoveFile( const char *cp_pnn, SError *po_error )
 {
     ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
 
@@ -40,7 +40,7 @@ NOINLINE bln Files::DeleteFile( const char *cp_pnn, SError *po_error )
     return funcResult;
 }
 
-NOINLINE bln Files::DeleteFolder( const char *cp_path, SError *po_error )
+NOINLINE bln Files::RemoveFolder( const char *cp_path, SError *po_error )
 {
     ASSUME( cp_path && _StrLen( cp_path ) + 2 < MAX_PATH );
 
@@ -74,13 +74,13 @@ NOINLINE bln Files::DeleteFolder( const char *cp_path, SError *po_error )
         _StrCpy( a_buf + cpy, o_find.cFileName );
         if( o_find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
         {
-            if( !DeleteFolder( a_buf, po_error ) )
+            if( !RemoveFolder( a_buf, po_error ) )
             {
                 ::FindClose( h_find );
                 goto toExit;
             }
         }
-        else if( !DeleteFile( a_buf, po_error ) )
+        else if( !RemoveFile( a_buf, po_error ) )
         {
             ::FindClose( h_find );
             goto toExit;
@@ -342,6 +342,14 @@ struct CFileEnumerator : public Files::CFileEnumInfo
         if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
         {
             _StrCat( _pnn + _pathLen, "\\" );
+            _fileSize = ui64_max;
+        }
+        else
+        {
+            LARGE_INTEGER large_size;
+            large_size.LowPart = findData.nFileSizeLow;
+            large_size.HighPart = findData.nFileSizeHigh;
+            _fileSize = large_size.QuadPart;
         }
 
         return true;
@@ -363,6 +371,14 @@ struct CFileEnumerator : public Files::CFileEnumInfo
         if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
         {
             _StrCat( _pnn + _pathLen, "\\" );
+            _fileSize = ui64_max;
+        }
+        else
+        {
+            LARGE_INTEGER large_size;
+            large_size.LowPart = findData.nFileSizeLow;
+            large_size.HighPart = findData.nFileSizeHigh;
+            _fileSize = large_size.QuadPart;
         }
 
         return true;

@@ -46,4 +46,6 @@
 #include "CF16.hpp"
 #include "CCustomF16.hpp"
 
+void StdCoreLib_Initialize();
+
 #endif __STD_LIB_HEADER_HPP__

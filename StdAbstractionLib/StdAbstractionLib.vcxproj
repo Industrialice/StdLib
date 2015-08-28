@@ -203,6 +203,7 @@
     <ClInclude Include="CMutex.hpp" />
     <ClInclude Include="PreHeader.hpp" />
     <ClInclude Include="CThread.hpp" />
+    <ClInclude Include="StdAbstractionLib.hpp" />
     <ClInclude Include="WinCEFuncs.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +226,7 @@
     </ClCompile>
     <ClCompile Include="CThreadPosix.cpp" />
     <ClCompile Include="CThreadWindows.cpp" />
+    <ClCompile Include="StdAbstractionLib.cpp" />
     <ClCompile Include="WinCEFuncs.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -27,8 +27,8 @@ public:
 
     ~CThread();
     CThread();
-    CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority );
-    void Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority );
+    CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority = PriorityNormal );
+    void Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority = PriorityNormal );
     static void SleepCurrent( ui32 msecs );
 };
 

@@ -28,17 +28,17 @@ namespace VirtualMem
     {
         const ui32 InconsistentProtection = Error::Private::MaxDefaultError + 0;
     }
+}
 
-    namespace Private
-    {
-        EXTERNAL const char *const *GetErrorsDesc();
-    }
+namespace CPU
+{
+    EXTERNAL ui32 CoresNum();
 }
 
 class CTC
 {
     tcs _tc;
-    DBGCODE( bln _is_seted; );
+    DBGCODE( bln _is_set; );
 
 public:
     CTC( bln is_set = false );
@@ -54,6 +54,15 @@ public:
     ui64 CompareUSec64( const CTC &second ) const;  //  will subtract the second from the first
     const tcs &TCSGet() const;
 };
+
+namespace Misc
+{
+    namespace Private
+    {
+        EXTERNAL const char *const *GetErrorsDesc();
+        void Initialize();
+    }
+}
 
 }  //  namespace StdLib
 

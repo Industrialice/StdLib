@@ -6,12 +6,6 @@
 #include <sys/mman.h>
 #include <time.h>
 
-const char *const *VirtualMem::Private::GetErrorsDesc()
-{
-    static const char *const errors[] = { "INCONSISTENT_PROTECTION" };
-    return errors;
-}
-
 namespace
 {
     const int ca_PageProtectMapping[] =
@@ -88,6 +82,13 @@ bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
     return ::mprotect( p_mem, size, prot ) == 0;
 }
 
+//  CPU
+
+ui32 CPU::CoresNum()
+{
+#error
+}
+
 //  TC
 
 CTC::CTC( bln is_set = false )
@@ -105,12 +106,12 @@ CTC::CTC( bln is_set = false )
 void CTC::Set()
 {
     ::clock_gettime( CLOCK_MONOTONIC, &_tc );
-    DBGCODE( _is_seted = true );
+    DBGCODE( _is_set = true );
 }
 
 NOINLINE f32 CTC::Get32() const
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     tcs o_count;
     ::clock_gettime( CLOCK_MONOTONIC, &o_count );
     return ((((ui64)o_count.tv_sec * 1000000000ULL + o_count.tv_nsec) - ((ui64)_tc.tv_sec * 1000000000ULL + _tc.tv_nsec)) / 1000.0) / 1000.0 / 1000.0;
@@ -118,7 +119,7 @@ NOINLINE f32 CTC::Get32() const
 
 NOINLINE f64 CTC::Get64() const
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     tcs o_count;
     ::clock_gettime( CLOCK_MONOTONIC, &o_count );
     return ((((ui64)o_count.tv_sec * 1000000000ULL + o_count.tv_nsec) - ((ui64)_tc.tv_sec * 1000000000ULL + _tc.tv_nsec)) / 1000.0) / 1000.0 / 1000.0;
@@ -126,7 +127,7 @@ NOINLINE f64 CTC::Get64() const
 
 ui64 CTC::GetUSec64() const
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     tcs o_count;
     ::clock_gettime( CLOCK_MONOTONIC, &o_count );
     return (((ui64)o_count.tv_sec * 1000000000ULL + o_count.tv_nsec) - ((ui64)_tc.tv_sec * 1000000000ULL + _tc.tv_nsec)) / 1000.0;
@@ -134,7 +135,7 @@ ui64 CTC::GetUSec64() const
 
 NOINLINE f32 CTC::Get32Set()
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     tcs o_count;
     ::clock_gettime( CLOCK_MONOTONIC, &o_count );
     f32 dt = ((((ui64)o_count.tv_sec * 1000000000ULL + o_count.tv_nsec) - ((ui64)_tc.tv_sec * 1000000000ULL + _tc.tv_nsec)) / 1000.0) / 1000.0 / 1000.0;
@@ -144,7 +145,7 @@ NOINLINE f32 CTC::Get32Set()
 
 NOINLINE f64 CTC::Get64Set()
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     tcs o_count;
     ::clock_gettime( CLOCK_MONOTONIC, &o_count );
     f64 dt = ((((ui64)o_count.tv_sec * 1000000000ULL + o_count.tv_nsec) - ((ui64)_tc.tv_sec * 1000000000ULL + _tc.tv_nsec)) / 1000.0) / 1000.0 / 1000.0;
@@ -154,7 +155,7 @@ NOINLINE f64 CTC::Get64Set()
 
 ui64 CTC::GetUSec64Set()
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     tcs o_count;
     ::clock_gettime( CLOCK_MONOTONIC, &o_count );
     ui64 dt = (((ui64)o_count.tv_sec * 1000000000ULL + o_count.tv_nsec) - ((ui64)_tc.tv_sec * 1000000000ULL + _tc.tv_nsec)) / 1000.0;
@@ -165,13 +166,13 @@ ui64 CTC::GetUSec64Set()
 //  TODO: complete
 NOINLINE f32 CTC::Compare32( const CTC &second ) const
 {
-    CHECK( _is_seted && second._is_seted );
+    CHECK( _is_set && second._is_set );
     return 0;
 }
 
 NOINLINE f64 CTC::Compare64( const CTC &second ) const
 {
-    CHECK( _is_seted && second._is_seted );
+    CHECK( _is_set && second._is_set );
     return 0;
 }
 
@@ -182,8 +183,18 @@ ui64 CTC::CompareUSec64( const CTC &second ) const
 
 const tcs &CTC::TCSGet() const
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     return _tc;
+}
+
+const char *const *Misc::Private::GetErrorsDesc()
+{
+    static const char *const errors[] = { "INCONSISTENT_PROTECTION" };
+    return errors;
+}
+
+void Misc::Private::Initialize()
+{
 }
 
 #endif POSIX

@@ -6,12 +6,6 @@
 #include "Misc.hpp"
 #include "Funcs.hpp"
 
-const char *const *VirtualMem::Private::GetErrorsDesc()
-{
-    static const char *const errors[] = { "INCONSISTENT_PROTECTION" };
-    return errors;
-}
-
 namespace
 {
     const DWORD ca_PageProtectMapping[] =
@@ -25,31 +19,60 @@ namespace
         PAGE_EXECUTE_READ,  //  6 - Execute + Read
         PAGE_EXECUTE_READWRITE  //  7 - Execute + Write + Read
     };
+        
+    bool is_Initialized;
 
-    ui32 MemPageSizeInit()
+    class
     {
-        SYSTEM_INFO o_si;
-        ::GetSystemInfo( &o_si );
-        return o_si.dwPageSize;
-    }
-    ui32 MemPageSize = MemPageSizeInit();
+        ui32 _memPageSize;
+        
+        ui32 _cpuCoresCount;
 
-    struct SFreq
-    {
-        f32 freqMult32;
-        f64 freqMult64;
-        ui64 freqDivU64;
+        f32 _freqMult32;
+        f64 _freqMult64;
+        ui64 _freqDivU64;
 
-        SFreq()
+    public:
+        void Initialize( ui32 memPageSize, ui32 cpuCoresCount, f32 freqMult32, f64 freqMult64, ui64 freqDivU64 )
         {
-            LARGE_INTEGER o_freq;
-            BOOL freqRes = ::QueryPerformanceFrequency( &o_freq );
-            ASSUME( freqRes );
-            freqMult32 = 1.f / o_freq.QuadPart;
-            freqMult64 = 1.0 / o_freq.QuadPart;
-            freqDivU64 = o_freq.QuadPart;
+            _memPageSize = memPageSize;
+            _cpuCoresCount = cpuCoresCount;
+            _freqMult32 = freqMult32;
+            _freqMult64 = freqMult64;
+            _freqDivU64 = freqDivU64;
+            is_Initialized = true;
         }
-    } o_Freq;
+
+        ui32 MemPageSize() const
+        {
+            ASSUME( is_Initialized );
+            return _memPageSize;
+        }
+
+        ui32 CpuCoresCount() const
+        {
+            ASSUME( is_Initialized );
+            return _cpuCoresCount;
+        }
+
+        f32 FreqMult32() const
+        {
+            ASSUME( is_Initialized );
+            return _freqMult32;
+        }
+
+        f64 FreqMult64() const
+        {
+            ASSUME( is_Initialized );
+            return _freqMult64;
+        }
+
+        ui64 FreqDivU64() const
+        {
+            ASSUME( is_Initialized );
+            return _freqDivU64;
+        }
+    } MiscData;
 }
 
 //  VirtualMem
@@ -91,7 +114,7 @@ bln VirtualMem::Free( void *p_mem )
 
 ui32 VirtualMem::PageSize()
 {
-    return MemPageSize;
+    return MiscData.MemPageSize();
 }
 
 NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_mem, uiw size, SError *po_error )
@@ -108,7 +131,7 @@ NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_
     }
     if( o_mbi.RegionSize < size )
     {
-        o_error = Error::GetOther( VirtualMemError::InconsistentProtection, Private::GetErrorsDesc() );
+        o_error = Error::GetOther( VirtualMemError::InconsistentProtection, Misc::Private::GetErrorsDesc() );
         goto toExit;
     }
 
@@ -141,6 +164,13 @@ bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
     return ::VirtualProtect( p_mem, size, protect, &oldProtect ) != 0;
 }
 
+//  CPU
+
+ui32 CPU::CoresNum()
+{
+    return MiscData.CpuCoresCount();
+}
+
 //  CTC
 
 CTC::CTC( bln is_set /* = false */ )
@@ -152,95 +182,121 @@ CTC::CTC( bln is_set /* = false */ )
     else
     {
         _MemSet( &_tc, 0, sizeof(_tc) );
-        DBGCODE( _is_seted = false );
+        DBGCODE( _is_set = false );
     }
 }
 
 void CTC::Set()
 {
     ::QueryPerformanceCounter( &_tc );
-    DBGCODE( _is_seted = true );
+    DBGCODE( _is_set = true );
 }
 
 f32 CTC::Get32() const
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     LARGE_INTEGER o_count;
     ::QueryPerformanceCounter( &o_count );
-    return (o_count.QuadPart - _tc.QuadPart) * o_Freq.freqMult32;
+    return (o_count.QuadPart - _tc.QuadPart) * MiscData.FreqMult32();
 }
 
 f64 CTC::Get64() const
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     LARGE_INTEGER o_count;
     ::QueryPerformanceCounter( &o_count );
-    return (o_count.QuadPart - _tc.QuadPart) * o_Freq.freqMult64;
+    return (o_count.QuadPart - _tc.QuadPart) * MiscData.FreqMult64();
 }
 
 ui64 CTC::GetUSec64() const
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     LARGE_INTEGER o_count;
     ::QueryPerformanceCounter( &o_count );
-    return ((o_count.QuadPart - _tc.QuadPart) * (1000ULL * 1000ULL * 1000ULL)) / o_Freq.freqDivU64;
+    return ((o_count.QuadPart - _tc.QuadPart) * (1000ULL * 1000ULL * 1000ULL)) / MiscData.FreqDivU64();
 }
 
 f32 CTC::Get32Set()
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     LARGE_INTEGER o_count;
     ::QueryPerformanceCounter( &o_count );
-    f32 dt = (o_count.QuadPart - _tc.QuadPart) * o_Freq.freqMult32;
+    f32 dt = (o_count.QuadPart - _tc.QuadPart) * MiscData.FreqMult32();
     _tc = o_count;
     return dt;
 }
 
 f64 CTC::Get64Set()
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     LARGE_INTEGER o_count;
     ::QueryPerformanceCounter( &o_count );
-    f64 dt = (o_count.QuadPart - _tc.QuadPart) * o_Freq.freqMult64;
+    f64 dt = (o_count.QuadPart - _tc.QuadPart) * MiscData.FreqMult64();
     _tc = o_count;
     return dt;
 }
 
 ui64 CTC::GetUSec64Set()
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     LARGE_INTEGER o_count;
     ::QueryPerformanceCounter( &o_count );
-    ui64 dt = ((o_count.QuadPart - _tc.QuadPart) * (1000ULL * 1000ULL * 1000ULL)) / o_Freq.freqDivU64;
+    ui64 dt = ((o_count.QuadPart - _tc.QuadPart) * (1000ULL * 1000ULL * 1000ULL)) / MiscData.FreqDivU64();
     _tc = o_count;
     return dt;
 }
 
 f32 CTC::Compare32( const CTC &second ) const
 {
-    CHECK( _is_seted && second._is_seted );
+    CHECK( _is_set && second._is_set );
     LONGLONG delta = _tc.QuadPart - second.TCSGet().QuadPart;
-    return delta * o_Freq.freqMult32;
+    return delta * MiscData.FreqMult32();
 }
 
 f64 CTC::Compare64( const CTC &second ) const
 {
-    CHECK( _is_seted && second._is_seted );
+    CHECK( _is_set && second._is_set );
     LONGLONG delta = _tc.QuadPart - second.TCSGet().QuadPart;
-    return delta * o_Freq.freqMult64;
+    return delta * MiscData.FreqMult64();
 }
 
 ui64 CTC::CompareUSec64( const CTC &second ) const
 {
-    CHECK( _is_seted && second._is_seted );
+    CHECK( _is_set && second._is_set );
     LONGLONG delta = _tc.QuadPart - second.TCSGet().QuadPart;
-    return (delta * (1000ULL * 1000ULL * 1000ULL)) / o_Freq.freqDivU64;
+    return (delta * (1000ULL * 1000ULL * 1000ULL)) / MiscData.FreqDivU64();
 }
 
 const tcs &CTC::TCSGet() const
 {
-    CHECK( _is_seted );
+    CHECK( _is_set );
     return _tc;
+}
+
+const char *const *Misc::Private::GetErrorsDesc()
+{
+    static const char *const errors[] = { "INCONSISTENT_PROTECTION" };
+    return errors;
+}
+
+void Misc::Private::Initialize()
+{
+    SYSTEM_INFO o_si;
+    ::GetSystemInfo( &o_si );
+    ui32 memPageSize = o_si.dwPageSize;
+
+    LARGE_INTEGER o_freq;
+    BOOL freqRes = ::QueryPerformanceFrequency( &o_freq );
+    ASSUME( freqRes );
+    f32 freqMult32 = 1.f / o_freq.QuadPart;
+    f64 freqMult64 = 1.0 / o_freq.QuadPart;
+    ui64 freqDivU64 = o_freq.QuadPart;
+    
+    SYSTEM_INFO sysinfo;
+    GetSystemInfo( &sysinfo );
+    ui32 cpuCoresCount = sysinfo.dwNumberOfProcessors;
+
+    MiscData.Initialize( memPageSize, cpuCoresCount, freqMult32, freqMult64, freqDivU64 );
 }
 
 #endif WINDOWS

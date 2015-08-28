@@ -23,8 +23,9 @@ CEvent::CEvent( bln isInitiallySignaling /* = false */, bln isResetAfterWait /* 
     ASSUME( result == 0 );
 }
 
-void CEvent::WaitFor()
+void CEvent::WaitFor( ui32 timeout )
 {
+#error
     int result = pthread_mutex_lock( &_handle.lock );
     ASSUME( result == 0 );
 

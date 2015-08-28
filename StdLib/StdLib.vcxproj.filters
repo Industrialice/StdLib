@@ -50,5 +50,8 @@
     <ClCompile Include="PreHeader.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="StdCoreLib.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

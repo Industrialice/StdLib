@@ -17,7 +17,7 @@ namespace StdLib
         ~CEvent();
         CEvent( bln isInitiallySignaling = false, bln isResetAfterWait = false );
 
-        void WaitFor();
+        void WaitFor( ui32 timeout = ui32_max );
         void Reset();
         void Raise();
     };

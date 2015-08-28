@@ -121,13 +121,23 @@ public:
     enum { value = sizeof(Func(Converter < Candidate, Of >(), int())) == sizeof(int) };
 };
 
-template < uiw numBits > struct TypeWithSizeAndAlignment
-{
-    ALIGNED_PRE( numBits / 8 ) struct type { ui8 u[ numBits / 8 ]; } ALIGNED_POST( numBits / 8 );
+template < const uiw al > struct TypeWithSizeAndAlignment;
 
-    STATIC_CHECK( sizeof(type) == (numBits / 8), "Error in TypeWithSizeAndAlignment" );
-    STATIC_CHECK( ALIGNOF(type) == (numBits / 8), "Error in TypeWithSizeAndAlignment" );
-};
+#define _TypeWithSizeAndAlignment_HelperDefine( align ) \
+    template <> struct TypeWithSizeAndAlignment < align > \
+    { ALIGNED_PRE( align ) struct type { ui8 u[ align ]; } ALIGNED_POST( align ); \
+      STATIC_CHECK( sizeof(type) == (align), "Error in TypeWithSizeAndAlignment" ); \
+      STATIC_CHECK( ALIGNOF(type) == (align), "Error in TypeWithSizeAndAlignment" ); \
+    };
+
+_TypeWithSizeAndAlignment_HelperDefine( 1 )
+_TypeWithSizeAndAlignment_HelperDefine( 2 )
+_TypeWithSizeAndAlignment_HelperDefine( 4 )
+_TypeWithSizeAndAlignment_HelperDefine( 8 )
+_TypeWithSizeAndAlignment_HelperDefine( 16 )
+_TypeWithSizeAndAlignment_HelperDefine( 32 )
+_TypeWithSizeAndAlignment_HelperDefine( 64 )
+_TypeWithSizeAndAlignment_HelperDefine( 128 )
 
 template < uiw numBits > struct IntWithSize{};
 template <> struct IntWithSize < 8 >
@@ -188,7 +198,7 @@ template <> struct IntWithSizeAndSign < 64, false >
 template < typename X, size_t count = 1 > class AlignmentHelper
 {
 #ifdef NATIVE_ALIGNOF
-    typedef typename TypeWithSizeAndAlignment < ALIGNOF(X) * 8 >::type alignedType;
+    typedef typename TypeWithSizeAndAlignment < ALIGNOF(X) >::type alignedType;
 #else
     typedef typename TypeWithSize < DATA_ALIGNMENT * 8 >::type alignedType;
 #endif
@@ -199,13 +209,14 @@ template < typename X, size_t count = 1 > class AlignmentHelper
 public:
     struct type { alignedType store[ bufferArraySize ]; };
 
-    STATIC_CHECK( sizeof(X) == sizeof(type), "Error in AlignmentHelper" );
+    STATIC_CHECK( sizeof(X) * count == sizeof(type), "Error in AlignmentHelper" );
     STATIC_CHECK( ALIGNOF(X) == ALIGNOF(type), "Error in AlignmentHelper" );
 };
 
 static const struct Nullv
 {} nullv;
 
+/*  References aren't supported!  */
 template < typename X > class Nullable
 {
     typename AlignmentHelper < X >::type _object;
@@ -302,6 +313,12 @@ public:
         ASSUME( _is_null == false );
         return ToRef();
     }
+};
+
+//  To prevent using Nullable as a holder for reference types
+template < typename X > class Nullable < X & >
+{
+    Nullable();
 };
 
 struct CharMovable
@@ -425,7 +442,7 @@ public:
     }
 };
 
-/*  volatile is not really supported  */
+/*  volatile doesn't supported  */
 
 template < typename X > struct TypeDesc
 {
@@ -442,12 +459,14 @@ template < typename X > struct TypeDesc
     #endif
     static const bln is_movable = is_pod || IsDerivedFrom < X, CharMovable >::value;
     static const uiw bits = sizeof(X) * 8;
+    typedef X type;
     typedef X & ref;
     typedef X * pointer;
 };
 template < typename X > struct TypeDesc < const X > : TypeDesc < X >
 {
     static const bln is_const = true;
+    typedef const X type;
     typedef const X & ref;
     typedef const X * pointer;
 };
@@ -459,15 +478,17 @@ template < typename X > struct TypeDesc < X & >
     static const bln is_fp = false;
     static const bln is_pointer = false;
     static const bln is_reference = true;
-    static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_pod = false;
+    static const bln is_movable = false;
     static const uiw bits = sizeof(X &) * 8;
+    typedef X type;
     typedef X & ref;
     typedef X * pointer;
 };
 template < typename X > struct TypeDesc < const X & > : TypeDesc < X & >
 {
     static const bln is_const = true;
+    typedef const X type;
     typedef const X & ref;
     typedef const X * pointer;
 };
@@ -482,12 +503,14 @@ template < typename X > struct TypeDesc < X * >
     static const bln is_pod = true;
     static const bln is_movable = true;
     static const uiw bits = sizeof(X *) * 8;
+    typedef X type;
     typedef X & ref;
     typedef X * pointer;
 };
 template < typename X > struct TypeDesc < const X * > : TypeDesc < X * >
 {
     static const bln is_const = true;
+    typedef const X type;
     typedef const X & ref;
     typedef const X * pointer;
 };
@@ -499,15 +522,17 @@ template < typename X > struct TypeDesc < X [] >
     static const bln is_fp = false;
     static const bln is_pointer = false;
     static const bln is_reference = false;
-    static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_pod = TypeDesc < X >::is_pod;
+    static const bln is_movable = TypeDesc < X >::is_movable;
     static const uiw bits = sizeof(X) * 8;
+    typedef X type;
     typedef X & ref;
     typedef X * pointer;
 };
 template < typename X > struct TypeDesc < const X [] > : TypeDesc < X [] >
 {
     static const bln is_const = true;
+    typedef const X type;
     typedef const X & ref;
     typedef const X * pointer;
 };
@@ -519,15 +544,17 @@ template < typename X, size_t size > struct TypeDesc < X [ size ] >
     static const bln is_fp = false;
     static const bln is_pointer = false;
     static const bln is_reference = false;
-    static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_pod = TypeDesc < X >::is_pod;
+    static const bln is_movable = TypeDesc < X >::is_movable;
     static const uiw bits = sizeof(X) * 8 * size;
+    typedef X type;
     typedef X & ref;
     typedef X * pointer;
 };
 template < typename X, size_t size > struct TypeDesc < const X [ size ] > : TypeDesc < X [ size ] >
 {
     static const bln is_const = true;
+    typedef const X type;
     typedef const X & ref;
     typedef const X * pointer;
 };
@@ -551,12 +578,14 @@ template <> struct TypeDesc < i64 >
     static const uiw hexDigits = 16;
     static const i64 max = i64_max;
     static const i64 min = i64_min;
+    typedef i64 type;
     typedef i64 & ref;
     typedef i64 * pointer;
 };
 template <> struct TypeDesc < const i64 > : TypeDesc < i64 >
 {
     static const bln is_const = true;
+    typedef const i64 type;
     typedef const i64 & ref;
     typedef const i64 * pointer;
 };
@@ -568,12 +597,14 @@ template <> struct TypeDesc < ui64 > : TypeDesc < i64 >
     static const uiw decDigits = 20;
     static const ui64 max = ui64_max;
     static const ui64 min = ui64_min;
+    typedef ui64 type;
     typedef ui64 & ref;
     typedef ui64 * pointer;
 };
 template <> struct TypeDesc < const ui64 > : TypeDesc < ui64 >
 {
     static const bln is_const = true;
+    typedef const ui64 type;
     typedef const ui64 & ref;
     typedef const ui64 * pointer;
 };
@@ -597,12 +628,14 @@ template <> struct TypeDesc < i32 >
     static const uiw hexDigits = 8;
     static const i32 max = i32_max;
     static const i32 min = i32_min;
+    typedef i32 type;
     typedef i32 & ref;
     typedef i32 * pointer;
 };
 template <> struct TypeDesc < const i32 > : TypeDesc < i32 >
 {
     static const bln is_const = true;
+    typedef const i32 type;
     typedef const i32 & ref;
     typedef const i32 * pointer;
 };
@@ -614,12 +647,14 @@ template <> struct TypeDesc < ui32 > : TypeDesc < i32 >
     static const uiw decDigits = 10;
     static const ui32 max = ui32_max;
     static const ui32 min = ui32_min;
+    typedef ui32 type;
     typedef ui32 & ref;
     typedef ui32 * pointer;
 };
 template <> struct TypeDesc < const ui32 > : TypeDesc < ui32 >
 {
     static const bln is_const = false;
+    typedef const ui32 type;
     typedef const ui32 & ref;
     typedef const ui32 * pointer;
 };
@@ -643,12 +678,14 @@ template <> struct TypeDesc < i16 >
     static const uiw hexDigits = 4;
     static const i16 max = i16_max;
     static const i16 min = i16_min;
+    typedef i16 type;
     typedef i16 & ref;
     typedef i16 * pointer;
 };
 template <> struct TypeDesc < const i16 > : TypeDesc < i16 >
 {
     static const bln is_const = true;
+    typedef const i16 type;
     typedef const i16 & ref;
     typedef const i16 * pointer;
 };
@@ -660,12 +697,14 @@ template <> struct TypeDesc < ui16 > : TypeDesc < i16 >
     static const uiw decDigits = 5;
     static const ui16 max = ui16_max;
     static const ui16 min = ui16_min;
+    typedef ui16 type;
     typedef ui16 & ref;
     typedef ui16 * pointer;
 };
 template <> struct TypeDesc < const ui16 > : TypeDesc < ui16 >
 {
     static const bln is_const = true;
+    typedef const ui16 type;
     typedef const ui16 & ref;
     typedef const ui16 * pointer;
 };
@@ -689,12 +728,14 @@ template <> struct TypeDesc < i8 >
     static const uiw hexDigits = 2;
     static const i8 max = i8_max;
     static const i8 min = i8_min;
+    typedef i8 type;
     typedef i8 & ref;
     typedef i8 * pointer;
 };
 template <> struct TypeDesc < const i8 > : TypeDesc < i8 >
 {
     static const bln is_const = true;
+    typedef const i8 type;
     typedef const i8 & ref;
     typedef const i8 * pointer;
 };
@@ -706,12 +747,14 @@ template <> struct TypeDesc < ui8 > : TypeDesc < i8 >
     static const uiw decDigits = 3;
     static const ui8 max = ui8_max;
     static const ui8 min = ui8_min;
+    typedef ui8 type;
     typedef ui8 & ref;
     typedef ui8 * pointer;
 };
 template <> struct TypeDesc < const ui8 > : TypeDesc < ui8 >
 {
     static const bln is_const = true;
+    typedef const ui8 type;
     typedef const ui8 & ref;
     typedef const ui8 * pointer;
 };
@@ -731,12 +774,14 @@ template <> struct TypeDesc < f32 >
     static const uiw bits = 32;
     static constexpr f32 max() { return f32_max; }
     static constexpr f32 min() { return f32_min; }
+    typedef f32 type;
     typedef f32 & ref;
     typedef f32 * pointer;
 };
 template <> struct TypeDesc < const f32 > : TypeDesc < f32 >
 {
     static const bln is_const = true;
+    typedef const f32 type;
     typedef const f32 & ref;
     typedef const f32 * pointer;
 };
@@ -756,12 +801,14 @@ template <> struct TypeDesc < f64 >
     static const uiw bits = 64;
     static constexpr f64 max() { return f64_max; }
     static constexpr f64 min() { return f64_min; }
+    typedef f64 type;
     typedef f64 & ref;
     typedef f64 * pointer;
 };
 template <> struct TypeDesc < const f64 > : TypeDesc < f64 >
 {
     static const bln is_const = true;
+    typedef const f64 type;
     typedef const f64 & ref;
     typedef const f64 * pointer;
 };
@@ -779,12 +826,14 @@ template <> struct TypeDesc < bln >
     static const uiw bits = 8;
     static const bln max = bln_max;
     static const bln min = bln_min;
+    typedef bln type;
     typedef bln & ref;
     typedef bln * pointer;
 };
 template <> struct TypeDesc < const bln > : TypeDesc < bln >
 {
     static const bln is_const = true;
+    typedef const bln type;
     typedef const bln & ref;
     typedef const bln * pointer;
 };

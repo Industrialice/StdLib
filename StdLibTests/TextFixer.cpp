@@ -199,8 +199,8 @@ static void MakeFixes( const char *pnn, TextFixerMode::mode_t fixMode )
                 to.PushBack( ' ' );
                 continue;
             }
-            to.PushBack( next( 0 ) );
         }
+        to.PushBack( next( 0 ) );
     }
 
     if( fixMode == TextFixerMode::fanfic )
@@ -231,6 +231,41 @@ static void MakeFixes( const char *pnn, TextFixerMode::mode_t fixMode )
                 }
             }
         }
+
+        //  Page numbers
+        //to.PushBack( '\0' );
+        //char *start = _StrChr( to.Data(), '\n' );
+        //for( ; ; )
+        //{
+        //    char *next = _StrChr( start + 1, '\n' );
+        //    if( next == 0 )
+        //    {
+        //        break;
+        //    }
+        //    if( Funcs::IsStrMatchAdv( start + 1, Funcs::IsChrDec, uiw_max, '\n' ) )
+        //    {
+        //        ++start;
+        //        to.Erase( start - to.Data(), next - start + 1 );
+        //        ++GlobalFixes;
+        //        continue;
+        //    }
+        //    start = next;
+        //}
+        //to.PopBack();
+
+        //  Line breaks
+        //for( auto it = to.Begin(); it != to.End(); )
+        //{
+        //    if( *it == '\n' && Funcs::IsChrLowerAlpha( *(it + 1) ) )
+        //    {
+        //        it = to.Erase( it );
+        //        ++GlobalFixes;
+        //    }
+        //    else
+        //    {
+        //        ++it;
+        //    }
+        //}
     }
 
     if( localFixes != GlobalFixes )
@@ -261,7 +296,7 @@ void Fix( TextFixerMode::mode_t fixMode )
 {
     printf( "file or folder: " );
     char buf[ 256 ];
-    scanf_s( "%s", buf );
+    scanf( "%s", buf );
 
     Files::CFileEnumInfo info;
 

@@ -11,8 +11,8 @@ namespace Files
     class CFileEnumInfo;
     typedef void (*EnumFilesCallback)( CFileEnumInfo *info, void *argument );
 
-    EXTERNAL bln DeleteFile( const char *cp_pnn, SError *po_error );
-    EXTERNAL bln DeleteFolder( const char *cp_path, SError *po_error );
+    EXTERNAL bln RemoveFile( const char *cp_pnn, SError *po_error );
+    EXTERNAL bln RemoveFolder( const char *cp_path, SError *po_error );
     EXTERNAL bln IsFileOrFolderExists( const char *cp_papn );
     EXTERNAL bln IsFileExists( const char *cp_pnn );
     EXTERNAL bln IsFolderExists( const char *cp_path );
@@ -40,6 +40,7 @@ namespace Files
         fileEnumHandle _handle;
         char _pnn[ MAX_PATH ];
         uiw _pathLen;
+        ui64 _fileSize;
 
     public:
         ~CFileEnumInfo()
@@ -72,6 +73,11 @@ namespace Files
             }
 
             return false;
+        }
+
+        ui64 FileSize() const  //  ui64_max if not defined
+        {
+            return _fileSize;
         }
     };
 }

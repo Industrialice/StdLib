@@ -49,12 +49,12 @@ protected:
 
     X *_GetArr()
     {
-        return (X *)_arr;
+        return (X *)&_arr;
     }
 
     const X *_GetArr() const
     {
-        return (const X *)_arr;
+        return (const X *)&_arr;
     }
 
     void _SetArr( X *arr, count_type newCount )
@@ -1161,6 +1161,18 @@ public:
 
 }  //  namespace Private
 
+template < typename X, TypeSemantic_t typeSemantic = Sem_Strict > class CRefVec : public Private::_CBaseVecStatic < X, void, void, typeSemantic, 0 >
+{
+    typedef Private::_CBaseVecStatic < X, void, void, typeSemantic, 0 > baseType;
+
+public:
+    CRefVec() : baseType()
+    {}
+
+    CRefVec( X *source, count_type size ) : baseType( source, size )
+    {}
+};
+
 template < typename X, typename reservator = Reservator::Half <>, TypeSemantic_t typeSemantic = Sem_Strict, typename allocator = Allocator::Simple > class CVec : public Private::_CBaseVec < X, reservator, allocator, typeSemantic, 0 >
 {
     typedef Private::_CBaseVec < X, reservator, allocator, typeSemantic, 0 > baseType;
@@ -1178,10 +1190,29 @@ public:
     CVec( const CVec &source ) : baseType( source )
     {}
 
+    CVec( const CRefVec< X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
+    {}
+
 #ifdef MOVABLE_SUPPORTED
     CVec( CVec &&source ) : baseType( std::move( source ) )
     {}
+
+    CVec &operator = ( const CVec &source )
+    {
+        baseType::operator = ( source );
+        return *this;
+    }
 #endif
+
+    CRefVec < X > ToRef()
+    {
+        return CRefVec < X >( Data(), Size() );
+    }
+
+    CRefVec < X > ToRef() const
+    {
+        return CRefVec < X >( Data(), Size() );
+    }
 };
 
 template < typename X, uiw static_size, TypeSemantic_t typeSemantic = Sem_Strict > class CStaticVec : public Private::_CBaseVec < X, void, void, typeSemantic, static_size >
@@ -1204,19 +1235,13 @@ public:
 #ifdef MOVABLE_SUPPORTED
     CStaticVec( CStaticVec &&source ) : baseType( std::move( source ) )
     {}
+
+    CStaticVec &operator = ( const CStaticVec &source )
+    {
+        baseType::operator = ( source );
+        return *this;
+    }
 #endif
-};
-
-template < typename X, TypeSemantic_t typeSemantic = Sem_Strict > class CRefVec : public Private::_CBaseVecStatic < X, void, void, typeSemantic, 0 >
-{
-    typedef Private::_CBaseVecStatic < X, void, void, typeSemantic, 0 > baseType;
-
-public:
-    CRefVec() : baseType()
-    {}
-
-    CRefVec( X *source, count_type size ) : baseType( source, size )
-    {}
 };
 
 }  //  namespace StdLib

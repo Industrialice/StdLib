@@ -8,3 +8,5 @@
 #include "LiceMathFuncs.hpp"
 #include "CString.hpp"
 #include "PackedIntArray.hpp"
+
+void StdHelperLib_Initialize();
