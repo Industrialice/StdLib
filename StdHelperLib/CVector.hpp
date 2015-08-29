@@ -24,9 +24,9 @@ namespace StdLib
 namespace Private
 {
 
-template < typename X, typename reservator, typename allocator, TypeSemantic_t typeSemantic, uiw static_size > class _CBasisVec;
+template < typename X, typename reservator, typename allocator, uiw static_size > class _CBasisVec;
 
-template < typename X, TypeSemantic_t typeSemantic, uiw static_size > class _CBasisVec < X, void, void, typeSemantic, static_size > : CharMovable
+template < typename X, uiw static_size > class _CBasisVec < X, void, void, static_size > : CharMovable
 {
     typename AlignmentHelper < X, static_size >::type _arr;
 
@@ -112,7 +112,7 @@ protected:
     }
 };
 
-template < typename X, typename reservator, typename allocator, TypeSemantic_t typeSemantic > class _CBasisVec < X, reservator, allocator, typeSemantic, 0 > : CharMovable
+template < typename X, typename reservator, typename allocator > class _CBasisVec < X, reservator, allocator, 0 > : CharMovable
 {
     X *_arr;
 
@@ -257,7 +257,7 @@ protected:
     }
 };
 
-template < typename X, typename allocator, TypeSemantic_t typeSemantic > class _CBasisVec < X, void, allocator, typeSemantic, 0 > : CharMovable
+template < typename X, typename allocator > class _CBasisVec < X, void, allocator, 0 > : CharMovable
 {
     X *_arr;
 
@@ -385,7 +385,7 @@ protected:
     }
 };
 
-template < typename X, TypeSemantic_t typeSemantic > class _CBasisVec < X, void, void, typeSemantic, 0 > : CharMovable
+template < typename X > class _CBasisVec < X, void, void, 0 > : CharMovable
 {
     X *_arr;
 
@@ -432,9 +432,116 @@ public:
     }
 };
 
-template < typename X, typename reservator, typename allocator, TypeSemantic_t typeSemantic, uiw static_size > class _CBaseVecStatic : public _CBasisVec < X, reservator, allocator, typeSemantic, static_size >
+template < typename X, typename reservator, typename allocator, uiw static_size > class _CBaseVecConstStatic : public _CBasisVec < X, reservator, allocator, static_size >
 {
-    typedef _CBasisVec < X, reservator, allocator, typeSemantic, static_size > baseType;
+    typedef _CBasisVec < X, reservator, allocator, static_size > baseType;
+
+public:
+    typedef typename baseType::count_type count_type;
+
+protected:
+    using baseType::_count;
+
+public:
+    typedef Iterator::_IterRandomConst < const X, 1 > IterConst;
+    typedef Iterator::_IterRandomConst < const X, -1 > IterRevConst;
+
+    _CBaseVecConstStatic()
+    {
+    }
+
+    _CBaseVecConstStatic( const X *arr, count_type size )
+    {
+        this->_SetArr( (X *)arr, size );
+    }
+
+    _CBaseVecConstStatic( count_type count ) : baseType( count )
+    {
+    }
+
+    const X *Data() const
+    {
+        return this->_GetArr();
+    }
+
+    const X &Back() const
+    {
+        ASSUME( _count );
+        return this->_GetArr()[ _count - 1 ];
+    }
+
+    const X &Front() const
+    {
+        ASSUME( _count );
+        return this->_GetArr()[ 0 ];
+    }
+
+    count_type Size() const
+    {
+        return _count;
+    }
+
+    bln IsEmpty() const
+    {
+        return _count == 0;
+    }
+
+    IterConst Begin() const
+    {
+        return IterConst( this->_GetArr() );
+    }
+
+    IterConst CBegin() const
+    {
+        return IterConst( this->_GetArr() );
+    }
+
+    IterConst End() const
+    {
+        return IterConst( this->_GetArr() + _count );
+    }
+
+    IterConst CEnd() const
+    {
+        return IterConst( this->_GetArr() + _count );
+    }
+
+    IterRevConst BeginRev() const
+    {
+        return IterRevConst( this->_GetArr() + _count - 1 );
+    }
+
+    IterRevConst CBeginRev() const
+    {
+        return IterRevConst( this->_GetArr() + _count - 1 );
+    }
+
+    IterRevConst EndRev() const
+    {
+        return IterRevConst( this->_GetArr() - 1 );
+    }
+
+    IterRevConst CEndRev() const
+    {
+        return IterRevConst( this->_GetArr() - 1 );
+    }
+
+    const X &Get( count_type index ) const
+    {
+        ASSUME( index < _count );
+        return this->_GetArr()[ index ];
+    }
+
+    const X &operator [] ( count_type index ) const
+    {
+        ASSUME( index < _count );
+        return this->_GetArr()[ index ];
+    }
+};
+
+template < typename X, typename reservator, typename allocator, uiw static_size > class _CBaseVecStatic : public _CBaseVecConstStatic < X, reservator, allocator, static_size >
+{
+    typedef _CBaseVecConstStatic < X, reservator, allocator, static_size > baseType;
 
 public:
     typedef typename baseType::count_type count_type;
@@ -445,8 +552,6 @@ protected:
 public:
     typedef Iterator::_IterRandom < X, 1 > Iter;
     typedef Iterator::_IterRandom < X, -1 > IterRev;
-    typedef Iterator::_IterRandomConst < const X, 1 > IterConst;
-    typedef Iterator::_IterRandomConst < const X, -1 > IterRevConst;
 
     _CBaseVecStatic()
     {
@@ -466,18 +571,7 @@ public:
         return this->_GetArr();
     }
 
-    const X *Data() const
-    {
-        return this->_GetArr();
-    }
-
     X &Back()
-    {
-        ASSUME( _count );
-        return this->_GetArr()[ _count - 1 ];
-    }
-
-    const X &Back() const
     {
         ASSUME( _count );
         return this->_GetArr()[ _count - 1 ];
@@ -489,35 +583,9 @@ public:
         return this->_GetArr()[ 0 ];
     }
 
-    const X &Front() const
-    {
-        ASSUME( _count );
-        return this->_GetArr()[ 0 ];
-    }
-
-    count_type Size() const
-    {
-        return _count;
-    }
-
-    bln IsEmpty() const
-    {
-        return _count == 0;
-    }
-
     Iter Begin()
     {
         return Iter( this->_GetArr() );
-    }
-
-    IterConst Begin() const
-    {
-        return IterConst( this->_GetArr() );
-    }
-
-    IterConst CBegin() const
-    {
-        return IterConst( this->_GetArr() );
     }
 
     Iter End()
@@ -525,29 +593,9 @@ public:
         return Iter( this->_GetArr() + _count );
     }
 
-    IterConst End() const
-    {
-        return IterConst( this->_GetArr() + _count );
-    }
-
-    IterConst CEnd() const
-    {
-        return IterConst( this->_GetArr() + _count );
-    }
-
     IterRev BeginRev()
     {
         return IterRev( this->_GetArr() + _count - 1 );
-    }
-
-    IterRevConst BeginRev() const
-    {
-        return IterRevConst( this->_GetArr() + _count - 1 );
-    }
-
-    IterRevConst CBeginRev() const
-    {
-        return IterRevConst( this->_GetArr() + _count - 1 );
     }
 
     IterRev EndRev()
@@ -555,23 +603,7 @@ public:
         return IterRev( this->_GetArr() - 1 );
     }
 
-    IterRevConst EndRev() const
-    {
-        return IterRevConst( this->_GetArr() - 1 );
-    }
-
-    IterRevConst CEndRev() const
-    {
-        return IterRevConst( this->_GetArr() - 1 );
-    }
-
     X &Get( count_type index )
-    {
-        ASSUME( index < _count );
-        return this->_GetArr()[ index ];
-    }
-
-    const X &Get( count_type index ) const
     {
         ASSUME( index < _count );
         return this->_GetArr()[ index ];
@@ -588,17 +620,11 @@ public:
         ASSUME( index < _count );
         return this->_GetArr()[ index ];
     }
-
-    const X &operator [] ( count_type index ) const
-    {
-        ASSUME( index < _count );
-        return this->_GetArr()[ index ];
-    }
 };
 
-template < typename X, typename reservator, typename allocator, TypeSemantic_t typeSemantic, uiw static_size > class _CBaseVec : public _CBaseVecStatic < X, reservator, allocator, typeSemantic, static_size >
+template < typename X, typename reservator, typename allocator, TypeSemantic_t typeSemantic, uiw static_size > class _CBaseVec : public _CBaseVecStatic < X, reservator, allocator, static_size >
 {
-    typedef _CBaseVecStatic < X, reservator, allocator, typeSemantic, static_size > baseType;
+    typedef _CBaseVecStatic < X, reservator, allocator, static_size > baseType;
 
     typedef _CBaseVec < X, reservator, allocator, typeSemantic, static_size > ownType;
 
@@ -1161,11 +1187,18 @@ public:
 
 }  //  namespace Private
 
-template < typename X, TypeSemantic_t typeSemantic = Sem_Strict > class CRefVec : public Private::_CBaseVecStatic < X, void, void, typeSemantic, 0 >
+template < typename X > class CRefVec;
+template < typename X > class CCRefVec;
+template < typename X, typename reservator = Reservator::Half <>, TypeSemantic_t typeSemantic = Sem_Strict, typename allocator = Allocator::Simple > class CVec;
+template < typename X, uiw static_size, TypeSemantic_t typeSemantic = Sem_Strict > class CStaticVec;
+
+template < typename X > class CRefVec : public Private::_CBaseVecStatic < X, void, void, 0 >
 {
-    typedef Private::_CBaseVecStatic < X, void, void, typeSemantic, 0 > baseType;
+    typedef Private::_CBaseVecStatic < X, void, void, 0 > baseType;
 
 public:
+    typedef typename baseType::count_type count_type;
+
     CRefVec() : baseType()
     {}
 
@@ -1173,11 +1206,27 @@ public:
     {}
 };
 
-template < typename X, typename reservator = Reservator::Half <>, TypeSemantic_t typeSemantic = Sem_Strict, typename allocator = Allocator::Simple > class CVec : public Private::_CBaseVec < X, reservator, allocator, typeSemantic, 0 >
+template < typename X > class CCRefVec : public Private::_CBaseVecConstStatic < X, void, void, 0 >
+{
+    typedef Private::_CBaseVecConstStatic < X, void, void, 0 > baseType;
+
+public:
+    typedef typename baseType::count_type count_type;
+
+    CCRefVec() : baseType()
+    {}
+
+    CCRefVec( const X *source, count_type size ) : baseType( source, size )
+    {}
+};
+
+template < typename X, typename reservator, TypeSemantic_t typeSemantic, typename allocator > class CVec : public Private::_CBaseVec < X, reservator, allocator, typeSemantic, 0 >
 {
     typedef Private::_CBaseVec < X, reservator, allocator, typeSemantic, 0 > baseType;
 
 public:
+    typedef typename baseType::count_type count_type;
+
     CVec() : baseType()
     {}
 
@@ -1193,6 +1242,21 @@ public:
     CVec( const CRefVec< X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
     {}
 
+    CVec( const CCRefVec< X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
+    {}
+
+    CVec &operator = ( const CRefVec< X > &source )
+    {
+        this->Assign( source.Data(), source.Size() );
+        return *this;
+    }
+
+    CVec &operator = ( const CCRefVec< X > &source )
+    {
+        this->Assign( source.Data(), source.Size() );
+        return *this;
+    }
+
 #ifdef MOVABLE_SUPPORTED
     CVec( CVec &&source ) : baseType( std::move( source ) )
     {}
@@ -1206,20 +1270,29 @@ public:
 
     CRefVec < X > ToRef()
     {
-        return CRefVec < X >( Data(), Size() );
+        return CRefVec < X >( this->Data(), this->Size() );
     }
 
-    CRefVec < X > ToRef() const
+    CCRefVec < X > ToRef() const
     {
-        return CRefVec < X >( Data(), Size() );
+        typedef _CBaseVecConstStatic < X, reservator, allocator, 0 > constBaseType;
+        return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
+    }
+
+    CCRefVec < X > ToCRef() const
+    {
+        typedef _CBaseVecConstStatic < X, reservator, allocator, 0 > constBaseType;
+        return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
     }
 };
 
-template < typename X, uiw static_size, TypeSemantic_t typeSemantic = Sem_Strict > class CStaticVec : public Private::_CBaseVec < X, void, void, typeSemantic, static_size >
+template < typename X, uiw static_size, TypeSemantic_t typeSemantic > class CStaticVec : public Private::_CBaseVec < X, void, void, typeSemantic, static_size >
 {
     typedef Private::_CBaseVec < X, void, void, typeSemantic, static_size > baseType;
 
 public:
+    typedef typename baseType::count_type count_type;
+
     CStaticVec() : baseType()
     {}
 
@@ -1242,6 +1315,23 @@ public:
         return *this;
     }
 #endif
+
+    CRefVec < X > ToRef()
+    {
+        return CRefVec < X >( this->Data(), this->Size() );
+    }
+
+    CCRefVec < X > ToRef() const
+    {
+        typedef _CBaseVecConstStatic < X, void, void, static_size > constBaseType;
+        return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
+    }
+
+    CCRefVec < X > ToCRef() const
+    {
+        typedef _CBaseVecConstStatic < X, void, void, static_size > constBaseType;
+        return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
+    }
 };
 
 }  //  namespace StdLib

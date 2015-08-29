@@ -34,5 +34,8 @@
     <ClInclude Include="TextFixer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DeleteShit.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

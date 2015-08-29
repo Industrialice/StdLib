@@ -14,6 +14,7 @@
 #include <CFramedStore.hpp>
 #include <PackedIntArray.hpp>
 #include <CString.hpp>
+#include "DeleteShit.hpp"
 
 using namespace StdLib;
 
@@ -363,8 +364,6 @@ ALIGNED_PRE( 16 ) struct TestStruct
     int a;
 };
 
-void DeleteShit();
-
 void foo(const std::string &str) 
 {
     ::printf( "%s\n", str.c_str() );
@@ -449,7 +448,12 @@ int __cdecl main()
 
     //Words();
 
-    DeleteShit();
+    //for( uiw index = 0; index < 100; ++index )
+    {
+        DeleteShit *deleter = DeleteShit::Create();
+        deleter->Perform();
+        deleter->Destroy();
+    }
 
 #if 0
     CString str( "fuck" );
@@ -1043,6 +1047,7 @@ int __cdecl main()
     ::printf( "1. %i\n2. %i\n3. %i\n", Funcs::RoundUIDownTo( 8000, 4096 ), Funcs::RoundUIUpTo( 9999, 4096 ), Funcs::RoundUIToNearest( 5000, 4096 ) );
 #endif
     ::printf( "done" );
-    while( ::getchar() != 'e' );
+    //while( ::getchar() != 'e' );
+    ::getchar();
     return 0;
 }
