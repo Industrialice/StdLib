@@ -329,7 +329,7 @@ struct CharPOD : CharMovable
 
 template < typename X > struct NewDeleter
 {
-    NewDeleter( void *something )
+    NewDeleter( X *something )
     {
         delete something;
     }
@@ -337,7 +337,7 @@ template < typename X > struct NewDeleter
 
 template < typename X > struct NewDeleter < X [] >
 {
-    NewDeleter( void *something )
+    NewDeleter( X *something )
     {
         delete[] something;
     }
@@ -345,7 +345,7 @@ template < typename X > struct NewDeleter < X [] >
 
 template < typename X = void > struct MallocDeleter
 {
-    MallocDeleter( void *something )
+    MallocDeleter( X *something )
     {
         ::free( something );
     }
@@ -362,7 +362,7 @@ protected:
 public:
     ~UniquePtr()
     {
-        Deleter( (void *)_ptr );
+        Deleter( (X *)_ptr );  //  this dummy C-cast will eliminate syntax confusion between creating a local variable and calling a constructor
     }
 
     UniquePtr() : _ptr( 0 )
@@ -373,20 +373,20 @@ public:
 
     void Own( UniquePtr *source )
     {
-        Deleter( (void *)_ptr );
+        Deleter( (X *)_ptr );
         _ptr = source->_ptr;
         source->_ptr = 0;
     }
 
     void Release()
     {
-        Deleter( (void *)_ptr );
+        Deleter( (X *)_ptr );
         _ptr = 0;
     }
 
     UniquePtr &operator = ( X *ptr )
     {
-        Deleter( (void *)_ptr );
+        Deleter( (X *)_ptr );
         _ptr = ptr;
         return *this;
     }
@@ -417,13 +417,11 @@ public:
 
     operator X * ()
     {
-        ASSUME( _ptr );
         return _ptr;
     }
 
     operator const X * () const
     {
-        ASSUME( _ptr );
         return _ptr;
     }
 };

@@ -23,29 +23,11 @@
     <ClInclude Include="StdHelperLib.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CFramedStore.hpp">
-      <Filter>Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="CPreallocatedContainer.hpp">
-      <Filter>Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="CString.hpp">
-      <Filter>Containers</Filter>
-    </ClInclude>
     <ClInclude Include="Allocators.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Reservators.hpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="oldCBaseVector.hpp">
-      <Filter>Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="oldCObjectVector.hpp">
-      <Filter>Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="oldCVector.hpp">
-      <Filter>Containers</Filter>
     </ClInclude>
     <ClInclude Include="CVector.hpp">
       <Filter>Containers</Filter>
@@ -64,6 +46,24 @@
     </ClInclude>
     <ClInclude Include="LiceMathFuncs.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deprecatedCPreallocatedContainer.hpp">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="deprecatedCBaseVector.hpp">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="deprecatedCObjectVector.hpp">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="deprecatedCVector.hpp">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="deprecatedCFramedStore.hpp">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="deprecatedCString.hpp">
+      <Filter>Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

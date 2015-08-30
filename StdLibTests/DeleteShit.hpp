@@ -9,6 +9,14 @@ public:
     static DeleteShit *Create();
     void Destroy();
     void Perform();
+
+    struct Deleter
+    {
+        Deleter( DeleteShit *ob )
+        {
+            ob->Destroy();
+        }
+    };
 };
 
 #endif

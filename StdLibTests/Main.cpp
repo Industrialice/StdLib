@@ -11,9 +11,7 @@
 //#include <FileIO.hpp>
 //#include <Files.hpp>
 
-#include <CFramedStore.hpp>
 #include <PackedIntArray.hpp>
-#include <CString.hpp>
 #include "DeleteShit.hpp"
 
 using namespace StdLib;
@@ -448,12 +446,13 @@ int __cdecl main()
 
     //Words();
 
-    //for( uiw index = 0; index < 100; ++index )
+    for( uiw index = 0; index < 100; ++index )
     {
-        DeleteShit *deleter = DeleteShit::Create();
+        UniquePtr < DeleteShit, DeleteShit::Deleter > deleter = DeleteShit::Create();
         deleter->Perform();
-        deleter->Destroy();
     }
+
+    ::printf( "%i\n", sizeof(UniquePtr < DeleteShit, DeleteShit::Deleter >) );
 
 #if 0
     CString str( "fuck" );

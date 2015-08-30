@@ -268,11 +268,13 @@ FileIO::ProcMode::ProcMode_t FileIO::Private::ProcModeGet( const CFileBasis *fil
 ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
 {
     ASSUME( IsValid( file ) );
-    if( p_buf )
+    //  TODO:
+    /*if( p_buf )
     {
-        //_MemCpy( p_buf, file->pnn.Data(), file->pnn.Size() + 1 );  //  TODO:
+        _MemCpy( p_buf, file->pnn.Data(), file->pnn.Size() + 1 );
     }
-    return file->pnn.Size();
+    return file->pnn.Size();*/
+    return 0;
 }
 
 NOINLINE bln FileIO::Private::WriteToFile( FileIO::Private::CFileBasis *file, const void *cp_source, ui32 len )
