@@ -17,24 +17,39 @@ namespace Type
     };
 }
 
-template < typename type, iw step > class _IterRandomConst
-{
-    typedef _IterRandomConst < type, step > ownType;
+template < typename type, iw step, typename retType, bool is_const > class _IterRandomBasis;
 
+template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, false >
+{
 protected:
     type *_str;
+};
+
+template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, true >
+{
+protected:
+    const type *_str;
+};
+
+template < typename type, iw step, typename retType, bool is_const > class _IterRandomBase : public _IterRandomBasis < type, step, retType, is_const >
+{
+    typedef _IterRandomBasis < type, step, retType, is_const > baseType;
+    typedef _IterRandomBase < type, step, retType, is_const > ownType;
+
+protected:
+    using baseType::_str;
 
 public:
     static const Type::type_t iteratorType = Type::Random;
 
-    _IterRandomConst()
+    _IterRandomBase()
     {
         DBGCODE( _str = 0; )
     }
 
-    _IterRandomConst( const type *source )
+    _IterRandomBase( const type *source )
     {
-        _str = (type *)source;
+        _str = source;
     }
 
     const type &operator *() const
@@ -52,29 +67,29 @@ public:
         return _str[ index ];
     }
 
-    ownType &operator ++ ()
+    retType &operator ++ ()
     {
         ASSUME( _str );
         _str += step;
         return *this;
     }
 
-    ownType operator ++ (int)
+    retType operator ++ (int)
     {
         ASSUME( _str );
-        ownType temp = *this;
+        retType temp = *this;
         ++(*this);
         return temp;
     }
 
-    ownType &operator -- ()
+    retType &operator -- ()
     {
         ASSUME( _str );
         _str -= step;
         return *this;
     }
 
-    ownType operator -- (int)
+    retType operator -- (int)
     {
         ASSUME( _str );
         ownType temp = *this;
@@ -82,19 +97,19 @@ public:
         return temp;
     }
 
-    ownType operator + ( size_t addition ) const
+    retType operator + ( size_t addition ) const
     {
-        return ownType( _str + (addition * step) );
+        return retType( _str + (addition * step) );
     }
 
-    friend ownType operator + ( size_t addition, const ownType &it )
+    friend retType operator + ( size_t addition, const ownType &it )
     {
-        return ownType( it._str + (addition * step) );
+        return retType( it._str + (addition * step) );
     }
 
-    ownType operator - ( size_t subtraction ) const
+    retType operator - ( size_t subtraction ) const
     {
-        return ownType( _str - (subtraction * step) );
+        return retType( _str - (subtraction * step) );
     }
 
     size_t operator - ( const ownType& subtraction ) const
@@ -104,13 +119,13 @@ public:
         return subtraction._str - _str;
     }
 
-    ownType &operator += ( size_t addition )
+    retType &operator += ( size_t addition )
     {
         _str += addition * step;
         return *this;
     }
 
-    ownType &operator -= ( size_t subtraction )
+    retType &operator -= ( size_t subtraction )
     {
         _str -= subtraction * step;
         return *this;
@@ -155,10 +170,30 @@ public:
     }
 };
 
-template < typename type, iw step > class _IterRandom : public _IterRandomConst < type, step >
+template < typename type, iw step > class _IterRandomConst : public _IterRandomBase < type, step, _IterRandomConst < type, step >, true >
 {
+    typedef _IterRandomBase < type, step, _IterRandomConst < type, step >, true > baseType;
+
 public:
-    using _IterRandomConst < type, step >::_str;
+    using baseType::_str;
+
+    _IterRandomConst()
+    {
+        DBGCODE( _str = 0; )
+    }
+
+    _IterRandomConst( const type *source )
+    {
+        _str = source;
+    }
+};
+
+template < typename type, iw step > class _IterRandom : public _IterRandomBase < type, step, _IterRandom < type, step >, false >
+{
+    typedef _IterRandomBase < type, step, _IterRandom < type, step >, false > baseType;
+
+public:
+    using baseType::_str;
 
     _IterRandom()
     {
@@ -183,6 +218,11 @@ public:
     type &operator [] ( size_t index )
     {
         return _str[ index ];
+    }
+
+    operator _IterRandomConst < type, step >() const
+    {
+        return _IterRandomConst < type, step >( _str );
     }
 };
 

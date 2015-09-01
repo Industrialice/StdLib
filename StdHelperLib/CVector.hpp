@@ -443,8 +443,8 @@ protected:
     using baseType::_count;
 
 public:
-    typedef Iterator::_IterRandomConst < const X, 1 > IterConst;
-    typedef Iterator::_IterRandomConst < const X, -1 > IterRevConst;
+    typedef Iterator::_IterRandomConst < X, 1 > IterConst;
+    typedef Iterator::_IterRandomConst < X, -1 > IterRevConst;
 
     _CBaseVecConstStatic()
     {
@@ -550,6 +550,8 @@ protected:
     using baseType::_count;
 
 public:
+    /*using baseType::IterConst;
+    using baseType::IterRevConst;*/
     typedef Iterator::_IterRandom < X, 1 > Iter;
     typedef Iterator::_IterRandom < X, -1 > IterRev;
 
@@ -699,7 +701,7 @@ private:
         }
     }
 
-    template < bln is_destroySource > void _Copy( X *RSTR target, const X *source, count_type count )
+    template < bln is_destroySource > void _Copy( X *RSTR target, X *source, count_type count )
     {
         if( _c_typeSemantic == Sem_POD )
         {
@@ -709,11 +711,23 @@ private:
         {
             for( ; count; --count )
             {
-                new (target) X( *source );
-                if( is_destroySource )
-                {
-                    source->~X();
-                }
+#               ifdef MOVABLE_SUPPORTED
+                    if( is_destroySource )
+                    {
+                        new (target) X( std::move( *source ) );
+                        source->~X();
+                    }
+                    else
+                    {
+                        new (target) X( *source );
+                    }
+#               else
+                    new (target) X( *source );
+                    if( is_destroySource )
+                    {
+                        source->~X();
+                    }
+#               endif
                 ++target;
                 ++source;
             }
@@ -753,7 +767,11 @@ private:
                 X *end = this->_GetArr() + _count;
                 for( ; source != end; ++source, ++target )
                 {
-                    new (target) X( *source );
+#                   ifdef MOVABLE_SUPPORTED
+                        new (target) X( std::move( *source ) );
+#                   else
+                        new (target) X( *source );
+#                   endif
                     source->~X();
                 }
             }
@@ -836,14 +854,14 @@ public:
     _CBaseVec( const X *source, count_type size, count_type reserve ) : baseType( Funcs::Max( size, reserve ) )
     {
         _count = size;
-        _Copy < false >( this->_GetArr(), source, size );
+        _Copy < false >( this->_GetArr(), (X *)source, size );
     }
 
     _CBaseVec( const ownType &source ) : baseType( source._count )
     {
         ASSUME( this != &source );
         _count = source._count;
-        _Copy < false >( this->_GetArr(), source._GetArr(), source._count );
+        _Copy < false >( this->_GetArr(), (X *)source._GetArr(), source._count );
     }
 
 #ifdef MOVABLE_SUPPORTED
@@ -854,7 +872,7 @@ public:
         source._count = 0;
         if( _cis_static )  //  TODO: bad
         {
-            _Copy < false >( this->_GetArr(), source._GetArr(), _count );
+            _Copy < false >( this->_GetArr(), (X *)source._GetArr(), _count );
         }
     }
 #endif
@@ -1052,7 +1070,7 @@ public:
         _Erase( pos, count );
     }
 
-    Iter Erase( Iter where )
+    Iter Erase( IterConst where )
     {
         count_type index = &*where - this->_GetArr();
         ASSUME( index < _count );
@@ -1060,7 +1078,7 @@ public:
         return Iter( this->_GetArr() + index );
     }
 
-    Iter Erase( Iter begin, Iter end )
+    Iter Erase( IterConst begin, IterConst end )
     {
         count_type index = &*where - this->_GetArr();
         count_type count = end - begin;
@@ -1158,7 +1176,7 @@ public:
         {
             _Destroy( this->_GetArr(), _count );
             _SizeToUnknown( count );
-            _Copy < false >( this->_GetArr(), source, count );
+            _Copy < false >( this->_GetArr(), (X *)source, count );
             _count = count;
         }
     }

@@ -357,21 +357,46 @@ static void EnumFilesCallback( Files::CFileEnumInfo *info, void * )
     ::WaitForSingleObject( pi.hProcess, 100 );*/
 }
 
-ALIGNED_PRE( 16 ) struct TestStruct
+struct TestStruct
 {
     int a;
-};
 
-void foo(const std::string &str) 
-{
-    ::printf( "%s\n", str.c_str() );
-}
+    TestStruct() : a( rand() )
+    {}
+
+    TestStruct( TestStruct &&source )
+    {
+        ::printf( "move\n" );
+        a = source.a;
+        source.a = 0;
+    };
+
+    TestStruct( const TestStruct &source )
+    {
+        ::printf( "copy\n" );
+        a = source.a;
+    };
+};
 
 #include <memory>
 
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
+
+    CVec < TestStruct > vec;
+    vec.PushBack( TestStruct() );
+    vec.PushBack( TestStruct() );
+    vec.PushBack( TestStruct() );
+    vec.PushBack( TestStruct() );
+    vec.PushBack( TestStruct() );
+    vec.PushBack( TestStruct() );
+    vec.Reserve( 100 );
+    ::system( "Cls" );
+    CVec < TestStruct >::Iter wh = vec.Begin() + 1;
+    CVec < TestStruct >::IterConst ci = vec.Erase( wh );
+
+    ::printf( "%i\n%i\n", wh->a, ci->a );
 
     //foo(false);
 
@@ -446,13 +471,7 @@ int __cdecl main()
 
     //Words();
 
-    for( uiw index = 0; index < 100; ++index )
-    {
-        UniquePtr < DeleteShit, DeleteShit::Deleter > deleter = DeleteShit::Create();
-        deleter->Perform();
-    }
-
-    ::printf( "%i\n", sizeof(UniquePtr < DeleteShit, DeleteShit::Deleter >) );
+    //UniquePtr < DeleteShit, DeleteShit::Deleter >( DeleteShit::Create() )->Perform();
 
 #if 0
     CString str( "fuck" );

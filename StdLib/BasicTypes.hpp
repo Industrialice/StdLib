@@ -402,7 +402,7 @@ public:
         ASSUME( _ptr );
         return *_ptr;
     }
-
+      
     const X *operator -> () const
     {
         ASSUME( _ptr );
