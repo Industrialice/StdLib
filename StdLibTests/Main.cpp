@@ -481,7 +481,7 @@ int __cdecl main()
 
     //GLFuncsCreate();
 
-    //Fix( TextFixerMode::fanfic );
+    //Fix( TextFixerMode::codeSpaces );
 
     //Words();
 
@@ -1079,7 +1079,7 @@ int __cdecl main()
     ::printf( "1. %i\n2. %i\n3. %i\n", Funcs::RoundUIDownTo( 8000, 4096 ), Funcs::RoundUIUpTo( 9999, 4096 ), Funcs::RoundUIToNearest( 5000, 4096 ) );
 #endif
     ::printf( "done" );
-    //while( ::getchar() != 'e' );
-    ::getchar();
+    while( ::getchar() != 'e' );
+    //::getchar();
     return 0;
 }
