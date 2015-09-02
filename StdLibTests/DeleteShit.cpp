@@ -9,6 +9,7 @@
 #include <CEvent.hpp>
 #include <CAtomicFlag.hpp>
 #include <CMutex.hpp>
+#include <CString.hpp>
 
 using namespace StdLib;
 
@@ -24,8 +25,8 @@ class DeleteShitImpl
         CEvent endEvent;
         CAtomicFlag is_finished;
         CAtomicFlag is_continue;
-        CVec < char, void > extensionToProcess;
-        CVec < char, void > path;
+        CStr extensionToProcess;
+        CStr path;
         CEvent *threadFreeEventPointer;
         CMutex *printfMutexPointer;
         CThread thread;  //  keep it last, it must be initialized last
@@ -57,7 +58,7 @@ public:
         extensions.Read( bufMem, size, 0 );
         bufMem[ size ] = '\0';
 
-        CVec < CVec < char > > exts;
+        CVec < CStr > exts;
 
         char *next = bufMem;
         for( ; ; )
@@ -146,7 +147,7 @@ private:
         } while( ti->is_continue.IsSet() );
     }
 
-    void AddFileJob( const CCRefVec < char > &path, const CVec < char > &ext )
+    void AddFileJob( const CCRefVec < char > &path, const CStr &ext )
     {
         ThreadFreeEvent.WaitFor();
         for( uiw index = 0; ; ++index )
@@ -164,8 +165,8 @@ private:
                     ::printf( "#thread %u# job %s%s has been completed\n", index, tpath, text );
                     PrintfMutex.Unlock();
                 }
-                ThreadInfos[ index ].path = path;
-                ThreadInfos[ index ].extensionToProcess = ext.ToRef();
+                ThreadInfos[ index ].path.Assign( path.Begin(), path.End() );
+                ThreadInfos[ index ].extensionToProcess = ext;
                 ThreadInfos[ index ].is_finished.Reset();
                 ThreadInfos[ index ].endEvent.Reset();
                 ThreadInfos[ index ].is_continue.Set();

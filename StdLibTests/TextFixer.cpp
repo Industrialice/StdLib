@@ -1,6 +1,7 @@
 ﻿#include "TextFixer.hpp"
 #include <StdCoreLib.hpp>
 #include <FileIO.hpp>
+#include <CString.hpp>
 #include <CVector.hpp>
 #include <Files.hpp>
 #include <stdio.h>
@@ -31,7 +32,7 @@ static void MakeFixes( const char *pnn, TextFixerMode::mode_t fixMode )
     UniquePtr < char[] > bufDel( new char[ size ] );
     char *buf = bufDel;
     char *bufEnd = buf + size;
-    CVec < char > to;
+    CStr to;
 
     file.Read( buf, size, 0 );
 
@@ -300,19 +301,16 @@ void Fix( TextFixerMode::mode_t fixMode )
 
     Files::CFileEnumInfo info;
 
-    CVec < CVec < char > > extNum;
+    CVec < CStr > extNum;
 
     if( fixMode == TextFixerMode::fanfic )
     {
-        char txt[] = "*.txt";
-        extNum.PushBack( CVec < char >( txt, sizeof(txt), sizeof(txt) ) );
+        extNum.PushBack( CStr( "*.txt" ) );
     }
     else if( fixMode == TextFixerMode::codeSpaces )
     {
-        char cpp[] = "*.cpp";
-        char hpp[] = "*.hpp";
-        extNum.PushBack( CVec < char >( cpp, sizeof(cpp), sizeof(cpp) ) );
-        extNum.PushBack( CVec < char >( hpp, sizeof(hpp), sizeof(hpp) ) );
+        extNum.PushBack( CStr( "*.cpp" ) );
+        extNum.PushBack( CStr( "*.hpp" ) );
     }
 
     for( uiw index = 0; index < extNum.Size(); ++index )

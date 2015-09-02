@@ -379,12 +379,13 @@ struct TestStruct
 };
 
 #include <memory>
+#include <CString.hpp>
 
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-    CVec < TestStruct > vec;
+    /*CVec < TestStruct > vec;
     vec.PushBack( TestStruct() );
     vec.PushBack( TestStruct() );
     vec.PushBack( TestStruct() );
@@ -400,7 +401,16 @@ int __cdecl main()
     wh++;
     CVec < TestStruct >::IterConst ci = vec.Erase( wh );
 
-    ::printf( "%i\n%i\n", wh->a, ci->a );
+    ::printf( "%i\n%i\n", wh->a, ci->a );*/
+
+    CVec < char > vec;
+    vec.Append( "vecFuck", 8 );
+
+    CStr str;
+    str = "fuck";
+    str.Append( vec.Begin(), vec.End() );
+    str.Assign( vec.Begin(), vec.End() );
+    ::printf( "%s\n", str.CStr() );
 
     //foo(false);
 
@@ -478,7 +488,7 @@ int __cdecl main()
     //UniquePtr < DeleteShit, DeleteShit::Deleter >( DeleteShit::Create() )->Perform();
 
 #if 0
-    CString str( "fuck" );
+    CStr str( "fuck" );
     str += " hello";
     str += " shiifhv";
     str = str + "sd";

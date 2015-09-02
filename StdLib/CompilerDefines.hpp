@@ -71,7 +71,7 @@
 
     #if _MSC_VER >= 1600  //  Visual Studio 2010
         #define STATIC_ASSERTION_SUPPORTED
-        #define MOVABLE_SUPPORTED
+        #define MOVE_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1700  //  Visual Studio 2012
@@ -166,7 +166,7 @@
     #endif
 
     /*  TODO: actual checks  */
-    #define MOVABLE_SUPPORTED
+    #define MOVE_SUPPORTED
     #define VAR_TEMPLATES_SUPPORTED
     #define DEFAULT_FUNC_PARAMS_SUPPORTED
     #define DEFINE_VARARGS_SUPPORTED

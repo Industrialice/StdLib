@@ -65,6 +65,9 @@
     <ClInclude Include="deprecatedCString.hpp">
       <Filter>Containers</Filter>
     </ClInclude>
+    <ClInclude Include="CString.hpp">
+      <Filter>Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Error.cpp">

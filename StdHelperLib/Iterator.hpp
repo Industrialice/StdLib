@@ -17,6 +17,22 @@ namespace Type
     };
 }
 
+template < typename X, Type::type_t type > struct _IterDist
+{
+    static uiw Dist( const X &first, const X &second )
+    {
+        uiw_max;
+    }
+};
+
+template < typename X > struct _IterDist < X, Type::Random >
+{
+    static uiw Dist( const X &first, const X &second )
+    {
+        return second - first;
+    }
+};
+
 template < typename type, iw step, typename retType, bool is_const > class _IterRandomBasis;
 
 template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, false >
@@ -62,7 +78,7 @@ public:
         return _str;
     }
 
-    const type &operator [] ( size_t index ) const
+    const type &operator [] ( uiw index ) const
     {
         return _str[ index ];
     }
@@ -97,35 +113,35 @@ public:
         return temp;
     }
 
-    retType operator + ( size_t addition ) const
+    retType operator + ( uiw addition ) const
     {
         return retType( _str + (addition * step) );
     }
 
-    friend retType operator + ( size_t addition, const ownType &it )
+    friend retType operator + ( uiw addition, const ownType &it )
     {
         return retType( it._str + (addition * step) );
     }
 
-    retType operator - ( size_t subtraction ) const
+    retType operator - ( uiw subtraction ) const
     {
         return retType( _str - (subtraction * step) );
     }
 
-    size_t operator - ( const ownType& subtraction ) const
+    uiw operator - ( const ownType& subtraction ) const
     {
         if( _str > subtraction._str )
             return _str - subtraction._str;
         return subtraction._str - _str;
     }
 
-    retType &operator += ( size_t addition )
+    retType &operator += ( uiw addition )
     {
         _str += addition * step;
         return *(retType *)this;
     }
 
-    retType &operator -= ( size_t subtraction )
+    retType &operator -= ( uiw subtraction )
     {
         _str -= subtraction * step;
         return *(retType *)this;
@@ -215,7 +231,7 @@ public:
         return _str;
     }
 
-    type &operator [] ( size_t index )
+    type &operator [] ( uiw index )
     {
         return _str[ index ];
     }

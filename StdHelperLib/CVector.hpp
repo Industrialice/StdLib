@@ -137,7 +137,7 @@ protected:
         _arr = allocator::Alloc < X >( count );
     }
 
-#ifdef MOVABLE_SUPPORTED
+#ifdef MOVE_SUPPORTED
     _CBasisVec( _CBasisVec &&source ) NOEXEPT
     {
         _arr = source._arr;
@@ -282,7 +282,7 @@ protected:
         _arr = allocator::Alloc < X >( count );
     }
 
-#ifdef MOVABLE_SUPPORTED
+#ifdef MOVE_SUPPORTED
     _CBasisVec( _CBasisVec &&source ) NOEXEPT
     {
         _arr = source._arr;
@@ -711,7 +711,7 @@ private:
         {
             for( ; count; --count )
             {
-#               ifdef MOVABLE_SUPPORTED
+#               ifdef MOVE_SUPPORTED
                     if( is_destroySource )
                     {
                         new (target) X( std::move( *source ) );
@@ -767,7 +767,7 @@ private:
                 X *end = this->_GetArr() + _count;
                 for( ; source != end; ++source, ++target )
                 {
-#                   ifdef MOVABLE_SUPPORTED
+#                   ifdef MOVE_SUPPORTED
                         new (target) X( std::move( *source ) );
 #                   else
                         new (target) X( *source );
@@ -864,7 +864,7 @@ public:
         _Copy < false >( this->_GetArr(), (X *)source._GetArr(), source._count );
     }
 
-#ifdef MOVABLE_SUPPORTED
+#ifdef MOVE_SUPPORTED
     _CBaseVec( ownType &&source ) NOEXEPT : baseType( std::move( source ) )
     {
         ASSUME( this != &source );
@@ -1101,7 +1101,7 @@ public:
         if( _cis_static || !is_checkOverlap )
         {
             _SizeUp( _count + count );
-            _Copy < false >( this->_GetArr() + _count, source, count );
+            _Copy < false >( this->_GetArr() + _count, (X *)source, count );
         }
         else
         {
@@ -1111,7 +1111,7 @@ public:
             {
                 source = &this->_GetArr()[ index ];
             }
-            _Copy < false >( this->_GetArr() + _count, source, count );
+            _Copy < false >( this->_GetArr() + _count, (X *)source, count );
         }
         _count += count;
     }
@@ -1275,7 +1275,7 @@ public:
         return *this;
     }
 
-#ifdef MOVABLE_SUPPORTED
+#ifdef MOVE_SUPPORTED
     CVec( CVec &&source ) : baseType( std::move( source ) )
     {}
 
@@ -1323,7 +1323,7 @@ public:
     CStaticVec( const CStaticVec &source ) : baseType( source )
     {}
 
-#ifdef MOVABLE_SUPPORTED
+#ifdef MOVE_SUPPORTED
     CStaticVec( CStaticVec &&source ) : baseType( std::move( source ) )
     {}
 

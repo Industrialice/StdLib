@@ -6,9 +6,9 @@
 
 namespace StdLib {
 
-template < typename count_type = ui32, typename allocator = Allocator::Simple, typename reservator = Reservator::Simple < count_type >, uiw basicSize = 16 > class TCString
+template < typename count_type = ui32, typename allocator = Allocator::Simple, typename reservator = Reservator::Simple < count_type >, uiw basicSize = 16 > class TCStr
 {
-    typedef TCString < count_type, allocator, reservator, basicSize > ownType;
+    typedef TCStr < count_type, allocator, reservator, basicSize > ownType;
 
     struct SDymanicFmt
     {
@@ -146,7 +146,7 @@ template < typename count_type = ui32, typename allocator = Allocator::Simple, t
     }
 
 public:
-    ~TCString()
+    ~TCStr()
     {
         if( IsDynamic() )
         {
@@ -154,14 +154,14 @@ public:
         }
     }
 
-    TCString()
+    TCStr()
     {
         _static_str[ 0 ] = '\0';
         SetStatic();
         _count = 0;
     }
 
-    TCString( count_type reserve )
+    TCStr( count_type reserve )
     {
         if( reserve >= static_size )
         {
@@ -178,7 +178,7 @@ public:
         _count = 0;
     }
 
-    TCString( const char *str )
+    TCStr( const char *str )
     {
         count_type len = _StrLen( str );
         _count = len;
@@ -198,7 +198,7 @@ public:
         }
     }
 
-    TCString( const char *str, count_type len )
+    TCStr( const char *str, count_type len )
     {
         _count = len;
         if( len >= static_size )
@@ -219,7 +219,7 @@ public:
         }
     }
 
-    NOINLINE TCString( const char *str0, count_type len0, const char *str1, count_type len1 )
+    NOINLINE TCStr( const char *str0, count_type len0, const char *str1, count_type len1 )
     {
         _count = len0 + len1;
         if( _count >= static_size )
@@ -242,7 +242,7 @@ public:
         }
     }
 
-    TCString( const ownType &source )
+    TCStr( const ownType &source )
     {
         ASSUME( this != &source );
         if( source.IsDynamic() )
@@ -363,7 +363,7 @@ public:
         _count = 0;
     }
 
-    TCString &operator = ( const ownType &source )
+    TCStr &operator = ( const ownType &source )
     {
         if( this != &source )
         {
@@ -390,51 +390,51 @@ public:
         return *this;
     }
 
-    TCString operator + ( const ownType &source )
+    TCStr operator + ( const ownType &source )
     {
-        return TCString( this->CStr(), this->_count, source.CStr(), source._count );
+        return TCStr( this->CStr(), this->_count, source.CStr(), source._count );
     }
 
-    TCString operator + ( const char *str )
+    TCStr operator + ( const char *str )
     {
-        return TCString( this->CStr(), this->_count, str, _StrLen( str ) );
+        return TCStr( this->CStr(), this->_count, str, _StrLen( str ) );
     }
 
-    TCString operator + ( char symbol )
+    TCStr operator + ( char symbol )
     {
-        return TCString( this->CStr(), this->_count, &symbol, 1 );
+        return TCStr( this->CStr(), this->_count, &symbol, 1 );
     }
 
-    friend TCString operator + ( const char *str, const ownType &second )
+    friend TCStr operator + ( const char *str, const ownType &second )
     {
-        return TCString( str, _StrLen( str ), second.CStr(), second.Len() );
+        return TCStr( str, _StrLen( str ), second.CStr(), second.Len() );
     }
 
-    friend TCString operator + ( char symbol, const ownType &second )
+    friend TCStr operator + ( char symbol, const ownType &second )
     {
-        return TCString( &symbol, 1, second.CStr(), second.Len() );
+        return TCStr( &symbol, 1, second.CStr(), second.Len() );
     }
 
-    TCString &operator += ( const ownType &source )
+    TCStr &operator += ( const ownType &source )
     {
         AddString( source.CStr(), source.Len() );
         return *this;
     }
 
-    TCString &operator += ( const char *str )
+    TCStr &operator += ( const char *str )
     {
         AddString( str, _StrLen( str ) );
         return *this;
     }
 
-    TCString &operator += ( char symbol )
+    TCStr &operator += ( char symbol )
     {
         AddString( &symbol, 1 );
         return *this;
     }
 };
 
-typedef TCString <> CString;
+typedef TCStr <> CStr;
 
 }  //  namespace StdLib
 

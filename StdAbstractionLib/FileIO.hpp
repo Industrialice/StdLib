@@ -69,7 +69,7 @@ namespace FileIO
             ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
 
             #ifdef WINDOWS
-                //CString pnn;
+                //CStr pnn;
             #endif
         };
 

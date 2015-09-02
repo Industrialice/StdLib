@@ -197,6 +197,7 @@
   <ItemGroup>
     <ClInclude Include="Algorithm.hpp" />
     <ClInclude Include="Allocators.hpp" />
+    <ClInclude Include="CString.hpp" />
     <ClInclude Include="Iterator.hpp" />
     <ClInclude Include="LiceMathFuncs.hpp" />
     <ClInclude Include="deprecatedCBaseVector.hpp" />

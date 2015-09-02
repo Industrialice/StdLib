@@ -195,7 +195,7 @@ template <> struct IntWithSizeAndSign < 64, false >
     typedef ui64 type_t;
 };
 
-template < typename X, size_t count = 1 > class AlignmentHelper
+template < typename X, uiw count = 1 > class AlignmentHelper
 {
 #ifdef NATIVE_ALIGNOF
     typedef typename TypeWithSizeAndAlignment < ALIGNOF(X) >::type alignedType;
@@ -534,7 +534,7 @@ template < typename X > struct TypeDesc < const X [] > : TypeDesc < X [] >
     typedef const X & ref;
     typedef const X * pointer;
 };
-template < typename X, size_t size > struct TypeDesc < X [ size ] >
+template < typename X, uiw size > struct TypeDesc < X [ size ] >
 {
     static const bln is_array = true;
     static const bln is_const = false;
@@ -549,7 +549,7 @@ template < typename X, size_t size > struct TypeDesc < X [ size ] >
     typedef X & ref;
     typedef X * pointer;
 };
-template < typename X, size_t size > struct TypeDesc < const X [ size ] > : TypeDesc < X [ size ] >
+template < typename X, uiw size > struct TypeDesc < const X [ size ] > : TypeDesc < X [ size ] >
 {
     static const bln is_const = true;
     typedef const X type;
