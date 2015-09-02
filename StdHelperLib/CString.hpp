@@ -6,8 +6,8 @@
 #include "Allocators.hpp"
 #include "Iterator.hpp"
 
-#define _MemCpyStr( a, b, c, d ) memcpy( a, b, (c) * d )
-#define _MemMoveStr( a, b, c, d ) memmove( a, b, (c) * d )
+#define _MemCpyStr( a, b, c ) memcpy( a, b, (c) * sizeof(charType) )
+#define _MemMoveStr( a, b, c ) memmove( a, b, (c) * sizeof(charType) )
 
 namespace StdLib
 {
@@ -128,13 +128,15 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         }
     }
 
-    void _ProcReservationDown( uiw newCount )
+    bool _ProcReservationDown( uiw newCount )
     {
         ASSUME( IsDynamic() );
         if( reservator::Down( newCount, &_reserved ) )
         {
             _dynamic_str = allocator::Realloc( _dynamic_str, _reserved + 1 );
+            return true;
         }
+        return false;
     }
 
     template < bool isCanBeAliased >
@@ -160,11 +162,11 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             {
                 uiw reserved = _count + len;
                 charType *newStr = allocator::Alloc < charType >( reserved + 1 );
-                _MemCpyStr( newStr, _static_str, _count, sizeof(charType) );
+                _MemCpyStr( newStr, _static_str, _count );
                 if( isCanBeAliased && IsStrInRange( str, _static_str, _static_str + _count ) )
                 {
                     ASSUME( len <= static_last );
-                    _MemCpyStr( temp, str, len, sizeof(charType) );
+                    _MemCpyStr( temp, str, len );
                     str = temp;
                 }
                 SetDynamic();
@@ -178,7 +180,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             }
         }
 
-        _MemCpyStr( targetStr + _count, str, len, sizeof(charType) );
+        _MemCpyStr( targetStr + _count, str, len );
         _count += len;
         targetStr[ _count ] = (charType)0;
     }
@@ -199,7 +201,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             {
                 uiw reserved = _count + len;
                 charType *newStr = allocator::Alloc < charType >( reserved + 1 );
-                _MemCpyStr( newStr, _static_str, _count, sizeof(charType) );
+                _MemCpyStr( newStr, _static_str, _count );
                 thisStr = newStr;
                 SetDynamic();
                 _reserved = reserved;
@@ -211,9 +213,8 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             }
         }
 
-        thisStr += _count;
         _count += len;
-        thisStr[ len ] = (charType)0;
+        thisStr[ _count ] = (charType)0;
         return thisStr;
     }
 
@@ -230,7 +231,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
                 if( IsStrInRange( str, _dynamic_str, _dynamic_str + _count ) )
                 {
                     dynPtr = allocator::Alloc < charType >( len );
-                    _MemCpyStr( dynPtr, str, len, sizeof(charType) );
+                    _MemCpyStr( dynPtr, str, len );
                     str = dynPtr;
                 }
                 else
@@ -239,8 +240,8 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
                 }
             }
             _ProcReservationUp( _count + len );
-            _MemMoveStr( _dynamic_str + index + len, _dynamic_str + index, _count - index + 1, sizeof(charType) );
-            _MemCpyStr( _dynamic_str + index, str, len, sizeof(charType) );
+            _MemMoveStr( _dynamic_str + index + len, _dynamic_str + index, _count - index + 1 );
+            _MemCpyStr( _dynamic_str + index, str, len );
             if( isCanBeAliased )
             {
                 allocator::Free( dynPtr );
@@ -252,9 +253,9 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             {
                 uiw reserved = _count + len;
                 charType *newStr = allocator::Alloc < charType >( reserved + 1 );
-                _MemCpyStr( newStr, _static_str, index, sizeof(charType) );
-                _MemCpyStr( newStr + index, str, len, sizeof(charType) );
-                _MemCpyStr( newStr + index + len, _static_str + index, _count - index + 1, sizeof(charType) );
+                _MemCpyStr( newStr, _static_str, index );
+                _MemCpyStr( newStr + index, str, len );
+                _MemCpyStr( newStr + index + len, _static_str + index, _count - index + 1 );
                 SetDynamic();
                 _reserved = reserved;
                 _dynamic_str = newStr;
@@ -264,11 +265,11 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
                 if( isCanBeAliased && IsStrInRange( str, _static_str, _static_str + _count ) )
                 {
                     ASSUME( len < static_size );
-                    _MemCpyStr( temp, str, len, sizeof(charType) );
+                    _MemCpyStr( temp, str, len );
                     str = temp;
                 }
-                _MemMoveStr( _static_str + index + len, _static_str + index, _count - index + 1, sizeof(charType) );
-                _MemCpyStr( _static_str + index, str, len, sizeof(charType) );
+                _MemMoveStr( _static_str + index + len, _static_str + index, _count - index + 1 );
+                _MemCpyStr( _static_str + index, str, len );
             }
         }
 
@@ -282,7 +283,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         if( IsDynamic() )
         {
             _ProcReservationUp( _count + len );
-            _MemMoveStr( _dynamic_str + index + len, _dynamic_str + index, _count - index + 1, sizeof(charType) );
+            _MemMoveStr( _dynamic_str + index + len, _dynamic_str + index, _count - index + 1 );
             thisStr = _dynamic_str;
         }
         else
@@ -291,8 +292,8 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             {
                 uiw reserved = _count + len;
                 charType *newStr = allocator::Alloc < charType >( reserved + 1 );
-                _MemCpyStr( newStr, _static_str, index, sizeof(charType) );
-                _MemCpyStr( newStr + index + len, _static_str + index, _count - index + 1, sizeof(charType) );
+                _MemCpyStr( newStr, _static_str, index );
+                _MemCpyStr( newStr + index + len, _static_str + index, _count - index + 1 );
                 SetDynamic();
                 _reserved = reserved;
                 _dynamic_str = newStr;
@@ -300,25 +301,56 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             }
             else
             {
-                _MemMoveStr( _static_str + index + len, _static_str + index, _count - index + 1, sizeof(charType) );
+                _MemMoveStr( _static_str + index + len, _static_str + index, _count - index + 1 );
                 thisStr = _static_str;
             }
         }
 
         _count += len;
-        return thisStr + index;
+        return thisStr;
     }
 
-    NOINLINE void EraseSpace( uiw index, uiw count )
+    NOINLINE charType *EraseSpace( uiw index, uiw count )
     {
         ASSUME( (count == 0 || (index < _count)) && count <= _count && index + count <= _count );
         charType *str = Str();
         _count -= count;
-        _MemMoveStr( str + index, str + index + count, _count - index + 1, sizeof(charType) );
+        _MemMoveStr( str + index, str + index + count, _count - index + 1 );
         if( IsDynamic() )
         {
-            _ProcReservationDown( _count );
+            if( _ProcReservationDown( _count ) )
+            {
+                return Str();
+            }
         }
+        return str;
+    }
+
+    NOINLINE void EraseAndInsert( const uiw index, uiw count, const charType *const str, const uiw len )
+    {
+        ASSUME( (count == 0 || (index < _count)) && count <= _count && index + count <= _count );
+        charType *thisStr = Str();
+        if( count != len )
+        {
+            if( count > len )  //  deleting more than copying, shifting string's part to the left
+            {
+                thisStr = EraseSpace( index + len, count - len ) + index;
+            }
+            else  //  copying more than deleting, shifting string's part to the right if needed
+            {
+                if( index + len > _count )  //  shifting is not needed
+                {
+                    thisStr = AddSpace( (index + len) - _count ) + index;
+                }
+                else if( index + len < _count )
+                {
+                    uiw diff = len - count;
+                    thisStr = InsertSpace( index + count, diff ) + index;
+                }
+            }
+        }
+        _MemCpyStr( thisStr, str, len );
+        thisStr[ _count - index ] = (charType)0;
     }
 
     charType *Str()
@@ -439,7 +471,7 @@ public:
             SetStatic();
             thisStr = _static_str;
         }
-        _MemCpyStr( thisStr, str, _count + 1, sizeof(charType) );
+        _MemCpyStr( thisStr, str, _count + 1 );
     }
 
     NOINLINE TCStr( const charType *str, uiw len )
@@ -456,7 +488,7 @@ public:
             SetStatic();
             thisStr = _static_str;
         }
-        _MemCpyStr( thisStr, str, _count, sizeof(charType) );
+        _MemCpyStr( thisStr, str, _count );
         thisStr[ _count ] = (charType)0;
     }
 
@@ -474,8 +506,8 @@ public:
             SetStatic();
             thisStr = _static_str;
         }
-        _MemCpyStr( thisStr, str0, len0, sizeof(charType) );
-        _MemCpyStr( thisStr + len0, str1, len1, sizeof(charType) );
+        _MemCpyStr( thisStr, str0, len0 );
+        _MemCpyStr( thisStr + len0, str1, len1 );
         thisStr[ _count ] = (charType)0;
     }
 
@@ -497,7 +529,7 @@ public:
                 SetStatic();
                 thisStr = _static_str;
             }
-            _MemCpyStr( thisStr, &*i1, len, sizeof(charType) );
+            _MemCpyStr( thisStr, &*i1, len );
             thisStr[ _count ] = (charType)0;
         }
         else
@@ -507,7 +539,7 @@ public:
             _count = 0;
             for( ; i1 != i2; ++i1 )
             {
-                AddString < false > ( &*i1, 1 );
+                AddString < false >( &*i1, 1 );
             }
         }
     }
@@ -519,19 +551,19 @@ public:
         if( source.IsDynamic() )
         {
             SetDynamic( source._count );
-            _MemCpyStr( _dynamic_str, source._dynamic_str, source._count + 1, sizeof(charType) );
+            _MemCpyStr( _dynamic_str, source._dynamic_str, source._count + 1 );
         }
         else
         {
             SetStatic();
-            _MemCpyStr( _static_str, source._static_str, source._count + 1, sizeof(charType) );
+            _MemCpyStr( _static_str, source._static_str, source._count + 1 );
         }
     }
 
     NOINLINE TCStr( const ownType &source, uiw pos, uiw len = npos )
     {
         ASSUME( this != &source && pos <= source._count );
-        uiw realLen = Funcs::Min< uiw > ( source._count - pos, len );
+        uiw realLen = Funcs::Min< uiw >( source._count - pos, len );
         _count = realLen;
         charType *thisStr;
         if( realLen >= static_size )
@@ -544,7 +576,7 @@ public:
             SetStatic();
             thisStr = _static_str;
         }
-        _MemCpyStr( thisStr, source.CStr() + pos, realLen, sizeof(charType) );
+        _MemCpyStr( thisStr, source.CStr() + pos, realLen );
         thisStr[ realLen ] = (charType)0;
     }
 
@@ -583,9 +615,15 @@ public:
         return IsStatic() ? _static_str : _dynamic_str;
     }
 
+    charType Back() const
+    {
+        ASSUME( _count );
+        return CStr()[ _count - 1 ];
+    }
+
     void PushBack( charType c )
     {
-        AddString < false > ( &c, 1 );
+        AddString < false >( &c, 1 );
     }
 
     NOINLINE void PopBack()
@@ -622,7 +660,7 @@ public:
             if( reserve >= static_size )
             {
                 charType *dyn = allocator::Alloc < charType >( reserve + 1 );
-                _MemCpyStr( dyn, _static_str, _count + 1, sizeof(charType) );
+                _MemCpyStr( dyn, _static_str, _count + 1 );
                 SetDynamic();
                 _dynamic_str = dyn;
                 _reserved = reserve;
@@ -689,16 +727,10 @@ public:
         return _static_str[ static_last ] != (charType)0;
     }
 
-    charType Back() const
-    {
-        ASSUME( _count );
-        return IsDynamic() ? _dynamic_str[ _count - 1 ] : _static_str[ _count - 1 ];
-    }
-
     ownType SubStr( uiw pos = 0, uiw len = npos ) const
     {
         ASSUME( pos <= _count );
-        return TCStr( CStr() + pos, Funcs::Min< uiw > ( len, _count - pos ) );
+        return TCStr( CStr() + pos, Funcs::Min< uiw >( len, _count - pos ) );
     }
 
     NOINLINE void ShrinkToFit()
@@ -707,7 +739,7 @@ public:
         {
             if( _count < static_size )
             {
-                _MemCpyStr( _static_str, _dynamic_str, _count + 1, sizeof(charType) );
+                _MemCpyStr( _static_str, _dynamic_str, _count + 1 );
                 SetStatic();
             }
             else if( _reserved > _count )
@@ -718,34 +750,38 @@ public:
         }
     }
 
-    ownType &Insert( uiw pos, const ownType &str )
+    ownType &Insert( const ownType &str, uiw pos )
     {
-        InsertString < true > ( pos, str.CStr(), str.length() );
+        InsertString < true >( pos, str.CStr(), str.length() );
         return *this;
     }
 
-    ownType &Insert( uiw pos, const ownType &str, uiw subpos, uiw sublen )
+    ownType &Insert( const ownType &str, uiw pos, uiw subpos, uiw sublen )
     {
         ASSUME( subpos <= str._count );
-        InsertString < true > ( pos, str.CStr() + subpos, Funcs::Min< uiw > ( str.length() - subpos, sublen ) );
+        InsertString < true >( pos, str.CStr() + subpos, Funcs::Min< uiw >( str.length() - subpos, sublen ) );
         return *this;
     }
 
-    ownType &Insert( uiw pos, const charType *s )
+    ownType &Insert( const charType *s, uiw pos )
     {
-        InsertString < true > ( pos, s, GetStringLength( s ) );
+        InsertString < true >( pos, s, GetStringLength( s ) );
         return *this;
     }
 
-    ownType &Insert( uiw pos, const charType *s, uiw n )
+    ownType &Insert( const charType *s, uiw pos, uiw n = uiw_max )
     {
-        InsertString < true > ( pos, s, n );
+        if( n == uiw_max )
+        {
+            n = GetStringLength( s );
+        }
+        InsertString < true >( pos, s, n );
         return *this;
     }
 
-    ownType &Insert( uiw pos, uiw n, charType c )
+    ownType &Insert( charType c, uiw pos, uiw n = 1 )
     {
-        charType *thisStr = InsertSpace( pos, n );
+        charType *thisStr = InsertSpace( pos, n ) + pos;
         for( ; n; --n )
         {
             *thisStr++ = c;
@@ -753,43 +789,39 @@ public:
         return *this;
     }
 
-    void Insert( Iter p, uiw n, charType c )
+    void Insert( charType c, IterConst p, uiw n = 1 )
     {
         uiw pos = &*p - Str();
         ASSUME( pos <= _count );
-        charType *thisStr = InsertSpace( pos, n );
+        charType *thisStr = InsertSpace( pos, n ) + pos;
         for( ; n; --n )
         {
             *thisStr++ = c;
         }
     }
 
-    Iter Insert( Iter p, charType c )
+    Iter Insert( charType c, IterConst p )
     {
         uiw pos = &*p - Str();
         ASSUME( pos <= _count );
-        InsertString < false > ( pos, &c, 1 );
+        InsertString < false >( pos, &c, 1 );
         return Iter( Str() + pos );
     }
 
-    Iter Insert( Iter p, const charType *str )
+    Iter Insert( const charType *str, IterConst p, uiw n = uiw_max )
     {
         uiw pos = &*p - Str();
         ASSUME( pos <= _count );
-        InsertString < true > ( pos, str, GetStringLength( str ) );
-        return Iter( Str() + pos );
-    }
-
-    Iter Insert( Iter p, const charType *str, uiw len )
-    {
-        uiw pos = &*p - Str();
-        ASSUME( pos <= _count );
-        InsertString < true > ( pos, str, len );
+        if( n == uiw_max )
+        {
+            str = GetStringLength( str );
+        }
+        InsertString < true >( pos, str, n );
         return Iter( Str() + pos );
     }
 
     template <typename InputIterator>
-    NOINLINE void Insert( Iter p, InputIterator first, InputIterator last )
+    NOINLINE void Insert( IterConst p, InputIterator first, InputIterator last )
     {
         charType *thisStr = Str();
         uiw pos = &*p - thisStr;
@@ -808,26 +840,26 @@ public:
             if( first.iteratorType == Iterator::Type::Random )
             {
                 uiw len = Iterator::_IterDist< InputIterator, InputIterator::iteratorType >::Dist( first, last );
-                charType *thisStr = InsertSpace( pos, len );
-                _MemCpyStr( thisStr, &*first, len, sizeof(charType) );
+                charType *thisStr = InsertSpace( pos, len ) + pos;
+                _MemCpyStr( thisStr, &*first, len );
             }
             else
             {
                 for( ; first != last; ++first )
                 {
-                    InsertString < false > ( pos, &*first, 1 );
+                    InsertString < false >( pos, &*first, 1 );
                 }
             }
         }
     }
 
-    ownType &Erase( uiw pos = 0, uiw len = npos )
+    ownType &Erase( uiw pos, uiw len = npos )
     {
-        EraseSpace( pos, Funcs::Min< uiw > ( _count - pos, len ) );
+        EraseSpace( pos, Funcs::Min< uiw >( _count - pos, len ) );
         return *this;
     }
 
-    Iter Erase( Iter p )
+    Iter Erase( IterConst p )
     {
         charType *thisStr = Str();
         uiw pos = &*p - thisStr;
@@ -837,7 +869,7 @@ public:
         return Iter( thisStr + pos );
     }
 
-    Iter Erase( Iter first, Iter last )
+    Iter Erase( IterConst first, IterConst last )
     {
         charType *thisStr = Str();
         uiw pos = &*first - thisStr;
@@ -849,72 +881,59 @@ public:
         return Iter( thisStr + pos );
     }
 
-    ownType &Replace( uiw pos, uiw len, const ownType &str )
+    ownType &Replace( const ownType &str, uiw pos, uiw len = uiw_max )  //  TODO: overlapping
     {
         ASSUME( pos <= _count && this != &str );
-        EraseSpace( pos, Funcs::Min< uiw > ( len, _count - pos ) );
-        InsertString < false > ( pos, str.CStr(), str._count );
+        EraseAndInsert( pos, Funcs::Min< uiw >( len, _count - pos ), str.CStr(), str._count );
         return *this;
     }
 
-    ownType &Replace( Iter i1, Iter i2, const ownType &str )
+    ownType &Replace( const ownType &str, IterConst i1, IterConst i2 )  //  TODO: overlapping
     {
         ASSUME( this != &str );
         uiw pos = &*i1 - CStr();
         uiw len = i2 - i1;
-        EraseSpace( pos, len );
-        InsertString < false > ( pos, str.CStr(), str._count );
+        EraseAndInsert( pos, len, str.CStr(), str._count );
         return *this;
     }
 
-    ownType &Replace( uiw pos, uiw len, const ownType &str, uiw subpos, uiw sublen )
+    ownType &Replace( const ownType &str, uiw pos, uiw len, uiw subpos = 0, uiw sublen = uiw_max )  //  TODO: overlapping
     {
         ASSUME( pos <= _count && subpos <= str._count && this != &str );
-        EraseSpace( pos, Funcs::Min< uiw > ( len, _count - pos ) );
-        InsertString < false > ( pos, str.CStr() + subpos, Funcs::Min< uiw > ( str._count - subpos, sublen ) );
+        EraseAndInsert( pos, Funcs::Min< uiw >( len, _count - pos ), str.CStr() + subpos, Funcs::Min< uiw >( str._count - subpos, sublen ) );
         return *this;
     }
 
-    ownType &Replace( uiw pos, uiw len, const charType *s )
-    {
-        ASSUME( pos <= _count && (s < CStr() || s >= CStr() + _count) );
-        EraseSpace( pos, Funcs::Min< uiw > ( len, _count - pos ) );
-        InsertString < false > ( pos, s, GetStringLength( s ) );
-        return *this;
-    }
-
-    ownType &Replace( Iter i1, Iter i2, const charType *s )
+    ownType &Replace( const charType *s, IterConst i1, IterConst i2, uiw len = uiw_max )  //  TODO: overlapping
     {
         ASSUME( false && (s < CStr() || s >= CStr() + _count) );
+        if( len == uiw_max )
+        {
+            len = GetStringLength( s );
+        }
         uiw pos = &*i1 - CStr();
         uiw len = i2 - i1;
-        EraseSpace( pos, len );
-        InsertString < false > ( pos, s, GetStringLength( s ) );
+        EraseAndInsert( pos, len, s, len );
         return *this;
     }
 
-    ownType &Replace( uiw pos, uiw len, const charType *s, uiw n )
+    ownType &Replace( const charType *s, uiw replacePos, uiw replaceLen = 0, uiw strLen = uiw_max )  //  TODO: overlapping
     {
-        ASSUME( pos <= _count && (s < CStr() || s >= CStr() + _count) );
-        EraseSpace( pos, Funcs::Min< uiw > ( len, _count - pos ) );
-        InsertString < false > ( pos, s, n );
+        ASSUME( replacePos <= _count );
+        if( strLen == uiw_max )
+        {
+            strLen = GetStringLength( s );
+        }
+        replaceLen = Funcs::Min< uiw >( replaceLen, _count - replacePos );
+        EraseAndInsert( replacePos, replaceLen, s, strLen );
         return *this;
     }
 
-    ownType &Replace( Iter i1, Iter i2, const charType *s, uiw n )
-    {
-        uiw pos = &*i1 - CStr();
-        uiw len = i2 - i1;
-        EraseSpace( pos, len );
-        InsertString < false > ( pos, s, n );
-        return *this;
-    }
-
-    ownType &Replace( uiw pos, uiw len, uiw n, charType c )
+    ownType &Replace( charType c, uiw pos, uiw len, uiw n = 1 )
     {
         ASSUME( pos <= _count );
-        EraseSpace( pos, Funcs::Min< uiw > ( len, _count - pos ) );
-        charType *thisStr = InsertSpace( pos, n );
+        EraseSpace( pos, Funcs::Min< uiw >( len, _count - pos ) );
+        charType *thisStr = InsertSpace( pos, n ) + pos;
         for( ; n; --n )
         {
             *thisStr++ = c;
@@ -922,12 +941,12 @@ public:
         return *this;
     }
 
-    ownType &Replace( Iter i1, Iter i2, uiw n, charType c )
+    ownType &Replace( charType c, IterConst i1, IterConst i2, uiw n = 1 )
     {
         uiw pos = &*i1 - CStr();
         uiw len = i2 - i1;
         EraseSpace( pos, len );
-        charType *thisStr = InsertSpace( pos, n );
+        charType *thisStr = InsertSpace( pos, n ) + pos;
         for( ; n; --n )
         {
             *thisStr++ = c;
@@ -936,22 +955,22 @@ public:
     }
 
     template <typename InputIterator>
-    ownType &Replace( Iter i1, Iter i2, InputIterator first, InputIterator last )
+    ownType &Replace( IterConst i1, IterConst i2, InputIterator first, InputIterator last )
     {
         ASSUME( &*first < CStr() || &*first >= CStr() + _count );
         uiw pos = &*i1 - CStr();
         uiw len = i2 - i1;
-        EraseSpace( pos, len );
         if( first.iteratorType == Iterator::Type::Random )
         {
             uiw dist = Iterator::_IterDist< InputIterator, InputIterator::iteratorType >::Dist( first, last );
-            InsertString < false > ( pos, &*first, dist );
+            EraseAndInsert( pos, len, &*first, dist );
         }
         else
         {
+            EraseSpace( pos, len );
             for( ; first != last; ++first )
             {
-                InsertString < false > ( pos++, &*first, 1 );
+                InsertString < false >( pos++, &*first, 1 );
             }
         }
         return *this;
@@ -959,32 +978,32 @@ public:
 
     ownType &Append( const ownType &str )
     {
-        AddString < true > ( str.CStr(), str._count );
+        AddString < true >( str.CStr(), str._count );
         return *this;
     }
 
     ownType &Append( const ownType &str, uiw subpos, uiw sublen )
     {
         ASSUME( subpos <= str._count );
-        AddString < true > ( str.CStr() + subpos, Funcs::Min< uiw > ( str._count - subpos, sublen ) );
+        AddString < true >( str.CStr() + subpos, Funcs::Min< uiw >( str._count - subpos, sublen ) );
         return *this;
     }
 
     ownType &Append( const charType *s )
     {
-        AddString < true > ( s, GetStringLength( s ) );
+        AddString < true >( s, GetStringLength( s ) );
         return *this;
     }
 
     ownType &Append( const charType *s, uiw n )
     {
-        AddString < true > ( s, n );
+        AddString < true >( s, n );
         return *this;
     }
 
-    ownType &Append( uiw n, charType c )
+    ownType &Append( charType c, uiw n = 1 )
     {
-        charType *str = AddSpace( n );
+        charType *str = AddSpace( n ) + _count;
         for( ; n; --n )
         {
             *str++ = c;
@@ -1007,13 +1026,13 @@ public:
             if( first.iteratorType == Iterator::Type::Random )
             {
                 uiw dist = Iterator::_IterDist< InputIterator, InputIterator::iteratorType >::Dist( first, last );
-                AddString < false > ( &*first, dist );
+                AddString < false >( &*first, dist );
             }
             else
             {
                 for( ; first != last; ++first )
                 {
-                    AddString < false > ( &*first, 1 );
+                    AddString < false >( &*first, 1 );
                 }
             }
         }
@@ -1031,17 +1050,17 @@ public:
                 {
                     ASSUME( source.IsDynamic() );
                     SetDynamic( source._count );
-                    _MemCpyStr( _dynamic_str, source._dynamic_str, source._count + 1, sizeof(charType) );
+                    _MemCpyStr( _dynamic_str, source._dynamic_str, source._count + 1 );
                 }
                 else
                 {
-                    _MemCpyStr( _static_str, source.CStr(), source._count + 1, sizeof(charType) );
+                    _MemCpyStr( _static_str, source.CStr(), source._count + 1 );
                 }
             }
             else
             {
                 _ProcReservationUp( source._count );
-                _MemCpyStr( _dynamic_str, source.CStr(), source._count + 1, sizeof(charType) );
+                _MemCpyStr( _dynamic_str, source.CStr(), source._count + 1 );
             }
             _count = source._count;
         }
@@ -1051,12 +1070,12 @@ public:
     NOINLINE ownType &Assign( const ownType &str, uiw subpos, uiw sublen )
     {
         ASSUME( subpos <= str._count );
-        uiw realLen = Funcs::Min< uiw > ( str._count - subpos, sublen );
+        uiw realLen = Funcs::Min< uiw >( str._count - subpos, sublen );
         if( this == &str )
         {
             charType *curStr = Str();
             ASSUME( curStr == str.CStr() );
-            _MemMoveStr( curStr, curStr + subpos, realLen, sizeof(charType) );
+            _MemMoveStr( curStr, curStr + subpos, realLen );
             curStr[ realLen ] = (charType)0;
             _count = realLen;
             return *this;
@@ -1067,13 +1086,12 @@ public:
         }
     }
 
-    ownType &Assign( const charType *s )
+    NOINLINE ownType &Assign( const charType *s, uiw n = uiw_max )
     {
-        return Assign( s, GetStringLength( s ) );
-    }
-
-    NOINLINE ownType &Assign( const charType *s, uiw n )
-    {
+        if( n == uiw_max )
+        {
+            n = GetStringLength( s );
+        }
         const charType *curStr = CStr();
         bool isOverlapped = !(s < curStr || s >= curStr + _count);
         if( isOverlapped )  //  TODO: proto
@@ -1094,13 +1112,13 @@ public:
             {
                 _ProcReservationUp( n );
             }
-            _MemCpyStr( _dynamic_str, s, n, sizeof(charType) );
+            _MemCpyStr( _dynamic_str, s, n );
             _dynamic_str[ n ] = (charType)0;
         }
         else
         {
             charType *str = Str();
-            _MemCpyStr( str, s, n, sizeof(charType) );
+            _MemCpyStr( str, s, n );
             str[ n ] = (charType)0;
         }
 
@@ -1109,10 +1127,10 @@ public:
         return *this;
     }
 
-    ownType &Assign( uiw n, charType c )
+    ownType &Assign( charType c, uiw n = 1 )
     {
         Clear();
-        charType *str = AddSpace( n );
+        charType *str = AddSpace( n ) + _count;
         for( ; n; --n )
         {
             *str++ = c;
@@ -1147,13 +1165,13 @@ public:
                     {
                         thisStr = _static_str;
                     }
-                    _MemCpyStr( thisStr, &*first, len, sizeof(charType) );
+                    _MemCpyStr( thisStr, &*first, len );
                     thisStr[ len ] = (charType)0;
                 }
                 else
                 {
                     _ProcReservationUp( len );
-                    _MemCpyStr( _dynamic_str, &*first, len, sizeof(charType) );
+                    _MemCpyStr( _dynamic_str, &*first, len );
                     _dynamic_str[ len ] = (charType)0;
                 }
                 _count = len;
@@ -1163,7 +1181,7 @@ public:
                 Clear();
                 for( ; first != last; ++first )
                 {
-                    AddString < false > ( &*first, 1 );
+                    AddString < false >( &*first, 1 );
                 }
             }
         }
@@ -1246,19 +1264,19 @@ public:
 
     TCStr &operator += ( const ownType &source )
     {
-        AddString < true > ( source.CStr(), source._count );
+        AddString < true >( source.CStr(), source._count );
         return *this;
     }
 
     TCStr &operator += ( const charType *str )
     {
-        AddString < true > ( str, GetStringLength( str ) );
+        AddString < true >( str, GetStringLength( str ) );
         return *this;
     }
 
     TCStr &operator += ( charType symbol )
     {
-        AddString < false > ( &symbol, 1 );
+        AddString < false >( &symbol, 1 );
         return *this;
     }
 
@@ -1296,12 +1314,12 @@ public:
         return StringCompare( CStr(), str ) < 0;
     }
 
-    bool operator > ( const ownType &source ) const
+    bool operator >( const ownType &source ) const
     {
         return StringCompare( CStr(), source.CStr() ) > 0;
     }
 
-    bool operator > ( const charType *str ) const
+    bool operator >( const charType *str ) const
     {
         return StringCompare( CStr(), str ) > 0;
     }

@@ -404,13 +404,22 @@ int __cdecl main()
     ::printf( "%i\n%i\n", wh->a, ci->a );*/
 
     CVec < char > vec;
-    vec.Append( "vecFuck", 8 );
+    vec.Append( "123456789", 10 );
 
     CStr str;
-    str = "fuck";
-    str.Append( vec.Begin(), vec.End() );
-    str.Assign( vec.Begin(), vec.End() );
-    ::printf( "%s\n", str.CStr() );
+    str = "I do love when the director of engineering slings emails about peoples";
+    str.Replace( vec.Data(), 45, 5 );
+
+    for( CStr::IterConst it = str.Begin(); it != str.End(); ++it )
+    {
+        ::printf( "%c", *it );
+    }
+    ::printf( "\n" );
+    for( CStr::IterRevConst it = str.RBegin(); it != str.REnd(); ++it )
+    {
+        ::printf( "%c", *it );
+    }
+    ::printf( "\n" );
 
     //foo(false);
 

@@ -1033,7 +1033,16 @@ public:
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
     void Insert( count_type pos, const X *source, count_type count )
     {
-        //  TODO: overlapping
+        if( is_checkOverlap )
+        {
+            uiw index = source - this->_GetArr();
+            if( index < _count )  //  overlapped
+            {
+                ASSUME( false );  //  TODO:
+                return;
+            }
+        }
+
         X *target = _InsertRaw( pos, count );
         for( ; count; --count )
         {
@@ -1065,9 +1074,9 @@ public:
         //
     }
 
-    void Erase( count_type pos, count_type count )
+    void Erase( count_type pos, count_type count = uiw_max )
     {
-        _Erase( pos, count );
+        _Erase( pos, Funcs::Min< count_type >( _count - pos, count ) );
     }
 
     Iter Erase( IterConst where )
@@ -1080,7 +1089,7 @@ public:
 
     Iter Erase( IterConst begin, IterConst end )
     {
-        count_type index = &*where - this->_GetArr();
+        count_type index = &*begin - this->_GetArr();
         count_type count = end - begin;
         ASSUME( index < _count && count < _count && index + count <= _count );
         Erase( index, count );
