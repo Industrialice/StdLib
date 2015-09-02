@@ -71,13 +71,13 @@ public:
     {
         ASSUME( _str );
         _str += step;
-        return *this;
+        return *(retType *)this;
     }
 
     retType operator ++ (int)
     {
         ASSUME( _str );
-        retType temp = *this;
+        retType temp( this->_str );
         ++(*this);
         return temp;
     }
@@ -86,13 +86,13 @@ public:
     {
         ASSUME( _str );
         _str -= step;
-        return *this;
+        return *(retType *)this;
     }
 
     retType operator -- (int)
     {
         ASSUME( _str );
-        ownType temp = *this;
+        retType temp( this->_str );
         --(*this);
         return temp;
     }
@@ -122,13 +122,13 @@ public:
     retType &operator += ( size_t addition )
     {
         _str += addition * step;
-        return *this;
+        return *(retType *)this;
     }
 
     retType &operator -= ( size_t subtraction )
     {
         _str -= subtraction * step;
-        return *this;
+        return *(retType *)this;
     }
 
     bln operator != ( const ownType &other ) const

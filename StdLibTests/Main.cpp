@@ -394,6 +394,10 @@ int __cdecl main()
     vec.Reserve( 100 );
     ::system( "Cls" );
     CVec < TestStruct >::Iter wh = vec.Begin() + 1;
+    wh--;
+    ++wh;
+    --wh;
+    wh++;
     CVec < TestStruct >::IterConst ci = vec.Erase( wh );
 
     ::printf( "%i\n%i\n", wh->a, ci->a );
