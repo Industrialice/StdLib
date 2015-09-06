@@ -409,7 +409,7 @@ uiw Funcs::NormalizeMemWord( uiw val, char *p_buf )
     return WSC( Funcs::NormalizeMem32, Funcs::NormalizeMem64 )( val, p_buf );
 }
 
-uiw Funcs::MemCpy( void *p_dest, const void *cp_source, uiw size )
+uiw Funcs::MemCpy( void *RSTR p_dest, const void *cp_source, uiw size )
 {
     ::memcpy( p_dest, cp_source, size );
     return size;
@@ -649,7 +649,7 @@ bln Funcs::IsStrDec( const char *cp_str, uiw maxLen /* = uiw_max */ )
     return true;
 }
 
-uiw Funcs::StrToLower( char *p_dest, const char *cp_source )
+uiw Funcs::StrToLower( char *RSTR p_dest, const char *cp_source )
 {
     ASSUME( p_dest && cp_source );
     uiw cpy = 0;
@@ -662,7 +662,7 @@ uiw Funcs::StrToLower( char *p_dest, const char *cp_source )
     return cpy;
 }
 
-uiw Funcs::StrToLowerAdv( char *p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
+uiw Funcs::StrToLowerAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
     ASSUME( p_dest && cp_source );
     uiw cpy = 0;
@@ -701,7 +701,7 @@ uiw Funcs::StrToLowerInplaceAdv( char *p_str, uiw maxLen /* = uiw_max */, char a
     return cpy;
 }
 
-uiw Funcs::StrToUpper( char *p_dest, const char *cp_source )
+uiw Funcs::StrToUpper( char *RSTR p_dest, const char *cp_source )
 {
     ASSUME( p_dest && cp_source );
     uiw cpy = 0;
@@ -714,7 +714,7 @@ uiw Funcs::StrToUpper( char *p_dest, const char *cp_source )
     return cpy;
 }
 
-uiw Funcs::StrToUpperAdv( char *p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
+uiw Funcs::StrToUpperAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
     ASSUME( p_dest && cp_source );
     uiw cpy = 0;
@@ -907,7 +907,7 @@ uiw Funcs::StrLenAdv( const char *cp_str, uiw maxLen /* = uiw_max */, char aes /
     return len;
 }
 
-void Funcs::StrCat( char *p_dest, const char *cp_source )
+void Funcs::StrCat( char *RSTR p_dest, const char *cp_source )
 {
     ASSUME( p_dest && cp_source );
     while( *p_dest )
@@ -921,7 +921,7 @@ void Funcs::StrCat( char *p_dest, const char *cp_source )
     *p_dest = '\0';
 }
 
-uiw Funcs::StrCatAdv( char *p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aesDest /* = '\0' */, char aesSrc /* = '\0' */ )
+uiw Funcs::StrCatAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aesDest /* = '\0' */, char aesSrc /* = '\0' */ )
 {
     ASSUME( p_dest && cp_source );
     while( *p_dest && *p_dest != aesDest )
@@ -937,7 +937,7 @@ uiw Funcs::StrCatAdv( char *p_dest, const char *cp_source, uiw maxLen /* = uiw_m
     return cpy;
 }
 
-void Funcs::StrCpy( char *p_dest, const char *cp_source )
+void Funcs::StrCpy( char *RSTR p_dest, const char *cp_source )
 {
     ASSUME( p_dest && cp_source );
     while( *cp_source )
@@ -947,7 +947,7 @@ void Funcs::StrCpy( char *p_dest, const char *cp_source )
     *p_dest = '\0';
 }
 
-uiw Funcs::StrCpyAdv( char *p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
+uiw Funcs::StrCpyAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
     ASSUME( p_dest && cp_source );
     uiw cpy = 0;
@@ -960,7 +960,7 @@ uiw Funcs::StrCpyAdv( char *p_dest, const char *cp_source, uiw maxLen /* = uiw_m
     return cpy;
 }
 
-uiw Funcs::StrNCpy( char *p_dest, const char *cp_source, uiw count )
+uiw Funcs::StrNCpy( char *RSTR p_dest, const char *cp_source, uiw count )
 {
     ASSUME( p_dest && cp_source );
     ::strncpy( p_dest, cp_source, count );
@@ -977,7 +977,7 @@ void Funcs::StrConnect( char *RSTR p_dest, const char *cp_first, const char *cp_
     _StrCpy( p_dest, cp_second );
 }
 
-void Funcs::StrCpyWONull( char *p_dest, const char *cp_source )
+void Funcs::StrCpyWONull( char *RSTR p_dest, const char *cp_source )
 {
     ASSUME( p_dest && cp_source );
     while( *cp_source )
@@ -986,7 +986,7 @@ void Funcs::StrCpyWONull( char *p_dest, const char *cp_source )
     }
 }
 
-void Funcs::StrCpyWONullAdv( char *p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
+void Funcs::StrCpyWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
     ASSUME( p_dest && cp_source );
     while( maxLen && *cp_source && *cp_source != aes )
@@ -996,7 +996,7 @@ void Funcs::StrCpyWONullAdv( char *p_dest, const char *cp_source, uiw maxLen /* 
     }
 }
 
-uiw Funcs::StrCpyAndCount( char *p_dest, const char *cp_source )
+uiw Funcs::StrCpyAndCount( char *RSTR p_dest, const char *cp_source )
 {
     ASSUME( p_dest && cp_source );
     const char *cp_sourceStore = cp_source;
@@ -1010,7 +1010,7 @@ uiw Funcs::StrCpyAndCount( char *p_dest, const char *cp_source )
     return cp_source - cp_sourceStore;
 }
 
-uiw Funcs::StrCpyAndCountWONull( char *p_dest, const char *cp_source )
+uiw Funcs::StrCpyAndCountWONull( char *RSTR p_dest, const char *cp_source )
 {
     ASSUME( p_dest && cp_source );
     const char *cp_sourceStore = cp_source;
@@ -1023,7 +1023,7 @@ uiw Funcs::StrCpyAndCountWONull( char *p_dest, const char *cp_source )
     return cp_source - cp_sourceStore;
 }
 
-uiw Funcs::StrCpyAndCountWONullAdv( char *p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
+uiw Funcs::StrCpyAndCountWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
     ASSUME( p_dest && cp_source );
     uiw cpy = 0;
@@ -1049,7 +1049,7 @@ uiw Funcs::StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw max
     return index;
 }
 
-uiw Funcs::StrSafeCpyAndCountWONull( char *p_dest, const char *cp_source, uiw maxLen )
+uiw Funcs::StrSafeCpyAndCountWONull( char *RSTR p_dest, const char *cp_source, uiw maxLen )
 {
     ASSUME( p_dest && cp_source );
     uiw index = 0;
@@ -1062,7 +1062,7 @@ uiw Funcs::StrSafeCpyAndCountWONull( char *p_dest, const char *cp_source, uiw ma
     return index;
 }
 
-uiw Funcs::StrSafeCpyAndCountWONullAdv( char *p_dest, const char *cp_source, uiw maxLen, char aes /* = '\0' */ )
+uiw Funcs::StrSafeCpyAndCountWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen, char aes /* = '\0' */ )
 {
     ASSUME( p_dest && cp_source );
     uiw index = 0;

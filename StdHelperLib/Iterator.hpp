@@ -19,9 +19,14 @@ namespace Type
 
 template < typename X, Type::type_t type > struct _IterDist
 {
-    static uiw Dist( const X &first, const X &second )
+    static uiw Dist( X first, const X &second )
     {
-        uiw_max;
+        uiw dist = 0;
+        for( ; first != second; ++first )
+        {
+            ++dist;
+        }
+        return dist;
     }
 };
 
@@ -33,7 +38,7 @@ template < typename X > struct _IterDist < X, Type::Random >
     }
 };
 
-template < typename type, iw step, typename retType, bool is_const > class _IterRandomBasis;
+template < typename type, iw step, typename retType, bln is_const > class _IterRandomBasis;
 
 template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, false >
 {
@@ -47,7 +52,7 @@ protected:
     const type *_str;
 };
 
-template < typename type, iw step, typename retType, bool is_const > class _IterRandomBase : public _IterRandomBasis < type, step, retType, is_const >
+template < typename type, iw step, typename retType, bln is_const > class _IterRandomBase : public _IterRandomBasis < type, step, retType, is_const >
 {
     typedef _IterRandomBasis < type, step, retType, is_const > baseType;
     typedef _IterRandomBase < type, step, retType, is_const > ownType;
@@ -66,6 +71,11 @@ public:
     _IterRandomBase( const type *source )
     {
         _str = source;
+    }
+
+    const type *Ptr() const
+    {
+        return _str;
     }
 
     const type &operator *() const
@@ -219,6 +229,11 @@ public:
     _IterRandom( type *source )
     {
         _str = source;
+    }
+
+    type *Ptr()
+    {
+        return _str;
     }
 
     type &operator *()

@@ -16,7 +16,7 @@
 #ifdef COUNTER_SUPPORTED
     #define MAKE_UNIC( name ) CONCAT( name, __COUNTER__ )
 #else
-    #define MAKE_UNIC( name ) CONCAT( name, __LINE__ )  /*  not really unic  */
+    #define MAKE_UNIC( name ) CONCAT( name, __LINE__ )  /*  not really unique  */
 #endif
 
 #define AUTO_EXEC( code ) struct CONCAT( $__AUTO_EXEC_STRUCT__, __LINE__ ) { CONCAT( $__AUTO_EXEC_STRUCT__, __LINE__ )() \

@@ -408,7 +408,7 @@ int __cdecl main()
 
     CStr str;
     str = "I do love when the director of engineering slings emails about peoples";
-    str.Replace( vec.Data(), 45, 5 );
+    str.Replace( str, str.Begin(), str.End() );
 
     for( CStr::IterConst it = str.Begin(); it != str.End(); ++it )
     {

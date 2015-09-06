@@ -29,6 +29,11 @@ namespace StdLib
           }
           return end;
       }
+
+      template < typename iter > uiw Distance( const iter &first, const iter &last )
+      {
+          return Iterator::_IterDist< iter, iter::iteratorType >::Dist( first, last );
+      }
   }
 }
 

@@ -20,7 +20,7 @@ namespace
         PAGE_EXECUTE_READWRITE  //  7 - Execute + Write + Read
     };
         
-    bool is_Initialized;
+    bln is_Initialized;
 
     class
     {

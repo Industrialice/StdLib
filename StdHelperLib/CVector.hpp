@@ -554,6 +554,21 @@ public:
     using baseType::IterRevConst;*/
     typedef Iterator::_IterRandom < X, 1 > Iter;
     typedef Iterator::_IterRandom < X, -1 > IterRev;
+    using baseType::Data;
+    using baseType::Back;
+    using baseType::Front;
+    using baseType::Size;
+    using baseType::IsEmpty;
+    using baseType::Begin;
+    using baseType::CBegin;
+    using baseType::End;
+    using baseType::CEnd;
+    using baseType::BeginRev;
+    using baseType::CBeginRev;
+    using baseType::EndRev;
+    using baseType::CEndRev;
+    using baseType::Get;
+    using baseType::operator [];
 
     _CBaseVecStatic()
     {
@@ -701,6 +716,32 @@ private:
         }
     }
 
+    template < typename X, bln is_destroySource > struct _CopySelector;
+    template < typename X > struct _CopySelector< X, true >
+    {
+        static void Copy( X *target, X *source )
+        {
+#           ifdef MOVE_SUPPORTED
+                new (target) X( std::move( *source ) );
+                source->~X();
+#           else
+                new (target) X( *source );
+                source->~X();
+#           endif
+        }
+    };
+    template < typename X > struct _CopySelector< X, false >
+    {
+        static void Copy( X *target, X *source )
+        {
+#           ifdef MOVE_SUPPORTED
+                new (target) X( std::move( *source ) );
+#           else
+                new (target) X( *source );
+#           endif
+        }
+    };
+
     template < bln is_destroySource > void _Copy( X *RSTR target, X *source, count_type count )
     {
         if( _c_typeSemantic == Sem_POD )
@@ -711,23 +752,7 @@ private:
         {
             for( ; count; --count )
             {
-#               ifdef MOVE_SUPPORTED
-                    if( is_destroySource )
-                    {
-                        new (target) X( std::move( *source ) );
-                        source->~X();
-                    }
-                    else
-                    {
-                        new (target) X( *source );
-                    }
-#               else
-                    new (target) X( *source );
-                    if( is_destroySource )
-                    {
-                        source->~X();
-                    }
-#               endif
+                _CopySelector< X, is_destroySource >::Copy( target, source );
                 ++target;
                 ++source;
             }
@@ -736,7 +761,7 @@ private:
 
     void _Erase( count_type pos, count_type count )
     {
-        ASSUME( pos < _count && count <= _count && pos + count <= _count );
+        ASSUME( count && pos < _count && count <= _count && pos + count <= _count );
 
         if( _c_typeSemantic != Sem_POD )
         {
@@ -804,7 +829,7 @@ private:
                 X *source = this->_GetArr() + _count - 1;
                 for( ; source != this->_GetArr() + pos; --target, --source )
                 {
-                    new (target) X( *source );
+                    new (target) X( *source );  //  TODO: movable
                     source->~X();
                 }
             }
@@ -883,7 +908,7 @@ public:
         {
             _Destroy( this->_GetArr(), _count );
             _SizeToUnknown( source._count );
-            _Copy < false >( this->_GetArr(), source._GetArr(), source._count );
+            _Copy < false >( this->_GetArr(), (X *)source._GetArr(), source._count );
             _count = source._count;
         }
         return *this;
@@ -1019,7 +1044,7 @@ public:
     }
 
 #ifdef VAR_TEMPLATES_SUPPORTED
-    template < typename... Args > void Emplace( count_type pos, Args &&... args, count_type count )
+    template < typename... Args > void Emplace( count_type pos, Args &&... args, count_type count = 1 )
     {
         X *target = _InsertRaw( pos, count );
         for( ; count; --count )
@@ -1038,7 +1063,7 @@ public:
             uiw index = source - this->_GetArr();
             if( index < _count )  //  overlapped
             {
-                ASSUME( false );  //  TODO:
+                DBGBREAK;  //  TODO:
                 return;
             }
         }
@@ -1055,23 +1080,35 @@ public:
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
     void Insert( count_type pos, const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
-        DBGBREAK;
-        //
-    }
+        ASSUME( pos < _count && source.Size() > start );
+        if( count > source.Size() - start )
+        {
+            count = source.Size() - start;
+        }
 
-#ifdef VAR_TEMPLATES_SUPPORTED
-    template < typename... Args > void Emplace( count_type pos, Args &&... args, count_type start = 0, count_type count = count_type_max )
-    {
-        DBGBREAK;
-        //
+        Insert< is_checkOverlap >( pos, source.Data() + start, count );  //  TODO: default param
     }
-#endif
 
     template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ) >
-    void InsertIter( IterType begin, IterType end )
+    void Insert( IterConst where, IterType begin, IterType end )
     {
-        DBGBREAK;
-        //
+        ASSUME( end >= begin );
+        uiw dist = Algorithm::Distance( begin, end );
+        uiw pos = where.Ptr() - this->_GetArr();
+        ASSUME( pos < _count );
+        if( IterType::iteratorType == Iterator::Type::Random )
+        {
+            Insert< is_checkOverlap >( pos, begin.Ptr(), dist );  //  TODO: default param
+        }
+        else
+        {
+            X *target = _InsertRaw( pos, dist );
+            for( ; first != last; ++first )
+            {
+                new (target) X( *first );
+                ++target;
+            }
+        }
     }
 
     void Erase( count_type pos, count_type count = uiw_max )
@@ -1081,7 +1118,7 @@ public:
 
     Iter Erase( IterConst where )
     {
-        count_type index = &*where - this->_GetArr();
+        count_type index = where.Ptr() - this->_GetArr();
         ASSUME( index < _count );
         Erase( index, 1 );
         return Iter( this->_GetArr() + index );
@@ -1089,7 +1126,8 @@ public:
 
     Iter Erase( IterConst begin, IterConst end )
     {
-        count_type index = &*begin - this->_GetArr();
+        ASSUME( end >= begin );
+        count_type index = begin.Ptr() - this->_GetArr();
         count_type count = end - begin;
         ASSUME( index < _count && count < _count && index + count <= _count );
         Erase( index, count );

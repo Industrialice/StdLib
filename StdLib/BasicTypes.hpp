@@ -281,12 +281,12 @@ public:
         return *this;
     }
 
-    bool operator == ( const Nullable &source ) const
+    bln operator == ( const Nullable &source ) const
     {
         return !_is_null && !source._is_null && ToRef() == source.ToRef();
     }
 
-    bool operator == ( Nullv ) const
+    bln operator == ( Nullv ) const
     {
         return _is_null;
     }
@@ -297,13 +297,13 @@ public:
         return (*this = nullv);
     }
 
-    bool operator == ( std::nullptr_t ) const
+    bln operator == ( std::nullptr_t ) const
     {
         return _is_null;
     }
 #endif
 
-    bool IsNull() const
+    bln IsNull() const
     {
         return _is_null;
     }
@@ -362,7 +362,7 @@ protected:
 public:
     ~UniquePtr()
     {
-        Deleter( (X *)_ptr );  //  this dummy C-cast will eliminate syntax confusion between creating a local variable and calling a constructor
+        Deleter( (X *)_ptr );  //  this dummy C-cast will eliminate a syntax confusion between creating a local variable _ptr and calling a constructor with the argument _ptr
     }
 
     UniquePtr() : _ptr( 0 )
@@ -370,6 +370,14 @@ public:
 
     UniquePtr( X *ptr ) : _ptr( ptr )
     {}
+
+#ifdef MOVE_SUPPORTED
+    UniquePtr( UniquePtr &&source )
+    {
+        _ptr = source._ptr;
+        source._ptr = 0;
+    }
+#endif
 
     void Own( UniquePtr *source )
     {
@@ -382,6 +390,33 @@ public:
     {
         Deleter( (X *)_ptr );
         _ptr = 0;
+    }
+
+    X *TakeAway()
+    {
+        X *ret = _ptr;
+        _ptr = 0;
+        return ret;
+    }
+
+    X *Get()
+    {
+        return _ptr;
+    }
+
+    const X *Get() const
+    {
+        return _ptr;
+    }
+
+    X **Addr()
+    {
+        return &_ptr;
+    }
+
+    const X *const *Addr() const
+    {
+        return &_ptr;
     }
 
     UniquePtr &operator = ( X *ptr )

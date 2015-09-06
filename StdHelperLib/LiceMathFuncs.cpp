@@ -1504,7 +1504,7 @@ f32 LiceMath::Vec4SquareDistance( const vec4 *v0, const vec4 *v1 )
 
 void LiceMath::Vec4Normalize( vec4 *RSTR v0, const vec4 *v1 )
 {
-    //  THERE IS NO CHECKING FOR len == 0 CASE
+    //  TODO: zero vectors
     f32 revLen = 1.f / ::sqrtf( v1->x * v1->x + v1->y * v1->y + v1->z * v1->z + v1->w * v1->w );
     v0->x = v1->x * revLen;
     v0->y = v1->y * revLen;
@@ -1514,7 +1514,7 @@ void LiceMath::Vec4Normalize( vec4 *RSTR v0, const vec4 *v1 )
 
 void LiceMath::Vec4NormalizeInplace( vec4 *v )
 {
-    //  THERE IS NO CHECKING FOR len == 0 CASE
+    //  TODO: zero vectors
     f32 revLen = 1.f / ::sqrtf( v->x * v->x + v->y * v->y + v->z * v->z + v->w * v->w );
     v->x *= revLen;
     v->y *= revLen;
@@ -1744,7 +1744,7 @@ f32 LiceMath::Vec3SquareDistance( const vec3 *v0, const vec3 *v1 )
 
 void LiceMath::Vec3Normalize( vec3 *RSTR v0, const vec3 *v1 )
 {
-    //  THERE IS NO CHECKING FOR len == 0 CASE
+    //  TODO: zero vectors
     f32 revLen = 1.f / ::sqrtf( v1->x * v1->x + v1->y * v1->y + v1->z * v1->z );
     v0->x = v1->x * revLen;
     v0->y = v1->y * revLen;
@@ -1753,7 +1753,7 @@ void LiceMath::Vec3Normalize( vec3 *RSTR v0, const vec3 *v1 )
 
 void LiceMath::Vec3NormalizeInplace( vec3 *v )
 {
-    //  THERE IS NO CHECKING FOR len == 0 CASE
+    //  TODO: zero vectors
     f32 revLen = 1.f / ::sqrtf( v->x * v->x + v->y * v->y + v->z * v->z );
     v->x *= revLen;
     v->y *= revLen;
@@ -2028,7 +2028,7 @@ f32 LiceMath::Vec2SquareDistance( const vec2 *v0, const vec2 *v1 )
 
 void LiceMath::Vec2Normalize( vec2 *RSTR v0, const vec2 *v1 )
 {
-    //  THERE IS NO CHECKING FOR len == 0 CASE
+    //  TODO: zero vectors
     f32 revLen = 1.f / ::sqrtf( v1->x * v1->x + v1->y * v1->y );
     v0->x = v1->x * revLen;
     v0->y = v1->y * revLen;
@@ -2036,7 +2036,7 @@ void LiceMath::Vec2Normalize( vec2 *RSTR v0, const vec2 *v1 )
 
 void LiceMath::Vec2NormalizeInplace( vec2 *v )
 {
-    //  THERE IS NO CHECKING FOR len == 0 CASE
+    //  TODO: zero vectors
     f32 revLen = 1.f / ::sqrtf( v->x * v->x + v->y * v->y );
     v->x *= revLen;
     v->y *= revLen;
@@ -2159,7 +2159,7 @@ void LiceMath::PlaneNormalize( plane *RSTR plane0, const plane *plane1 )
 
 void LiceMath::PlaneNormalizeInplace( plane *plane )
 {
-    //  THERE IS NO CHECKING FOR len == 0 CASE
+    //  TODO: zero planes
     f32 len = 1.f / ::sqrtf( plane->a * plane->a + plane->b * plane->b + plane->c * plane->c );
     plane->a *= len;
     plane->b *= len;
