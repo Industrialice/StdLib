@@ -30,6 +30,8 @@ template < typename X, uiw static_size > class _CBasisVec < X, void, void, stati
 {
     typename AlignmentHelper < X, static_size >::type _arr;
 
+    _CBasisVec( const _CBasisVec &source );
+
 protected:
     typedef uiw count_type;
     count_type _count;
@@ -46,6 +48,18 @@ protected:
     {
         ASSUME( count <= static_size );
     }
+
+#ifdef MOVE_SUPPORTED
+    _CBasisVec( _CBasisVec &&source ) NOEXEPT
+    {
+        //  do nothing
+    }
+
+    void operator =( _CBasisVec &&source ) NOEXEPT
+    {
+        //  do nothing
+    }
+#endif
 
     X *_GetArr()
     {
@@ -116,6 +130,8 @@ template < typename X, typename reservator, typename allocator > class _CBasisVe
 {
     X *_arr;
 
+    _CBasisVec( const _CBasisVec &source );
+
 public:
     typedef typename reservator::count_type count_type;
 
@@ -140,6 +156,15 @@ protected:
 #ifdef MOVE_SUPPORTED
     _CBasisVec( _CBasisVec &&source ) NOEXEPT
     {
+        _arr = source._arr;
+        source._arr = 0;
+        _reserved = source._reserved;
+        source._reserved = 0;
+    }
+
+    void operator =( _CBasisVec &&source ) NOEXEPT
+    {
+        ASSUME( this != &source );
         _arr = source._arr;
         source._arr = 0;
         _reserved = source._reserved;
@@ -261,6 +286,8 @@ template < typename X, typename allocator > class _CBasisVec < X, void, allocato
 {
     X *_arr;
 
+    _CBasisVec( const _CBasisVec &source );
+
 public:
     typedef uiw count_type;
 
@@ -285,6 +312,13 @@ protected:
 #ifdef MOVE_SUPPORTED
     _CBasisVec( _CBasisVec &&source ) NOEXEPT
     {
+        _arr = source._arr;
+        source._arr = 0;
+    }
+
+    void operator = ( _CBasisVec &&source ) NOEXEPT
+    {
+        ASSUME( this != &source );
         _arr = source._arr;
         source._arr = 0;
     }
@@ -732,13 +766,9 @@ private:
     };
     template < typename X > struct _CopySelector< X, false >
     {
-        static void Copy( X *target, X *source )
+        static void Copy( X *target, const X *source )
         {
-#           ifdef MOVE_SUPPORTED
-                new (target) X( std::move( *source ) );
-#           else
-                new (target) X( *source );
-#           endif
+            new (target) X( *source );
         }
     };
 
@@ -792,12 +822,7 @@ private:
                 X *end = this->_GetArr() + _count;
                 for( ; source != end; ++source, ++target )
                 {
-#                   ifdef MOVE_SUPPORTED
-                        new (target) X( std::move( *source ) );
-#                   else
-                        new (target) X( *source );
-#                   endif
-                    source->~X();
+                    _CopySelector< X, true >::Copy( target, source );
                 }
             }
             _count = newCount;
@@ -829,8 +854,7 @@ private:
                 X *source = this->_GetArr() + _count - 1;
                 for( ; source != this->_GetArr() + pos; --target, --source )
                 {
-                    new (target) X( *source );  //  TODO: movable
-                    source->~X();
+                    _CopySelector< X, true >::Copy( target, source );
                 }
             }
         }
@@ -897,7 +921,19 @@ public:
         source._count = 0;
         if( _cis_static )  //  TODO: bad
         {
-            _Copy < false >( this->_GetArr(), (X *)source._GetArr(), _count );
+            _Copy < true >( this->_GetArr(), (X *)source._GetArr(), _count );
+        }
+    }
+
+    void operator = ( ownType &&source ) NOEXEPT
+    {
+        ASSUME( this != &source );
+        baseType::operator =( std::move( source ) );
+        _count = source._count;
+        source._count = 0;
+        if( _cis_static )  //  TODO: bad
+        {
+            _Copy < true >( this->_GetArr(), (X *)source._GetArr(), _count );
         }
     }
 #endif
@@ -951,7 +987,7 @@ public:
     template < typename... Args > void EmplaceBack( Args &&... args )
     {
         _SizeUp( _count + 1 );
-        new (this->_GetArr() + _count ) X( args... );
+        new (this->_GetArr() + _count ) X( std::move( args )... );
         ++_count;
     }
 #endif
@@ -1323,14 +1359,9 @@ public:
     }
 
 #ifdef MOVE_SUPPORTED
-    CVec( CVec &&source ) : baseType( std::move( source ) )
-    {}
-
-    CVec &operator = ( const CVec &source )
-    {
-        baseType::operator = ( source );
-        return *this;
-    }
+    CVec &operator = ( const CVec &source ) = default;
+    CVec( CVec &&source ) = default;
+    CVec &operator = ( CVec &&source ) = default;
 #endif
 
     CRefVec < X > ToRef()
@@ -1371,14 +1402,9 @@ public:
     {}
 
 #ifdef MOVE_SUPPORTED
-    CStaticVec( CStaticVec &&source ) : baseType( std::move( source ) )
-    {}
-
-    CStaticVec &operator = ( const CStaticVec &source )
-    {
-        baseType::operator = ( source );
-        return *this;
-    }
+    CStaticVec &operator = ( const CStaticVec &source ) = default;
+    CStaticVec( CStaticVec &&source ) = default;
+    CStaticVec &operator = ( CStaticVec &&source ) = default;
 #endif
 
     CRefVec < X > ToRef()
@@ -1398,6 +1424,13 @@ public:
         return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
     }
 };
+
+//  force all methods compilation to check for correctness
+/*template class CVec< int >;
+template class CVec< int, void >;
+template class CRefVec< int >;
+template class CCRefVec< int >;
+template class CStaticVec< int, 100 >;*/
 
 }  //  namespace StdLib
 

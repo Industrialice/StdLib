@@ -31,7 +31,7 @@
     #define RSTR __restrict
     #define FORCEINLINE __forceinline
     #define NORETURN __declspec(noreturn)
-    #define UNICPTRRETURN __declspec(restrict)
+    #define UNIQUEPTRRETURN __declspec(restrict)
     #define ALLOCA( size ) _alloca( size )
     #define INT16_CHANGE_ENDIANNESS( val ) _byteswap_ushort( val )
     #define INT32_CHANGE_ENDIANNESS( val ) _byteswap_ulong( val )
@@ -55,6 +55,7 @@
         #define SWAP_SUPPORTED
         #define ALIGNOF( what ) __alignof( what )
         #define NATIVE_ALIGNOF
+        #define EXTERN_TEMPLATES_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1400  //  Visual Studio 2005
@@ -147,7 +148,7 @@
     #define NOINLINE __attribute__((noinline))
     #define FORCEINLINE __attribute__((always_inline))
     #define NORETURN __attribute__(noreturn)
-    #define UNICPTRRETURN  /*  there is must be something  */
+    #define UNIQUEPTRRETURN  /*  there is must be something  */
     #define ALLOCA( size ) __builtin_alloca( size )
     #define INT16_CHANGE_ENDIANNESS( val ) __builtin_bswap16( val )
     #define INT32_CHANGE_ENDIANNESS( val ) __builtin_bswap32( val )
@@ -171,6 +172,7 @@
     #define DEFAULT_FUNC_PARAMS_SUPPORTED
     #define DEFINE_VARARGS_SUPPORTED
     #define NULLPTR_SUPPORTED
+    #define EXTERN_TEMPLATES_SUPPORTED
 
     #if GCC_VERSION >= 40500
         #ifdef DEBUG

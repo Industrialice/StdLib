@@ -53,7 +53,7 @@ namespace StdLib
 
             #endif
 
-        #elif defined(POSIX)  //  TODO: there is probably should be a CPU type check
+        #elif defined(POSIX)  //  TODO: there should be a CPU type check
 
             typedef volatile int atomic32;
 

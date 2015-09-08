@@ -3,6 +3,7 @@
 
 #include <StdCoreLib.hpp>
 #include <Error.hpp>
+#include <CString.hpp>
 
 namespace StdLib {
 
@@ -69,7 +70,7 @@ namespace FileIO
             ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
 
             #ifdef WINDOWS
-                //CStr pnn;
+                CStr pnn;
             #endif
         };
 

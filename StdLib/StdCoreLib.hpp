@@ -13,6 +13,8 @@
     #define DATA_ALIGNMENT 8
 #endif
 
+#define EXTERN_TEMPLATES_ALLOWED
+
 #define EXTERNAL
 
 #include <stddef.h>

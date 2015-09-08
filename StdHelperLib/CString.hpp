@@ -650,12 +650,12 @@ public:
 
     uiw Length() const
     {
-        return _count - 1;
+        return _count;
     }
 
     uiw Size() const
     {
-        return _count;
+        return _count + 1;
     }
 
     NOINLINE void Reserve( uiw reserve )
@@ -757,14 +757,14 @@ public:
 
     ownType &Insert( const ownType &str, uiw pos )
     {
-        InsertString < true >( pos, str.CStr(), str.length() );
+        InsertString < true >( pos, str.CStr(), str.Length() );
         return *this;
     }
 
     ownType &Insert( const ownType &str, uiw pos, uiw subpos, uiw sublen )
     {
         ASSUME( subpos <= str._count );
-        InsertString < true >( pos, str.CStr() + subpos, Funcs::Min< uiw >( str.length() - subpos, sublen ) );
+        InsertString < true >( pos, str.CStr() + subpos, Funcs::Min< uiw >( str.Length() - subpos, sublen ) );
         return *this;
     }
 
@@ -819,7 +819,7 @@ public:
         ASSUME( pos <= _count );
         if( n == uiw_max )
         {
-            str = GetStringLength( str );
+            n = GetStringLength( str );
         }
         InsertString < true >( pos, str, n );
         return Iter( Str() + pos );
@@ -874,13 +874,13 @@ public:
         return Iter( thisStr + pos );
     }
 
-    Iter Erase( IterConst first, IterConst last )
+    Iter Erase( IterConst begin, IterConst end )
     {
         ASSUME( end >= begin );
         charType *thisStr = Str();
-        uiw pos = first.Ptr() - thisStr;
+        uiw pos = begin.Ptr() - thisStr;
         ASSUME( pos <= _count );
-        uiw len = last - first;
+        uiw len = end - begin;
         ASSUME( len + pos <= _count );
         EraseSpace( pos, len );
         ASSUME( thisStr == Str() );
@@ -936,8 +936,8 @@ public:
         }
         uiw pos = begin.Ptr() - CStr();
         ASSUME( pos < _count );
-        uiw len = begin - end;
-        EraseAndInsert( pos, len, s, len );
+        uiw diff = begin - end;
+        EraseAndInsert( pos, diff, s, len );
         return *this;
     }
 
@@ -1365,6 +1365,12 @@ public:
         return CStr()[ index ];
     }
 };
+
+//  TODO: I really need to instantiate them somewhere
+#if defined(EXTERN_TEMPLATES_SUPPORTED) && defined(EXTERN_TEMPLATES_ALLOWED)
+    extern template class TCStr< char, StringDefReserve, Reservator::Half <>, Allocator::Simple >;
+    extern template class TCStr< wchar_t, StringDefReserve, Reservator::Half <>, Allocator::Simple >;
+#endif
 
 typedef TCStr< char, StringDefReserve, Reservator::Half <>, Allocator::Simple > CStr;
 typedef TCStr< wchar_t, StringDefReserve, Reservator::Half <>, Allocator::Simple > CWStr;

@@ -421,6 +421,9 @@ int __cdecl main()
     }
     ::printf( "\n" );
 
+    CStr sstr = "123";
+    ::printf( "len %u\nsize %u\n", sstr.Length(), sstr.Size() );
+
     //foo(false);
 
     /*CStaticVec < TestStruct, 16 > vec;

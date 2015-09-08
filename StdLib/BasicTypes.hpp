@@ -377,6 +377,14 @@ public:
         _ptr = source._ptr;
         source._ptr = 0;
     }
+
+    UniquePtr &operator = ( UniquePtr &&source )
+    {
+        ASSUME( this != &source );
+        _ptr = source._ptr;
+        source._ptr = 0;
+        return *this;
+    }
 #endif
 
     void Own( UniquePtr *source )

@@ -108,7 +108,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
 
     absPathLen = Files::AbsolutePath( cp_pnn, a_absPath ) + 1;
 
-    //file->pnn.Assign( a_absPath, absPathLen );  //  TODO:
+    file->pnn.Assign( a_absPath, absPathLen );
     file->openMode = openMode;
     file->procMode = procMode;
     file->handle = h_file;
@@ -268,13 +268,11 @@ FileIO::ProcMode::ProcMode_t FileIO::Private::ProcModeGet( const CFileBasis *fil
 ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
 {
     ASSUME( IsValid( file ) );
-    //  TODO:
-    /*if( p_buf )
+    if( p_buf )
     {
         _MemCpy( p_buf, file->pnn.Data(), file->pnn.Size() + 1 );
     }
-    return file->pnn.Size();*/
-    return 0;
+    return file->pnn.Size();
 }
 
 NOINLINE bln FileIO::Private::WriteToFile( FileIO::Private::CFileBasis *file, const void *cp_source, ui32 len )
