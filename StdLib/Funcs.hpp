@@ -51,6 +51,7 @@ namespace Funcs
     EXTERNAL i32 RandomRangeI32( i32 from, i32 to );
     EXTERNAL ui32 RandomRangeUI32( ui32 from, ui32 to );
     EXTERNAL f32 RandomRangeF32( f32 from, f32 to );
+    EXTERNAL ui32 RandomUI32Limit( ui32 limit );  //  [ 0; limit )
 
     EXTERNAL i32 RoundF32( f32 val );
     EXTERNAL i32 RoundF32WithPrecise( f32 val, ui32 precise );
@@ -259,6 +260,7 @@ namespace Funcs
 
     EXTERNAL va_return PrintToStrArgList( char *p_str, uiw maxLen, uiw *printedLen, const char *cp_fmt, va_list args );
     EXTERNAL va_return PrintToStr( char *p_str, uiw maxLen, uiw *printedLen, const char *cp_fmt, ... );
+    EXTERNAL va_return PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
 
     template < ChrTestFunc func > bln IsStrMatchT( const char *cp_str, uiw count = uiw_max )
     {

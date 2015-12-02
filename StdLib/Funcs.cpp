@@ -34,6 +34,11 @@ f32 Funcs::RandomRangeF32( f32 from, f32 to )
     return from + rand() / (f32)RAND_MAX * (to - from);
 }
 
+ui32 Funcs::RandomUI32Limit( ui32 limit )
+{
+    return (rand() * rand() * rand()) % limit;
+}
+
 i32 Funcs::RoundF32( f32 val )  //  TODO: bullshit
 {
     return (i32)(val < 0 ? val - 0.55555555555f : val + 0.55555555555f);
@@ -1484,8 +1489,8 @@ char *Funcs::StrStrAdv( const char *cp_source, const char *cp_under, uiw countSr
     ASSUME( cp_source && cp_under );
     for( ; countSrc; --countSrc, ++cp_source )
     {
-        ui32 countUnderLeft = countUnder;
-        ui32 countSrcLeft = countSrc;
+        uiw countUnderLeft = countUnder;
+        uiw countSrcLeft = countSrc;
         for( const char *cp_testSrc = cp_source, *cp_testUnder = cp_under; countUnderLeft && *cp_testUnder && *cp_testUnder != aesUnder; --countUnderLeft, --countSrcLeft, ++cp_testSrc, ++cp_testUnder )
         {
             if( !countSrcLeft || !*cp_testSrc || *cp_testSrc == aesSrc )
@@ -1532,8 +1537,8 @@ char *Funcs::StrIStrAdv( const char *cp_source, const char *cp_under, uiw countS
     ASSUME( cp_source && cp_under );
     for( ; countSrc; --countSrc, ++cp_source )
     {
-        ui32 countUnderLeft = countUnder;
-        ui32 countSrcLeft = countSrc;
+        uiw countUnderLeft = countUnder;
+        uiw countSrcLeft = countSrc;
         for( const char *cp_testSrc = cp_source, *cp_testUnder = cp_under; countUnderLeft && *cp_testUnder && *cp_testUnder != aesUnder; --countUnderLeft, --countSrcLeft, ++cp_testSrc, ++cp_testUnder )
         {
             if( !countSrcLeft || !*cp_testSrc || *cp_testSrc == aesSrc )
@@ -2065,7 +2070,7 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ui32 *p_para
     if( *cp_fmt == '[' )
     {
         ++cp_fmt;
-        const char *cp_end = Funcs::StrChr( cp_fmt, ']' );
+        const char *cp_end = _StrChr( cp_fmt, ']' );
         if( !cp_end )
         {
             return 0;
@@ -2111,25 +2116,25 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ui32 *p_para
 }
 
 /*
-a - pointer, integer word as bin str
-b - boolean
+a - pointer, integer word as bin str [param - when non-zero, use upper case]
+b - boolean [param - when non-zero, use upper case]
 c - char
-d - f64
+d - f64 [param - precision]
 e -
-f - f32
+f - f32 [param - precision]
 g -
-h - integer 32 as hex str
+h - integer 32 as hex str [param - when non-zero, use upper case]
 i - i32
-j - integer 64 as hex str
+j - integer 64 as hex str [param - when non-zero, use upper case]
 k -
 l -
-m - integer 64 as bin str
-n - integer 32 as bin str
+m - integer 64 as bin str [param - when non-zero, use upper case]
+n - integer 32 as bin str [param - when non-zero, use upper case]
 o - signed word
-p - pointer, integer word as hex str
-q - f64 rounded to i32
-r - f32 rounded to i32
-s - string
+p - pointer, integer word as hex str [param - when non-zero, use upper case]
+q - f64 rounded to i32 [param - precision]
+r - f32 rounded to i32 [param - precision]
+s - string [param - max length]
 t -
 u - ui32
 v -
@@ -2370,6 +2375,20 @@ NOINLINE va_return Funcs::PrintToStr( char *p_str, uiw maxLen, uiw *printedLen, 
     va_start( args, cp_fmt );
 
     DBGCODE( va_return argsProced = 4 + ) Funcs::PrintToStrArgList( p_str, maxLen, printedLen, cp_fmt, args );
+
+    va_end( args );
+
+    DBGCODE( return argsProced; )
+}
+
+NOINLINE va_return Funcs::PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... )
+{
+    ASSUME( p_str && cp_fmt && maxLen != uiw_max );
+
+    va_list args;
+    va_start( args, cp_fmt );
+
+    DBGCODE( va_return argsProced = 3 + ) Funcs::PrintToStrArgList( p_str, maxLen, 0, cp_fmt, args );
 
     va_end( args );
 

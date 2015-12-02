@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StdCoreLib", "StdLib\StdLib.vcxproj", "{373B9387-D7C0-4BE4-9FBC-E3A45D1D9682}"
 EndProject
@@ -58,7 +58,8 @@ Global
 		{A5516AF6-F86E-4A02-B0BF-F3887585D62B}.Release|x64.Build.0 = Release|x64
 		{B71563B7-AF84-410B-B2FB-503008D4B049}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B71563B7-AF84-410B-B2FB-503008D4B049}.Debug|Win32.Build.0 = Debug|Win32
-		{B71563B7-AF84-410B-B2FB-503008D4B049}.Debug|x64.ActiveCfg = Debug|Win32
+		{B71563B7-AF84-410B-B2FB-503008D4B049}.Debug|x64.ActiveCfg = Debug|x64
+		{B71563B7-AF84-410B-B2FB-503008D4B049}.Debug|x64.Build.0 = Debug|x64
 		{B71563B7-AF84-410B-B2FB-503008D4B049}.Release|Win32.ActiveCfg = Release|Win32
 		{B71563B7-AF84-410B-B2FB-503008D4B049}.Release|Win32.Build.0 = Release|Win32
 		{B71563B7-AF84-410B-B2FB-503008D4B049}.Release|x64.ActiveCfg = Release|x64

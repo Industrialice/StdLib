@@ -18,12 +18,12 @@ public:
     f64 ToF64();
     i32 ToI32();
 
-    void FromF32IEEE( f32 source );
-    void FromF32Clamp( f32 source );
-    void FromF64IEEE( f64 source );
-    void FromF64Clamp( f64 source );
-    void FromUI32Clamp( ui32 source );
-    void FromI32Clamp( i32 source );
+    f16 FromF32IEEE( f32 source );
+    f16 FromF32Clamp( f32 source );
+    f16 FromF64IEEE( f64 source );
+    f16 FromF64Clamp( f64 source );
+    f16 FromUI32Clamp( ui32 source );
+    f16 FromI32Clamp( i32 source );
 
     bln IsNaN();
     bln IsInf();

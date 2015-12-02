@@ -4,7 +4,7 @@
 
 #include "CThread.hpp"
 
-#ifndef WINCE
+#ifndef _WIN32_WCE
     #include <process.h>
 #endif
 
@@ -36,13 +36,13 @@ CThread::CThread()
     _thread = 0;
 }
 
-CThread::CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority)
+CThread::CThread( size_t stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority)
 {
     _thread = 0;
     CThread::Create( stackSize, ExecutionFunc, argument, priority );
 }
 
-void CThread::Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority )
+void CThread::Create( size_t stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority )
 {
     ASSUME( _thread == 0 );
 
@@ -50,7 +50,7 @@ void CThread::Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), vo
     threadArg->ExecutionFunc = ExecutionFunc;
     threadArg->argument = argument;
 
-    #ifdef WINCE
+    #ifdef _WIN32_WCE
         _thread = ::CreateThread( 0, stackSize, (LPTHREAD_START_ROUTINE)ThreadFunc, threadArg, 0, 0 );
     #else
         _thread = (HANDLE)_beginthreadex( 0, stackSize, ThreadFunc, threadArg, 0, 0 );
@@ -77,7 +77,7 @@ void CThread::Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), vo
     }
 }
 
-void CThread::SleepCurrent( ui32 msecs )  //  static
+void CThread::SleepCurrent( unsigned int msecs )  //  static
 {
     ::Sleep( msecs );
 }

@@ -95,27 +95,31 @@ NOINLINE i32 f16::ToI32()
     return (i32)(u.f + 0.00001f);
 }
 
-void f16::FromF32IEEE( f32 source )
+f16 f16::FromF32IEEE( f32 source )
 {
     FromF32( source, (EnumDecl)Flow_IEEE );
+    return *this;
 }
 
-void f16::FromF32Clamp( f32 source )
+f16 f16::FromF32Clamp( f32 source )
 {
     FromF32( source, (EnumDecl)Flow_Clamp );
+    return *this;
 }
 
-void f16::FromF64IEEE( f64 source )
+f16 f16::FromF64IEEE( f64 source )
 {
     FromF64( source, (EnumDecl)Flow_IEEE );
+    return *this;
 }
 
-void f16::FromF64Clamp( f64 source )
+f16 f16::FromF64Clamp( f64 source )
 {
     FromF64( source, (EnumDecl)Flow_Clamp );
+    return *this;
 }
 
-NOINLINE void f16::FromUI32Clamp( ui32 source )
+NOINLINE f16 f16::FromUI32Clamp( ui32 source )
 {
     if( source > f16_int_max )
     {
@@ -128,9 +132,11 @@ NOINLINE void f16::FromUI32Clamp( ui32 source )
         ifsource -= (112 << 23);
         _val = (ifsource & ~f32_sign_mask) >> 13;
     }
+
+    return *this;
 }
 
-NOINLINE void f16::FromI32Clamp( i32 source )
+NOINLINE f16 f16::FromI32Clamp( i32 source )
 {
     if( (ui32)source > f16_int_max )
     {
@@ -144,6 +150,8 @@ NOINLINE void f16::FromI32Clamp( i32 source )
         _val = (ifsource & ~f32_sign_mask) >> 13;
         _val |= (ifsource & f32_sign_mask) >> 16;
     }
+
+    return *this;
 }
 
 bln f16::IsNaN()

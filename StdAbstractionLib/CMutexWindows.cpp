@@ -9,7 +9,7 @@ CMutex::~CMutex()
     ::DeleteCriticalSection( &_handle );
 }
 
-CMutex::CMutex( ui32 spinCount /* = 0 */ )
+CMutex::CMutex( unsigned int spinCount /* = 0 */ )
 {
     #ifdef DEBUG
         BOOL result = ::InitializeCriticalSectionEx( &_handle, spinCount, 0 );
@@ -29,7 +29,7 @@ void CMutex::Unlock()
     ::LeaveCriticalSection( &_handle );
 }
 
-bln CMutex::TryLock()
+bool CMutex::TryLock()
 {
     return ::TryEnterCriticalSection( &_handle ) == TRUE;
 }

@@ -1,6 +1,6 @@
 #include "PreHeader.hpp"
 
-#ifdef WINCE
+#ifdef _WIN32_WCE
 
 class CToWChar
 {

@@ -38,23 +38,23 @@ namespace FileIO
 
     struct SStats
     {
-        ui32 writesToBufferCount;
-        ui32 writesToFileCount;
-        ui32 readsFromBufferCount;
-        ui32 readsFromFileCount;
-        ui32 bytesFromBufferReaded;
-        ui32 bytesFromFileReaded;
-        ui32 bytesToBufferWritten;
-        ui32 bytesToFileWritten;
-        ui32 bufferedWrites;
-        ui32 unbufferedWrites;
-        ui32 bufferedReads;
-        ui32 unbufferedReads;
+        unsigned int writesToBufferCount;
+        unsigned int writesToFileCount;
+        unsigned int readsFromBufferCount;
+        unsigned int readsFromFileCount;
+        unsigned int bytesFromBufferReaded;
+        unsigned int bytesFromFileReaded;
+        unsigned int bytesToBufferWritten;
+        unsigned int bytesToFileWritten;
+        unsigned int bufferedWrites;
+        unsigned int unbufferedWrites;
+        unsigned int bufferedReads;
+        unsigned int unbufferedReads;
     };
 
     namespace Private
     {
-        struct CFileBasis
+        struct CFileBasis : CharMovable
         {
             HANDLE handle;
             OpenMode::OpenMode_t openMode;
@@ -63,11 +63,11 @@ namespace FileIO
             FileIO::SStats stats;
 
             byte *buffer;
-            bln is_customBuffer;
-            bln is_reading;
-            ui32 bufferSize;
-            ui32 bufferPos;
-            ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
+            bool is_customBuffer;
+            bool is_reading;
+            unsigned int bufferSize;
+            unsigned int bufferPos;
+            unsigned int readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
 
             #ifdef WINDOWS
                 CStr pnn;
@@ -77,23 +77,23 @@ namespace FileIO
         /*  Core Functions  */
         EXTERNAL void Initialize( CFileBasis *file );
         EXTERNAL void Destroy( CFileBasis *file );
-        EXTERNAL bln Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error );
+        EXTERNAL bool Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error );
         EXTERNAL void Close( CFileBasis *file );
-        EXTERNAL bln IsValid( const CFileBasis *file );
-        EXTERNAL bln Write( CFileBasis *file, const void *cp_source, ui32 len );
-        EXTERNAL bln Read( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
-        EXTERNAL bln BufferSet( CFileBasis *file, void *buffer, ui32 size );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
-        EXTERNAL ui32 BufferSizeGet( CFileBasis *file );
+        EXTERNAL bool IsValid( const CFileBasis *file );
+        EXTERNAL bool Write( CFileBasis *file, const void *cp_source, unsigned int len );
+        EXTERNAL bool Read( CFileBasis *file, void *p_target, unsigned int len, unsigned int *p_readed );
+        EXTERNAL bool BufferSet( CFileBasis *file, unsigned int size, void *buffer = 0 );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
+        EXTERNAL unsigned int BufferSizeGet( CFileBasis *file );
         EXTERNAL void StatsGet( const CFileBasis *file, SStats *po_stats );
         EXTERNAL void StatsReset( CFileBasis *file );
-        EXTERNAL bln Flush( CFileBasis *file );  //  false if writing to file failed to complete
+        EXTERNAL bool Flush( CFileBasis *file );  //  false if writing to file failed to complete
         EXTERNAL i64 OffsetGet( CFileBasis *file );  //  -1 on fail, current offset on success
         EXTERNAL i64 OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, SError *po_error );  //  -1 on fail, current offset on success
         EXTERNAL ui64 SizeGet( CFileBasis *file );
-        EXTERNAL bln SizeSet( CFileBasis *file, ui64 newSize );
+        EXTERNAL bool SizeSet( CFileBasis *file, ui64 newSize );
         EXTERNAL OpenMode::OpenMode_t OpenModeGet( const CFileBasis *file );
         EXTERNAL ProcMode::ProcMode_t ProcModeGet( const CFileBasis *file );
-        EXTERNAL ui32 PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len
+        EXTERNAL unsigned int PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len
     }
 
     struct CFile : private Private::CFileBasis
@@ -114,7 +114,7 @@ namespace FileIO
             Private::Open( this, pnn, openMode, procMode, po_error );
         }
 
-        CFile( const CFile &source )  //  bufferization will not be derived
+        CFile( const CFile &source )  //  bufferization will not be derived  TODO: file position?
         {
             Private::Initialize( this );
             char pnn[ MAX_PATH ];
@@ -122,7 +122,7 @@ namespace FileIO
             Private::Open( this, pnn, source.OpenModeGet(), source.ProcModeGet(), 0 );
         }
 
-        CFile & operator = ( const CFile &source )  //  bufferization will not be derived
+        CFile & operator = ( const CFile &source )  //  bufferization will not be derived  TODO: file position?
         {
             if( this != &source )
             {
@@ -133,6 +133,20 @@ namespace FileIO
             }
             return *this;
         }
+
+#ifdef MOVE_SUPPORTED
+        CFile( CFile &&source )
+        {
+            Transfer( std::move( source ) );
+        }
+
+        CFile &operator = ( CFile &&source )
+        {
+            ASSUME( this != &source );
+            Transfer( std::move( source ) );
+            return *this;
+        }
+#endif
 
         void Open( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error )
         {
@@ -145,27 +159,27 @@ namespace FileIO
             Private::Close( this );
         }
 
-        bln IsOpened() const
+        bool IsOpened() const
         {
             return Private::IsValid( this );
         }
 
-        bln Write( const void *cp_source, ui32 len )
+        bool Write( const void *cp_source, unsigned int len )
         {
             return Private::Write( this, cp_source, len );
         }
 
-        bln Read( void *p_target, ui32 len, ui32 *p_readed )
+        bool Read( void *p_target, unsigned int len, unsigned int *p_readed )
         {
             return Private::Read( this, p_target, len, p_readed );
         }
 
-        bln BufferSet( void *buffer, ui32 size )  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
+        bool BufferSet( unsigned int size, void *buffer = 0 )  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
         {
-            return Private::BufferSet( this, buffer, size );
+            return Private::BufferSet( this, size, buffer );
         }
 
-        ui32 BufferSizeGet()
+        unsigned int BufferSizeGet()
         {
             return Private::BufferSizeGet( this );
         }
@@ -180,7 +194,7 @@ namespace FileIO
             Private::StatsReset( this );
         }
 
-        bln Flush()  //  false if writing to file failed to complete
+        bool Flush()  //  false if writing to file failed to complete
         {
             return Private::Flush( this );
         }
@@ -200,7 +214,7 @@ namespace FileIO
             return Private::SizeGet( this );
         }
 
-        bln SizeSet( ui64 newSize )
+        bool SizeSet( ui64 newSize )
         {
             return Private::SizeSet( this, newSize );
         }
@@ -215,15 +229,37 @@ namespace FileIO
             return Private::ProcModeGet( this );
         }
 
-        ui32 PNNGet( char *p_buf ) const  //  pass 0 as p_buf to get only len
+        unsigned int PNNGet( char *p_buf ) const  //  pass 0 as p_buf to get only len
         {
             return Private::PNNGet( this, p_buf );
         }
+        
+#ifdef MOVE_SUPPORTED
+    private:
+        void Transfer( CFile &&source )
+        {
+            this->handle = source.handle;
+            this->openMode = source.openMode;
+            this->procMode = source.procMode;
+            this->stats = source.stats;
+            this->buffer = source.buffer;
+            this->is_customBuffer = source.is_customBuffer;
+            this->is_reading = source.is_reading;
+            this->bufferSize = source.bufferSize;
+            this->bufferPos = source.bufferPos;
+            this->readBufferCurrentSize = source.readBufferCurrentSize;
+            #ifdef WINDOWS
+                this->pnn = std::move( source.pnn );
+            #endif
+
+            Private::Initialize( &source );
+        }
+#endif
     };
 
     namespace FileError
     {
-        const ui32 CanNotOpenFile = Error::Private::MaxDefaultError + 0;
+        const unsigned int CanNotOpenFile = Error::Private::MaxDefaultError + 0;
     }
 
     namespace Private

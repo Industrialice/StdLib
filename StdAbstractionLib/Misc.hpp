@@ -16,41 +16,41 @@ namespace VirtualMem
                 Read = BIT( 1 ),
                 Execute = BIT( 2 ) )
     }
-    EXTERNAL void *Reserve( uiw size );
-    EXTERNAL bln Commit( void *p_mem, uiw size, PageMode::PageMode_t mode );
-    EXTERNAL void *Alloc( uiw size, PageMode::PageMode_t mode );
-    EXTERNAL bln Free( void *p_mem );
-    EXTERNAL PageMode::PageMode_t ProtectGet( const void *p_mem, uiw size, SError *po_error );  //  PageMode::Error if pages have different protection, always PageMode::Error on POSIX
-    EXTERNAL bln ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode );  //  can commit uncommited memory
-    EXTERNAL ui32 PageSize();
+    EXTERNAL void *Reserve( size_t size );
+    EXTERNAL bool Commit( void *p_mem, size_t size, PageMode::PageMode_t mode );
+    EXTERNAL void *Alloc( size_t size, PageMode::PageMode_t mode );
+    EXTERNAL bool Free( void *p_mem );
+    EXTERNAL PageMode::PageMode_t ProtectGet( const void *p_mem, size_t size, SError *po_error );  //  PageMode::Error if pages have different protection, always PageMode::Error on POSIX
+    EXTERNAL bool ProtectSet( void *p_mem, size_t size, PageMode::PageMode_t mode );  //  can commit uncommited memory
+    EXTERNAL unsigned int PageSize();
 
     namespace VirtualMemError
     {
-        const ui32 InconsistentProtection = Error::Private::MaxDefaultError + 0;
+        const unsigned int InconsistentProtection = Error::Private::MaxDefaultError + 0;
     }
 }
 
 namespace CPU
 {
-    EXTERNAL ui32 CoresNum();
+    EXTERNAL unsigned int CoresNum();
 }
 
 class CTC
 {
     tcs _tc;
-    DBGCODE( bln _is_set; );
+    DBGCODE( bool _is_set; );
 
 public:
-    CTC( bln is_set = false );
+    CTC( bool is_set = false );
     void Set();
-    f32 Get32() const;
-    f64 Get64() const;
+    float Get32() const;
+    double Get64() const;
     ui64 GetUSec64() const;
-    f32 Get32Set();
-    f64 Get64Set();
+    float Get32Set();
+    double Get64Set();
     ui64 GetUSec64Set();
-    f32 Compare32( const CTC &second ) const;    //  ...
-    f64 Compare64( const CTC &second ) const;    //  ...
+    float Compare32( const CTC &second ) const;    //  ...
+    double Compare64( const CTC &second ) const;    //  ...
     ui64 CompareUSec64( const CTC &second ) const;  //  will subtract the second from the first
     const tcs &TCSGet() const;
 };

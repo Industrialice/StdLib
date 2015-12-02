@@ -22,23 +22,23 @@ public:
                 important = 5 )
     };
 
-    typedef void (*DirectionFunc)( Tag::messageTag_t tag, const char *cp_text, uiw len );
+    typedef void (*DirectionFunc)( Tag::messageTag_t tag, const char *cp_text, size_t len );
 
     va_return Message( Tag::messageTag_t tag, const char *cp_fmt, ... );
     void AddDirection( DirectionFunc dir );
     void PopDirection();
-    uiw DirectionsCount() const;
-    DirectionFunc DirectionByIndexGet( uiw index ) const;
-    void DirectionByIndexSet( uiw index, DirectionFunc dir );
-    void BufferLengthSet( ui32 length );
-    ui32 BufferLengthGet() const;
-    void IsOnSet( bln is_on );
-    bln IsOnGet() const;
-    bln IsOnToggle();  //  return new state
-    bln IsMultithreadedGet() const;
-    void IsMitlithreadedSet( bln is_multithreaded );
+    size_t DirectionsCount() const;
+    DirectionFunc DirectionByIndexGet( size_t index ) const;
+    void DirectionByIndexSet( size_t index, DirectionFunc dir );
+    void BufferLengthSet( unsigned int length );
+    unsigned int BufferLengthGet() const;
+    void IsOnSet( bool is_on );
+    bool IsOnGet() const;
+    bool IsOnToggle();  //  return new state
+    bool IsMultithreadedGet() const;
+    void IsMitlithreadedSet( bool is_multithreaded );
     const char *NameGet() const;
-    static CLogger *Create( const char *cp_name, bln is_on, bln is_multithreaded, ui32 bufferSize = 2048 );
+    static CLogger *Create( const char *cp_name, bool is_on, bool is_multithreaded, unsigned int bufferSize = 2048 );
     static void Delete( CLogger *po_logger );
 };
 

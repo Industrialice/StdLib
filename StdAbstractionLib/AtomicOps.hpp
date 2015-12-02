@@ -3,7 +3,7 @@
 
 #include <StdCoreLib.hpp>
 
-#if defined(WINDOWS) && !defined(WINCE)
+#if defined(WINDOWS) && !defined(_WIN32_WCE)
     #include <intrin.h>
 #endif
 

@@ -1,4 +1,4 @@
-#ifdef WINCE
+#ifdef _WIN32_WCE
 
 WINBASEAPI HMODULE WINAPI GetModuleHandleA( LPCSTR lpModuleName );
 WINBASEAPI HMODULE WINAPI LoadLibraryExA( LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags );

@@ -165,7 +165,7 @@ private:
                     ::printf( "#thread %u# job %s%s has been completed\n", index, tpath, text );
                     PrintfMutex.Unlock();
                 }
-                ThreadInfos[ index ].path.Assign( path.Begin(), path.End() );
+                ThreadInfos[ index ].path.Assign( path.begin(), path.end() );
                 ThreadInfos[ index ].extensionToProcess = ext;
                 ThreadInfos[ index ].is_finished.Reset();
                 ThreadInfos[ index ].endEvent.Reset();

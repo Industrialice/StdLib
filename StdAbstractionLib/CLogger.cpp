@@ -2,19 +2,20 @@
 #include "CLogger.hpp"
 #include "CVector.hpp"
 #include "CMutex.hpp"
+#include <Allocators.hpp>
 #include <stdarg.h>
 
 namespace
 {
     struct SLogger : public CLogger
     {
-        SLogger( bln is_on, bln is_multithreaded, ui32 bufferSize ) : _is_on( is_on ), _is_multithreaded( is_multithreaded ), _bufferLength( bufferSize )
+        SLogger( bool is_on, bool is_multithreaded, unsigned int bufferSize ) : _is_on( is_on ), _is_multithreaded( is_multithreaded ), _bufferLength( bufferSize )
         {}
 
-        ui32 _bufferLength;
+        unsigned int _bufferLength;
         CVec < CLogger::DirectionFunc, void > _o_dirs;
-        bln _is_on;
-        bln _is_multithreaded;
+        bool _is_on;
+        bool _is_multithreaded;
         mutable CMutex _mutex;
         char *name()
         {
@@ -30,6 +31,40 @@ namespace
 CLogger::CLogger()
 {}
 
+template < typename X, uiw static_size, typename allocator = Allocator::Simple > class CSmartBuf
+{
+    typename AlignmentHelper < X, static_size >::type _arr;
+    X *_dynamic_pointer;
+
+public:
+    ~CSmartBuf()
+    {
+        allocator::Free( _dynamic_pointer );
+    }
+
+    CSmartBuf( uiw dynamic_size )
+    {
+        if( dynamic_size > static_size )
+        {
+            _dynamic_pointer = allocator::Alloc < X >( dynamic_size );
+        }
+        else
+        {
+            _dynamic_pointer = 0;
+        }
+    }
+
+    X *Acquire()
+    {
+        return _dynamic_pointer ? _dynamic_pointer : (X *)&_arr;
+    }
+
+    const X *Acquire() const
+    {
+        return _dynamic_pointer ? _dynamic_pointer : (X *)&_arr;
+    }
+};
+
 NOINLINE va_return CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
 {
     ASSUME( dis );
@@ -43,25 +78,20 @@ NOINLINE va_return CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, 
         return va_return_whatever;
     }
 
-    char a_buf[ 4096 ];
-    char *p_buffer = dis->_bufferLength > COUNTOF( a_buf ) ? (char *)::malloc( dis->_bufferLength ) : a_buf;
-    uiw printedLen;
+    CSmartBuf < char, 4096 > smartBuf( dis->_bufferLength );
+    char *tempBuffer = smartBuf.Acquire();
+    size_t printedLen;
 
     va_list args;
     va_start( args, cp_fmt );
 
-    DBGCODE( va_return argsProced = 2 + ) Funcs::PrintToStrArgList( p_buffer, dis->_bufferLength, &printedLen, cp_fmt, args );
+    DBGCODE( va_return argsProced = 2 + ) Funcs::PrintToStrArgList( tempBuffer, dis->_bufferLength, &printedLen, cp_fmt, args );
 
     va_end( args );
 
-    for( ui32 index = 0; index < dis->_o_dirs.Size(); ++index )
+    for( unsigned int index = 0; index < dis->_o_dirs.Size(); ++index )
     {
-        dis->_o_dirs[ index ]( tag, p_buffer, printedLen );
-    }
-
-    if( dis->_bufferLength > COUNTOF( a_buf ) )
-    {
-        ::free( p_buffer );
+        dis->_o_dirs[ index ]( tag, tempBuffer, printedLen );
     }
 
     DBGCODE( return argsProced );
@@ -81,14 +111,14 @@ void CLogger::PopDirection()
     dis->_o_dirs.PopBackSafe();
 }
 
-uiw CLogger::DirectionsCount() const
+size_t CLogger::DirectionsCount() const
 {
     ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     return dis->_o_dirs.Size();
 }
 
-CLogger::DirectionFunc CLogger::DirectionByIndexGet( uiw index ) const
+CLogger::DirectionFunc CLogger::DirectionByIndexGet( size_t index ) const
 {
     ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
@@ -100,7 +130,7 @@ CLogger::DirectionFunc CLogger::DirectionByIndexGet( uiw index ) const
     return 0;
 }
 
-void CLogger::DirectionByIndexSet( uiw index, DirectionFunc dir )
+void CLogger::DirectionByIndexSet( size_t index, DirectionFunc dir )
 {
     ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
@@ -111,7 +141,7 @@ void CLogger::DirectionByIndexSet( uiw index, DirectionFunc dir )
     }
 }
 
-void CLogger::BufferLengthSet( ui32 length )
+void CLogger::BufferLengthSet( unsigned int length )
 {
     ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
@@ -119,28 +149,28 @@ void CLogger::BufferLengthSet( ui32 length )
     dis->_bufferLength = length;
 }
 
-ui32 CLogger::BufferLengthGet() const
+unsigned int CLogger::BufferLengthGet() const
 {
     ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     return dis->_bufferLength;
 }
 
-void CLogger::IsOnSet( bln is_on )
+void CLogger::IsOnSet( bool is_on )
 {
     ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     dis->_is_on = is_on;
 }
 
-bln CLogger::IsOnGet() const
+bool CLogger::IsOnGet() const
 {
     ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     return dis->_is_on;
 }
 
-bln CLogger::IsOnToggle()
+bool CLogger::IsOnToggle()
 {
     ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
@@ -148,14 +178,14 @@ bln CLogger::IsOnToggle()
     return dis->_is_on;
 }
 
-bln CLogger::IsMultithreadedGet() const
+bool CLogger::IsMultithreadedGet() const
 {
     ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     return dis->_is_multithreaded;
 }
 
-void CLogger::IsMitlithreadedSet( bln is_multithreaded )
+void CLogger::IsMitlithreadedSet( bool is_multithreaded )
 {
     ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
@@ -170,10 +200,10 @@ const char *CLogger::NameGet() const
     return dis->name();
 }
 
-NOINLINE CLogger *CLogger::Create( const char *cp_name, bln is_on, bln is_multithreaded, ui32 bufferSize /* = 2048 */ )
+NOINLINE CLogger *CLogger::Create( const char *cp_name, bool is_on, bool is_multithreaded, unsigned int bufferSize /* = 2048 */ )
 {
     ASSUME( cp_name && bufferSize );
-    uiw len = _StrLen( cp_name ) + 1;
+    size_t len = _StrLen( cp_name ) + 1;
     SLogger *po_logger = new (::malloc( sizeof(SLogger) + len )) SLogger( is_on, is_multithreaded, bufferSize );
     _MemCpy( po_logger->name(), cp_name, len );
     return (CLogger *)po_logger;

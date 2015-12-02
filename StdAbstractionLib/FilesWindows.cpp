@@ -277,7 +277,7 @@ NOINLINE uiw Files::ExtractExtensionFromString( const char *cp_str, char *RSTR p
 
 NOINLINE uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char a_procedPath[ MAX_PATH ] )
 {
-    #ifdef WINCE
+    #ifdef _WIN32_WCE
         return Funcs::StrCpyAndCount( a_procedPath, cp_sourcePath );
     #else
         return ::GetFullPathNameA( cp_sourcePath, MAX_PATH, a_procedPath, 0 );

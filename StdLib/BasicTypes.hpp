@@ -209,8 +209,8 @@ template < typename X, uiw count = 1 > class AlignmentHelper
 public:
     struct type { alignedType store[ bufferArraySize ]; };
 
-    STATIC_CHECK( sizeof(X) * count == sizeof(type), "Error in AlignmentHelper" );
-    STATIC_CHECK( ALIGNOF(X) == ALIGNOF(type), "Error in AlignmentHelper" );
+    //STATIC_CHECK( sizeof(X) * count == sizeof(type), "Error in AlignmentHelper" );
+    //STATIC_CHECK( ALIGNOF(X) == ALIGNOF(type), "Error in AlignmentHelper" );
 };
 
 static const struct Nullv
@@ -389,6 +389,7 @@ public:
 
     void Own( UniquePtr *source )
     {
+        ASSUME( (_ptr != source->_ptr) || (_ptr == 0) );
         Deleter( (X *)_ptr );
         _ptr = source->_ptr;
         source->_ptr = 0;
@@ -417,7 +418,24 @@ public:
         return _ptr;
     }
 
-    X **Addr()
+    X *const *Addr()
+    {
+        return &_ptr;
+    }
+
+    X **AddrModifiable()
+    {
+        ASSUME( _ptr == 0 );
+        return &_ptr;
+    }
+
+    X **AddrModifiableRelease()
+    {
+        Release();
+        return &_ptr;
+    }
+
+    X **AddrModifiableUnsafe()
     {
         return &_ptr;
     }
@@ -429,6 +447,7 @@ public:
 
     UniquePtr &operator = ( X *ptr )
     {
+        ASSUME( (_ptr != ptr) || (_ptr == 0) );
         Deleter( (X *)_ptr );
         _ptr = ptr;
         return *this;

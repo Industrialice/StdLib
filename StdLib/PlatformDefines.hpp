@@ -21,7 +21,7 @@
     #else
         #define WHRCHECK( a )
         #define CHECK( a )
-        #define DBGBREAK
+        #define DBGBREAK UNREACHABLE
         #ifdef DEFINE_VARARGS_SUPPORTED
             #define DBGMSG( ... )
             #define DBGMSGBREAK( ... )
@@ -56,7 +56,7 @@
         #endif
     #else
         #define CHECK( a )
-        #define DBGBREAK
+        #define DBGBREAK UNREACHABLE
         #ifdef DEFINE_VARARGS_SUPPORTED
             #define DBGMSG( ... )
             #define DBGMSGBREAK( ... )

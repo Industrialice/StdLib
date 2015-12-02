@@ -21,7 +21,7 @@ static void PrintWordAndCount( const char *word, uiw index, uiw count )
     CONSOLE_SCREEN_BUFFER_INFO cbi;
     ::GetConsoleScreenBufferInfo( ConsoleOutut, &cbi );
     char buf[ 128 ];
-    VC( Funcs::PrintToStr, buf,, 127, 0, "[%u out of %u]", index, count );
+    VC( Funcs::PrintToStr, buf,, 127, "[%u out of %u]", index, count );
     uiw len = _StrLen( buf );
     COORD coord = { (cbi.dwSize.X - len) / 2, 0 };
     ::SetConsoleCursorPosition( ConsoleOutut, coord );

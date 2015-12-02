@@ -20,20 +20,20 @@ namespace
         PAGE_EXECUTE_READWRITE  //  7 - Execute + Write + Read
     };
         
-    bln is_Initialized;
+    bool is_Initialized;
 
     class
     {
-        ui32 _memPageSize;
+        unsigned int _memPageSize;
         
-        ui32 _cpuCoresCount;
+        unsigned int _cpuCoresCount;
 
-        f32 _freqMult32;
-        f64 _freqMult64;
+        float _freqMult32;
+        double _freqMult64;
         ui64 _freqDivU64;
 
     public:
-        void Initialize( ui32 memPageSize, ui32 cpuCoresCount, f32 freqMult32, f64 freqMult64, ui64 freqDivU64 )
+        void Initialize( unsigned int memPageSize, unsigned int cpuCoresCount, float freqMult32, double freqMult64, ui64 freqDivU64 )
         {
             _memPageSize = memPageSize;
             _cpuCoresCount = cpuCoresCount;
@@ -43,25 +43,25 @@ namespace
             is_Initialized = true;
         }
 
-        ui32 MemPageSize() const
+        unsigned int MemPageSize() const
         {
             ASSUME( is_Initialized );
             return _memPageSize;
         }
 
-        ui32 CpuCoresCount() const
+        unsigned int CpuCoresCount() const
         {
             ASSUME( is_Initialized );
             return _cpuCoresCount;
         }
 
-        f32 FreqMult32() const
+        float FreqMult32() const
         {
             ASSUME( is_Initialized );
             return _freqMult32;
         }
 
-        f64 FreqMult64() const
+        double FreqMult64() const
         {
             ASSUME( is_Initialized );
             return _freqMult64;
@@ -77,12 +77,12 @@ namespace
 
 //  VirtualMem
 
-void *VirtualMem::Reserve( uiw size )
+void *VirtualMem::Reserve( size_t size )
 {
     return ::VirtualAlloc( 0, size, MEM_RESERVE, PAGE_NOACCESS );
 }
 
-bln VirtualMem::Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
+bool VirtualMem::Commit( void *p_mem, size_t size, PageMode::PageMode_t mode )
 {
     ASSUME( p_mem && size && mode );
     DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
@@ -94,7 +94,7 @@ bln VirtualMem::Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
     return ::VirtualAlloc( p_mem, size, MEM_COMMIT, protect ) != 0;
 }
 
-void *VirtualMem::Alloc( uiw size, PageMode::PageMode_t mode )
+void *VirtualMem::Alloc( size_t size, PageMode::PageMode_t mode )
 {
     ASSUME( size && mode );
     DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
@@ -106,18 +106,18 @@ void *VirtualMem::Alloc( uiw size, PageMode::PageMode_t mode )
     return ::VirtualAlloc( 0, size, MEM_RESERVE | MEM_COMMIT, protect );
 }
 
-bln VirtualMem::Free( void *p_mem )
+bool VirtualMem::Free( void *p_mem )
 {
     ASSUME( p_mem );
     return ::VirtualFree( p_mem, 0, MEM_RELEASE ) != 0;
 }
 
-ui32 VirtualMem::PageSize()
+unsigned int VirtualMem::PageSize()
 {
     return MiscData.MemPageSize();
 }
 
-NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_mem, uiw size, SError *po_error )
+NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_mem, size_t size, SError *po_error )
 {
     MEMORY_BASIC_INFORMATION o_mbi;
     PageMode::PageMode_t mode = PageMode::Error;
@@ -135,7 +135,7 @@ NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_
         goto toExit;
     }
 
-    for( ui32 index = 0; index < COUNTOF( ca_PageProtectMapping ); ++index )
+    for( unsigned int index = 0; index < COUNTOF( ca_PageProtectMapping ); ++index )
     {
         if( ca_PageProtectMapping[ index ] == o_mbi.Protect )
         {
@@ -151,7 +151,7 @@ toExit:
     return mode;
 }
 
-bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
+bool VirtualMem::ProtectSet( void *p_mem, size_t size, PageMode::PageMode_t mode )
 {
     ASSUME( p_mem && size && mode );
     DWORD oldProtect;
@@ -166,14 +166,14 @@ bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
 
 //  CPU
 
-ui32 CPU::CoresNum()
+unsigned int CPU::CoresNum()
 {
     return MiscData.CpuCoresCount();
 }
 
 //  CTC
 
-CTC::CTC( bln is_set /* = false */ )
+CTC::CTC( bool is_set /* = false */ )
 {
     if( is_set )
     {
@@ -192,7 +192,7 @@ void CTC::Set()
     DBGCODE( _is_set = true );
 }
 
-f32 CTC::Get32() const
+float CTC::Get32() const
 {
     CHECK( _is_set );
     LARGE_INTEGER o_count;
@@ -200,7 +200,7 @@ f32 CTC::Get32() const
     return (o_count.QuadPart - _tc.QuadPart) * MiscData.FreqMult32();
 }
 
-f64 CTC::Get64() const
+double CTC::Get64() const
 {
     CHECK( _is_set );
     LARGE_INTEGER o_count;
@@ -216,22 +216,22 @@ ui64 CTC::GetUSec64() const
     return ((o_count.QuadPart - _tc.QuadPart) * (1000ULL * 1000ULL * 1000ULL)) / MiscData.FreqDivU64();
 }
 
-f32 CTC::Get32Set()
+float CTC::Get32Set()
 {
     CHECK( _is_set );
     LARGE_INTEGER o_count;
     ::QueryPerformanceCounter( &o_count );
-    f32 dt = (o_count.QuadPart - _tc.QuadPart) * MiscData.FreqMult32();
+    float dt = (o_count.QuadPart - _tc.QuadPart) * MiscData.FreqMult32();
     _tc = o_count;
     return dt;
 }
 
-f64 CTC::Get64Set()
+double CTC::Get64Set()
 {
     CHECK( _is_set );
     LARGE_INTEGER o_count;
     ::QueryPerformanceCounter( &o_count );
-    f64 dt = (o_count.QuadPart - _tc.QuadPart) * MiscData.FreqMult64();
+    double dt = (o_count.QuadPart - _tc.QuadPart) * MiscData.FreqMult64();
     _tc = o_count;
     return dt;
 }
@@ -246,14 +246,14 @@ ui64 CTC::GetUSec64Set()
     return dt;
 }
 
-f32 CTC::Compare32( const CTC &second ) const
+float CTC::Compare32( const CTC &second ) const
 {
     CHECK( _is_set && second._is_set );
     LONGLONG delta = _tc.QuadPart - second.TCSGet().QuadPart;
     return delta * MiscData.FreqMult32();
 }
 
-f64 CTC::Compare64( const CTC &second ) const
+double CTC::Compare64( const CTC &second ) const
 {
     CHECK( _is_set && second._is_set );
     LONGLONG delta = _tc.QuadPart - second.TCSGet().QuadPart;
@@ -281,20 +281,17 @@ const char *const *Misc::Private::GetErrorsDesc()
 
 void Misc::Private::Initialize()
 {
-    SYSTEM_INFO o_si;
-    ::GetSystemInfo( &o_si );
-    ui32 memPageSize = o_si.dwPageSize;
-
     LARGE_INTEGER o_freq;
     BOOL freqRes = ::QueryPerformanceFrequency( &o_freq );
     ASSUME( freqRes );
-    f32 freqMult32 = 1.f / o_freq.QuadPart;
-    f64 freqMult64 = 1.0 / o_freq.QuadPart;
+    float freqMult32 = 1.f / o_freq.QuadPart;
+    double freqMult64 = 1.0 / o_freq.QuadPart;
     ui64 freqDivU64 = o_freq.QuadPart;
     
     SYSTEM_INFO sysinfo;
-    GetSystemInfo( &sysinfo );
-    ui32 cpuCoresCount = sysinfo.dwNumberOfProcessors;
+    ::GetSystemInfo( &sysinfo );
+    unsigned int memPageSize = sysinfo.dwPageSize;
+    unsigned int cpuCoresCount = sysinfo.dwNumberOfProcessors;
 
     MiscData.Initialize( memPageSize, cpuCoresCount, freqMult32, freqMult64, freqDivU64 );
 }

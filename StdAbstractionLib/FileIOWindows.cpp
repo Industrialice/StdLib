@@ -11,14 +11,14 @@ namespace StdLib
     {
         namespace Private
         {
-            bln WriteToFile( CFileBasis *file, const void *cp_source, ui32 len );
-            bln ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
-            bln CancelCachedRead( CFileBasis *file );
+            bool WriteToFile( CFileBasis *file, const void *cp_source, unsigned int len );
+            bool ReadFromFile( CFileBasis *file, void *p_target, unsigned int len, unsigned int *p_readed );
+            bool CancelCachedRead( CFileBasis *file );
         }
     }
 }
 
-NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error )
+NOINLINE bool FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error )
 {
     ASSUME( cp_pnn && file );
 
@@ -30,7 +30,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     DWORD dwCreationDisposition;
     HANDLE h_file;
     char a_absPath[ MAX_PATH ];
-    uiw absPathLen;
+    size_t absPathLen;
 
     if( (procMode & (ProcMode::Read | ProcMode::Write)) == 0 )
     {
@@ -95,9 +95,9 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
         goto toExit;
     }
 
-    if( procMode & ProcMode::Append )
+    if( (procMode & ProcMode::Append) && (openMode != OpenMode::CreateAlways) )
     {
-        if( !::SetFilePointer( h_file, 0, 0, FILE_END ) )
+        if( ::SetFilePointer( h_file, 0, 0, FILE_END ) == INVALID_SET_FILE_POINTER )
         {
             o_error = Error::Get( Error::Unknown );
             BOOL result = ::CloseHandle( h_file );
@@ -135,7 +135,7 @@ NOINLINE void FileIO::Private::Close( CFileBasis *file )
     file->handle = INVALID_HANDLE_VALUE;
 }
 
-bln FileIO::Private::IsValid( const CFileBasis *file )
+bool FileIO::Private::IsValid( const CFileBasis *file )
 {
     ASSUME( file );
     return file->handle != INVALID_HANDLE_VALUE;
@@ -220,7 +220,7 @@ ui64 FileIO::Private::SizeGet( CFileBasis *file )
     return o_size.QuadPart;
 }
 
-bln FileIO::Private::SizeSet( CFileBasis *file, ui64 newSize )
+bool FileIO::Private::SizeSet( CFileBasis *file, ui64 newSize )
 {
     ASSUME( IsValid( file ) );
     LARGE_INTEGER o_userOffset;
@@ -265,7 +265,7 @@ FileIO::ProcMode::ProcMode_t FileIO::Private::ProcModeGet( const CFileBasis *fil
     return file->procMode;
 }
 
-ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
+unsigned int FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
 {
     ASSUME( IsValid( file ) );
     if( p_buf )
@@ -275,7 +275,7 @@ ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
     return file->pnn.Size();
 }
 
-NOINLINE bln FileIO::Private::WriteToFile( FileIO::Private::CFileBasis *file, const void *cp_source, ui32 len )
+NOINLINE bool FileIO::Private::WriteToFile( FileIO::Private::CFileBasis *file, const void *cp_source, unsigned int len )
 {
     ASSUME( FileIO::Private::IsValid( file ) && (cp_source || len == 0) );
     ++file->stats.writesToFileCount;
@@ -292,14 +292,17 @@ NOINLINE bln FileIO::Private::WriteToFile( FileIO::Private::CFileBasis *file, co
     return true;
 }
 
-NOINLINE bln FileIO::Private::ReadFromFile( FileIO::Private::CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
+NOINLINE bool FileIO::Private::ReadFromFile( FileIO::Private::CFileBasis *file, void *p_target, unsigned int len, unsigned int *p_readed )
 {
-    ASSUME( FileIO::Private::IsValid( file ) && p_target );
-    DWORD readed;
+    ASSUME( FileIO::Private::IsValid( file ) && (p_target || len == 0) );
+    DWORD readed = 0;
     ++file->stats.readsFromFileCount;
-    if( !::ReadFile( file->handle, p_target, len, &readed, 0 ) )
+    if( len != 0 )
     {
-        return false;
+        if( !::ReadFile( file->handle, p_target, len, &readed, 0 ) )
+        {
+            return false;
+        }
     }
     file->stats.bytesFromFileReaded += readed;
     if( p_readed )
@@ -309,14 +312,14 @@ NOINLINE bln FileIO::Private::ReadFromFile( FileIO::Private::CFileBasis *file, v
     return true;
 }
 
-NOINLINE bln FileIO::Private::CancelCachedRead( FileIO::Private::CFileBasis *file )
+NOINLINE bool FileIO::Private::CancelCachedRead( FileIO::Private::CFileBasis *file )
 {
     ASSUME( FileIO::Private::IsValid( file ) );
     if( !file->is_reading || file->bufferPos == file->readBufferCurrentSize )
     {
         return true;
     }
-    i32 move = (i32)file->bufferPos - (i32)file->readBufferCurrentSize;
+    int move = (int)file->bufferPos - (int)file->readBufferCurrentSize;
     LARGE_INTEGER o_move;
     o_move.QuadPart = move;
     BOOL result = ::SetFilePointerEx( file->handle, o_move, 0, FILE_CURRENT );

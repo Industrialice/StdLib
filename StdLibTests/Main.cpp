@@ -385,6 +385,39 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
+    /*for( int index = 0; index < 10000; ++index )
+    {
+        FuncWithAlloca();
+    }*/
+
+    {
+        CVec < int, void, Sem_Strict > v = { 1, 2, 3 };
+
+        v = { 2, 3, 4 };
+
+        v.Append( { 4, 5, 6 } );
+
+        v.PopBack();
+
+        v.Insert( 1, { 999 } );
+
+        v.Erase( 2, 1 );
+
+        v.Insert( v.Size(), { 555, 666, 777 } );
+
+        CRefVec < int > ref;
+        ref = v.ToRef();
+
+        CRefVec < int > ref2 = ref;
+
+        ::printf( "size %i\n", ref2.Size() );
+
+        for( auto i : ref2 )
+        {
+            ::printf( "%i\n", i );
+        }
+    }
+
     /*CVec < TestStruct > vec;
     vec.PushBack( TestStruct() );
     vec.PushBack( TestStruct() );
@@ -403,7 +436,7 @@ int __cdecl main()
 
     ::printf( "%i\n%i\n", wh->a, ci->a );*/
 
-    CVec < char > vec;
+    /*CVec < char > vec;
     vec.Append( "123456789", 10 );
 
     CStr str;
@@ -419,10 +452,11 @@ int __cdecl main()
     {
         ::printf( "%c", *it );
     }
+
     ::printf( "\n" );
 
     CStr sstr = "123";
-    ::printf( "len %u\nsize %u\n", sstr.Length(), sstr.Size() );
+    ::printf( "len %u\nsize %u\n", sstr.Length(), sstr.Size() );*/
 
     //foo(false);
 

@@ -371,62 +371,62 @@ public:
     typedef Iterator::_IterRandom < charType, -1 > IterRev;
     typedef Iterator::_IterRandomConst < charType, -1 > IterRevConst;
 
-    Iter Begin()
+    Iter begin()
     {
         return Iter( Str() );
     }
 
-    Iter End()
-    {
-        return Iter( Str() + _count );
-    }
-
-    IterConst Begin() const
+    IterConst begin() const
     {
         return IterConst( CStr() );
     }
 
-    IterConst CBegin() const
-    {
-        return IterConst( CStr() );
-    }
-
-    IterConst End() const
-    {
-        return IterConst( CStr() + _count );
-    }
-
-    IterConst CEnd() const
-    {
-        return IterConst( CStr() + _count );
-    }
-
-    IterRev RBegin()
+    IterRev beginRev()
     {
         return IterRev( Str() + _count - 1 );
     }
 
-    IterRev REnd()
+    IterRevConst beginRev() const
+    {
+        return IterRevConst( Str() + _count - 1 );
+    }
+
+    IterConst cbegin() const
+    {
+        return IterConst( CStr() );
+    }
+
+    IterRevConst cbeginRev() const
+    {
+        return IterRevConst( CStr() + _count - 1 );
+    }
+
+    Iter end()
+    {
+        return Iter( Str() + _count );
+    }
+
+    IterConst end() const
+    {
+        return IterConst( CStr() + _count );
+    }
+
+    IterRev endRev()
     {
         return IterRev( Str() - 1 );
     }
 
-    IterRevConst RBegin() const
+    IterRevConst endRev() const
     {
-        return IterRevConst( CStr() + _count - 1 );
+        return IterRevConst( Str() - 1 );
     }
 
-    IterRevConst CRBegin() const
+    IterConst cend() const
     {
-        return IterRevConst( CStr() + _count - 1 );
+        return IterConst( CStr() + _count );
     }
 
-    IterRevConst REnd() const
-    {
-        return IterRevConst( CStr() - 1 );
-    }
-
-    IterRevConst CREnd() const
+    IterRevConst cendRev() const
     {
         return IterRevConst( CStr() - 1 );
     }

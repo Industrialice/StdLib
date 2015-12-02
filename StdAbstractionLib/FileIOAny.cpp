@@ -7,14 +7,14 @@ namespace StdLib
     {
         namespace Private
         {
-            bln WriteToFile( CFileBasis *file, const void *cp_source, ui32 len );
-            bln ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
-            bln CancelCachedRead( CFileBasis *file );
+            bool WriteToFile( CFileBasis *file, const void *cp_source, unsigned int len );
+            bool ReadFromFile( CFileBasis *file, void *p_target, unsigned int len, unsigned int *p_readed );
+            bool CancelCachedRead( CFileBasis *file );
         }
     }
 }
 
-static void FORCEINLINE WriteToBuffer( FileIO::Private::CFileBasis *file, const void *what, ui32 howMuch )
+static void FORCEINLINE WriteToBuffer( FileIO::Private::CFileBasis *file, const void *what, unsigned int howMuch )
 {
     _MemCpy( file->buffer + file->bufferPos, what, howMuch );
     file->stats.bytesToBufferWritten += howMuch;
@@ -22,7 +22,7 @@ static void FORCEINLINE WriteToBuffer( FileIO::Private::CFileBasis *file, const 
     file->bufferPos += howMuch;
 }
 
-static void FORCEINLINE ReadFromBuffer( FileIO::Private::CFileBasis *file, void *target, ui32 howMuch )
+static void FORCEINLINE ReadFromBuffer( FileIO::Private::CFileBasis *file, void *target, unsigned int howMuch )
 {
     _MemCpy( target, file->buffer + file->bufferPos, howMuch );
     file->stats.bytesFromBufferReaded += howMuch;
@@ -57,7 +57,7 @@ const char *const *FileIO::Private::GetErrorsDesc()
     return errors;
 }
 
-NOINLINE bln FileIO::Private::Write( CFileBasis *file, const void *cp_source, ui32 len )
+NOINLINE bool FileIO::Private::Write( CFileBasis *file, const void *cp_source, unsigned int len )
 {
     ASSUME( IsValid( file ) && (cp_source || len == 0) );
     if( file->bufferSize )
@@ -71,7 +71,7 @@ NOINLINE bln FileIO::Private::Write( CFileBasis *file, const void *cp_source, ui
 
         if( file->bufferSize - file->bufferPos < len )
         {
-            ui32 cpyLen = file->bufferSize - file->bufferPos;
+            unsigned int cpyLen = file->bufferSize - file->bufferPos;
             WriteToBuffer( file, cp_source, cpyLen );
             if( !Flush( file ) )
             {
@@ -92,7 +92,7 @@ NOINLINE bln FileIO::Private::Write( CFileBasis *file, const void *cp_source, ui
     return WriteToFile( file, cp_source, len );
 }
 
-NOINLINE bln FileIO::Private::Read( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
+NOINLINE bool FileIO::Private::Read( CFileBasis *file, void *p_target, unsigned int len, unsigned int *p_readed )
 {
     ASSUME( IsValid( file ) && (p_target || len == 0) );
     DSA( p_readed, 0 );
@@ -107,7 +107,7 @@ NOINLINE bln FileIO::Private::Read( CFileBasis *file, void *p_target, ui32 len, 
 
         if( file->readBufferCurrentSize - file->bufferPos < len )
         {
-            ui32 cpyLen = file->readBufferCurrentSize - file->bufferPos;
+            unsigned int cpyLen = file->readBufferCurrentSize - file->bufferPos;
             ReadFromBuffer( file, p_target, cpyLen );
             DSA( p_readed, cpyLen );
             len -= cpyLen;
@@ -126,7 +126,7 @@ NOINLINE bln FileIO::Private::Read( CFileBasis *file, void *p_target, ui32 len, 
             file->bufferPos = 0;
         }
 
-        ui32 cpyLen = Funcs::Min < ui32 >( file->readBufferCurrentSize - file->bufferPos, len );
+        unsigned int cpyLen = Funcs::Min < unsigned int >( file->readBufferCurrentSize - file->bufferPos, len );
         ReadFromBuffer( file, p_target, cpyLen );
         if( p_readed )
         {
@@ -138,7 +138,7 @@ NOINLINE bln FileIO::Private::Read( CFileBasis *file, void *p_target, ui32 len, 
     return ReadFromFile( file, p_target, len, p_readed );
 }
 
-NOINLINE bln FileIO::Private::BufferSet( CFileBasis *file, void *buffer, ui32 size )
+NOINLINE bool FileIO::Private::BufferSet( CFileBasis *file, unsigned int size, void *buffer )
 {
     ASSUME( IsValid( file ) );
     if( buffer == 0 && file->is_customBuffer && size == file->bufferSize )
@@ -195,18 +195,18 @@ NOINLINE bln FileIO::Private::BufferSet( CFileBasis *file, void *buffer, ui32 si
     return true;
 }
 
-ui32 FileIO::Private::BufferSizeGet( CFileBasis *file )
+unsigned int FileIO::Private::BufferSizeGet( CFileBasis *file )
 {
     ASSUME( IsValid( file ) );
     return file->bufferSize;
 }
 
-NOINLINE bln FileIO::Private::Flush( CFileBasis *file )
+NOINLINE bool FileIO::Private::Flush( CFileBasis *file )
 {
     ASSUME( IsValid( file ) && file->bufferPos <= file->bufferSize );
     if( !file->is_reading && file->bufferPos )
     {
-        bln result = WriteToFile( file, file->buffer, file->bufferPos );
+        bool result = WriteToFile( file, file->buffer, file->bufferPos );
         if( result )
         {
             file->bufferPos = 0;

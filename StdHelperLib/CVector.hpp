@@ -2,6 +2,7 @@
 #define __CVECTOR_HPP__
 
 #include <StdCoreLib.hpp>
+#include "_CVectorBase.hpp"
 #include "Reservators.hpp"
 #include "Allocators.hpp"
 #include "Iterator.hpp"
@@ -23,458 +24,15 @@ namespace StdLib
 
 namespace Private
 {
-
-template < typename X, typename reservator, typename allocator, uiw static_size > class _CBasisVec;
-
-template < typename X, uiw static_size > class _CBasisVec < X, void, void, static_size > : CharMovable
-{
-    typename AlignmentHelper < X, static_size >::type _arr;
-
-    _CBasisVec( const _CBasisVec &source );
-
-protected:
-    typedef uiw count_type;
-    count_type _count;
-
-    static const bln _cis_static = true;
-
-    ~_CBasisVec()
-    {}
-
-    _CBasisVec()
-    {}
-
-    _CBasisVec(count_type count )
-    {
-        ASSUME( count <= static_size );
-    }
-
-#ifdef MOVE_SUPPORTED
-    _CBasisVec( _CBasisVec &&source ) NOEXEPT
-    {
-        //  do nothing
-    }
-
-    void operator =( _CBasisVec &&source ) NOEXEPT
-    {
-        //  do nothing
-    }
-#endif
-
-    X *_GetArr()
-    {
-        return (X *)&_arr;
-    }
-
-    const X *_GetArr() const
-    {
-        return (const X *)&_arr;
-    }
-
-    void _SetArr( X *arr, count_type newCount )
-    {
-        DBGBREAK;
-    }
-
-    void _IncSize( count_type newCount )
-    {
-        ASSUME( newCount <= static_size );
-    }
-
-    void _DecSize( count_type newCount )
-    {
-        ASSUME( newCount <= static_size );
-    }
-
-    void _UnkSize( count_type newCount )
-    {
-        ASSUME( newCount <= static_size );
-    }
-
-    bln _IsIncSize( count_type newCount )
-    {
-        ASSUME( newCount <= static_size );
-        return false;
-    }
-
-    bln _IsDecSize( count_type newCount )
-    {
-        ASSUME( newCount <= static_size );
-        return false;
-    }
-
-    bln _IsUnkSize( count_type newCount )
-    {
-        ASSUME( newCount <= static_size );
-        return false;
-    }
-
-    void _FlushReserved()
-    {}
-
-    bln _IsFlushReserved()
-    {
-        return false;
-    }
-
-    void _Free( X *arr )
-    {}
-
-    count_type _Reserved() const
-    {
-        return static_size;
-    }
-};
-
-template < typename X, typename reservator, typename allocator > class _CBasisVec < X, reservator, allocator, 0 > : CharMovable
-{
-    X *_arr;
-
-    _CBasisVec( const _CBasisVec &source );
-
-public:
-    typedef typename reservator::count_type count_type;
-
-protected:
-    count_type _count, _reserved;
-
-    static const bln _cis_static = false;
-
-    ~_CBasisVec()
-    {
-        allocator::Free( _arr );
-    }
-
-    _CBasisVec() : _arr( 0 ), _reserved( 0 )
-    {}
-
-    _CBasisVec( count_type count ) : _reserved( count )
-    {
-        _arr = allocator::Alloc < X >( count );
-    }
-
-#ifdef MOVE_SUPPORTED
-    _CBasisVec( _CBasisVec &&source ) NOEXEPT
-    {
-        _arr = source._arr;
-        source._arr = 0;
-        _reserved = source._reserved;
-        source._reserved = 0;
-    }
-
-    void operator =( _CBasisVec &&source ) NOEXEPT
-    {
-        ASSUME( this != &source );
-        _arr = source._arr;
-        source._arr = 0;
-        _reserved = source._reserved;
-        source._reserved = 0;
-    }
-#endif
-
-    X *_GetArr()
-    {
-        return _arr;
-    }
-
-    const X *_GetArr() const
-    {
-        return _arr;
-    }
-
-    void _SetArr( X *arr, count_type newCount )
-    {
-        ASSUME( arr == 0 && newCount <= _reserved );
-        _arr = allocator::Alloc < X >( _reserved );
-    }
-
-    void _IncSize( count_type newCount )
-    {
-        if( reservator::Up( newCount, &_reserved ) )
-        {
-            _arr = allocator::Realloc( _arr, _reserved );
-        }
-    }
-
-    void _DecSize( count_type newCount )
-    {
-        if( reservator::Down( newCount, &_reserved ) )
-        {
-            _arr = allocator::Realloc( _arr, _reserved );
-        }
-    }
-
-    void _UnkSize( count_type newCount )
-    {
-        if( newCount < _reserved )
-        {
-            _DecSize( newCount );
-        }
-        else
-        {
-            _IncSize( newCount );
-        }
-    }
-
-    bln _IsIncSize( count_type newCount )
-    {
-        if( reservator::Up( newCount, &_reserved ) )
-        {
-            if( !allocator::ReallocInplaceIfPossible( _arr, _reserved ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bln _IsDecSize( count_type newCount )
-    {
-        if( reservator::Down( newCount, &_reserved ) )
-        {
-            if( !allocator::ReallocInplaceIfPossible( _arr, _reserved ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bln _IsUnkSize( count_type newCount )
-    {
-        if( newCount > _reserved )
-        {
-            return _IsIncSize( newCount );
-        }
-        return _IsDecSize( newCount );
-    }
-
-    void _FlushReserved()
-    {
-        if( _count > _reserved )
-        {
-            _reserved = _count;
-            _arr = allocator::Realloc( _arr, _reserved );
-        }
-    }
-
-    bln _IsFlushReserved()
-    {
-        if( _count > _reserved )
-        {
-            _reserved = _count;
-            if( !allocator::ReallocInplaceIfPossible( _arr, _reserved ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void _Free( X *arr )
-    {
-        allocator::Free( arr );
-    }
-
-    count_type _Reserved() const
-    {
-        return _reserved;
-    }
-};
-
-template < typename X, typename allocator > class _CBasisVec < X, void, allocator, 0 > : CharMovable
-{
-    X *_arr;
-
-    _CBasisVec( const _CBasisVec &source );
-
-public:
-    typedef uiw count_type;
-
-protected:
-    count_type _count;
-
-    static const bln _cis_static = false;
-
-    ~_CBasisVec()
-    {
-        allocator::Free < X >( _arr );
-    }
-
-    _CBasisVec() : _arr( 0 )
-    {}
-
-    _CBasisVec( count_type count )
-    {
-        _arr = allocator::Alloc < X >( count );
-    }
-
-#ifdef MOVE_SUPPORTED
-    _CBasisVec( _CBasisVec &&source ) NOEXEPT
-    {
-        _arr = source._arr;
-        source._arr = 0;
-    }
-
-    void operator = ( _CBasisVec &&source ) NOEXEPT
-    {
-        ASSUME( this != &source );
-        _arr = source._arr;
-        source._arr = 0;
-    }
-#endif
-
-    X *_GetArr()
-    {
-        return _arr;
-    }
-
-    const X *_GetArr() const
-    {
-        return _arr;
-    }
-
-    void _SetArr( X *arr, count_type newCount )
-    {
-        ASSUME( arr == 0 );
-        _arr = allocator::Alloc < X >( newCount );
-    }
-
-    void _IncSize( count_type newCount )
-    {
-        if( newCount != _count )
-        {
-            _arr = allocator::Realloc( _arr, newCount );
-        }
-    }
-
-    void _DecSize( count_type newCount )
-    {
-        if( newCount != _count )
-        {
-            _arr = allocator::Realloc( _arr, newCount );
-        }
-    }
-
-    void _UnkSize( count_type newCount )
-    {
-        if( newCount != _count )
-        {
-            _arr = allocator::Realloc( _arr, newCount );
-        }
-    }
-
-    bln _IsIncSize( count_type newCount )
-    {
-        if( newCount != _count )
-        {
-            if( !allocator::ReallocInplaceIfPossible( _arr, newCount ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bln _IsDecSize( count_type newCount )
-    {
-        if( newCount != _count )
-        {
-            if( !allocator::ReallocInplaceIfPossible( _arr, newCount ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bln _IsUnkSize( count_type newCount )
-    {
-        if( newCount != _count )
-        {
-            if( !allocator::ReallocInplaceIfPossible( _arr, newCount ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void _FlushReserved()
-    {}
-
-    bln _IsFlushReserved()
-    {
-        return false;
-    }
-
-    void _Free( X *arr )
-    {
-        allocator::Free( arr );
-    }
-
-    count_type _Reserved() const
-    {
-        return _count;
-    }
-};
-
-template < typename X > class _CBasisVec < X, void, void, 0 > : CharMovable
-{
-    X *_arr;
-
-public:
-    typedef uiw count_type;
-
-protected:
-    count_type _count;
-
-    _CBasisVec()
-    {
-        _arr = 0;
-        _count = 0;
-    }
-
-    _CBasisVec( count_type count )
-    {
-        DBGBREAK;
-    }
-
-    X *_GetArr()
-    {
-        return _arr;
-    }
-
-    const X *_GetArr() const
-    {
-        return _arr;
-    }
-
-    void _SetArr( X *arr, count_type newCount )
-    {
-        ASSUME( arr != 0 || newCount == 0 );
-        _arr = arr;
-        _count = newCount;
-    }
-
-public:
-    void SetSource( X *arr, count_type count )
-    {
-        ASSUME( arr != 0 || count == 0 );
-        _arr = arr;
-        _count = count;
-    }
-};
-
 template < typename X, typename reservator, typename allocator, uiw static_size > class _CBaseVecConstStatic : public _CBasisVec < X, reservator, allocator, static_size >
 {
-    typedef _CBasisVec < X, reservator, allocator, static_size > baseType;
+    typedef _CBasisVec < X, reservator, allocator, static_size > arrType;
 
 public:
-    typedef typename baseType::count_type count_type;
+    typedef typename arrType::count_type count_type;
 
 protected:
-    using baseType::_count;
+    using arrType::_count;
 
 public:
     typedef Iterator::_IterRandomConst < X, 1 > IterConst;
@@ -484,12 +42,11 @@ public:
     {
     }
 
-    _CBaseVecConstStatic( const X *arr, count_type size )
+    _CBaseVecConstStatic( const X *arr, count_type size ) : arrType( (X *)arr, size )
     {
-        this->_SetArr( (X *)arr, size );
     }
 
-    _CBaseVecConstStatic( count_type count ) : baseType( count )
+    _CBaseVecConstStatic( count_type count ) : arrType( count )
     {
     }
 
@@ -520,42 +77,42 @@ public:
         return _count == 0;
     }
 
-    IterConst Begin() const
+    IterConst begin() const
     {
         return IterConst( this->_GetArr() );
     }
 
-    IterConst CBegin() const
+    IterConst cbegin() const
     {
         return IterConst( this->_GetArr() );
     }
 
-    IterConst End() const
+    IterConst end() const
     {
         return IterConst( this->_GetArr() + _count );
     }
 
-    IterConst CEnd() const
+    IterConst cend() const
     {
         return IterConst( this->_GetArr() + _count );
     }
 
-    IterRevConst BeginRev() const
+    IterRevConst beginRev() const
     {
         return IterRevConst( this->_GetArr() + _count - 1 );
     }
 
-    IterRevConst CBeginRev() const
+    IterRevConst cbeginRev() const
     {
         return IterRevConst( this->_GetArr() + _count - 1 );
     }
 
-    IterRevConst EndRev() const
+    IterRevConst endRev() const
     {
         return IterRevConst( this->_GetArr() - 1 );
     }
 
-    IterRevConst CEndRev() const
+    IterRevConst cendRev() const
     {
         return IterRevConst( this->_GetArr() - 1 );
     }
@@ -591,16 +148,16 @@ public:
     using baseType::Data;
     using baseType::Back;
     using baseType::Front;
-    using baseType::Size;
-    using baseType::IsEmpty;
-    using baseType::Begin;
-    using baseType::CBegin;
-    using baseType::End;
-    using baseType::CEnd;
-    using baseType::BeginRev;
-    using baseType::CBeginRev;
-    using baseType::EndRev;
-    using baseType::CEndRev;
+    //using baseType::Size;
+    //using baseType::IsEmpty;
+    using baseType::begin;
+    using baseType::cbegin;
+    using baseType::end;
+    using baseType::cend;
+    using baseType::beginRev;
+    using baseType::cbeginRev;
+    using baseType::endRev;
+    using baseType::cendRev;
     using baseType::Get;
     using baseType::operator [];
 
@@ -608,9 +165,8 @@ public:
     {
     }
 
-    _CBaseVecStatic( X *arr, count_type size )
+    _CBaseVecStatic( X *arr, count_type size ) : baseType( arr, size )
     {
-        this->_SetArr( arr, size );
     }
 
     _CBaseVecStatic( count_type count ) : baseType( count )
@@ -634,22 +190,22 @@ public:
         return this->_GetArr()[ 0 ];
     }
 
-    Iter Begin()
+    Iter begin()
     {
         return Iter( this->_GetArr() );
     }
 
-    Iter End()
+    Iter end()
     {
         return Iter( this->_GetArr() + _count );
     }
 
-    IterRev BeginRev()
+    IterRev beginRev()
     {
         return IterRev( this->_GetArr() + _count - 1 );
     }
 
-    IterRev EndRev()
+    IterRev endRev()
     {
         return IterRev( this->_GetArr() - 1 );
     }
@@ -675,6 +231,8 @@ public:
 
 template < typename X, typename reservator, typename allocator, TypeSemantic_t typeSemantic, uiw static_size > class _CBaseVec : public _CBaseVecStatic < X, reservator, allocator, static_size >
 {
+    typedef _CBasisVec < X, reservator, allocator, static_size > arrType;
+
     typedef _CBaseVecStatic < X, reservator, allocator, static_size > baseType;
 
     typedef _CBaseVec < X, reservator, allocator, typeSemantic, static_size > ownType;
@@ -696,16 +254,17 @@ private:
         static const bln is_checkOverlap = true;
     #endif
 
-    void _SizeUp( count_type newCount )
+    void _SizeUp( count_type sizeToLeave, count_type newCount )  //  you can't change _count before that call, will not destroy anything
     {
+        ASSUME( newCount >= _count && sizeToLeave <= newCount );
+
         if( _c_typeSemantic == Sem_Strict )
         {
             if( _IsIncSize( newCount ) )
             {
-                X *arr = this->_GetArr();
-                this->_SetArr( 0, newCount );
-                _Copy < true >( this->_GetArr(), arr, _count );
-                this->_Free( arr );
+                arrType oldArr = *this;
+                new (this) arrType( newCount );
+                _Copy < true >( this->_GetArr(), oldArr._GetArr(), sizeToLeave );
             }
         }
         else
@@ -714,16 +273,17 @@ private:
         }
     }
 
-    void _SizeDown( count_type newCount )
+    void _SizeDown( count_type sizeToLeave, count_type newCount )  //  you can't change _count before that call, will not destroy anything
     {
+        ASSUME( newCount <= _count && sizeToLeave <= newCount );
+
         if( _c_typeSemantic == Sem_Strict )
         {
             if( _IsDecSize( newCount ) )
             {
-                X *arr = this->_GetArr();
-                this->_SetArr( 0, newCount );
-                _Copy < true >( this->_GetArr(), arr, _count );
-                this->_Free( arr );
+                arrType oldArr = *this;
+                new (this) arrType( newCount );
+                _Copy < true >( this->_GetArr(), oldArr._GetArr(), sizeToLeave );
             }
         }
         else
@@ -732,16 +292,17 @@ private:
         }
     }
 
-    void _SizeToUnknown( count_type newCount )
+    void _SizeToUnknown( count_type sizeToLeave, count_type newCount )  //  you can't change _count before that call, will not destroy anything
     {
+        ASSUME( sizeToLeave <= newCount );
+
         if( _c_typeSemantic == Sem_Strict )
         {
             if( _IsUnkSize( newCount ) )
             {
-                X *arr = this->_GetArr();
-                this->_SetArr( 0, newCount );
-                _Copy < true >( this->_GetArr(), arr, _count );
-                this->_Free( arr );
+                arrType oldArr = *this;
+                new (this) arrType( newCount );
+                _Copy < true >( this->_GetArr(), oldArr._GetArr(), sizeToLeave );
             }
         }
         else
@@ -751,7 +312,7 @@ private:
     }
 
     template < typename X, bln is_destroySource > struct _CopySelector;
-    template < typename X > struct _CopySelector< X, true >
+    template < typename X > struct _CopySelector < X, true >
     {
         static void Copy( X *target, X *source )
         {
@@ -764,7 +325,7 @@ private:
 #           endif
         }
     };
-    template < typename X > struct _CopySelector< X, false >
+    template < typename X > struct _CopySelector < X, false >
     {
         static void Copy( X *target, const X *source )
         {
@@ -782,7 +343,7 @@ private:
         {
             for( ; count; --count )
             {
-                _CopySelector< X, is_destroySource >::Copy( target, source );
+                _CopySelector < X, is_destroySource >::Copy( target, source );
                 ++target;
                 ++source;
             }
@@ -801,19 +362,18 @@ private:
         if( _c_typeSemantic == Sem_POD || _c_typeSemantic == Sem_Mov )
         {
             _MemMove( this->_GetArr() + pos, this->_GetArr() + pos + count, (_count - count - pos) * sizeof(X) );
+            _SizeDown( _count - count, _count - count );
             _count -= count;
-            _SizeDown( _count );
         }
         else
         {
             count_type newCount = _count - count;
             if( _IsDecSize( newCount ) )
             {
-                X *arr = this->_GetArr();
-                this->_SetArr( 0, newCount );
-                _Copy < true >( this->_GetArr(), arr, pos );
-                _Copy < true >( this->_GetArr() + pos, arr + pos + count, _count - count - pos );
-                this->_Free( arr );
+                arrType oldArr = *this;
+                new (this) arrType( newCount );
+                _Copy < true >( this->_GetArr(), oldArr._GetArr(), pos );
+                _Copy < true >( this->_GetArr() + pos, oldArr._GetArr() + pos + count, _count - count - pos );
             }
             else
             {
@@ -822,7 +382,7 @@ private:
                 X *end = this->_GetArr() + _count;
                 for( ; source != end; ++source, ++target )
                 {
-                    _CopySelector< X, true >::Copy( target, source );
+                    _CopySelector < X, true >::Copy( target, source );
                 }
             }
             _count = newCount;
@@ -831,30 +391,29 @@ private:
 
     X *_InsertRaw( count_type pos, count_type count )
     {
-        ASSUME( pos < _count && count <= _count && pos + count <= _count );
+        ASSUME( pos <= _count );
         count_type newCount = _count + count;
         if( _c_typeSemantic == Sem_POD || _c_typeSemantic == Sem_Mov )
         {
-            _SizeUp( newCount );
+            _SizeUp( _count, newCount );
             _MemMove( this->_GetArr() + pos + count, this->_GetArr() + pos, (_count - pos) * sizeof(X) );
         }
         else
         {
             if( _IsIncSize( newCount ) )
             {
-                X *arr = this->_GetArr();
-                this->_SetArr( 0, newCount );
-                _Copy < true >( this->_GetArr(), arr, pos );
-                _Copy < true >( this->_GetArr() + pos + count, arr + pos, _count - pos );
-                this->_Free( arr );
+                arrType oldArr = *this;
+                new (this) arrType( newCount );
+                _Copy < true >( this->_GetArr(), oldArr._GetArr(), pos );
+                _Copy < true >( this->_GetArr() + pos + count, oldArr._GetArr() + pos, _count - pos );
             }
             else
             {
                 X *target = this->_GetArr() + newCount - 1;
                 X *source = this->_GetArr() + _count - 1;
-                for( ; source != this->_GetArr() + pos; --target, --source )
+                for( ; source != this->_GetArr() + pos - 1; --target, --source )
                 {
-                    _CopySelector< X, true >::Copy( target, source );
+                    _CopySelector < X, true >::Copy( target, source );
                 }
             }
         }
@@ -914,7 +473,7 @@ public:
     }
 
 #ifdef MOVE_SUPPORTED
-    _CBaseVec( ownType &&source ) NOEXEPT : baseType( std::move( source ) )
+    _CBaseVec( ownType &&source ) NOEXCEPT : baseType( std::move( source ) )
     {
         ASSUME( this != &source );
         _count = source._count;
@@ -925,7 +484,7 @@ public:
         }
     }
 
-    void operator = ( ownType &&source ) NOEXEPT
+    void operator = ( ownType &&source ) NOEXCEPT
     {
         ASSUME( this != &source );
         baseType::operator =( std::move( source ) );
@@ -938,12 +497,20 @@ public:
     }
 #endif
 
+#ifdef INITIALIZER_LISTS_SUPPORTED
+    _CBaseVec( std::initializer_list < X > ilist ) : baseType( ilist.size() )
+    {
+        _count = ilist.size();
+        _Copy < false >( this->_GetArr(), (X *)ilist.begin(), ilist.size() );
+    }
+#endif
+
     ownType &operator = ( const ownType &source )
     {
         if( this != &source )
         {
             _Destroy( this->_GetArr(), _count );
-            _SizeToUnknown( source._count );
+            _SizeToUnknown( 0, source._count );
             _Copy < false >( this->_GetArr(), (X *)source._GetArr(), source._count );
             _count = source._count;
         }
@@ -952,7 +519,7 @@ public:
 
     void PushBackNum( count_type num = 1 )
     {
-        _SizeUp( _count + num );
+        _SizeUp( _count, _count + num );
         if( _c_typeSemantic != Sem_POD )
         {
             X *target = this->_GetArr() + _count;
@@ -971,13 +538,13 @@ public:
         if( !_cis_static && is_checkOverlap )
         {
             uiw index = &source - this->_GetArr();
-            _SizeUp( _count + 1 );
+            _SizeUp( _count, _count + 1 );
             new (this->_GetArr() + _count ) X( index < _count ? this->_GetArr()[ index ] : source );
             ++_count;
         }
         else
         {
-            _SizeUp( _count + 1 );
+            _SizeUp( _count, _count + 1 );
             new (this->_GetArr() + _count ) X( source );
             ++_count;
         }
@@ -986,7 +553,7 @@ public:
 #ifdef VAR_TEMPLATES_SUPPORTED
     template < typename... Args > void EmplaceBack( Args &&... args )
     {
-        _SizeUp( _count + 1 );
+        _SizeUp( _count, _count + 1 );
         new (this->_GetArr() + _count ) X( std::move( args )... );
         ++_count;
     }
@@ -994,7 +561,7 @@ public:
 
     X *PushBackUninit()
     {
-        _SizeUp( _count + 1 );
+        _SizeUp( _count, _count + 1 );
         X *ret = this->_GetArr() + _count;
         ++_count;
         return ret;
@@ -1003,9 +570,9 @@ public:
     void PopBack( count_type num = 1 )
     {
         ASSUME( num <= _count );
+        _Destroy( this->_GetArr() + _count - 1, num );
+        _SizeDown( _count - 1, _count - 1 );
         _count -= num;
-        _Destroy( this->_GetArr() + _count, num );
-        _SizeDown( _count );
     }
 
     void PopBackSafe( count_type num = 1 )
@@ -1015,7 +582,7 @@ public:
 
     void Reserve( count_type size )
     {
-        _SizeUp( size );
+        _SizeUp( _count, size );
     }
 
     count_type Reserved() const
@@ -1029,10 +596,9 @@ public:
         {
             if( this->_IsFlushReserved() )
             {
-                X *arr = this->_GetArr();
-                this->_SetArr( 0, _count );
-                _Copy < true >( this->_GetArr(), arr, _count );
-                this->_Free( arr );
+                arrType oldArr = *this;
+                new (this) arrType( newCount );
+                _Copy < true >( this->_GetArr(), oldArr._GetArr(), _count );
             }
         }
         else
@@ -1052,6 +618,18 @@ public:
             PopBack( _count - size );
         }
     }
+
+#ifdef VAR_TEMPLATES_SUPPORTED
+    template < typename... Args > void Emplace( count_type pos, Args &&... args, count_type count = 1 )
+    {
+        X *target = _InsertRaw( pos, count );
+        for( ; count; --count )
+        {
+            new (target) X( args... );
+            ++target;
+        }
+    }
+#endif
 
     X *InsertUninit( count_type pos, count_type count )
     {
@@ -1079,18 +657,6 @@ public:
         }
     }
 
-#ifdef VAR_TEMPLATES_SUPPORTED
-    template < typename... Args > void Emplace( count_type pos, Args &&... args, count_type count = 1 )
-    {
-        X *target = _InsertRaw( pos, count );
-        for( ; count; --count )
-        {
-            new (target) X( args... );
-            ++target;
-        }
-    }
-#endif
-
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
     void Insert( count_type pos, const X *source, count_type count )
     {
@@ -1107,7 +673,7 @@ public:
         X *target = _InsertRaw( pos, count );
         for( ; count; --count )
         {
-            new (target) X( source );
+            new (target) X( *source );
             ++target;
             ++source;
         }
@@ -1122,7 +688,7 @@ public:
             count = source.Size() - start;
         }
 
-        Insert< is_checkOverlap >( pos, source.Data() + start, count );  //  TODO: default param
+        Insert < is_checkOverlap >( pos, source.Data() + start, count );  //  TODO: default param
     }
 
     template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ) >
@@ -1134,7 +700,7 @@ public:
         ASSUME( pos < _count );
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Insert< is_checkOverlap >( pos, begin.Ptr(), dist );  //  TODO: default param
+            Insert < is_checkOverlap >( pos, begin.Ptr(), dist );  //  TODO: default param
         }
         else
         {
@@ -1147,16 +713,29 @@ public:
         }
     }
 
-    void Erase( count_type pos, count_type count = uiw_max )
+#ifdef INITIALIZER_LISTS_SUPPORTED
+    void Insert( count_type pos, std::initializer_list < X > what )
     {
-        _Erase( pos, Funcs::Min< count_type >( _count - pos, count ) );
+        Insert < false >( pos, what.begin(), what.size() );
     }
 
-    Iter Erase( IterConst where )
+    void Insert( IterConst where, std::initializer_list < X > what )
+    {
+        Insert < false >( where, what.begin(), what.size() );
+    }
+#endif
+
+    void Erase( count_type pos, count_type count = uiw_max )
+    {
+        ASSUME( pos < _count );
+        _Erase( pos, Funcs::Min < count_type >( _count - pos, count ) );
+    }
+
+    Iter Erase( IterConst where, count_type count = uiw_max )
     {
         count_type index = where.Ptr() - this->_GetArr();
         ASSUME( index < _count );
-        Erase( index, 1 );
+        Erase( index, count );  //  Erase will check the count
         return Iter( this->_GetArr() + index );
     }
 
@@ -1172,7 +751,7 @@ public:
 
     X *AppendUninit( count_type count )
     {
-        _SizeUp( _count + count );
+        _SizeUp( _count, _count + count );
         X *ret = this->_GetArr() + _count;
         _count += count;
         return ret;
@@ -1183,13 +762,13 @@ public:
     {
         if( _cis_static || !is_checkOverlap )
         {
-            _SizeUp( _count + count );
+            _SizeUp( _count, _count + count );
             _Copy < false >( this->_GetArr() + _count, (X *)source, count );
         }
         else
         {
             uiw index = source - this->_GetArr();
-            _SizeUp( _count + count );
+            _SizeUp( _count, _count + count );
             if( index < _count )
             {
                 source = &this->_GetArr()[ index ];
@@ -1208,11 +787,18 @@ public:
     }
 
     template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ) >
-    void AppendIter( IterType begin, IterType end )
+    void Append( IterType begin, IterType end )
     {
         DBGBREAK;
         //
     }
+
+#ifdef INITIALIZER_LISTS_SUPPORTED
+    void Append( std::initializer_list < X > ilist )
+    {
+        Append( ilist.begin(), ilist.size() );
+    }
+#endif
 
 private:
     NOINLINE void AssignOverlapped( const X &source, count_type count, count_type index )
@@ -1239,7 +825,7 @@ public:
         else
         {
             _Destroy( this->_GetArr(), _count );
-            _SizeToUnknown( count );
+            _SizeToUnknown( 0, count );
             for( _count = 0; _count < count; ++_count )
             {
                 new (&this->_GetArr()[ _count ]) X( source );
@@ -1258,7 +844,7 @@ public:
         else
         {
             _Destroy( this->_GetArr(), _count );
-            _SizeToUnknown( count );
+            _SizeToUnknown( 0, count );
             _Copy < false >( this->_GetArr(), (X *)source, count );
             _count = count;
         }
@@ -1272,17 +858,24 @@ public:
     }
 
     template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ) >
-    void AssignIter( IterType begin, IterType end )
+    void Assign( IterType begin, IterType end )
     {
         DBGBREAK;
         //
     }
 
+#ifdef INITIALIZER_LISTS_SUPPORTED
+    void Assign( std::initializer_list < X > ilist )
+    {
+        Assign < false >( ilist.begin(), ilist.size() );
+    }
+#endif
+
     void Clear()
     {
         _Destroy( this->_GetArr(), _count );
+        _SizeDown( 0, 0 );
         _count = 0;
-        _SizeDown( 0 );
     }
 };
 
@@ -1305,6 +898,16 @@ public:
 
     CRefVec( X *source, count_type size ) : baseType( source, size )
     {}
+
+    CRefVec &operator = ( const CRefVec &source )
+    {
+        if( this != &source )
+        {
+            this->~CRefVec();
+            new (this) CRefVec( (X *)source.Data(), source.Size() );
+        }
+        return *this;
+    }
 };
 
 template < typename X > class CCRefVec : public Private::_CBaseVecConstStatic < X, void, void, 0 >
@@ -1319,6 +922,16 @@ public:
 
     CCRefVec( const X *source, count_type size ) : baseType( source, size )
     {}
+
+    CCRefVec &operator = ( const CCRefVec &source )
+    {
+        if( this != &source )
+        {
+            this->~CCRefVec();
+            new (this) CCRefVec( source.Data(), source.Size() );
+        }
+        return *this;
+    }
 };
 
 template < typename X, typename reservator, TypeSemantic_t typeSemantic, typename allocator > class CVec : public Private::_CBaseVec < X, reservator, allocator, typeSemantic, 0 >
@@ -1340,28 +953,62 @@ public:
     CVec( const CVec &source ) : baseType( source )
     {}
 
-    CVec( const CRefVec< X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
+    CVec( const CRefVec < X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
     {}
 
-    CVec( const CCRefVec< X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
+    CVec( const CCRefVec < X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
     {}
+    
+    CVec &operator = ( const CVec &source )
+    {
+        baseType::operator =( source );
+        return *this;
+    }
 
-    CVec &operator = ( const CRefVec< X > &source )
+    CVec &operator = ( const CRefVec < X > &source )
     {
         this->Assign( source.Data(), source.Size() );
         return *this;
     }
 
-    CVec &operator = ( const CCRefVec< X > &source )
+    CVec &operator = ( const CCRefVec < X > &source )
     {
         this->Assign( source.Data(), source.Size() );
         return *this;
     }
+
+    /*CVec &operator += ( const CRefVec < X > &source )
+    {
+        this->Append( source.Data(), source.Size() );
+        return *this;
+    }
+
+    CVec &operator += ( const CCRefVec < X > &source )
+    {
+        this->Append( source.Data(), source.Size() );
+        return *this;
+    }
+
+    CVec &operator += ( CVec &source )
+    {
+        this->Append( source.Data(), source.Size() );
+        return *this;
+    }*/
 
 #ifdef MOVE_SUPPORTED
-    CVec &operator = ( const CVec &source ) = default;
-    CVec( CVec &&source ) = default;
-    CVec &operator = ( CVec &&source ) = default;
+    CVec( CVec &&source ) NOEXCEPT = default;
+    CVec &operator = ( CVec &&source ) NOEXCEPT = default;
+#endif
+
+#ifdef INITIALIZER_LISTS_SUPPORTED
+    CVec( std::initializer_list < X > ilist ) : baseType( ilist )
+    {}
+
+    CVec &operator = ( std::initializer_list < X > ilist )
+    {
+        baseType::Assign( ilist );
+        return *this;
+    }
 #endif
 
     CRefVec < X > ToRef()
@@ -1400,11 +1047,27 @@ public:
 
     CStaticVec( const CStaticVec &source ) : baseType( source )
     {}
+    
+    CStaticVec &operator = ( const CStaticVec &source )
+    {
+        baseType::operator =( source );
+        return *this;
+    }
 
 #ifdef MOVE_SUPPORTED
-    CStaticVec &operator = ( const CStaticVec &source ) = default;
     CStaticVec( CStaticVec &&source ) = default;
     CStaticVec &operator = ( CStaticVec &&source ) = default;
+#endif
+
+#ifdef INITIALIZER_LISTS_SUPPORTED
+    CStaticVec( std::initializer_list < X > ilist ) : baseType( ilist )
+    {}
+
+    CStaticVec &operator = ( std::initializer_list < X > ilist )
+    {
+        baseType::Assign( ilist );
+        return *this;
+    }
 #endif
 
     CRefVec < X > ToRef()
@@ -1426,11 +1089,11 @@ public:
 };
 
 //  force all methods compilation to check for correctness
-/*template class CVec< int >;
-template class CVec< int, void >;
-template class CRefVec< int >;
-template class CCRefVec< int >;
-template class CStaticVec< int, 100 >;*/
+template class CVec < int >;
+template class CVec < int, void >;
+template class CRefVec < int >;
+template class CCRefVec < int >;
+template class CStaticVec < int, 100 >;
 
 }  //  namespace StdLib
 

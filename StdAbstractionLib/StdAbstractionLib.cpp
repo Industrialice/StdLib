@@ -1,4 +1,5 @@
 #include "PreHeader.hpp"
+#include "StdHelperLib.hpp"
 #include "Misc.hpp"
 
 void StdAbstractionLib_Initialize()

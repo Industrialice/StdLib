@@ -62,8 +62,6 @@
         #define DEFINE_VARARGS_SUPPORTED
         #define OVERRIDE_SUPPORTED
         #define NOINLINE __declspec(noinline)
-    #else
-        #define NOINLINE
     #endif
 
     #if _MSC_VER >= 1500  //  Visual Studio 2008
@@ -79,14 +77,16 @@
         #define FINAL_SUPPORTED
         #define DEFAULT_FUNC_PARAMS_SUPPORTED
         #define NULLPTR_SUPPORTED
+        #define RANGE_BASED_FOR_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1800  //  Visual Studio 2013
         #define VAR_TEMPLATES_SUPPORTED
+        #define INITIALIZER_LISTS_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1900  //  Visual Studio 2015
-        //#define NOEXEPT noexept
+        #define NOEXCEPT noexcept
         #define CONSTEXPR_SUPPORTED
     #endif
 
@@ -96,13 +96,27 @@
     #define ASUINT64( number ) number##UI64
 
     #if defined(_M_IX86) || defined(_M_AMD64)
-        #define LITTLE_ENDIAN
+        #ifndef LITTLE_ENDIAN
+            #define LITTLE_ENDIAN
+        #endif
+
+        #ifdef BIG_ENDIAN
+            #error your CPU isn't BIG_ENDIAN
+        #endif
     #endif
 
     #if defined(_M_IX86)
-        #define WORD_SIZE 32
+        #ifndef WORD_SIZE
+            #define WORD_SIZE 32
+        #elif WORD_SIZE != 32
+            #error incorrect WORD_SIZE
+        #endif
     #elif defined(_M_AMD64)
-        #define WORD_SIZE 64
+        #ifndef WORD_SIZE
+            #define WORD_SIZE 64
+        #elif WORD_SIZE != 64
+            #error incorrect WORD_SIZE
+        #endif
     #endif
 
     #if defined(_M_IX86) || defined(_M_AMD64) || defined(_M_ARM) || defined(_M_ARMT)
@@ -173,6 +187,9 @@
     #define DEFINE_VARARGS_SUPPORTED
     #define NULLPTR_SUPPORTED
     #define EXTERN_TEMPLATES_SUPPORTED
+    #define NOEXCEPT noexcept
+    #define INITIALIZER_LISTS_SUPPORTED
+    #define RANGE_BASED_FOR_SUPPORTED
 
     #if GCC_VERSION >= 40500
         #ifdef DEBUG
@@ -277,13 +294,17 @@
     #define ALIGNOF( type ) offsetof(__AlignmentCheck<type>, t)
 #endif
 
-#ifndef NOEXEPT
-    #define NOEXEPT
+#ifndef NOEXCEPT
+    #define NOEXCEPT
 #endif
 
 /*  TODO: wtf  */
-#if defined(ISPOD_SUPPORTED) && defined(WINCE)
+#if defined(ISPOD_SUPPORTED) && defined(_WIN32_WCE)
     #undef ISPOD_SUPPORTED
+#endif
+
+#ifndef NOINLINE
+    #define NOINLINE
 #endif
 
 #endif __COMPILER_DEFINES_HPP__
