@@ -13,7 +13,7 @@ namespace StdLib
 {
 const uiw StringDefReserve = 16;
 
-template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType), typename reservator = Reservator::Half <>, typename allocator = Allocator::Simple > class TCStr
+template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType), typename reservator = Reservator::Half <>, typename allocator = Allocator::Simple > class TCStr : CharMovable
 {
     typedef TCStr < charType, basicSize, reservator, allocator > ownType;
 

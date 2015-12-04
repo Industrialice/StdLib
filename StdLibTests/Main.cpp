@@ -391,30 +391,63 @@ int __cdecl main()
     }*/
 
     {
-        CVec < int, void, Sem_Strict > v = { 1, 2, 3 };
+        CVec < std::pair< int, CStr > > v = { { 1, "init" }, { 2, "init" }, { 3, "init" } };
 
-        v = { 2, 3, 4 };
+        v = { { 2, "init2" }, { 3, "init2" }, { 4, "init2" } };
 
-        v.Append( { 4, 5, 6 } );
+        for( uiw index = 0; index < 100; ++index )
+        {
+            if( rand() % 2 )
+            {
+                v.Append( { { 4, "high append" }, { 5, "high append" }, { 6, "high append" } } );
+            }
 
-        v.PopBack();
+            if( rand() % 2 && v.Size() )
+            {
+                v.PopBack();
+            }
 
-        v.Insert( 1, { 999 } );
+            if( rand() % 2 && v.Size() )
+            {
+                v.PopBack();
+            }
 
-        v.Erase( 2, 1 );
+            if( rand() % 2 && v.Size() )
+            {
+                v.PopBack();
+            }
 
-        v.Insert( v.Size(), { 555, 666, 777 } );
+            if( rand() % 2 )
+            {
+                v.Insert( 1, { { 999, "high insert" } } );
+            }
 
-        CRefVec < int > ref;
+            if( rand() % 2 && v.Size() )
+            {
+                v.Erase( 2, 1 );
+            }
+
+            if( rand() % 2 )
+            {
+                v.Insert( v.Size(), { { 555, "low insert" }, { 666, "low insert" }, { 777, "low insert" } } );
+            }
+
+            if( rand() % 2 && v.Size() )
+            {
+                v.Erase( v.Size() / 2, 3 );
+            }
+        }
+
+        CRefVec < std::pair< int, CStr > > ref;
         ref = v.ToRef();
 
-        CRefVec < int > ref2 = ref;
+        CRefVec < std::pair< int, CStr > > ref2 = ref;
 
         ::printf( "size %i\n", ref2.Size() );
 
         for( auto i : ref2 )
         {
-            ::printf( "%i\n", i );
+            ::printf( "%i ... %s\n", i.first, i.second.CStr() );
         }
     }
 
