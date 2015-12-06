@@ -15,13 +15,6 @@
 
 namespace StdLib
 {
-  enum TypeSemantic_t
-  {
-      Sem_POD,
-      Sem_Mov,
-      Sem_Strict
-  };
-
 namespace Private
 {
 template < typename X, typename reservator, typename allocator, uiw static_size > class _CBaseVecConstStatic : public _CBasisVec < X, reservator, allocator, static_size >
@@ -706,7 +699,7 @@ public:
             count = source.Size() - start;
         }
 
-        Insert < is_checkOverlap >( pos, source.Data() + start, count );  //  TODO: default param
+        Insert VEC_DEF_PARAM(< is_checkOverlap >)( pos, source.Data() + start, count );  //  TODO: default param
     }
 
     template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ) >
@@ -718,7 +711,7 @@ public:
         ASSUME( pos < this->_Size() );
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Insert < is_checkOverlap >( pos, begin.Ptr(), dist );  //  TODO: default param
+            Insert VEC_DEF_PARAM(< is_checkOverlap >)( pos, begin.Ptr(), dist );  //  TODO: default param
         }
         else
         {
@@ -734,12 +727,12 @@ public:
 #ifdef INITIALIZER_LISTS_SUPPORTED
     void Insert( count_type pos, std::initializer_list < X > what )
     {
-        Insert < false >( pos, what.begin(), what.size() );
+        Insert VEC_DEF_PARAM(< false >)( pos, what.begin(), what.size() );
     }
 
     void Insert( IterConst where, std::initializer_list < X > what )
     {
-        Insert < false >( where, what.begin(), what.size() );
+        Insert VEC_DEF_PARAM(< false >)( where, what.begin(), what.size() );
     }
 #endif
 
@@ -885,7 +878,7 @@ public:
 #ifdef INITIALIZER_LISTS_SUPPORTED
     void Assign( std::initializer_list < X > ilist )
     {
-        Assign < false >( ilist.begin(), ilist.size() );
+        Assign VEC_DEF_PARAM(< false >)( ilist.begin(), ilist.size() );
     }
 #endif
 

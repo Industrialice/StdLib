@@ -330,6 +330,13 @@ struct CharMovable
 struct CharPOD : CharMovable
 {};
 
+enum TypeSemantic_t
+{
+    Sem_POD,
+    Sem_Mov,
+    Sem_Strict
+};
+
 template < typename X > struct NewDeleter
 {
     NewDeleter( X *something )
