@@ -900,9 +900,7 @@ public:
 
 template < typename X > class CRefVec;
 template < typename X > class CCRefVec;
-template < typename X, typename reservator = Reservator::Half <>, TypeSemantic_t typeSemantic = Sem_Strict, typename allocator = Allocator::Simple > class CVec;
-template < typename X, uiw static_size, TypeSemantic_t typeSemantic = Sem_Strict > class CStaticVec;
-template < typename X, uiw static_size, typename reservator = Reservator::Half <>, TypeSemantic_t typeSemantic = Sem_Strict, typename allocator = Allocator::Simple > class CPreallocVec;
+template < typename X, typename reservator = Reservator::Half <>, uiw static_size = 0, TypeSemantic_t typeSemantic = Sem_Strict, typename allocator = Allocator::Simple > class CVec;
 
 template < typename X > class CRefVec : public Private::_CBaseVecStatic < X, void, void, 0 >
 {
@@ -958,9 +956,9 @@ public:
     }
 };
 
-template < typename X, typename reservator, TypeSemantic_t typeSemantic, typename allocator > class CVec : public Private::_CBaseVec < X, reservator, allocator, typeSemantic, 0 >
+template < typename X, typename reservator, uiw static_size, TypeSemantic_t typeSemantic, typename allocator > class CVec : public Private::_CBaseVec < X, reservator, allocator, typeSemantic, static_size >
 {
-    typedef Private::_CBaseVec < X, reservator, allocator, typeSemantic, 0 > baseType;
+    typedef Private::_CBaseVec < X, reservator, allocator, typeSemantic, static_size > baseType;
 
 public:
     typedef typename baseType::count_type count_type;
@@ -1042,131 +1040,13 @@ public:
 
     CCRefVec < X > ToRef() const
     {
-        typedef _CBaseVecConstStatic < X, reservator, allocator, 0 > constBaseType;
+        typedef _CBaseVecConstStatic < X, reservator, allocator, static_size > constBaseType;
         return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
     }
 
     CCRefVec < X > ToCRef() const
     {
-        typedef _CBaseVecConstStatic < X, reservator, allocator, 0 > constBaseType;
-        return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
-    }
-};
-
-template < typename X, uiw static_size, TypeSemantic_t typeSemantic > class CStaticVec : public Private::_CBaseVec < X, void, void, typeSemantic, static_size >
-{
-    typedef Private::_CBaseVec < X, void, void, typeSemantic, static_size > baseType;
-
-public:
-    typedef typename baseType::count_type count_type;
-
-    explicit CStaticVec( count_type reserve = 0 ) : baseType( reserve )
-    {}
-
-    CStaticVec( count_type reserve, count_type size ) : baseType( size, reserve )
-    {}
-
-    CStaticVec( count_type reserve, const X *source, count_type size ) : baseType( source, size, reserve )
-    {}
-
-    CStaticVec( const CStaticVec &source ) : baseType( source )
-    {}
-    
-    CStaticVec &operator = ( const CStaticVec &source )
-    {
-        baseType::operator =( source );
-        return *this;
-    }
-
-#ifdef MOVE_SUPPORTED
-    CStaticVec( CStaticVec &&source ) = default;
-    CStaticVec &operator = ( CStaticVec &&source ) = default;
-#endif
-
-#ifdef INITIALIZER_LISTS_SUPPORTED
-    CStaticVec( std::initializer_list < X > ilist ) : baseType( ilist )
-    {}
-
-    CStaticVec &operator = ( std::initializer_list < X > ilist )
-    {
-        baseType::Assign( ilist );
-        return *this;
-    }
-#endif
-
-    CRefVec < X > ToRef()
-    {
-        return CRefVec < X >( this->Data(), this->Size() );
-    }
-
-    CCRefVec < X > ToRef() const
-    {
-        typedef _CBaseVecConstStatic < X, void, void, static_size > constBaseType;
-        return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
-    }
-
-    CCRefVec < X > ToCRef() const
-    {
-        typedef _CBaseVecConstStatic < X, void, void, static_size > constBaseType;
-        return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
-    }
-};
-
-template < typename X, uiw static_size, typename reservator, TypeSemantic_t typeSemantic, typename allocator > class CPreallocVec : public Private::_CBaseVec < X, reservator, allocator, typeSemantic, static_size >
-{
-    typedef Private::_CBaseVec < X, reservator, allocator, typeSemantic, static_size > baseType;
-
-public:
-    typedef typename baseType::count_type count_type;
-
-    explicit  CPreallocVec( count_type reserve = 0 ) : baseType( reserve )
-    {}
-    
-    CPreallocVec( count_type reserve, count_type size ) : baseType( size, reserve )
-    {}
-
-    CPreallocVec( count_type reserve, const X *source, count_type size ) : baseType( source, size, reserve )
-    {}
-
-    CPreallocVec( const CPreallocVec &source ) : baseType( source )
-    {}
-    
-    CPreallocVec &operator = ( const CPreallocVec &source )
-    {
-        baseType::operator =( source );
-        return *this;
-    }
-
-#ifdef MOVE_SUPPORTED
-    CPreallocVec( CPreallocVec &&source ) = default;
-    CPreallocVec &operator = ( CPreallocVec &&source ) = default;
-#endif
-
-#ifdef INITIALIZER_LISTS_SUPPORTED
-    CPreallocVec( std::initializer_list < X > ilist ) : baseType( ilist )
-    {}
-
-    CPreallocVec &operator = ( std::initializer_list < X > ilist )
-    {
-        baseType::Assign( ilist );
-        return *this;
-    }
-#endif
-
-    CRefVec < X > ToRef()
-    {
-        return CRefVec < X >( this->Data(), this->Size() );
-    }
-
-    CCRefVec < X > ToRef() const
-    {
-        typedef _CBaseVecConstStatic < X, void, void, static_size > constBaseType;
-        return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
-    }
-
-    CCRefVec < X > ToCRef() const
-    {
-        typedef _CBaseVecConstStatic < X, void, void, static_size > constBaseType;
+        typedef _CBaseVecConstStatic < X, reservator, allocator, static_size > constBaseType;
         return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
     }
 };
@@ -1174,9 +1054,9 @@ public:
 //  force all methods compilation to check for correctness
 template class CVec < int >;
 template class CVec < int, void >;
+template class CVec < int, void, 128 >;
 template class CRefVec < int >;
 template class CCRefVec < int >;
-template class CStaticVec < int, 100 >;
 
 }  //  namespace StdLib
 

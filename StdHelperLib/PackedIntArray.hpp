@@ -187,7 +187,7 @@ template < const uiw cells, const uiw pack, bln is_signed, const packiarr_OutOfR
     using parentType::nativeBits;
 
     static const uiw arrSize = ((cells * pack + (nativeBits - 1)) & ~(nativeBits - 1)) / nativeBits;
-    CStaticVec < unative_t, arrSize > _arr;
+    CVec < unative_t, void, arrSize > _arr;
 
 public:
     packiarr_static()
@@ -239,7 +239,7 @@ template < const uiw pack, bln is_signed, typename reservator = Reservator::Half
     typedef typename parentType::unative_t unative_t;
     using parentType::nativeBits;
 
-    CVec < unative_t, reservator, Sem_POD, allocator > _arr;
+    CVec < unative_t, reservator, 0, Sem_POD, allocator > _arr;
 
     uiw _cells;
 

@@ -26,44 +26,8 @@ namespace
 
 #define dis ((SLogger *)this)
 
-//  TODO: add mutexes
-
 CLogger::CLogger()
 {}
-
-template < typename X, uiw static_size, typename allocator = Allocator::Simple > class CSmartBuf
-{
-    typename AlignmentHelper < X, static_size >::type _arr;
-    X *_dynamic_pointer;
-
-public:
-    ~CSmartBuf()
-    {
-        allocator::Free( _dynamic_pointer );
-    }
-
-    CSmartBuf( uiw dynamic_size )
-    {
-        if( dynamic_size > static_size )
-        {
-            _dynamic_pointer = allocator::Alloc < X >( dynamic_size );
-        }
-        else
-        {
-            _dynamic_pointer = 0;
-        }
-    }
-
-    X *Acquire()
-    {
-        return _dynamic_pointer ? _dynamic_pointer : (X *)&_arr;
-    }
-
-    const X *Acquire() const
-    {
-        return _dynamic_pointer ? _dynamic_pointer : (X *)&_arr;
-    }
-};
 
 NOINLINE va_return CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
 {
@@ -78,8 +42,8 @@ NOINLINE va_return CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, 
         return va_return_whatever;
     }
 
-    CSmartBuf < char, 4096 > smartBuf( dis->_bufferLength );
-    char *tempBuffer = smartBuf.Acquire();
+    CVec < char, void, 4096 > smartBuf( dis->_bufferLength );
+    char *tempBuffer = smartBuf.Data();
     size_t printedLen;
 
     va_list args;
