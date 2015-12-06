@@ -27,7 +27,7 @@ public:
 
     _CBasisVec( count_type count, count_type reserve ) : _count( count )
     {
-        ASSUME( count <= static_size );
+        ASSUME( count <= static_size && reserve != TypeDesc < count_type >::max );
     }
 
     void _Transfer( _CBasisVec *source )
@@ -64,33 +64,33 @@ public:
         _count = newCount;
     }
 
-    bln _TryIncSizeLocally( count_type newCount )
+    count_type _TryIncSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         ASSUME( newCount <= static_size );
         _count = newCount;
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
-    bln _TryDecSizeLocally( count_type newCount )
+    count_type _TryDecSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         ASSUME( newCount <= static_size );
         _count = newCount;
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
-    bln _TryUnkSizeLocally( count_type newCount )
+    count_type _TryUnkSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         ASSUME( newCount <= static_size );
         _count = newCount;
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
     void _FlushReserved()
     {}
 
-    bln _TryFlushReservedLocally()
+    count_type _TryFlushReservedLocally()  //  will return TypeDesc < count_type >::max on success
     {
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
     count_type _Reserved() const
@@ -135,6 +135,7 @@ public:
 
     _CBasisVec( count_type count, count_type reserve ) : _reserved( reserve ), _count( count )
     {
+        ASSUME( reserve != TypeDesc < count_type >::max );
         if( _reserved < _count )
         {
             _reserved = _count;
@@ -196,37 +197,41 @@ public:
         _count = newCount;
     }
 
-    bln _TryIncSizeLocally( count_type newCount )
+    count_type _TryIncSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         ASSUME( newCount >= _count );
-        if( reservator::Up( newCount, &_reserved ) )
+        count_type newReserve = _reserved;
+        if( reservator::Up( newCount, &newReserve ) )
         {
-            if( !allocator::ReallocInplaceIfPossible( _arr, _reserved ) )
+            if( !allocator::ReallocInplaceIfPossible( _arr, newReserve ) )
             {
-                return false;
+                return newReserve;
             }
         }
+        _reserved = newReserve;
         _count = newCount;
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
-    bln _TryDecSizeLocally( count_type newCount )
+    count_type _TryDecSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         ASSUME( newCount <= _count );
-        if( reservator::Down( newCount, &_reserved ) )
+        count_type newReserve = _reserved;
+        if( reservator::Down( newCount, &newReserve ) )
         {
-            if( !allocator::ReallocInplaceIfPossible( _arr, _reserved ) )
+            if( !allocator::ReallocInplaceIfPossible( _arr, newReserve ) )
             {
-                return false;
+                return newReserve;
             }
         }
+        _reserved = newReserve;
         _count = newCount;
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
-    bln _TryUnkSizeLocally( count_type newCount )
+    count_type _TryUnkSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
-        if( newCount > _reserved )
+        if( newCount > _count )
         {
             return _TryIncSizeLocally( newCount );
         }
@@ -242,17 +247,17 @@ public:
         }
     }
 
-    bln _TryFlushReservedLocally()
+    count_type _TryFlushReservedLocally()  //  will return TypeDesc < count_type >::max on success
     {
         if( _count < _reserved )
         {
             if( !allocator::ReallocInplaceIfPossible( _arr, _count ) )
             {
-                return false;
+                return _count;
             }
             _reserved = _count;
         }
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
     count_type _Reserved() const
@@ -298,6 +303,7 @@ public:
 
     _CBasisVec( count_type count, count_type reserve ) : _count( count )
     {
+        ASSUME( reserve != TypeDesc < count_type >::max );
         _arr = allocator::Alloc < X >( count );
     }
 
@@ -349,53 +355,53 @@ public:
         _count = newCount;
     }
 
-    bln _TryIncSizeLocally( count_type newCount )
+    count_type _TryIncSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         ASSUME( newCount >= _count );
         if( newCount != _count )
         {
             if( !allocator::ReallocInplaceIfPossible( _arr, newCount ) )
             {
-                return false;
+                return newCount;
             }
         }
         _count = newCount;
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
-    bln _TryDecSizeLocally( count_type newCount )
+    count_type _TryDecSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         ASSUME( newCount <= _count );
         if( newCount != _count )
         {
             if( !allocator::ReallocInplaceIfPossible( _arr, newCount ) )
             {
-                return false;
+                return newCount;
             }
         }
         _count = newCount;
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
-    bln _TryUnkSizeLocally( count_type newCount )
+    count_type _TryUnkSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         if( newCount != _count )
         {
             if( !allocator::ReallocInplaceIfPossible( _arr, newCount ) )
             {
-                return false;
+                return newCount;
             }
         }
         _count = newCount;
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
     void _FlushReserved()
     {}
 
-    bln _TryFlushReservedLocally()
+    count_type _TryFlushReservedLocally()  //  will return TypeDesc < count_type >::max on success
     {
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
     count_type _Reserved() const
@@ -443,6 +449,7 @@ public:
 
     _CBasisVec( count_type count, count_type reserve ) : _count( count )
     {
+        ASSUME( reserve != TypeDesc < count_type >::max );
         if( _count > static_size )
         {
             _dynamicArr = allocator::Alloc < X >( count );
@@ -529,7 +536,7 @@ public:
         }
     }
 
-    bln _TryIncSizeLocally( count_type newCount )
+    count_type _TryIncSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         if( newCount != _count )
         {
@@ -539,21 +546,21 @@ public:
             {
                 if( _count <= static_size )  //  we're currently using a static array
                 {
-                    return false;  //  can't switch between static and dynamic without reallocation
+                    return newCount;  //  can't switch between static and dynamic without reallocation
                 }
                 else
                 {
                     if( !allocator::ReallocInplaceIfPossible( _dynamicArr, newCount ) )
                     {
-                        return false;
+                        return newCount;
                     }
                 }
             }
         }
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
-    bln _TryDecSizeLocally( count_type newCount )
+    count_type _TryDecSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         if( newCount != _count )
         {
@@ -563,21 +570,21 @@ public:
             {
                 if( _count > static_size )
                 {
-                    return false;  //  can't switch between static and dynamic without reallocation
+                    return newCount;  //  can't switch between static and dynamic without reallocation
                 }
             }
             else
             {
                 if( !allocator::ReallocInplaceIfPossible( _dynamicArr, newCount ) )
                 {
-                    return false;
+                    return newCount;
                 }
             }
         }
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
-    bln _TryUnkSizeLocally( count_type newCount )
+    count_type _TryUnkSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
     {
         if( newCount > _count )
         {
@@ -589,9 +596,9 @@ public:
     void _FlushReserved()
     {}
 
-    bln _TryFlushReservedLocally()
+    count_type _TryFlushReservedLocally()  //  will return TypeDesc < count_type >::max on success
     {
-        return true;
+        return TypeDesc < count_type >::max;
     }
 
     count_type _Reserved() const

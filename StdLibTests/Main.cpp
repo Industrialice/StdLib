@@ -381,16 +381,66 @@ struct TestStruct
 #include <memory>
 #include <CString.hpp>
 
+class MoveTest
+{
+    int *p;
+
+public:
+    ~MoveTest()
+    {
+        delete[] p;
+    }
+
+    MoveTest()
+    {
+        p = new int[ 10 ];
+    }
+
+    MoveTest( const MoveTest &source )
+    {
+        p = new int[ 10 ];
+    }
+
+    MoveTest &operator = ( const MoveTest &source )
+    {
+        p = new int[ 10 ];
+    }
+
+    MoveTest( MoveTest &&source )
+    {
+        p = new int[ 10 ];
+        delete[] source.p;
+        source.p = 0;
+    }
+
+    MoveTest &operator = ( MoveTest &&source )
+    {
+        p = new int[ 10 ];
+        delete[] source.p;
+        source.p = 0;
+    }
+};
+
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
+
+    ::printf( "%i\n", std::is_move_constructible < MoveTest >::value );
+    ::printf( "%i\n", std::is_move_assignable < MoveTest >::value );
+    ::printf( "%i\n", std::is_trivially_move_assignable < MoveTest >::value );
+    ::printf( "%i\n", std::is_trivially_move_constructible < MoveTest >::value );
+
+    CVec < MoveTest > test;
+    test.PushBackNum();
+    test.PushBackNum();
+    test.PushBackNum();
 
     /*for( int index = 0; index < 10000; ++index )
     {
         FuncWithAlloca();
     }*/
 
-    {
+    /*{
         CVec < std::pair< int, CStr > > v = { { 1, "init" }, { 2, "init" }, { 3, "init" } };
 
         v = { { 2, "init2" }, { 3, "init2" }, { 4, "init2" } };
@@ -449,7 +499,7 @@ int __cdecl main()
         {
             ::printf( "%i ... %s\n", i.first, i.second.CStr() );
         }
-    }
+    }*/
 
     /*CVec < TestStruct > vec;
     vec.PushBack( TestStruct() );

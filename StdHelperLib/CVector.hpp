@@ -241,9 +241,10 @@ public:
 
         if( _c_typeSemantic == Sem_Strict )
         {
-            if( _TryIncSizeLocally( newCount ) == false )
+            count_type newReserve = _TryIncSizeLocally( newCount );
+            if( newReserve != TypeDesc < count_type >::max )
             {
-                arrType newArr( newCount, newCount );
+                arrType newArr( newCount, newReserve );
                 ASSUME( newArr._IsStatic() == false );
                 _Copy < true >( newArr._GetArr(), this->_GetArr(), sizeToLeave );
                 this->_Transfer( &newArr );
@@ -261,12 +262,13 @@ public:
 
         if( _c_typeSemantic == Sem_Strict )
         {
-            if( _TryDecSizeLocally( newCount ) == false )
+            count_type newReserve = _TryDecSizeLocally( newCount );
+            if( newReserve != TypeDesc < count_type >::max )
             {
                 ASSUME( this->_IsStatic() == false );
                 arrType newArr;
                 newArr._Transfer( this );
-                new (this) arrType( newCount, newCount );
+                new (this) arrType( newCount, newReserve );
                 _Copy < true >( this->_GetArr(), newArr._GetArr(), sizeToLeave );
             }
         }
@@ -282,14 +284,15 @@ public:
 
         if( _c_typeSemantic == Sem_Strict )
         {
-            if( _TryUnkSizeLocally( newCount ) == false )
+            count_type newReserve = _TryUnkSizeLocally( newCount );
+            if( newReserve != TypeDesc < count_type >::max )
             {
-                arrType newArr( newCount, newCount );
+                arrType newArr( newCount, newReserve );
                 if( newArr._IsStatic() )  //  shrinking from dynamic to static
                 {
                     ASSUME( this->_IsStatic() == false );
                     newArr._Transfer( this );
-                    new (this) arrType( newCount, newCount );
+                    new (this) arrType( newCount, newReserve );
                     _Copy < true >( this->_GetArr(), newArr._GetArr(), sizeToLeave );
                 }
                 else  //  either shrinking from dynamic to dynamic, or growing from static to dynamic or dynamic to dynamic
@@ -305,14 +308,35 @@ public:
         }
     }
 
+#ifdef MOVE_SUPPORTED
+    template < typename X, bln is_useMoveContructor > struct _MoveTo;
+
+    template < typename X > struct _MoveTo < X, true >
+    {
+        static void Move( X *target, X *source )
+        {
+            new (target) X( std::move( *source ) );
+            source->~X();
+        }
+    };
+
+    template < typename X > struct _MoveTo < X, false >
+    {
+        static void Move( X *target, X *source )
+        {
+            new (target) X( *source );
+            source->~X();
+        }
+    };
+#endif
+
     template < typename X, bln is_destroySource > struct _CopySelector;
     template < typename X > struct _CopySelector < X, true >
     {
         static void Copy( X *target, X *source )
         {
 #           ifdef MOVE_SUPPORTED
-                new (target) X( std::move( *source ) );
-                source->~X();
+                _MoveTo < X, std::is_move_constructible < X >::value >::Move( target, source );
 #           else
                 new (target) X( *source );
                 source->~X();
@@ -327,11 +351,18 @@ public:
         }
     };
 
-    template < bln is_destroySource > void _Copy( X *RSTR target, X *source, count_type count )
+    template < bln is_destroySource, bln is_canBeOverlapped = false > void _Copy( X *target, X *source, count_type count )
     {
         if( _c_typeSemantic == Sem_POD )
         {
-            _MemCpy( target, source, count * sizeof(X) );
+            if( is_canBeOverlapped )
+            {
+                _MemMove( target, source, count * sizeof(X) );
+            }
+            else
+            {
+                _MemCpy( target, source, count * sizeof(X) );
+            }
         }
         else
         {
@@ -362,24 +393,19 @@ public:
         {
             count_type curCount = this->_Size();
             count_type newCount = curCount - count;
-            if( _TryDecSizeLocally( newCount ) == false )
+            count_type newReserve = _TryDecSizeLocally( newCount );
+            if( newReserve != TypeDesc < count_type >::max )
             {
                 ASSUME( this->_IsStatic() == false );
                 arrType newArr;
                 newArr._Transfer( this );
-                new (this) arrType( newCount, newCount );
+                new (this) arrType( newCount, newReserve );
                 _Copy < true >( this->_GetArr(), newArr._GetArr(), pos );
                 _Copy < true >( this->_GetArr() + pos, newArr._GetArr() + pos + count, curCount - count - pos );
             }
             else
             {
-                X *target = this->_GetArr() + pos;
-                X *source = this->_GetArr() + pos + count;
-                X *end = this->_GetArr() + curCount;
-                for( ; source != end; ++source, ++target )
-                {
-                    _CopySelector < X, true >::Copy( target, source );
-                }
+                _Copy < true >( this->_GetArr() + pos, this->_GetArr() + pos + count, curCount - count - pos );
             }
         }
     }
@@ -396,9 +422,10 @@ public:
         }
         else
         {
-            if( _TryIncSizeLocally( newCount ) == false )
+            count_type newReserve = _TryIncSizeLocally( newCount );
+            if( newReserve != TypeDesc < count_type >::max )
             {
-                arrType newArr( newCount, newCount );
+                arrType newArr( newCount, newReserve );
                 ASSUME( newArr._IsStatic() == false );
                 _Copy < true >( newArr._GetArr(), this->_GetArr(), pos );
                 _Copy < true >( newArr._GetArr() + pos + count, this->_GetArr() + pos, this->_Size() - pos );
@@ -406,12 +433,7 @@ public:
             }
             else
             {
-                X *target = this->_GetArr() + newCount - 1;
-                X *source = this->_GetArr() + curCount - 1;
-                for( ; source != this->_GetArr() + pos - 1; --target, --source )
-                {
-                    _CopySelector < X, true >::Copy( target, source );
-                }
+                _Copy < true >( this->_GetArr() + pos + count, this->_GetArr() + pos, curCount - pos );
             }
         }
         return this->_GetArr() + pos;
@@ -558,8 +580,7 @@ public:
     {
         count_type curCount = this->_Size();
         _SizeUp( curCount, curCount + 1 );
-        X *ret = this->_GetArr() + curCount;
-        return ret;
+        return this->_GetArr() + curCount;
     }
 
     void PopBack( count_type num = 1 )
@@ -588,12 +609,13 @@ public:
     {
         if( _c_typeSemantic == Sim_Strict )
         {
-            if( this->_TryFlushReservedLocally() == false )
+            count_type newReserve = this->_TryFlushReservedLocally();
+            if( newReserve != TypeDesc < count_type >::max )
             {
                 ASSUME( this->_IsStatic() == false );
                 arrType newArr;
                 newArr._Transfer( this );
-                new (this) arrType( newCount, newCount );
+                new (this) arrType( newCount, newReserve );
                 _Copy < true >( this->_GetArr(), newArr._GetArr(), newArr._Size() );
             }
         }
@@ -770,7 +792,7 @@ public:
             {
                 source = &this->_GetArr()[ index ];
             }
-            _Copy < false >( this->_GetArr() + curCount, (X *)source, count );
+            _Copy < false, true >( this->_GetArr() + curCount, (X *)source, count );
         }
     }
 

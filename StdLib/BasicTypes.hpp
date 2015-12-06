@@ -321,6 +321,9 @@ template < typename X > class Nullable < X & >
     Nullable();
 };
 
+struct CharStrict
+{};
+
 struct CharMovable
 {};
 
@@ -513,11 +516,11 @@ template < typename X > struct TypeDesc
     static const bln is_pointer = false;
     static const bln is_reference = false;
     #ifdef ISPOD_SUPPORTED
-        static const bln is_pod = std::is_pod < X >::value || IsDerivedFrom < X, CharPOD >::value;
+        static const bln is_pod = std::is_pod < X >::value || (IsDerivedFrom < X, CharPOD >::value && !IsDerivedFrom < X, CharMovable >::value);
     #else
-        static const bln is_pod = IsDerivedFrom < X, CharPOD >::value;
+        static const bln is_pod = IsDerivedFrom < X, CharPOD >::value && !IsDerivedFrom < X, CharStrict >::value;
     #endif
-    static const bln is_movable = is_pod || IsDerivedFrom < X, CharMovable >::value;
+    static const bln is_movable = is_pod || (IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value);
     static const uiw bits = sizeof(X) * 8;
     typedef X type;
     typedef X & ref;
