@@ -425,15 +425,9 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-    ::printf( "%i\n", std::is_move_constructible < MoveTest >::value );
-    ::printf( "%i\n", std::is_move_assignable < MoveTest >::value );
-    ::printf( "%i\n", std::is_trivially_move_assignable < MoveTest >::value );
-    ::printf( "%i\n", std::is_trivially_move_constructible < MoveTest >::value );
-
-    CVec < MoveTest > test;
-    test.PushBackNum();
-    test.PushBackNum();
-    test.PushBackNum();
+    f16 f;
+    f.FromF64IEEE( 0.0032452345 );
+    ::printf( "%f\n", f.ToF32() );
 
     /*for( int index = 0; index < 10000; ++index )
     {

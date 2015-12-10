@@ -2,13 +2,6 @@
 
 using namespace StdLib;
 
-namespace
-{
-    enum { Flow_IEEE, Flow_Clamp };
-    const ui16 ca_Overflows[ 2 ][ 2 ] = { f16_inf_pos, f16_inf_neg,
-                                              f16_max,     f16_min };
-}
-
 const ui16 *f16::GetRawPointer()
 {
     return &_val;
@@ -27,7 +20,7 @@ void f16::RawValueSet( ui16 source )
 NOINLINE f32 f16::ToF32()
 {
     ui32 s = _val & f16_sign_mask;
-    if( (_val & f16_exp_mask) == 0 )
+    if( (_val & f16_exp_mask) == 0 && (_val & f16_frac_mask) == 0 )
     {
         return s ? -0.f : 0.f;
     }
@@ -52,7 +45,7 @@ NOINLINE f32 f16::ToF32()
 NOINLINE f64 f16::ToF64()
 {
     ui64 s = _val & f16_sign_mask;
-    if( (_val & f16_exp_mask) == 0 )
+    if( (_val & f16_exp_mask) == 0 && (_val & f16_frac_mask) == 0 )
     {
         return s ? -0.0 : 0.0;
     }
@@ -74,7 +67,7 @@ NOINLINE f64 f16::ToF64()
     return u.f;
 }
 
-NOINLINE i32 f16::ToI32()
+NOINLINE i32 f16::ToI32()  //  TODO: facepalm
 {
     if( (_val & f16_exp_mask) == 0 )
     {
@@ -97,25 +90,25 @@ NOINLINE i32 f16::ToI32()
 
 f16 f16::FromF32IEEE( f32 source )
 {
-    FromF32( source, (EnumDecl)Flow_IEEE );
+    FromF32( source, Flow_IEEE );
     return *this;
 }
 
 f16 f16::FromF32Clamp( f32 source )
 {
-    FromF32( source, (EnumDecl)Flow_Clamp );
+    FromF32( source, Flow_Clamp );
     return *this;
 }
 
 f16 f16::FromF64IEEE( f64 source )
 {
-    FromF64( source, (EnumDecl)Flow_IEEE );
+    FromF64( source, Flow_IEEE );
     return *this;
 }
 
 f16 f16::FromF64Clamp( f64 source )
 {
-    FromF64( source, (EnumDecl)Flow_Clamp );
+    FromF64( source, Flow_Clamp );
     return *this;
 }
 
@@ -127,7 +120,7 @@ NOINLINE f16 f16::FromUI32Clamp( ui32 source )
     }
     else
     {
-        f32 fsource = (f32)source;
+        f32 fsource = (f32)source;  //  TODO: facepalm
         ui32 ifsource = *(ui32 *)&fsource;
         ifsource -= (112 << 23);
         _val = (ifsource & ~f32_sign_mask) >> 13;
@@ -144,7 +137,7 @@ NOINLINE f16 f16::FromI32Clamp( i32 source )
     }
     else
     {
-        f32 fsource = (f32)source;
+        f32 fsource = (f32)source;  //  TODO: facepalm
         ui32 ifsource = *(ui32 *)&fsource;
         ifsource -= (112 << 23);
         _val = (ifsource & ~f32_sign_mask) >> 13;
@@ -190,70 +183,74 @@ bln f16::IsInfNeg()
     return (_val & f16_sign_mask) != 0;
 }
 
-NOINLINE void f16::FromF32( f32 source, EnumDecl flowAction )
+NOINLINE void f16::FromF32( f32 source, OverflowAction flowAction )
 {
     ui32 isource = *(ui32 *)&source;
     ui32 s = isource & f32_sign_mask;
     ui32 e = isource & f32_exp_mask;
-    if( e == 0 )
+    if( e <= ((127 - 15) << 23) )  //  underflow, zero of subnormal
     {
-        _val = s >> 16;
-        return;
+        if( e < ((127 - 15) << 23) )  //  underflow or zero, assign a zero
+        {
+            _val = s >> 16;
+            return;
+        }
     }
-    if( (ui32)((i32)(e >> 23) - 112) > 31 )
+    else if( e >= ((127 + 16) << 23) )  //  overflow, NaN or infinity
     {
         if( e == (255 << 23) && (isource & f32_significand_mask) )
         {
             _val = f16_nan;
         }
-        else if( e > (143 << 23) )
+        else
         {
-            _val = ca_Overflows[ flowAction ][ s != 0 ];
+            _val = GetOverflowed( flowAction, s != 0 );
         }
-        else  //  underflow becomes [-0;0]
-        {
-            ASSUME( e < (112 << 23) );
-            _val = s >> 16;
-        }
+        return;
     }
-    else
-    {
-        isource -= (112 << 23);
-        _val = (isource & ~f32_sign_mask) >> 13;
-        _val |= s >> 16;
-    }
+    isource -= ((127 - 15) << 23);
+    _val = (isource & ~f32_sign_mask) >> 13;
+    _val |= s >> 16;
 }
 
-NOINLINE void f16::FromF64( f64 source, EnumDecl flowAction )
+NOINLINE void f16::FromF64( f64 source, OverflowAction flowAction )
 {
     ui64 isource = *(ui64 *)&source;
     ui64 s = isource & f64_sign_mask;
     ui64 e = isource & f64_exp_mask;
-    if( e == 0 )
+    if( e <= ((1023ULL - 15) << 52) )  //  underflow, zero of subnormal
     {
-        _val = s >> 48;
-        return;
+        if( e < ((1023ULL - 15) << 52) )  //  underflow or zero, assign a zero
+        {
+            _val = s >> 16;
+            return;
+        }
     }
-    if( (ui64)((i64)(e >> 52) - 1008ULL) > 31 )
+    else if( e >= ((1023ULL + 16) << 52) )  //  overflow, NaN or infinity
     {
-        if( e == (2047ULL << 52) && (isource & f64_significand_mask) )
+        if( e == (2048ULL << 52) && (isource & f32_significand_mask) )
         {
             _val = f16_nan;
         }
-        else if( e > (1038ULL << 52) )
+        else
         {
-            _val = ca_Overflows[ flowAction ][ s != 0 ];
+            _val = GetOverflowed( flowAction, s != 0 );
         }
-        else  //  underflow becomes [-0;0]
-        {
-            ASSUME( e < (1008ULL << 52) );
-            _val = s >> 48;
-        }
+        return;
+    }
+    isource -= ((1023ULL - 15) << 52);
+    _val = (isource & ~f64_sign_mask) >> 42;
+    _val |= s >> 48;
+}
+
+ui16 f16::GetOverflowed( OverflowAction action, bln is_negative )
+{
+    if( action == Flow_Clamp )
+    {
+        return is_negative ? f16_min : f16_max;
     }
     else
     {
-        isource -= (1008ULL << 52);
-        _val = (isource & ~f64_sign_mask) >> 42;
-        _val |= s >> 48;
+        return is_negative ? f16_inf_neg : f16_inf_pos;
     }
 }

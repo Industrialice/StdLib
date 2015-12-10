@@ -31,10 +31,11 @@ public:
     bln IsInfNeg();
 
 private:
-    enum EnumDecl {};
+    enum OverflowAction { Flow_IEEE, Flow_Clamp };
 
-    void FromF32( f32 source, EnumDecl flowAction );
-    void FromF64( f64 source, EnumDecl flowAction );
+    void FromF32( f32 source, OverflowAction flowAction );
+    void FromF64( f64 source, OverflowAction flowAction );
+    static ui16 GetOverflowed( OverflowAction action, bln is_negative );
 };
 
 const ui16 f16_sign_mask = 0x8000;
