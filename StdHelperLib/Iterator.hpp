@@ -34,19 +34,22 @@ template < typename X > struct _IterDist < X, Type::Random >
 {
     static uiw Dist( const X &first, const X &second )
     {
+        ASSUME( first <= second );
         return second - first;
     }
 };
 
+struct _TypeIterator {};
+
 template < typename type, iw step, typename retType, bln is_const > class _IterRandomBasis;
 
-template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, false >
+template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, false > : _TypeIterator
 {
 protected:
     type *_str;
 };
 
-template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, true >
+template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, true > : _TypeIterator
 {
 protected:
     const type *_str;

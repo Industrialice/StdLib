@@ -512,6 +512,14 @@ public:
     }
 };
 
+template < bln condition, typename X = void > struct EnableIf
+{
+    typedef X type;
+};
+
+template < typename X > struct EnableIf < false, X >
+{};
+
 /*  volatile doesn't supported  */
 
 template < typename X > struct TypeDesc

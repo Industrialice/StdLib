@@ -6,6 +6,7 @@
 #include "Reservators.hpp"
 #include "Allocators.hpp"
 #include "Iterator.hpp"
+#include "Algorithm.hpp"
 
 #ifdef DEFAULT_FUNC_PARAMS_SUPPORTED
     #define VEC_DEF_PARAM( ... ) __VA_ARGS__
@@ -346,6 +347,8 @@ public:
 
     template < bln is_destroySource, bln is_canBeOverlapped = false > void _Copy( X *target, X *source, count_type count )
     {
+        ASSUME( target != source );
+
         if( _c_typeSemantic == Sem_POD )
         {
             if( is_canBeOverlapped )
@@ -676,18 +679,13 @@ public:
             uiw index = source - this->_GetArr();
             if( index < this->_Size() )  //  overlapped
             {
-                DBGBREAK;  //  TODO:
+                InsertOverlapped( pos, count, index );
                 return;
             }
         }
 
         X *target = _InsertRaw( pos, count );
-        for( ; count; --count )
-        {
-            new (target) X( *source );
-            ++target;
-            ++source;
-        }
+        _Copy < false, false >( target, (X *)source, count );
     }
 
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
@@ -699,27 +697,25 @@ public:
             count = source.Size() - start;
         }
 
-        Insert VEC_DEF_PARAM(< is_checkOverlap >)( pos, source.Data() + start, count );  //  TODO: default param
+        Insert VEC_DEF_PARAM(< is_checkOverlap >)( pos, source.Data() + start, count );
     }
 
-    template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ) >
+    template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Insert( IterConst where, IterType begin, IterType end )
     {
-        ASSUME( end >= begin );
         uiw dist = Algorithm::Distance( begin, end );
         uiw pos = where.Ptr() - this->_GetArr();
         ASSUME( pos < this->_Size() );
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Insert VEC_DEF_PARAM(< is_checkOverlap >)( pos, begin.Ptr(), dist );  //  TODO: default param
+            Insert VEC_DEF_PARAM(< is_checkOverlap >)( pos, begin.Ptr(), dist );
         }
-        else
+        else  //  can't be overlapped because CVec iterator is random
         {
             X *target = _InsertRaw( pos, dist );
-            for( ; first != last; ++first )
+            for( ; begin != end; ++begin, ++target )
             {
-                new (target) X( *first );
-                ++target;
+                new (target) X( *begin );
             }
         }
     }
@@ -781,7 +777,7 @@ public:
         {
             uiw index = source - this->_GetArr();
             _SizeUp( curCount, curCount + count );
-            if( index < curCount )
+            if( index < curCount )  //  true if overlapped
             {
                 source = &this->_GetArr()[ index ];
             }
@@ -793,15 +789,30 @@ public:
     void Append( const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
         ASSUME( start < source._Size() || count == 0 );
-        DBGBREAK;
-        //
+        count = Funcs::Min( count, source.Size() - start );
+        uiw curCount = this->_Size();
+        _SizeUp( curCount, curCount + count );
+        _Copy < false, true >( this->_GetArr() + curCount, (X *)source.Data() + start, count );
     }
 
-    template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ) >
+    template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Append( IterType begin, IterType end )
     {
-        DBGBREAK;
-        //
+        uiw dist = Algorithm::Distance( begin, end );
+        if( IterType::iteratorType == Iterator::Type::Random )
+        {
+            Append VEC_DEF_PARAM(< is_checkOverlap >)( begin.Ptr(), dist );
+        }
+        else  //  can't be overlapped because CVec iterator is random
+        {
+            count_type curCount = this->_Size();
+            _SizeUp( curCount, curCount + dist );
+            X *target = this->_GetArr() + curCount;
+            for( ; begin != end; ++begin, ++target )
+            {
+                new (target) X( *begin );
+            }
+        }
     }
 
 #ifdef INITIALIZER_LISTS_SUPPORTED
@@ -812,16 +823,39 @@ public:
 #endif
 
 private:
-    NOINLINE void AssignOverlapped( const X &source, count_type count, count_type index )
+    NOINLINE void InsertOverlapped( count_type start, count_type count, count_type index )
     {
-        DBGBREAK;
-        //
+        CVec < X, void > tempVec( 0, this->_GetArr() + index, count );  //  TODO: bad
+        X *target = _InsertRaw( start, count );
+        _Copy < false, false >( target, tempVec.Data(), count );
     }
 
-    NOINLINE void AssignOverlapped( const X *source, count_type count, count_type index )
+    NOINLINE void AssignOverlappedSingle( count_type count, count_type index )
     {
-        DBGBREAK;
-        //
+        ASSUME( this->Size() && count );
+        _Destroy( this->_GetArr(), index );
+        _Destroy( this->_GetArr() + index + 1, this->Size() - index - 1 );
+        if( index )
+        {
+            _Copy < true, true >( this->_GetArr(), this->_GetArr() + index, 1 );
+        }
+        _SizeToUnknown( 1, count );
+        for( count_type copyIndex = 1; copyIndex < count; ++copyIndex )
+        {
+            new (this->_GetArr() + copyIndex) X( *this->_GetArr() );
+        }
+    }
+
+    NOINLINE void AssignOverlappedArray( count_type count, count_type index )
+    {
+        ASSUME( this->_Size() - index >= count );
+        _Destroy( this->_GetArr(), index );
+        _Destroy( this->_GetArr() + index + 1, this->Size() - index - 1 );
+        if( index )
+        {
+            _Copy < true, true >( this->_GetArr(), this->_GetArr() + index, count );
+        }
+        _SizeToUnknown( count, count );
     }
 
 public:
@@ -832,7 +866,7 @@ public:
         uiw index = &source - this->_GetArr();
         if( is_checkOverlap && index < curCount )
         {
-            AssignOverlapped( source, count, index );
+            AssignOverlappedSingle( count, index );
         }
         else
         {
@@ -851,7 +885,7 @@ public:
         uiw index = source - this->_GetArr();
         if( is_checkOverlap && index < this->_Size() )
         {
-            AssignOverlapped( source, count, index );
+            AssignOverlappedArray( count, index );
         }
         else
         {
@@ -864,15 +898,38 @@ public:
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
     void Assign( const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
-        DBGBREAK;
-        //
+        ASSUME( start <= source.Size() || count == 0 );
+        count = Funcs::Min( source.Size() - start, count );
+        if( is_checkOverlap && this == &source )  //  overlapped
+        {
+            AssignOverlappedArray( count, start );
+        }
+        else
+        {
+            _Destroy( this->_GetArr(), this->_Size() );
+            _SizeToUnknown( 0, count );
+            _Copy < false, false >( this->_GetArr(), (X *)source.Data() + start, count );
+        }
     }
 
-    template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ) >
+    template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Assign( IterType begin, IterType end )
     {
-        DBGBREAK;
-        //
+        uiw dist = Algorithm::Distance( begin, end );
+        if( IterType::iteratorType == Iterator::Type::Random )
+        {
+            Assign VEC_DEF_PARAM(< is_checkOverlap >)( begin.Ptr(), dist );
+        }
+        else  //  can't be overlapped because CVec iterator is random
+        {
+            _Destroy( this->_GetArr(), this->_Size() );
+            _SizeToUnknown( 0, dist );
+            X *target = this->_GetArr();
+            for( ; begin != end; ++begin, ++target )
+            {
+                new (target) X( *begin );
+            }
+        }
     }
 
 #ifdef INITIALIZER_LISTS_SUPPORTED
@@ -1046,8 +1103,11 @@ public:
 
 //  force all methods compilation to check for correctness
 template class CVec < int >;
+template class CVec < CVec < int > >;
 template class CVec < int, void >;
+template class CVec < CVec < int, void >, void >;
 template class CVec < int, void, 128 >;
+template class CVec < CVec < int, void, 128 >, void, 128 >;
 template class CRefVec < int >;
 template class CCRefVec < int >;
 

@@ -425,9 +425,17 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-    f16 f;
-    f.FromF64IEEE( 0.0032452345 );
-    ::printf( "%f\n", f.ToF32() );
+    CVec < int > v0 { 0, 1, 2, 3, 4 };
+    CVec < int > v1 { 9, 2, 5, 6, 3 };
+    //v0.Assign( v0[ 2 ], 3 );
+    //v0.Assign( v0.begin() + 1, v0.end() - 1 );
+    //v0.Assign( v0, 1, 2 );
+    v0.Insert( 1, v0.Data(), 3 );
+
+    for( int value : v0 )
+    {
+        ::printf( "%i\n", value );
+    }
 
     /*for( int index = 0; index < 10000; ++index )
     {
