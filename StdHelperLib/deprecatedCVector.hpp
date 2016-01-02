@@ -3,7 +3,7 @@
 
 #include "CBaseVector.hpp"
 
-#ifdef ISPOD_SUPPORTED
+#ifdef TYPETRAITS_SUPPORTED
     #include <type_traits>
 #endif
 
@@ -34,28 +34,28 @@ public:
 
     _CVectorBasis() : parentType()
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == true, "type X is not a pod, disable pod checking for prevent this error" );
         #endif
     }
 
     explicit _CVectorBasis( count_type reserve ) : parentType( reserve )
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == true, "type X is not a pod, disable pod checking for prevent this error" );
         #endif
     }
 
     explicit _CVectorBasis( CNoInit ) : parentType( CNoInit() )
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == true, "type X is not a pod, disable pod checking for prevent this error" );
         #endif
     }
 
     _CVectorBasis( const X &source, count_type reserve )
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == true, "type X is not a pod, disable pod checking for prevent this error" );
         #endif
 
@@ -372,7 +372,7 @@ public:
 
     CVectorStatic( const ownType &source )
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == true, "type X is not a pod, disable pod checking for prevent this error" );
         #endif
 
@@ -427,7 +427,7 @@ public:
 
     CVector( const ownType &source )
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == true, "type X is not a pod, disable pod checking for prevent this error" );
         #endif
 

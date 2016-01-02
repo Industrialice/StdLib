@@ -38,7 +38,7 @@ template < typename X, typename freeTestType, freeTestType freeTestValue, uiw t_
         }
     };
 
-    CVec < SFrame, Reservator::Half <>, 0, Sem_Mov > _o_frames;
+    CVec < SFrame, Reservator::Half <>, 0, Sem_MovableAsPOD > _o_frames;
 
 public:
     CFramedStore() : _o_frames( t_initialFrames )

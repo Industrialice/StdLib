@@ -3,7 +3,7 @@
 
 #include "CBaseVector.hpp"
 
-#ifdef ISPOD_SUPPORTED
+#ifdef TYPETRAITS_SUPPORTED
     #include <type_traits>
 #endif
 
@@ -47,28 +47,28 @@ public:
 
     _CObjectVectorBasis() : parentType()
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == false, "you should not use object vectors for pod types" );
         #endif
     }
 
     explicit _CObjectVectorBasis( count_type reserve ) : parentType( reserve )
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == false, "you should not use object vectors for pod types" );
         #endif
     }
 
     explicit _CObjectVectorBasis( CNoInit ) : parentType( CNoInit() )
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == false, "you should not use object vectors for pod types" );
         #endif
     }
 
     _CObjectVectorBasis( const X &source, count_type reserve )
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod == false || std::is_pod < X >::value == false, "you should not use object vectors for pod types" );
         #endif
 
@@ -454,7 +454,7 @@ public:
 
     CObjectVectorStatic( const ownType &source )
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod || std::is_pod < X >::value == false, "you should not use object vectors for pod types" );
         #endif
 
@@ -524,7 +524,7 @@ public:
 
     CObjectVector( const ownType &source )
     {
-        #ifdef ISPOD_SUPPORTED
+        #ifdef TYPETRAITS_SUPPORTED
             STATIC_CHECK( tis_checkForPod || std::is_pod < X >::value == false, "you should not use object vectors for pod types" );
         #endif
 

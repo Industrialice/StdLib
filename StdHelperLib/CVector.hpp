@@ -58,6 +58,12 @@ public:
         return this->_Size();
     }
 
+    count_type LastIndex() const  //  can't be called on an emtpy vector
+    {
+        ASSUME( this->_Size() );
+        return this->_Size() - 1;
+    }
+
     bln IsEmpty() const
     {
         return this->_Size() == 0;
@@ -220,10 +226,8 @@ public:
 
     static const count_type count_type_max = TypeDesc < count_type >::max;
 
-    static const TypeSemantic_t _c_typeSemantic = TERSWITCH2(
-        typeSemantic == Sem_POD || TypeDesc < X >::is_pod, Sem_POD,
-        typeSemantic == Sem_Mov || TypeDesc < X >::is_movable, Sem_Mov,
-        typeSemantic );
+    static const bln _cis_POD = typeSemantic == Sem_POD || TypeDesc < X >::is_pod;
+    static const bln _cis_MoveAsPOD = typeSemantic == Sem_MovableAsPOD || TypeDesc < X >::is_movableAsPOD;
 
     #ifndef DEFAULT_FUNC_PARAMS_SUPPORTED
         static const bln is_checkOverlap = true;
@@ -233,7 +237,7 @@ public:
     {
         ASSUME( newCount >= this->_Size() && sizeToLeave <= this->_Size() );
 
-        if( _c_typeSemantic == Sem_Strict )
+        if( _cis_MoveAsPOD == false )
         {
             count_type newReserve = _TryIncSizeLocally( newCount );
             if( newReserve != TypeDesc < count_type >::max )
@@ -254,7 +258,7 @@ public:
     {
         ASSUME( newCount <= this->_Size() && sizeToLeave <= this->_Size() );
 
-        if( _c_typeSemantic == Sem_Strict )
+        if( _cis_MoveAsPOD == false )
         {
             count_type newReserve = _TryDecSizeLocally( newCount );
             if( newReserve != TypeDesc < count_type >::max )
@@ -276,7 +280,7 @@ public:
     {
         ASSUME( sizeToLeave <= this->_Size() );
 
-        if( _c_typeSemantic == Sem_Strict )
+        if( _cis_MoveAsPOD == false )
         {
             count_type newReserve = _TryUnkSizeLocally( newCount );
             if( newReserve != TypeDesc < count_type >::max )
@@ -347,9 +351,9 @@ public:
 
     template < bln is_destroySource, bln is_canBeOverlapped = false > void _Copy( X *target, X *source, count_type count )
     {
-        ASSUME( target != source );
+        ASSUME( target != source || count == 0 );
 
-        if( _c_typeSemantic == Sem_POD )
+        if( _cis_POD )
         {
             if( is_canBeOverlapped )
             {
@@ -375,12 +379,12 @@ public:
     {
         ASSUME( count && pos < this->_Size() && count <= this->_Size() && pos + count <= this->_Size() );
 
-        if( _c_typeSemantic != Sem_POD )
+        if( _cis_POD == false )
         {
             _Destroy( this->_GetArr() + pos, count );
         }
 
-        if( _c_typeSemantic == Sem_POD || _c_typeSemantic == Sem_Mov )
+        if( _cis_MoveAsPOD )
         {
             _MemMove( this->_GetArr() + pos, this->_GetArr() + pos + count, (this->_Size() - count - pos) * sizeof(X) );
             _SizeDown( this->_Size() - count, this->_Size() - count );
@@ -411,7 +415,7 @@ public:
         ASSUME( pos <= this->_Size() );
         count_type curCount = this->_Size();
         count_type newCount = curCount + count;
-        if( _c_typeSemantic == Sem_POD || _c_typeSemantic == Sem_Mov )
+        if( _cis_MoveAsPOD )
         {
             _SizeUp( curCount, newCount );
             _MemMove( this->_GetArr() + pos + count, this->_GetArr() + pos, (curCount - pos) * sizeof(X) );
@@ -437,7 +441,7 @@ public:
 
     void _Destroy( X *target, count_type count )
     {
-        if( _c_typeSemantic != Sem_POD )
+        if( _cis_POD == false )
         {
             for( ; count; --count )
             {
@@ -459,7 +463,7 @@ public:
 
     _CBaseVec( count_type size, count_type reserve ) : baseType( size, reserve )
     {
-        if( _c_typeSemantic != Sem_POD )
+        if( _cis_POD == false )
         {
             X *target = this->_GetArr();
             for( ; size; --size )
@@ -473,6 +477,23 @@ public:
     _CBaseVec( const X *source, count_type size, count_type reserve ) : baseType( size, reserve )
     {
         _Copy < false >( this->_GetArr(), (X *)source, size );
+    }
+
+    template < typename IterType, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type > 
+    _CBaseVec( IterType begin, IterType end, count_type reserve ) : baseType( Algorithm::Distance( begin, end ), reserve )
+    {
+        if( IterType::iteratorType == Iterator::Type::Random )
+        {
+            Assign VEC_DEF_PARAM(< false >)( begin.Ptr(), this->_Size() );
+        }
+        else  //  can't be overlapped because CVec iterator is random
+        {
+            X *target = this->_GetArr();
+            for( ; begin != end; ++begin, ++target )
+            {
+                new (target) X( *begin );
+            }
+        }
     }
 
     _CBaseVec( const ownType &source ) : baseType( source._Size(), source._Size() )
@@ -535,7 +556,7 @@ public:
     {
         count_type curCount = this->_Size();
         _SizeUp( curCount, curCount + num );
-        if( _c_typeSemantic != Sem_POD )
+        if( _cis_POD == false )
         {
             X *target = this->_GetArr() + curCount;
             for( count_type counter = num; counter; --counter )
@@ -563,12 +584,23 @@ public:
         }
     }
 
+#ifdef MOVE_SUPPORTED
+    void PushBack( X &&source )
+    {
+        count_type curCount = this->_Size();
+        uiw index = &source - this->_GetArr();
+        ASSUME( index >= curCount );  //  overlapping isn't allowed
+        _SizeUp( curCount, curCount + 1 );
+        new (this->_GetArr() + curCount ) X( std::move( source ) );
+    }
+#endif
+
 #ifdef VAR_TEMPLATES_SUPPORTED
     template < typename... Args > void EmplaceBack( Args &&... args )
     {
         count_type curCount = this->_Size();
         _SizeUp( curCount, curCount + 1 );
-        new (this->_GetArr() + curCount ) X( std::move( args )... );
+        new (this->_GetArr() + curCount ) X( std::forward < Args >( args )... );
     }
 #endif
 
@@ -603,7 +635,7 @@ public:
 
     void ShrinkToFit()
     {
-        if( _c_typeSemantic == Sim_Strict )
+        if( _cis_MoveAsPOD == false )
         {
             count_type newReserve = this->_TryFlushReservedLocally();
             if( newReserve != TypeDesc < count_type >::max )
@@ -671,6 +703,16 @@ public:
         }
     }
 
+#ifdef MOVE_SUPPORTED
+    void Insert( count_type pos, X &&source )
+    {
+        uiw offset = &source - this->_GetArr();
+        ASSUME( offset >= this->_Size() );  //  overlapping isn't allowed
+        X *target = _InsertRaw( pos, 1 );
+        new (target) X( std::move( source ) );
+    }
+#endif
+
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
     void Insert( count_type pos, const X *source, count_type count )
     {
@@ -686,6 +728,11 @@ public:
 
         X *target = _InsertRaw( pos, count );
         _Copy < false, false >( target, (X *)source, count );
+    }
+
+    template < uiw count > void Insert( count_type pos, const X (&source)[ count ] )
+    {
+        Insert VEC_DEF_PARAM(< false >)( pos, source, count );
     }
 
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
@@ -785,6 +832,11 @@ public:
         }
     }
 
+    template < uiw count > void Append( const X (&source)[ count ] )
+    {
+        this->Append VEC_DEF_PARAM(< false >)( source, count );
+    }
+
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
     void Append( const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
@@ -879,6 +931,21 @@ public:
         }
     }
 
+#ifdef MOVE_SUPPORTED
+    void Assign( X &&source )
+    {
+        count_type curCount = this->_Size();
+        uiw index = &source - this->_GetArr();
+        ASSUME( index >= curCount );  //  overlapping isn't allowed
+        _Destroy( this->_GetArr(), curCount );
+        _SizeToUnknown( 0, count );
+        for( curCount = 0; curCount < count; ++curCount )
+        {
+            new (&this->_GetArr()[ curCount ]) X( std::move( source ) );
+        }
+    }
+#endif
+
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
     void Assign( const X *source, count_type count )
     {
@@ -893,6 +960,11 @@ public:
             _SizeToUnknown( 0, count );
             _Copy < false >( this->_GetArr(), (X *)source, count );
         }
+    }
+
+    template < uiw count > void Assign( const X (&source)[ count ] )
+    {
+        this->Assign VEC_DEF_PARAM(< false >)( source, count );
     }
 
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
@@ -968,7 +1040,12 @@ public:
         this->_SetArr( source, size );
     }
 
-    CRefVec &operator = ( const CRefVec &source )
+    template < uiw count > CRefVec( X (&source)[ count ] )
+    {
+        this->_SetArr( source, count );
+    }
+
+    CRefVec &operator = ( const CRefVec < X > &source )  //  TODO: wot
     {
         if( this != &source )
         {
@@ -995,13 +1072,33 @@ public:
         this->_SetArr( (X *)source, size );
     }
 
-    CCRefVec &operator = ( const CCRefVec &source )
+    CCRefVec( const CCRefVec < X > &source )
+    {
+        this->_SetArr( (X *)source.Data(), source.Size() );
+    }
+
+    CCRefVec( const CRefVec < X > &source )
+    {
+        this->_SetArr( (X *)source.Data(), source.Size() );
+    }
+
+    template < uiw count > CCRefVec( const X (&source)[ count ] )
+    {
+        this->_SetArr( (X *)source, count );
+    }
+
+    CCRefVec &operator = ( const CCRefVec < X > &source )
     {
         if( this != &source )
         {
-            this->~CCRefVec();
-            new (this) CCRefVec( source.Data(), source.Size() );
+            this->_SetArr( (X *)source.Data(), source.Size() );
         }
+        return *this;
+    }
+
+    CCRefVec &operator = ( const CRefVec < X > &source )
+    {
+        this->_SetArr( (X *)source.Data(), source.Size() );
         return *this;
     }
 };
@@ -1022,7 +1119,14 @@ public:
     CVec( count_type reserve, const X *source, count_type size ) : baseType( source, size, reserve )
     {}
 
+    template < typename IterType, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type > 
+    CVec( count_type reserve, IterType begin, IterType end ) : baseType( begin, end, reserve )
+    {}
+
     CVec( const CVec &source ) : baseType( source )
+    {}
+
+    template < uiw count > CVec( const X (&source)[ count ] ) : baseType( source, count, count )
     {}
 
     CVec( const CRefVec < X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
@@ -1036,16 +1140,22 @@ public:
         baseType::operator =( source );
         return *this;
     }
-
+    
     CVec &operator = ( const CRefVec < X > &source )
     {
         this->Assign( source.Data(), source.Size() );
         return *this;
     }
-
+    
     CVec &operator = ( const CCRefVec < X > &source )
     {
         this->Assign( source.Data(), source.Size() );
+        return *this;
+    }
+
+    template < uiw count > CVec &operator = ( const X (&source)[ count ] )
+    {
+        this->Assign( source, count );
         return *this;
     }
 
@@ -1099,17 +1209,37 @@ public:
         typedef _CBaseVecConstStatic < X, reservator, allocator, static_size > constBaseType;
         return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
     }
+
+    operator CRefVec < X >()
+    {
+        return ToRef();
+    }
+
+    operator CCRefVec < X >() const
+    {
+        return ToRef();
+    }
 };
 
-//  force all methods compilation to check for correctness
-template class CVec < int >;
-template class CVec < CVec < int > >;
-template class CVec < int, void >;
-template class CVec < CVec < int, void >, void >;
-template class CVec < int, void, 128 >;
-template class CVec < CVec < int, void, 128 >, void, 128 >;
-template class CRefVec < int >;
-template class CCRefVec < int >;
+template < typename X > CCRefVec < X > MakeRefVec( const X *source, uiw count )
+{
+    return CCRefVec < X >( source, count );
+}
+
+template < typename X > CRefVec < X > MakeRefVec( X *source, uiw count )
+{
+    return CRefVec < X >( source, count );
+}
+
+template < typename X, uiw count > CCRefVec < X > MakeRefVec( const X (&source)[ count ] )
+{
+    return CCRefVec < X >( source, count );
+}
+
+template < typename X, uiw count > CRefVec < X > MakeRefVec( X (&source)[ count ] )
+{
+    return CRefVec < X >( source, count );
+}
 
 }  //  namespace StdLib
 

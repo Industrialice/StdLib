@@ -421,21 +421,61 @@ public:
     }
 };
 
+//  force all methods compilation to check for correctness
+template class CVec < int >;
+template class CVec < CVec < int > >;
+template class CVec < int, void >;
+template class CVec < CVec < int, void >, void >;
+template class CVec < int, void, 128 >;
+template class CVec < CVec < int, void, 128 >, void, 128 >;
+template class CRefVec < int >;
+template class CCRefVec < int >;
+
+struct TestMe
+{
+public:
+    int a;
+
+    TestMe( int a ) : a( a )
+    {}
+
+    TestMe()
+    {
+        a = 0;
+    }
+
+    TestMe( const TestMe &source ) = delete;
+    /*{
+        a = source.a;
+    }*/
+
+    TestMe &operator = ( const TestMe &source ) = delete;
+    TestMe &operator = ( TestMe &&source ) = delete;
+    TestMe( TestMe &&source )// = delete;
+    {
+        a = source.a;
+    }
+};
+
+template < typename X > struct TypeTest
+{
+    template < typename X, uiw count >
+    TypeTest( const X (&source)[ count ] )
+    {
+    }
+};
+
+#include <algorithm>
+
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-    CVec < int > v0 { 0, 1, 2, 3, 4 };
-    CVec < int > v1 { 9, 2, 5, 6, 3 };
-    //v0.Assign( v0[ 2 ], 3 );
-    //v0.Assign( v0.begin() + 1, v0.end() - 1 );
-    //v0.Assign( v0, 1, 2 );
-    v0.Insert( 1, v0.Data(), 3 );
+    CVec < int > v0 { 1, 2, 3, 4, 5 };
 
-    for( int value : v0 )
-    {
-        ::printf( "%i\n", value );
-    }
+    int a = 5;
+
+    v0.PushBack( std::move( a ) );
 
     /*for( int index = 0; index < 10000; ++index )
     {

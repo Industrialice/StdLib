@@ -65,7 +65,7 @@
     #endif
 
     #if _MSC_VER >= 1500  //  Visual Studio 2008
-        #define ISPOD_SUPPORTED
+        #define TYPETRAITS_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1600  //  Visual Studio 2010
@@ -177,7 +177,7 @@
     #endif
 
     #if GCC_VERSION >= 40400
-        #define ISPOD_SUPPORTED  /*  TODO: 4.4 is not for sure  */
+        #define TYPETRAITS_SUPPORTED  /*  TODO: 4.4 is not for sure  */
     #endif
 
     /*  TODO: actual checks  */
@@ -299,8 +299,8 @@
 #endif
 
 /*  TODO: wtf  */
-#if defined(ISPOD_SUPPORTED) && defined(_WIN32_WCE)
-    #undef ISPOD_SUPPORTED
+#if defined(TYPETRAITS_SUPPORTED) && defined(_WIN32_WCE)
+    #undef TYPETRAITS_SUPPORTED
 #endif
 
 #ifndef NOINLINE

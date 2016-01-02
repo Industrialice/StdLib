@@ -1,7 +1,7 @@
 #ifndef __BASIC_TYPES_HPP__
 #define __BASIC_TYPES_HPP__
 
-#if defined(ISPOD_SUPPORTED)
+#if defined(TYPETRAITS_SUPPORTED)
     #include <type_traits>
 #endif
 
@@ -333,7 +333,7 @@ struct CharPOD : CharMovable
 enum TypeSemantic_t
 {
     Sem_POD,
-    Sem_Mov,
+    Sem_MovableAsPOD,
     Sem_Strict
 };
 
@@ -530,12 +530,16 @@ template < typename X > struct TypeDesc
     static const bln is_fp = false;
     static const bln is_pointer = false;
     static const bln is_reference = false;
-    #ifdef ISPOD_SUPPORTED
+    #ifdef TYPETRAITS_SUPPORTED
         static const bln is_pod = std::is_pod < X >::value || (IsDerivedFrom < X, CharPOD >::value && !IsDerivedFrom < X, CharMovable >::value);
+
+        static const bln is_movableAsPOD = is_pod || (IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value) ||
+                                           (std::is_trivially_constructible < X, const X & >::value && std::is_trivially_assignable < X, const X & >::value &&
+                                           std::is_trivially_move_constructible < X >::value && std::is_trivially_move_assignable < X >::value);  //  that line is not necessary because you can't have a non-trivial move construct/assign with trivial copy/assign
     #else
         static const bln is_pod = IsDerivedFrom < X, CharPOD >::value && !IsDerivedFrom < X, CharStrict >::value;
+        static const bln is_movableAsPOD = is_pod || (IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value);
     #endif
-    static const bln is_movable = is_pod || (IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value);
     static const uiw bits = sizeof(X) * 8;
     typedef X type;
     typedef X & ref;
@@ -557,7 +561,7 @@ template < typename X > struct TypeDesc < X & >
     static const bln is_pointer = false;
     static const bln is_reference = true;
     static const bln is_pod = false;
-    static const bln is_movable = false;
+    static const bln is_movableAsPOD = false;
     static const uiw bits = sizeof(X &) * 8;
     typedef X type;
     typedef X & ref;
@@ -579,7 +583,7 @@ template < typename X > struct TypeDesc < X * >
     static const bln is_pointer = true;
     static const bln is_reference = false;
     static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_movableAsPOD = true;
     static const uiw bits = sizeof(X *) * 8;
     typedef X type;
     typedef X & ref;
@@ -601,7 +605,7 @@ template < typename X > struct TypeDesc < X [] >
     static const bln is_pointer = false;
     static const bln is_reference = false;
     static const bln is_pod = TypeDesc < X >::is_pod;
-    static const bln is_movable = TypeDesc < X >::is_movable;
+    static const bln is_movableAsPOD = TypeDesc < X >::is_movableAsPOD;
     static const uiw bits = sizeof(X) * 8;
     typedef X type;
     typedef X & ref;
@@ -623,7 +627,7 @@ template < typename X, uiw size > struct TypeDesc < X [ size ] >
     static const bln is_pointer = false;
     static const bln is_reference = false;
     static const bln is_pod = TypeDesc < X >::is_pod;
-    static const bln is_movable = TypeDesc < X >::is_movable;
+    static const bln is_movableAsPOD = TypeDesc < X >::is_movableAsPOD;
     static const uiw bits = sizeof(X) * 8 * size;
     typedef X type;
     typedef X & ref;
@@ -650,7 +654,7 @@ template <> struct TypeDesc < i64 >
     static const bln is_pointer = false;
     static const bln is_reference = false;
     static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_movableAsPOD = true;
     static const uiw bits = 64;
     static const uiw decDigits = 19;
     static const uiw hexDigits = 16;
@@ -700,7 +704,7 @@ template <> struct TypeDesc < i32 >
     static const bln is_pointer = false;
     static const bln is_reference = false;
     static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_movableAsPOD = true;
     static const uiw bits = 32;
     static const uiw decDigits = 10;
     static const uiw hexDigits = 8;
@@ -750,7 +754,7 @@ template <> struct TypeDesc < i16 >
     static const bln is_pointer = false;
     static const bln is_reference = false;
     static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_movableAsPOD = true;
     static const uiw bits = 16;
     static const uiw decDigits = 5;
     static const uiw hexDigits = 4;
@@ -800,7 +804,7 @@ template <> struct TypeDesc < i8 >
     static const bln is_pointer = false;
     static const bln is_reference = false;
     static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_movableAsPOD = true;
     static const uiw bits = 8;
     static const uiw decDigits = 3;
     static const uiw hexDigits = 2;
@@ -848,7 +852,7 @@ template <> struct TypeDesc < f32 >
     static const bln is_pointer = false;
     static const bln is_reference = false;
     static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_movableAsPOD = true;
     static const uiw bits = 32;
     static constexpr f32 max() { return f32_max; }
     static constexpr f32 min() { return f32_min; }
@@ -875,7 +879,7 @@ template <> struct TypeDesc < f64 >
     static const bln is_pointer = false;
     static const bln is_reference = false;
     static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_movableAsPOD = true;
     static const uiw bits = 64;
     static constexpr f64 max() { return f64_max; }
     static constexpr f64 min() { return f64_min; }
@@ -900,7 +904,7 @@ template <> struct TypeDesc < bln >
     static const bln is_pointer = false;
     static const bln is_reference = false;
     static const bln is_pod = true;
-    static const bln is_movable = true;
+    static const bln is_movableAsPOD = true;
     static const uiw bits = 8;
     static const bln max = bln_max;
     static const bln min = bln_min;

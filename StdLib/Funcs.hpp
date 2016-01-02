@@ -603,6 +603,7 @@ namespace Funcs
     }
 
     //  TODO: p_buf must be able to contain at least TypeDesc < X >::decDigits + 2 bytes
+    //  use this function when you know exactly how many chars val is going to take
     template < typename X > NOINLINE char *IntToStrDecAlt( X val, char *p_buf, uiw bufSize )
     {
         ASSUME( p_buf && bufSize >= TypeDesc < X >::decDigits + 2 );

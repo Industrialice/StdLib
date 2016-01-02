@@ -11,11 +11,15 @@ CMutex::~CMutex()
 
 CMutex::CMutex( unsigned int spinCount /* = 0 */ )
 {
-    #ifdef DEBUG
-        BOOL result = ::InitializeCriticalSectionEx( &_handle, spinCount, 0 );
-        ASSUME( result );
+    #ifdef _WIN32_WINNT_VISTA
+        #ifdef DEBUG
+            BOOL result = ::InitializeCriticalSectionEx( &_handle, spinCount, 0 );
+            ASSUME( result );
+        #else
+            ::InitializeCriticalSectionEx( &_handle, spinCount, CRITICAL_SECTION_NO_DEBUG_INFO );
+        #endif
     #else
-        ::InitializeCriticalSectionEx( &_handle, spinCount, CRITICAL_SECTION_NO_DEBUG_INFO );
+        ::InitializeCriticalSection( &_handle );
     #endif
 }
 
