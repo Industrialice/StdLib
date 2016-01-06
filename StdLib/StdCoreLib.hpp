@@ -2,7 +2,11 @@
 #define __STD_LIB_HEADER_HPP__
 
 #if !defined(WINDOWS) && !defined(POSIX)
-    #error you must define platform: WINDOWS or POSIX
+    #if defined(_WIN32)
+        #define WINDOWS
+    #else
+        #error you must define platform: WINDOWS or POSIX
+    #endif
 #endif
 
 #if defined(WINDOWS) && defined(POSIX)

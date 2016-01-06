@@ -467,15 +467,39 @@ template < typename X > struct TypeTest
 
 #include <algorithm>
 
+NOINLINE CStr Dissect( int value )
+{
+    char temp[ 64 ];
+    Funcs::IntToStrDec( value, temp );
+    return temp;
+}
+
+NOINLINE CStr Dissect( const char *value )
+{
+    return value;
+}
+
+template < typename... Args > __forceinline CStr LogEntry( const Args &... args )
+{
+    CStr retStr;
+    int wot[] = { 0, (retStr += Dissect(args), 0)... };
+    return retStr;
+}
+
+template < typename... Args > CStr Concat( const Args &... strings )
+{
+    static_assert( typeid(strings) == typeid(CStr) )...;
+}
+
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-    CVec < int > v0 { 1, 2, 3, 4, 5 };
-
-    int a = 5;
-
-    v0.PushBack( std::move( a ) );
+    //CStr entry = LogEntry( "you have ", 52, " apples" );
+    //CStr entry = Concat( CStr{ "one" }, CStr{ "two" } );
+    char temp[ 512 ];
+    Funcs::PrintToStr( temp, 511, "you have %u apples", 52 );
+    ::printf( "%s\n", temp );
 
     /*for( int index = 0; index < 10000; ++index )
     {

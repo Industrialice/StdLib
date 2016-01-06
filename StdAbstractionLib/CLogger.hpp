@@ -23,8 +23,22 @@ public:
     };
 
     typedef void (*DirectionFunc)( Tag::messageTag_t tag, const char *cp_text, size_t len );
+    
+#if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+    void _Message( Tag::messageTag_t tag, const char *cp_fmt, ... );
 
-    va_return Message( Tag::messageTag_t tag, const char *cp_fmt, ... );
+    template < typename... Args > void Message( Tag::messageTag_t tag, const char *cp_fmt, const Args &... args )
+    {
+        if( !Funcs::_AreArgsValid( cp_fmt, args... ) )
+        {
+            DBGBREAK;
+            return;
+        }
+        _Message( tag, cp_fmt, args... );
+    }
+#else
+    void Message( Tag::messageTag_t tag, const char *cp_fmt, ... );
+#endif
     void AddDirection( DirectionFunc dir );
     void PopDirection();
     size_t DirectionsCount() const;

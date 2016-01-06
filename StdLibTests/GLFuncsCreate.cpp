@@ -85,8 +85,8 @@ void GLFuncsCreate()
     for( uiw index = 0; index < funcNames.Size(); ++index )
     {
         char buf[ 1024 ];
-        VC( Funcs::PrintToStr, buf,, 1023, 0, "    %s = wglGetProcAddress(\"%s\");\n", funcNames[ index ].Data(), funcNames[ index ].Data() );
-        file.Write( buf, _StrLen( buf ) );
+        uiw printed = Funcs::PrintToStr( buf, 1023, "    %s = wglGetProcAddress(\"%s\");\n", funcNames[ index ].Data(), funcNames[ index ].Data() );
+        file.Write( buf, printed );
     }
     file.Write( "}", 1 );
 

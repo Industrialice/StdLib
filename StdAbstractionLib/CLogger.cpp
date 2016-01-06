@@ -29,7 +29,11 @@ namespace
 CLogger::CLogger()
 {}
 
-NOINLINE va_return CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
+#if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+NOINLINE void CLogger::_Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
+#else
+NOINLINE void CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
+#endif
 {
     ASSUME( dis );
 
@@ -39,17 +43,16 @@ NOINLINE va_return CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, 
 
     if( !dis->_is_on || !dis->_o_dirs.Size() )
     {
-        return va_return_whatever;
+        return;
     }
 
     CVec < char, void, 4096 > smartBuf( dis->_bufferLength );
     char *tempBuffer = smartBuf.Data();
-    size_t printedLen;
 
     va_list args;
     va_start( args, cp_fmt );
 
-    DBGCODE( va_return argsProced = 2 + ) Funcs::PrintToStrArgList( tempBuffer, dis->_bufferLength, &printedLen, cp_fmt, args );
+    uiw printedLen = Funcs::PrintToStrArgList( tempBuffer, dis->_bufferLength, cp_fmt, args );
 
     va_end( args );
 
@@ -57,8 +60,6 @@ NOINLINE va_return CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, 
     {
         dis->_o_dirs[ index ]( tag, tempBuffer, printedLen );
     }
-
-    DBGCODE( return argsProced );
 }
 
 void CLogger::AddDirection( DirectionFunc dir )

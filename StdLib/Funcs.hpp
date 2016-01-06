@@ -256,11 +256,32 @@ namespace Funcs
     EXTERNAL uiw F64ToStr( f64 val, char *p_buf );
     EXTERNAL uiw F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf );
 
-    EXTERNAL va_return MemoryDistribute( const void *cp_mem, uiw memSize, ui32 distribsCount, void **pp_distrib0, ui32 distrib0Size, ... );
+    EXTERNAL uiw PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args );
 
-    EXTERNAL va_return PrintToStrArgList( char *p_str, uiw maxLen, uiw *printedLen, const char *cp_fmt, va_list args );
-    EXTERNAL va_return PrintToStr( char *p_str, uiw maxLen, uiw *printedLen, const char *cp_fmt, ... );
-    EXTERNAL va_return PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
+#if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+    EXTERNAL uiw _PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
+
+    struct _VariadicTypeInfo
+    {
+    };
+
+    template < typename... Args > bln _AreArgsValid( const char *cp_fmt, const Args &... args )
+    {
+        return true;  //  TODO: finish it
+    }
+
+    template < typename... Args > uiw PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, const Args &... args )
+    {
+        if( !_AreArgsValid( cp_fmt, args... ) )
+        {
+            DBGBREAK;
+            return 0;
+        }
+        return _PrintToStr( p_str, maxLen, cp_fmt, args... );
+    }
+#else
+    EXTERNAL uiw PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
+#endif
 
     template < ChrTestFunc func > bln IsStrMatchT( const char *cp_str, uiw count = uiw_max )
     {

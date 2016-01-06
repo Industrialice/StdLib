@@ -37,13 +37,13 @@ void GetSizes()
     }
 
     char buf[ 1024 ];
-    VC( Funcs::PrintToStr, buf,, 1023, "%u", maxHeight );
-    file.Write( buf, _StrLen( buf ) );
+    uiw printed = Funcs::PrintToStr( buf, 1023, "%u", maxHeight );
+    file.Write( buf, printed );
 
     for( uiw index = 0; text[ index ]; ++index )
     {
-        VC( Funcs::PrintToStr, buf,, 1023, "\x0A%c\x0A%u", text[ index ], widthes[ (uiw)text[ index ] ] );
-        file.Write( buf, _StrLen( buf ) );
+        printed = Funcs::PrintToStr( buf, 1023, "\x0A%c\x0A%u", text[ index ], widthes[ (uiw)text[ index ] ] );
+        file.Write( buf, printed );
     }
 
     BOOL result = GetTextExtentPoint32A( hdc, "j", 1, &size );

@@ -2024,28 +2024,6 @@ uiw Funcs::F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf )
     return ::sprintf( p_buf, "%.*lf", precise, val );
 }
 
-va_return Funcs::MemoryDistribute( const void *cp_mem, uiw memSize, ui32 distribsCount, void **pp_distrib0, ui32 distrib0Size, ... )
-{
-    ASSUME( distribsCount && cp_mem && pp_distrib0 );
-    DBGCODE( va_return argsProced = 5 );
-    byte *p_bmem = (byte *)cp_mem;
-    *pp_distrib0 = p_bmem;
-    uiw offset = distrib0Size;
-    va_list args;
-    va_start( args, distrib0Size );
-    for( ui32 index = 1; index < distribsCount; ++index )
-    {
-        void **pp_distribn = va_arg( args, void ** );
-        ASSUME( pp_distribn );
-        *pp_distribn = p_bmem + offset;
-        offset += va_arg( args, ui32 );
-        DBGCODE( argsProced += 2 );
-    }
-    ASSUME( offset == memSize );
-    va_end( args );
-    DBGCODE( return argsProced );
-}
-
 #define VAR_ARGS_CREATE_PARAMS void *__p_pointer__; union { i64 __nothing__; byte __a_data__[ 8 ]; }; DBGCODE( ui32 __paramSize__; )
 #define VAR_ARGS_SET_PARAM_POINTER( ch, list ) __p_pointer__ = __a_data__; \
     switch( ch ) { \
@@ -2161,7 +2139,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
     case 's':  //  string [param]
         if( !*(char **)p_source )
         {
-            len = _MemCpy( p_buf, "[null str]", sizeof("[null str]") - 1 );
+            len = Funcs::StrSafeCpyAndCountWONull( p_buf, "[null str]", MIN( maxLen, sizeof("[null str]") - 1 ) );
         }
         else
         {
@@ -2316,11 +2294,10 @@ retLen:
     return true;
 }
 
-EXTERNAL va_return Funcs::PrintToStrArgList( char *p_str, uiw maxLen, uiw *printedLen, const char *cp_fmt, va_list args )
+EXTERNAL uiw Funcs::PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args )
 {
     ASSUME( p_str && cp_fmt && maxLen != uiw_max );
 
-    DBGCODE( va_return argsProced = 0 );
     char *p_currStr = p_str;
     uiw parsedLen;
     ui32 param;
@@ -2337,9 +2314,7 @@ EXTERNAL va_return Funcs::PrintToStrArgList( char *p_str, uiw maxLen, uiw *print
                 if( param == FMT_PARSER_HELPER_EXTRA_PARAM )
                 {
                     param = va_arg( args, ui32 );
-                    DBGCODE( ++argsProced );
                 }
-                DBGCODE( ++argsProced );
                 VAR_ARGS_SET_PARAM_POINTER( ch, args );
                 if( ArgParserHelper( ch, VAR_ARGS_GET_PARAM_POINTER, param, p_currStr, maxLen - (p_currStr - p_str), &parsedLen ) )
                 {
@@ -2359,38 +2334,23 @@ EXTERNAL va_return Funcs::PrintToStrArgList( char *p_str, uiw maxLen, uiw *print
 
     *p_currStr = '\0';
 
-    if( printedLen )
-    {
-        *printedLen = p_currStr - p_str;
-    }
-
-    DBGCODE( return argsProced );
+    return p_currStr - p_str;
 }
 
-NOINLINE va_return Funcs::PrintToStr( char *p_str, uiw maxLen, uiw *printedLen, const char *cp_fmt, ... )
+#if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+NOINLINE uiw Funcs::_PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... )
+#else
+NOINLINE uiw Funcs::PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... )
+#endif
 {
     ASSUME( p_str && cp_fmt && maxLen != uiw_max );
 
     va_list args;
     va_start( args, cp_fmt );
 
-    DBGCODE( va_return argsProced = 4 + ) Funcs::PrintToStrArgList( p_str, maxLen, printedLen, cp_fmt, args );
+    uiw printedLen = Funcs::PrintToStrArgList( p_str, maxLen, cp_fmt, args );
 
     va_end( args );
 
-    DBGCODE( return argsProced; )
-}
-
-NOINLINE va_return Funcs::PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... )
-{
-    ASSUME( p_str && cp_fmt && maxLen != uiw_max );
-
-    va_list args;
-    va_start( args, cp_fmt );
-
-    DBGCODE( va_return argsProced = 3 + ) Funcs::PrintToStrArgList( p_str, maxLen, 0, cp_fmt, args );
-
-    va_end( args );
-
-    DBGCODE( return argsProced; )
+    return printedLen;
 }

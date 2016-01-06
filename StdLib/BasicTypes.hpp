@@ -455,14 +455,6 @@ public:
         return &_ptr;
     }
 
-    UniquePtr &operator = ( X *ptr )
-    {
-        ASSUME( (_ptr != ptr) || (_ptr == 0) );
-        Deleter( (X *)_ptr );
-        _ptr = ptr;
-        return *this;
-    }
-
     const X &operator * () const
     {
         ASSUME( _ptr );

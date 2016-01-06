@@ -19,17 +19,19 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
 
     static __forceinline i32 StringCompare( const char *first, const char *second )
     {
+        ASSUME( first && second );
         return strcmp( first, second );
     }
 
     static __forceinline i32 StringCompare( const wchar_t *first, const wchar_t *second )
     {
+        ASSUME( first && second );
         return wcscmp( first, second );
     }
 
-    template < typename type >
-    static __forceinline i32 StringCompare( const type *first, const type *second )
+    template < typename type > static __forceinline i32 StringCompare( const type *first, const type *second )
     {
+        ASSUME( first && second );
         for( ; *first == *second && *first; ++first, ++second );
         if( *first == *second )
         {
@@ -42,9 +44,9 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         return 1;
     }
 
-    template < typename type >
-    static __forceinline uiw GetStringLength( const type *str )
+    template < typename type > static __forceinline uiw GetStringLength( const type *str )
     {
+        ASSUME( str );
         if( sizeof( type ) == 1 )
         {
             return strlen( (char *)str );
@@ -60,23 +62,26 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
 
     static __forceinline bln IsStringEquals( const char *first, const char *second )
     {
+        ASSUME( first && second );
         return strcmp( first, second ) == 0;
     }
 
     static __forceinline bln IsStringEquals( const wchar_t *first, const wchar_t *second )
     {
+        ASSUME( first && second );
         return wcscmp( first, second ) == 0;
     }
 
-    template < typename type >
-    static __forceinline bln IsStringEquals( const type *first, const type *second )
+    template < typename type > static __forceinline bln IsStringEquals( const type *first, const type *second )
     {
+        ASSUME( first && second );
         for( ; *first == *second && *first; ++first, ++second );
         return *first == *second;
     }
 
     static __forceinline bln IsStrInRange( const charType *str, const charType *lower, const charType *upper )
     {
+        ASSUME( str );
         return !(str < lower || str >= upper);
     }
 
@@ -139,9 +144,10 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         return false;
     }
 
-    template < bln isCanBeAliased >
-    NOINLINE void AddString( const charType *str, uiw len )
+    template < bln isCanBeAliased > NOINLINE void AddString( const charType *str, uiw len )
     {
+        ASSUME( str != 0 || len == 0 );
+
         charType *targetStr;
         charType temp[ static_last ];
 
@@ -218,9 +224,10 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         return thisStr;
     }
 
-    template < bln isCanBeAliased >
-    NOINLINE void InsertString( uiw index, const charType *str, uiw len )
+    template < bln isCanBeAliased > NOINLINE void InsertString( uiw index, const charType *str, uiw len )
     {
+        ASSUME( str != 0 || len == 0 );
+
         charType temp[ static_last ];
         charType *dynPtr;
 
@@ -354,6 +361,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
 
     void EraseAndInsert( const uiw index, uiw replaceCount, const charType *const str, const uiw len )
     {
+        ASSUME( str != 0 || len == 0 );
         ASSUME( (replaceCount == 0 || (index < _count)) && replaceCount <= _count && index + replaceCount <= _count );
         charType *thisStr = EraseAndInsertSpace( index, replaceCount, len );
         _MemCpyStr( thisStr + index, str, len );
@@ -463,6 +471,11 @@ public:
 
     NOINLINE TCStr( const charType *str )
     {
+        if( str == 0 )
+        {
+            str = "";
+        }
+
         uiw len = GetStringLength( str );
         _count = len;
         charType *thisStr;
@@ -481,6 +494,8 @@ public:
 
     NOINLINE TCStr( const charType *str, uiw len )
     {
+        ASSUME( str != 0 || len == 0 );
+
         _count = len;
         charType *thisStr;
         if( len >= static_size )
@@ -499,6 +514,9 @@ public:
 
     NOINLINE TCStr( const charType *str0, uiw len0, const charType *str1, uiw len1 )
     {
+        ASSUME( str0 |= 0 || len0 == 0 );
+        ASSUME( str1 |= 0 || len1 == 0 );
+
         _count = len0 + len1;
         charType *thisStr;
         if( _count >= static_size )
@@ -516,12 +534,11 @@ public:
         thisStr[ _count ] = (charType)0;
     }
 
-    template < typename InputIterator >
-    NOINLINE TCStr( InputIterator begin, InputIterator end )
+    template < typename InputIterator > NOINLINE TCStr( InputIterator begin, InputIterator end )
     {
         if( begin.iteratorType == Iterator::Type::Random )
         {
-            uiw len = Iterator::_IterDist< InputIterator, InputIterator::iteratorType >::Dist( begin, end );
+            uiw len = Iterator::_IterDist < InputIterator, InputIterator::iteratorType >::Dist( begin, end );
             _count = len;
             charType *thisStr;
             if( len >= static_size )
@@ -568,7 +585,7 @@ public:
     NOINLINE TCStr( const ownType &source, uiw pos, uiw len = uiw_max )
     {
         ASSUME( this != &source && pos <= source._count );
-        uiw realLen = Funcs::Min< uiw >( source._count - pos, len );
+        uiw realLen = Funcs::Min < uiw >( source._count - pos, len );
         _count = realLen;
         charType *thisStr;
         if( realLen >= static_size )
@@ -735,7 +752,7 @@ public:
     ownType SubStr( uiw pos = 0, uiw len = uiw_max ) const
     {
         ASSUME( pos <= _count );
-        return TCStr( CStr() + pos, Funcs::Min< uiw >( len, _count - pos ) );
+        return TCStr( CStr() + pos, Funcs::Min < uiw >( len, _count - pos ) );
     }
 
     NOINLINE void ShrinkToFit()
@@ -764,23 +781,34 @@ public:
     ownType &Insert( const ownType &str, uiw pos, uiw subpos, uiw sublen )
     {
         ASSUME( subpos <= str._count );
-        InsertString < true >( pos, str.CStr() + subpos, Funcs::Min< uiw >( str.Length() - subpos, sublen ) );
+        InsertString < true >( pos, str.CStr() + subpos, Funcs::Min < uiw >( str.Length() - subpos, sublen ) );
         return *this;
     }
 
     ownType &Insert( const charType *s, uiw pos )
     {
+        if( s == 0 )
+        {
+            return;
+        }
         InsertString < true >( pos, s, GetStringLength( s ) );
         return *this;
     }
 
     ownType &Insert( const charType *s, uiw pos, uiw n = uiw_max )
     {
-        if( n == uiw_max )
+        if( s == 0 )
         {
-            n = GetStringLength( s );
+            ASSUME( n == 0 || n == uiw_max );
         }
-        InsertString < true >( pos, s, n );
+        else
+        {
+            if( n == uiw_max )
+            {
+                n = GetStringLength( s );
+            }
+            InsertString < true >( pos, s, n );
+        }
         return *this;
     }
 
@@ -815,18 +843,24 @@ public:
 
     Iter Insert( const charType *str, IterConst where, uiw n = uiw_max )
     {
-        uiw pos = where.Ptr() - Str();
-        ASSUME( pos <= _count );
-        if( n == uiw_max )
+        if( str == 0 )
         {
-            n = GetStringLength( str );
+            ASSUME( n == 0 || n == uiw_max );
         }
-        InsertString < true >( pos, str, n );
+        else
+        {
+            uiw pos = where.Ptr() - Str();
+            ASSUME( pos <= _count );
+            if( n == uiw_max )
+            {
+                n = GetStringLength( str );
+            }
+            InsertString < true >( pos, str, n );
+        }
         return Iter( Str() + pos );
     }
 
-    template <typename InputIterator>
-    NOINLINE void Insert( IterConst where, InputIterator first, InputIterator last )
+    template < typename InputIterator > NOINLINE void Insert( IterConst where, InputIterator first, InputIterator last )
     {
         charType *thisStr = Str();
         uiw pos = where.Ptr() - thisStr;
@@ -844,7 +878,7 @@ public:
         {
             if( first.iteratorType == Iterator::Type::Random )
             {
-                uiw len = Iterator::_IterDist< InputIterator, InputIterator::iteratorType >::Dist( first, last );
+                uiw len = Iterator::_IterDist < InputIterator, InputIterator::iteratorType >::Dist( first, last );
                 charType *thisStr = InsertSpace( pos, len ) + pos;
                 _MemCpyStr( thisStr, first.Ptr(), len );
             }
@@ -860,7 +894,7 @@ public:
 
     ownType &Erase( uiw pos, uiw len = uiw_max )
     {
-        EraseSpace( pos, Funcs::Min< uiw >( _count - pos, len ) );
+        EraseSpace( pos, Funcs::Min < uiw >( _count - pos, len ) );
         return *this;
     }
 
@@ -893,11 +927,11 @@ public:
         if( this == &str )
         {
             ownType temp( str );
-            EraseAndInsert( replacePos, Funcs::Min< uiw >( replaceLen, _count - replacePos ), temp.CStr(), temp._count );
+            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), temp.CStr(), temp._count );
         }
         else
         {
-            EraseAndInsert( replacePos, Funcs::Min< uiw >( replaceLen, _count - replacePos ), str.CStr(), str._count );
+            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), str.CStr(), str._count );
         }
         return *this;
     }
@@ -918,45 +952,59 @@ public:
         if( this == &str )
         {
             ownType temp( str, subpos, sublen );
-            EraseAndInsert( replacePos, Funcs::Min< uiw >( replaceLen, _count - replacePos ), temp.CStr(), temp._count );
+            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), temp.CStr(), temp._count );
         }
         else
         {
-            EraseAndInsert( replacePos, Funcs::Min< uiw >( replaceLen, _count - replacePos ), str.CStr() + subpos, Funcs::Min< uiw >( str._count - subpos, sublen ) );
+            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), str.CStr() + subpos, Funcs::Min < uiw >( str._count - subpos, sublen ) );
         }
         return *this;
     }
 
     ownType &Replace( const charType *s, IterConst begin, IterConst end, uiw len = uiw_max )  //  TODO:
     {
-        ASSUME( end >= begin );
-        if( len == uiw_max )
+        if( s == 0 )
         {
-            len = GetStringLength( s );
+            ASSUME( len == 0 || len == uiw_max );
         }
-        uiw pos = begin.Ptr() - CStr();
-        ASSUME( pos < _count );
-        uiw diff = begin - end;
-        EraseAndInsert( pos, diff, s, len );
+        else
+        {
+            ASSUME( end >= begin );
+            if( len == uiw_max )
+            {
+                len = GetStringLength( s );
+            }
+            uiw pos = begin.Ptr() - CStr();
+            ASSUME( pos < _count );
+            uiw diff = begin - end;
+            EraseAndInsert( pos, diff, s, len );
+        }
         return *this;
     }
 
     ownType &Replace( const charType *s, uiw replacePos, uiw replaceLen = 0, uiw strLen = uiw_max )  //  TODO: overlapping
     {
-        ASSUME( replacePos <= _count );
-        if( strLen == uiw_max )
+        if( s == 0 )
         {
-            strLen = GetStringLength( s );
+            ASSUME( strLen == 0 || strLen == uiw_max );
         }
-        replaceLen = Funcs::Min< uiw >( replaceLen, _count - replacePos );
-        EraseAndInsert( replacePos, replaceLen, s, strLen );
+        else
+        {
+            ASSUME( replacePos <= _count );
+            if( strLen == uiw_max )
+            {
+                strLen = GetStringLength( s );
+            }
+            replaceLen = Funcs::Min < uiw >( replaceLen, _count - replacePos );
+            EraseAndInsert( replacePos, replaceLen, s, strLen );
+        }
         return *this;
     }
 
     ownType &Replace( charType c, uiw pos, uiw len, uiw n = 1 )
     {
         ASSUME( pos <= _count );
-        EraseSpace( pos, Funcs::Min< uiw >( len, _count - pos ) );
+        EraseSpace( pos, Funcs::Min < uiw >( len, _count - pos ) );
         charType *thisStr = InsertSpace( pos, n ) + pos;
         for( ; n; --n )
         {
@@ -979,8 +1027,7 @@ public:
         return *this;
     }
 
-    template <typename InputIterator>
-    ownType &Replace( IterConst begin, IterConst end, InputIterator first, InputIterator last )  //  TODO: overlapping
+    template < typename InputIterator > ownType &Replace( IterConst begin, IterConst end, InputIterator first, InputIterator last )  //  TODO: overlapping
     {
         ASSUME( end >= begin );
         uiw pos = begin.Ptr() - CStr();
@@ -1013,18 +1060,22 @@ public:
     ownType &Append( const ownType &str, uiw subpos, uiw sublen )
     {
         ASSUME( subpos <= str._count );
-        AddString < true >( str.CStr() + subpos, Funcs::Min< uiw >( str._count - subpos, sublen ) );
+        AddString < true >( str.CStr() + subpos, Funcs::Min < uiw >( str._count - subpos, sublen ) );
         return *this;
     }
 
     ownType &Append( const charType *s )
     {
-        AddString < true >( s, GetStringLength( s ) );
+        if( s != 0 )
+        {
+            AddString < true >( s, GetStringLength( s ) );
+        }
         return *this;
     }
 
     ownType &Append( const charType *s, uiw n )
     {
+        ASSUME( s != 0 || n == 0 );
         AddString < true >( s, n );
         return *this;
     }
@@ -1039,8 +1090,7 @@ public:
         return *this;
     }
 
-    template <typename InputIterator>
-    NOINLINE ownType &Append( InputIterator first, InputIterator last )
+    template < typename InputIterator > NOINLINE ownType &Append( InputIterator first, InputIterator last )
     {
         const charType *str = CStr();
         bln isOverlapped = !(first.Ptr() < str || first.Ptr() >= str + _count);
@@ -1101,7 +1151,7 @@ public:
     NOINLINE ownType &Assign( const ownType &str, uiw subpos, uiw sublen )
     {
         ASSUME( subpos <= str._count );
-        uiw realLen = Funcs::Min< uiw >( str._count - subpos, sublen );
+        uiw realLen = Funcs::Min < uiw >( str._count - subpos, sublen );
         if( this == &str )
         {
             charType *curStr = Str();
@@ -1119,6 +1169,12 @@ public:
 
     NOINLINE ownType &Assign( const charType *s, uiw n = uiw_max )
     {
+        if( s == 0 )
+        {
+            ASSUME( n == 0 || n == uiw_max );
+            s = "";
+        }
+
         if( n == uiw_max )
         {
             n = GetStringLength( s );
@@ -1169,8 +1225,7 @@ public:
         return *this;
     }
 
-    template <class InputIterator>
-    NOINLINE ownType &Assign( InputIterator first, InputIterator last )
+    template < typename InputIterator > NOINLINE ownType &Assign( InputIterator first, InputIterator last )
     {
         const charType *str = CStr();
         bln isOverlapped = !(first.Ptr() < str || first.Ptr() >= str + _count);
@@ -1183,7 +1238,7 @@ public:
         {
             if( first.iteratorType == Iterator::Type::Random )
             {
-                uiw len = Iterator::_IterDist< InputIterator, InputIterator::iteratorType >::Dist( first, last );
+                uiw len = Iterator::_IterDist < InputIterator, InputIterator::iteratorType >::Dist( first, last );
                 if( IsStatic() )
                 {
                     charType *thisStr;
@@ -1251,7 +1306,7 @@ public:
 
     TCStr &operator = ( const charType *str )
     {
-        return Assign( str );
+        return Assign( str );  //  Assign will check for null
     }
 
     NOINLINE TCStr &operator = ( const charType c )
@@ -1275,6 +1330,10 @@ public:
 
     TCStr operator + ( const charType *str ) const
     {
+        if( str == 0 )
+        {
+            str = "";
+        }
         return TCStr( this->CStr(), this->_count, str, GetStringLength( str ) );
     }
 
@@ -1285,6 +1344,10 @@ public:
 
     friend TCStr operator + ( const charType *str, const ownType &second )
     {
+        if( str == 0 )
+        {
+            str = "";
+        }
         return TCStr( str, GetStringLength( str ), second.CStr(), second._count );
     }
 
@@ -1301,6 +1364,10 @@ public:
 
     TCStr &operator += ( const charType *str )
     {
+        if( str == 0 )
+        {
+            str = "";
+        }
         AddString < true >( str, GetStringLength( str ) );
         return *this;
     }
@@ -1322,6 +1389,10 @@ public:
 
     bln operator == ( const charType *str ) const
     {
+        if( str == 0 )
+        {
+            str = "";
+        }
         return IsStringEquals( CStr(), str );
     }
 
@@ -1342,6 +1413,10 @@ public:
 
     bln operator < ( const charType *str ) const
     {
+        if( str == 0 )
+        {
+            str = "";
+        }
         return StringCompare( CStr(), str ) < 0;
     }
 
@@ -1352,6 +1427,10 @@ public:
 
     bln operator >( const charType *str ) const
     {
+        if( str == 0 )
+        {
+            str = "";
+        }
         return StringCompare( CStr(), str ) > 0;
     }
 
