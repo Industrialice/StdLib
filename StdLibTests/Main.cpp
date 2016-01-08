@@ -497,9 +497,15 @@ int __cdecl main()
 
     //CStr entry = LogEntry( "you have ", 52, " apples" );
     //CStr entry = Concat( CStr{ "one" }, CStr{ "two" } );
-    char temp[ 512 ];
-    Funcs::PrintToStr( temp, 511, "you have %u apples", 52 );
-    ::printf( "%s\n", temp );
+
+    CStr str;
+    bln boolean = true;
+    Funcs::PrintToContainer( &str, "int %u string %s char %c bool %b ui8 %u pointer %p fp32 %f fp64 %f int64 %j", 52, "apples", 'c', boolean, ui8( 5 ), &boolean, 15.4f, 152.7, i64( 66 ) );
+    ::printf( "%s\n", str.CStr() );
+
+    /*char buf[ 512 ];
+    Funcs::PrintToStr( buf, 511, "int %u string %s char %c bool %b ui8 %u pointer %p fp32 %f fp64 %f int64 %j", 52, "apples", 'c', boolean, ui8( 5 ), &boolean, 15.4f, 152.7, i64( 66 ) );
+    ::printf( "%s\n", buf );*/
 
     /*for( int index = 0; index < 10000; ++index )
     {

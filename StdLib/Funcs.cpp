@@ -2024,22 +2024,8 @@ uiw Funcs::F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf )
     return ::sprintf( p_buf, "%.*lf", precise, val );
 }
 
-#define VAR_ARGS_CREATE_PARAMS void *__p_pointer__; union { i64 __nothing__; byte __a_data__[ 8 ]; }; DBGCODE( ui32 __paramSize__; )
-#define VAR_ARGS_SET_PARAM_POINTER( ch, list ) __p_pointer__ = __a_data__; \
-    switch( ch ) { \
-    case 'i': case 'u': case 'b': case 'c': case 'h': case 'n': *(ui32 *)__p_pointer__ = va_arg( list, ui32 ); DBGCODE( __paramSize__ = 4 ); break; \
-    case 'p': case 'w': case 'o': case 's': case 'a': *(uiw *)__p_pointer__ = va_arg( list, uiw ); DBGCODE( __paramSize__ = sizeof(uiw) ); break; \
-    case 'j': case 'm': *(ui64 *)__p_pointer__ = va_arg( list, ui64 ); DBGCODE( __paramSize__ = 8 ); break; \
-    case 'f': case 'r': case 'd': case 'q': *(f64 *)__p_pointer__ = va_arg( list, f64 ); DBGCODE( __paramSize__ = 8 ); break; \
-    default: __p_pointer__ = 0; DBGCODE( __paramSize__ = 0 ); \
-    }
-#define VAR_ARGS_GET_PARAM_POINTER __p_pointer__
-
 #define FMT_PARSER_HELPER_NO_PARAM ui32_max
 #define FMT_PARSER_HELPER_EXTRA_PARAM ui32_max - 1
-#ifdef DEBUG
-    #define FMT_PARSER_HELPER_SIZE __paramSize__
-#endif
 
 static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ui32 *p_param )
 {
@@ -2051,6 +2037,7 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ui32 *p_para
         const char *cp_end = _StrChr( cp_fmt, ']' );
         if( !cp_end )
         {
+            DBGBREAK;
             return 0;
         }
         if( *cp_fmt == '*' )
@@ -2061,6 +2048,7 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ui32 *p_para
             }
             else
             {
+                DBGBREAK;
                 return 0;
             }
         }
@@ -2071,6 +2059,7 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ui32 *p_para
                 cp_fmt += 2;
                 if( !Funcs::StrHexToIntQuest( cp_fmt, p_param, cp_end - cp_fmt ) )
                 {
+                    DBGBREAK;
                     return 0;
                 }
             }
@@ -2078,6 +2067,7 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ui32 *p_para
             {
                 if( !Funcs::StrDecToUI32Quest( cp_fmt, p_param, cp_end - cp_fmt ) )
                 {
+                    DBGBREAK;
                     return 0;
                 }
             }
@@ -2110,8 +2100,8 @@ m - integer 64 as bin str [param - when non-zero, use upper case]
 n - integer 32 as bin str [param - when non-zero, use upper case]
 o - signed word
 p - pointer, integer word as hex str [param - when non-zero, use upper case]
-q - f64 rounded to i32 [param - precision]
-r - f32 rounded to i32 [param - precision]
+q -
+r -
 s - string [param - max length]
 t -
 u - ui32
@@ -2122,30 +2112,56 @@ y -
 z -
 */
 
-static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, uiw maxLen, uiw *p_parsed )
+static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, uiw appendedLen, uiw *availibleLen, uiw *p_parsed, void *ob, char *(*RequestMoreSize)(void *ob, uiw size) )
 {
     ASSUME( p_buf && p_parsed );
 
     char a_buf[ 128 ];
     uiw len;
+    p_buf += appendedLen;
 
-    if( !p_source )
+    struct NoName
     {
-        return false;
-    }
+        static FORCEINLINE bln CheckSize( char **pp_buf, uiw appendedLen, uiw *availibleLen, uiw neededLen, void *ob, char *(*RequestMoreSize)(void *, uiw) )
+        {
+            if( neededLen > *availibleLen )
+            {
+                uiw sizeAddition = Funcs::Max < uiw >( 32, neededLen - *availibleLen );
+                *pp_buf = RequestMoreSize( ob, sizeAddition );
+                if( *pp_buf == 0 )
+                {
+                    DBGBREAK;
+                    return false;
+                }
+                *availibleLen += sizeAddition;
+                *pp_buf += appendedLen;
+            }
+            return true;
+        }
+    };
 
     switch( type )
     {
     case 's':  //  string [param]
-        if( !*(char **)p_source )
+    {
+        const char *sourceStr = *(char **)p_source;
+        if( !sourceStr )
         {
-            len = Funcs::StrSafeCpyAndCountWONull( p_buf, "[null str]", MIN( maxLen, sizeof("[null str]") - 1 ) );
-        }
+            sourceStr = "[null]";
+            len = _StrLen( "[null]" );
+        }        
         else
         {
-            len = Funcs::StrSafeCpyAndCountWONull( p_buf, *(char **)p_source, MIN( maxLen, param ) );
+            len = Funcs::Min < uiw >( _StrLen( sourceStr ), param );
         }
+        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, len, ob, RequestMoreSize ) )
+        {
+            DBGBREAK;
+            return false;
+        }
+        _MemCpy( p_buf, *(char **)p_source, len );
         goto retLen;
+    }
     case 'f':  //  f32 [param]
     {
         f32 f32val = (f32)*(f64 *)p_source;
@@ -2167,8 +2183,9 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         goto retBuf;
     case 'b':  //  bln [param]
         len = *(ui32 *)p_source ? _StrLen( "true" ) : _StrLen( "false" );
-        if( maxLen < len )
+        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, len, ob, RequestMoreSize ) )
         {
+            DBGBREAK;
             return false;
         }
         if( param == FMT_PARSER_HELPER_NO_PARAM )
@@ -2178,51 +2195,58 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         _MemCpy( p_buf, *(ui32 *)p_source ? (param ? "TRUE" : "true") : (param ? "FALSE" : "false"), len );
         goto retLen;
     case 'c':  //  char
-        if( !maxLen )
+        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 1, ob, RequestMoreSize ) )
         {
+            DBGBREAK;
             return false;
         }
         *p_buf = (char)*(i32 *)p_source;
         len = 1;
         goto retLen;
     case 'h':  //  integer 32 as hex str [param]
-        if( maxLen < 8 )
+        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 8, ob, RequestMoreSize ) )
         {
+            DBGBREAK;
             return false;
         }
         len = Funcs::IntToStrHex( param == FMT_PARSER_HELPER_NO_PARAM ? true : param != 0, false, false, p_buf, *(ui32 *)p_source );
         goto retLen;
     case 'j':  //  integer 64 as hex str [param]
-        if( maxLen < 16 )
+        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 16, ob, RequestMoreSize ) )
         {
+            DBGBREAK;
             return false;
         }
         len = Funcs::IntToStrHex( param == FMT_PARSER_HELPER_NO_PARAM ? true : param != 0, false, false, p_buf, *(ui64 *)p_source );
         goto retLen;
     case 'p':  //  pointer, integer word as hex str [param]
-        if( maxLen < sizeof(void *) * 2 )
+        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, sizeof(void *) * 2, ob, RequestMoreSize ) )
         {
+            DBGBREAK;
             return false;
         }
         len = Funcs::IntToStrHex( param == FMT_PARSER_HELPER_NO_PARAM ? true : param != 0, false, false, p_buf, *(uiw *)p_source );
         goto retLen;
     case 'n':  //  integer 32 as bin str [param]
-        if( maxLen < 32 )
+        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 32, ob, RequestMoreSize ) )
         {
+            DBGBREAK;
             return false;
         }
         len = Funcs::IntToStrBin( *(ui32 *)p_source, p_buf, false, param == FMT_PARSER_HELPER_NO_PARAM ? false : param != 0 );
         goto retLen;
     case 'm':  //  integer 64 as bin str [param]
-        if( maxLen < 64 )
+        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 64, ob, RequestMoreSize ) )
         {
+            DBGBREAK;
             return false;
         }
         len = Funcs::IntToStrBin( *(ui64 *)p_source, p_buf, false, param == FMT_PARSER_HELPER_NO_PARAM ? false : param != 0 );
         goto retLen;
     case 'a':  //  pointer, integer word as bin str [param]
-        if( maxLen < WORD_SIZE )
+        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, WORD_SIZE, ob, RequestMoreSize ) )
         {
+            DBGBREAK;
             return false;
         }
         len = Funcs::IntToStrBin( *(uiw *)p_source, p_buf, false, param == FMT_PARSER_HELPER_NO_PARAM ? false : param != 0 );
@@ -2243,37 +2267,10 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
             len = Funcs::F64ToStr( *(f64 *)p_source, a_buf );
         }
         goto retBuf;
-    case 'r':  //  f32 rounded to i32 [param]
-    {
-        i32 val;
-        if( param != FMT_PARSER_HELPER_NO_PARAM )
-        {
-            val = Funcs::RoundF32WithPrecise( *(f32 *)p_source, param );
-        }
-        else
-        {
-            val = Funcs::RoundF32( *(f32 *)p_source );
-        }
-        len = Funcs::IntToStrDec( val, a_buf );
-        goto retBuf;
-    }
-    case 'q':  //  f64 rounded to i32 [param]
-    {
-        i32 val;
-        if( param != FMT_PARSER_HELPER_NO_PARAM )
-        {
-            val = Funcs::RoundF64WithPrecise( *(f64 *)p_source, param );
-        }
-        else
-        {
-            val = Funcs::RoundF64( *(f64 *)p_source );
-        }
-        len = Funcs::IntToStrDec( val, a_buf );
-        goto retBuf;
-    }
     case '%':  //  % symbol
-        if( !maxLen )
+        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 1, ob, RequestMoreSize ) )
         {
+            DBGBREAK;
             return false;
         }
         *p_buf = '%';
@@ -2284,8 +2281,9 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
     }
 
 retBuf:
-    if( len > maxLen )
+    if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, len, ob, RequestMoreSize ) )
     {
+        DBGBREAK;
         return false;
     }
     _MemCpy( p_buf, a_buf, len );
@@ -2294,17 +2292,46 @@ retLen:
     return true;
 }
 
-EXTERNAL uiw Funcs::PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args )
+template < bln is_validateStep > Nullable < uiw > PrintToStrArgListImpl( const Funcs::_ArgType::argType *argTypes, uiw argsCount, char *p_str, uiw availibleSize, const char *cp_fmt, va_list args, void *ob, char *(*RequestMoreSize)(void *, uiw) )
 {
-    ASSUME( p_str && cp_fmt && maxLen != uiw_max );
+    using namespace Funcs;
 
-    char *p_currStr = p_str;
-    uiw parsedLen;
+    uiw argIndex = 0;
+    uiw parsedLen = 0, appendedLen = 0;
     ui32 param;
     char ch;
-    VAR_ARGS_CREATE_PARAMS;
+    ALIGNED_PRE( 8 ) ui64 argumentData ALIGNED_POST( 8 );
 
-    while( *cp_fmt && (uiw)(p_currStr - p_str) < maxLen )
+    #define LOAD_ARG( expectedType, target ) \
+        if( is_validateStep && argIndex >= argsCount ) { DBGBREAK; return nullv; } \
+        if( (expectedType) == _ArgType::fp ) \
+        { \
+            if( is_validateStep && argTypes[ argIndex ] != _ArgType::fp ) { DBGBREAK; return nullv; } \
+            *(f64 *)&target = va_arg( args, f64 ); \
+        } \
+        else if( (expectedType) == _ArgType::int32 ) \
+        { \
+            if( is_validateStep && argTypes[ argIndex ] != _ArgType::int32 ) { DBGBREAK; return nullv; } \
+            *(ui32 *)&target = va_arg( args, ui32 ); \
+        } \
+        else if( (expectedType) == _ArgType::int64 ) \
+        { \
+            if( is_validateStep && argTypes[ argIndex ] != _ArgType::int64 ) { DBGBREAK; return nullv; } \
+            *(ui32 *)&target = va_arg( args, ui64 ); \
+        } \
+        else if( (expectedType) == _ArgType::string ) \
+        { \
+            if( is_validateStep && argTypes[ argIndex ] != _ArgType::string ) { DBGBREAK; return nullv; } \
+            *(ui32 *)&target = va_arg( args, uiw ); \
+        } \
+        else \
+        { \
+            DBGBREAK; \
+            return nullv; \
+        } \
+        if( is_validateStep ) ++argIndex;
+
+    while( *cp_fmt )
     {
         if( *cp_fmt == '%' )
         {
@@ -2313,29 +2340,122 @@ EXTERNAL uiw Funcs::PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_f
             {
                 if( param == FMT_PARSER_HELPER_EXTRA_PARAM )
                 {
-                    param = va_arg( args, ui32 );
+                    LOAD_ARG( _ArgType::int32, param );
                 }
-                VAR_ARGS_SET_PARAM_POINTER( ch, args );
-                if( ArgParserHelper( ch, VAR_ARGS_GET_PARAM_POINTER, param, p_currStr, maxLen - (p_currStr - p_str), &parsedLen ) )
+
+                switch( ch )
                 {
-                    p_currStr += parsedLen;
+                    case 'i': case 'u': case 'b': case 'c': case 'h': case 'n':
+                        LOAD_ARG( _ArgType::int32, argumentData );
+                        break;
+                    case 'p': case 'w': case 'o': case 'a':
+                        if( sizeof(void *) == 4 )
+                        {
+                            LOAD_ARG( _ArgType::int32, argumentData );
+                        }
+                        else
+                        {
+                            LOAD_ARG( _ArgType::int64, argumentData );
+                        }
+                        break;
+                    case 's':
+                        LOAD_ARG( _ArgType::string, argumentData );
+                        break;
+                    case 'j': case 'm':
+                        LOAD_ARG( _ArgType::int64, argumentData );
+                        break;
+                    case 'f': case 'd':
+                        LOAD_ARG( _ArgType::fp, argumentData );
+                        break;
+                    default:
+                        DBGBREAK;
+                        return nullv;
+                }
+
+                if( is_validateStep || ArgParserHelper( ch, &argumentData, param, p_str, appendedLen, &availibleSize, &parsedLen, ob, RequestMoreSize ) )
+                {
+                    appendedLen += parsedLen;
+                    availibleSize -= parsedLen;
                     continue;
                 }
             }
             DBGBREAK;
-            p_currStr = p_str;
-            break;
+            return nullv;
         }
         else
         {
-            *p_currStr++ = *cp_fmt++;
+            if( is_validateStep )
+            {
+                ++cp_fmt;
+            }
+            else
+            {
+                if( !availibleSize )
+                {
+                    p_str = RequestMoreSize( ob, 32 );
+                    if( !p_str )
+                    {
+                        DBGBREAK;
+                        return nullv;
+                    }
+                    availibleSize = 32;
+                }
+                p_str[ appendedLen ] = *cp_fmt;
+                ++cp_fmt;
+                ++appendedLen;
+                --availibleSize;
+            }
         }
     }
 
-    *p_currStr = '\0';
+    if( is_validateStep && argIndex != argsCount )
+    {
+        DBGBREAK;
+        return nullv;
+    }
 
-    return p_currStr - p_str;
+    return appendedLen;
 }
+
+uiw Funcs::PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args )
+{
+    ASSUME( p_str && cp_fmt && maxLen != uiw_max );
+
+    struct NoName
+    {
+        static char *RequestMoreSize( void *ob, uiw size )
+        {
+            return 0;
+        }
+    };
+
+    Nullable < uiw > written = PrintToStrArgListImpl < false >( 0, 0, p_str, maxLen, cp_fmt, args, 0, NoName::RequestMoreSize );
+    p_str[ written.IsNull() ? 0 : written ] = '\0';
+    return written;
+}
+
+uiw Funcs::_PrintToContainer( void *cont, char *(*RequestMoreSize)(void *, uiw), const char *cp_fmt, va_list args )
+{
+    ASSUME( cont && RequestMoreSize && cp_fmt );
+    Nullable < uiw > written = PrintToStrArgListImpl < false >( 0, 0, 0, 0, cp_fmt, args, cont, RequestMoreSize );
+    return written.IsNull() ? 0 : written;
+}
+
+#if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+bln Funcs::_PrintCheckArgs( const _ArgType::argType *argTypes, uiw argsCount, const char *cp_fmt, ... )
+{
+    ASSUME( argTypes );
+
+    va_list args;
+    va_start( args, cp_fmt );
+
+    Nullable < uiw > written = PrintToStrArgListImpl < true >( argTypes, argsCount, 0, 0, cp_fmt, args, 0, 0 );
+
+    va_end( args );
+
+    return written.IsNull() == false;
+}
+#endif
 
 #if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
 NOINLINE uiw Funcs::_PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... )

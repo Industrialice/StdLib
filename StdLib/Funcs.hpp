@@ -1,6 +1,10 @@
 #ifndef __FUNCS_HPP__
 #define __FUNCS_HPP__
 
+#ifdef DEBUG
+    #include <typeinfo>
+#endif
+
 namespace StdLib {
 
 /*  0b or 0B is binary base  */
@@ -258,16 +262,42 @@ namespace Funcs
 
     EXTERNAL uiw PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args );
 
+    //  internal
+    EXTERNAL uiw _PrintToContainer( void *cont, char *(*RequestMoreSize)(void *, uiw), const char *cp_fmt, va_list args );
+    namespace _ArgType
+    {
+        enum argType { fp, int32, int64, string };
+    }
+
 #if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+    EXTERNAL bln _PrintCheckArgs( const _ArgType::argType *argTypes, uiw argsCount, const char *cp_fmt, ... );
+
     EXTERNAL uiw _PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
 
-    struct _VariadicTypeInfo
+    template < typename X > _ArgType::argType _AnalyzeArg( const X &arg )
     {
-    };
+        STATIC_CHECK( TypeDesc < X >::is_pod, "you can't pass non-pod args to variadic functions" );
+        STATIC_CHECK( sizeof(X) > 0 && sizeof(X) <= 8, "you can't use weird-sized types with variadic functions" );
+        if( TypeDesc < X >::is_fp )
+        {
+            return _ArgType::fp;
+        }
+        if( TypeDesc < X >::is_integer || TypeDesc < X >::is_pointer || TypeDesc < X >::is_array || typeid(X) == typeid(bln) || typeid(X) == typeid(char) )
+        {
+            if( (TypeDesc < X >::is_pointer || TypeDesc < X >::is_array) && typeid(TypeDesc < X >::type) == typeid(char) )
+            {
+                return _ArgType::string;
+            }
+            return sizeof(X) <= 4 ? _ArgType::int32 : _ArgType::int64;
+        }
+        DBGBREAK;
+        return _ArgType::int32;
+    }
 
     template < typename... Args > bln _AreArgsValid( const char *cp_fmt, const Args &... args )
     {
-        return true;  //  TODO: finish it
+        static const _ArgType::argType argTypes[] = { _ArgType::int32, _AnalyzeArg( args )... };
+        return _PrintCheckArgs( argTypes + 1, COUNTOF( argTypes ) - 1, cp_fmt, args... );
     }
 
     template < typename... Args > uiw PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, const Args &... args )
@@ -282,6 +312,65 @@ namespace Funcs
 #else
     EXTERNAL uiw PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
 #endif
+
+//  container storage must be linear, allowed to be non-zero size, will be cleared if not empty
+#if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+    template < typename container > uiw _PrintToContainer( container *cont, const char *cp_fmt, ... );
+
+    template < typename container, typename... Args > uiw PrintToContainer( container *cont, const char *cp_fmt, const Args &... args )
+    {
+        if( !_AreArgsValid( cp_fmt, args... ) )
+        {
+            DBGBREAK;
+            return 0;
+        }
+        return _PrintToContainer( cont, cp_fmt, args... );
+    }
+    
+    //  won't append string null-terminator
+    template < typename container > uiw _PrintToContainer( container *cont, const char *cp_fmt, ... )
+#else
+    //  won't append string null-terminator
+    template < typename container > uiw PrintToContainer( container *cont, const char *cp_fmt, ... )
+#endif
+    {
+        struct NoName
+        {
+            static char *RequestMoreSize( void *ob, uiw size )  //  can overcommit
+            {
+                container *cont = (container *)ob;
+                cont->Resize( cont->Size() + size );
+                return cont->Data();
+            }
+        };
+
+        va_list variadic;
+        va_start( variadic, cp_fmt );
+        uiw printed = _PrintToContainer( cont, NoName::RequestMoreSize, cp_fmt, variadic );
+        va_end( variadic );
+
+        cont->Resize( printed );  //  removing excessive size( if any )
+        return printed;
+    }
+
+    //  won't append string null-terminator
+    template < typename container > uiw PrintToContainerArgList( container *cont, const char *cp_fmt, va_list args )
+    {
+        struct NoName
+        {
+            static char *RequestMoreSize( void *ob, uiw size )  //  can overcommit
+            {
+                container *cont = (container *)ob;
+                cont->Resize( cont->Size() + size );
+                return cont->Data();
+            }
+        };
+
+        uiw printed = _PrintToContainer( cont, NoName::RequestMoreSize, cp_fmt, args );
+
+        cont->Resize( printed );  //  removing excessive size( if any )
+        return printed;
+    }
 
     template < ChrTestFunc func > bln IsStrMatchT( const char *cp_str, uiw count = uiw_max )
     {
@@ -447,7 +536,7 @@ namespace Funcs
         return powered;
     }
 
-    //  without base, *p_value is not changed if no suitable conversion possible
+    //  without base, *p_value is not changed if no suitable conversion possible, count sets a limit to cp_str len
     template < typename X > NOINLINE bln StrHexToIntQuest( const char *cp_str, X *p_value, uiw count = uiw_max )
     {
         ASSUME( cp_str && p_value );
@@ -479,7 +568,7 @@ namespace Funcs
         return true;
     }
 
-    //  without base
+    //  without base, count sets a limit to cp_str len
     template < typename X > X StrHexToInt( const char *cp_str, uiw count = uiw_max )
     {
         ASSUME( cp_str );
@@ -488,7 +577,7 @@ namespace Funcs
         return value;
     }
 
-    //  without base, *p_value is not changed if no suitable conversion possible
+    //  without base, *p_value is not changed if no suitable conversion possible, count sets a limit to cp_str len
     template < typename X > NOINLINE bln StrBinToIntQuest( const char *cp_str, X *p_value, uiw count = uiw_max )
     {
         ASSUME( cp_str && p_value );
@@ -518,7 +607,7 @@ namespace Funcs
         return true;
     }
 
-    //  without base
+    //  without base, count sets a limit to cp_str len
     template < typename X > X StrBinToInt( const char *cp_str, uiw count = uiw_max )
     {
         ASSUME( cp_str );
@@ -528,7 +617,7 @@ namespace Funcs
     }
 
     //  p_buf must be able to contain at least sizeof(X) * 2 + 1 bytes
-    template < typename X > NOINLINE uiw IntToStrHex( bln is_upper, bln is_setBase, bln is_dropFrontZeros, char *p_buf, X val )
+    template < typename X > NOINLINE uiw IntToStrHex( bln is_upper, bln is_setBase, bln is_dropFrontZeroes, char *p_buf, X val )
     {
         ASSUME( p_buf );
         const char *cp_set = "0123456789abcdef0123456789ABCDEF" + (is_upper << 4);
@@ -541,11 +630,11 @@ namespace Funcs
         for( typename TypeDesc < X >::uint_variant shift = sizeof(X) * 8 - 4; shift <= sizeof(X) * 8 - 4; shift -= 4 )
         {
             typename TypeDesc < X >::uint_variant half_byte = val >> shift & 0xF;
-            if( is_dropFrontZeros && !half_byte )
+            if( is_dropFrontZeroes && !half_byte )
             {
                 continue;
             }
-            is_dropFrontZeros = false;
+            is_dropFrontZeroes = false;
             *p_buf++ = cp_set[ half_byte ];
         }
         *p_buf = '\0';
@@ -553,7 +642,7 @@ namespace Funcs
     }
 
     //  p_buf must be able to contain at least sizeof(X) * 8 + 1 bytes
-    template < typename X > NOINLINE uiw IntToStrBin( X val, char *p_buf, bln is_setBase = false, bln is_dropFrontZeros = false  )
+    template < typename X > NOINLINE uiw IntToStrBin( X val, char *p_buf, bln is_setBase = false, bln is_dropFrontZeroes = false  )
     {
         ASSUME( p_buf );
         char *p_sourceBuf = p_buf;
@@ -566,11 +655,11 @@ namespace Funcs
         {
             X tested = val & test;
             bln is_nzero = tested != 0;
-            if( is_dropFrontZeros && !is_nzero )
+            if( is_dropFrontZeroes && !is_nzero )
             {
                 continue;
             }
-            is_dropFrontZeros = false;
+            is_dropFrontZeroes = false;
             *p_buf++ = '0' + is_nzero;
         }
         *p_buf = '\0';

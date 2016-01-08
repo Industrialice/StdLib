@@ -665,32 +665,39 @@ public:
         str[ _count ] = (charType)0;
     }
 
-    uiw Length() const
+    //  without null-terminator
+    uiw Size() const
     {
         return _count;
     }
 
-    uiw Size() const
-    {
-        return _count + 1;
-    }
-
     NOINLINE void Reserve( uiw reserve )
     {
-        if( IsStatic() )
+        if( reserve > _reserved )
         {
-            if( reserve >= static_size )
+            if( IsStatic() )
             {
-                charType *dyn = allocator::Alloc < charType >( reserve + 1 );
-                _MemCpyStr( dyn, _static_str, _count + 1 );
-                SetDynamic();
-                _dynamic_str = dyn;
-                _reserved = reserve;
+                if( reserve >= static_size )
+                {
+                    charType *dyn = allocator::Alloc < charType >( reserve + 1 );
+                    _MemCpyStr( dyn, _static_str, _count + 1 );
+                    SetDynamic();
+                    _dynamic_str = dyn;
+                    _reserved = reserve;
+                }
+            }
+            else
+            {
+                _ProcReservationUp( reserve );
             }
         }
-        else
+        else if( reserve < _reserved )
         {
-            _ProcReservationUp( reserve );
+            if( IsDynamic() )
+            {
+                _dynamic_str = allocator::Realloc( _dynamic_str, reserve + 1 );
+                _reserved = reserve;
+            }
         }
     }
 

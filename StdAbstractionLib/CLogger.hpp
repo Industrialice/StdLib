@@ -44,15 +44,13 @@ public:
     size_t DirectionsCount() const;
     DirectionFunc DirectionByIndexGet( size_t index ) const;
     void DirectionByIndexSet( size_t index, DirectionFunc dir );
-    void BufferLengthSet( unsigned int length );
-    unsigned int BufferLengthGet() const;
     void IsOnSet( bool is_on );
     bool IsOnGet() const;
     bool IsOnToggle();  //  return new state
     bool IsMultithreadedGet() const;
     void IsMitlithreadedSet( bool is_multithreaded );
     const char *NameGet() const;
-    static CLogger *Create( const char *cp_name, bool is_on, bool is_multithreaded, unsigned int bufferSize = 2048 );
+    static CLogger *Create( const char *cp_name, bool is_on, bool is_multithreaded );
     static void Delete( CLogger *po_logger );
 };
 
