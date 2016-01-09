@@ -5,8 +5,9 @@
     #include <type_traits>
 #endif
 
-STATIC_CHECK( sizeof(INT64_NUMBER)  == 8, "sizeof(long long) is unexpected" );
+STATIC_CHECK( sizeof(INT64_NUMBER) == 8, "sizeof(long long) is unexpected" );
 STATIC_CHECK( sizeof(int)        == 4, "sizeof(int) is unexpected" );
+STATIC_CHECK( sizeof(long) == 4 || sizeof(long) == 8, "sizeof(long) is unexpected" );
 STATIC_CHECK( sizeof(short)      == 2, "sizeof(short) is unexpected" );
 STATIC_CHECK( sizeof(char)       == 1, "sizeof(char) is unexpected" );
 STATIC_CHECK( sizeof(bool)       == 1, "sizeof(bool) is unexpected" );
@@ -615,10 +616,11 @@ template < typename X, uiw size > struct TypeDesc < const X [ size ] > : TypeDes
     typedef const X type;
 };
 
-template <> struct TypeDesc < i64 >
+#ifdef LONGLONG_SUPPORTED
+template <> struct TypeDesc < signed long long int >
 {
-    typedef ui64 uint_variant;
-    typedef i64 int_variant;
+    typedef unsigned long long int uint_variant;
+    typedef signed long long int int_variant;
     static const bln is_array = false;
     static const bln is_const = false;
     static const bln is_unsigned = false;
@@ -632,35 +634,74 @@ template <> struct TypeDesc < i64 >
     static const uiw bits = 64;
     static const uiw decDigits = 19;
     static const uiw hexDigits = 16;
-    static const i64 max = i64_max;
-    static const i64 min = i64_min;
-    typedef i64 type;
+    static const signed long long int max = LLONG_MAX;
+    static const signed long long int min = LLONG_MIN;
+    typedef signed long long int type;
 };
-template <> struct TypeDesc < const i64 > : TypeDesc < i64 >
+template <> struct TypeDesc < const signed long long int > : TypeDesc < signed long long int >
 {
     static const bln is_const = true;
-    typedef const i64 type;
 };
-template <> struct TypeDesc < ui64 > : TypeDesc < i64 >
+template <> struct TypeDesc < unsigned long long int > : TypeDesc < signed long long int >
 {
     static const bln is_const = false;
     static const bln is_unsigned = true;
     static const bln is_signed = !is_unsigned;
     static const uiw decDigits = 20;
-    static const ui64 max = ui64_max;
-    static const ui64 min = ui64_min;
-    typedef ui64 type;
+    static const unsigned long long int max = ULLONG_MAX;
+    static const unsigned long long int min = 0;
+    typedef unsigned long long int type;
 };
-template <> struct TypeDesc < const ui64 > : TypeDesc < ui64 >
+template <> struct TypeDesc < const unsigned long long int > : TypeDesc < unsigned long long int >
 {
     static const bln is_const = true;
-    typedef const ui64 type;
 };
-
-template <> struct TypeDesc < i32 >
+#elif defined(_MSC_VER)
+template <> struct TypeDesc < signed __int64 >
 {
-    typedef ui32 uint_variant;
-    typedef i32 int_variant;
+    typedef unsigned __int64 uint_variant;
+    typedef signed __int64 int_variant;
+    static const bln is_array = false;
+    static const bln is_const = false;
+    static const bln is_unsigned = false;
+    static const bln is_signed = !is_unsigned;
+    static const bln is_integer = true;
+    static const bln is_fp = false;
+    static const bln is_pointer = false;
+    static const bln is_reference = false;
+    static const bln is_pod = true;
+    static const bln is_movableAsPOD = true;
+    static const uiw bits = 64;
+    static const uiw decDigits = 19;
+    static const uiw hexDigits = 16;
+    static const signed __int64 max = 0x7FFFFFFFFFFFFFFFI64;
+    static const signed __int64 min = 0x8000000000000000I64;
+    typedef signed __int64 type;
+};
+template <> struct TypeDesc < const signed __int64 > : TypeDesc < signed __int64 >
+{
+    static const bln is_const = true;
+};
+template <> struct TypeDesc < unsigned __int64 > : TypeDesc < signed __int64 >
+{
+    static const bln is_const = false;
+    static const bln is_unsigned = true;
+    static const bln is_signed = !is_unsigned;
+    static const uiw decDigits = 20;
+    static const unsigned __int64 max = 0xFFFFFFFFFFFFFFFFUI64;
+    static const unsigned __int64 min = 0UI64;
+    typedef unsigned __int64 type;
+};
+template <> struct TypeDesc < const unsigned __int64 > : TypeDesc < unsigned __int64 >
+{
+    static const bln is_const = true;
+};
+#endif
+
+template <> struct TypeDesc < signed long int >
+{
+    typedef unsigned long int ulong_variant;
+    typedef signed long int long_variant;
     static const bln is_array = false;
     static const bln is_const = false;
     static const bln is_unsigned = false;
@@ -674,35 +715,73 @@ template <> struct TypeDesc < i32 >
     static const uiw bits = 32;
     static const uiw decDigits = 10;
     static const uiw hexDigits = 8;
-    static const i32 max = i32_max;
-    static const i32 min = i32_min;
-    typedef i32 type;
+    static const signed long int max = LONG_MAX;
+    static const signed long int min = LONG_MIN;
+    typedef signed long int type;
 };
-template <> struct TypeDesc < const i32 > : TypeDesc < i32 >
+template <> struct TypeDesc < const signed long int > : TypeDesc < signed long int >
 {
     static const bln is_const = true;
-    typedef const i32 type;
 };
-template <> struct TypeDesc < ui32 > : TypeDesc < i32 >
+template <> struct TypeDesc < unsigned long int > : TypeDesc < signed long int >
 {
     static const bln is_const = false;
     static const bln is_unsigned = true;
     static const bln is_signed = !is_unsigned;
     static const uiw decDigits = 10;
-    static const ui32 max = ui32_max;
-    static const ui32 min = ui32_min;
-    typedef ui32 type;
+    static const unsigned long int max = ULONG_MAX;
+    static const unsigned long int min = 0;
+    typedef unsigned long int type;
 };
-template <> struct TypeDesc < const ui32 > : TypeDesc < ui32 >
+template <> struct TypeDesc < const unsigned long int > : TypeDesc < unsigned long int >
 {
     static const bln is_const = false;
-    typedef const ui32 type;
 };
 
-template <> struct TypeDesc < i16 >
+template <> struct TypeDesc < signed int >
 {
-    typedef ui16 uint_variant;
-    typedef i16 int_variant;
+    typedef unsigned int uint_variant;
+    typedef signed int int_variant;
+    static const bln is_array = false;
+    static const bln is_const = false;
+    static const bln is_unsigned = false;
+    static const bln is_signed = !is_unsigned;
+    static const bln is_integer = true;
+    static const bln is_fp = false;
+    static const bln is_pointer = false;
+    static const bln is_reference = false;
+    static const bln is_pod = true;
+    static const bln is_movableAsPOD = true;
+    static const uiw bits = 32;
+    static const uiw decDigits = 10;
+    static const uiw hexDigits = 8;
+    static const signed int max = INT_MAX;
+    static const signed int min = INT_MIN;
+    typedef signed int type;
+};
+template <> struct TypeDesc < const signed int > : TypeDesc < signed int >
+{
+    static const bln is_const = true;
+};
+template <> struct TypeDesc < unsigned int > : TypeDesc < signed int >
+{
+    static const bln is_const = false;
+    static const bln is_unsigned = true;
+    static const bln is_signed = !is_unsigned;
+    static const uiw decDigits = 10;
+    static const unsigned int max = UINT_MAX;
+    static const unsigned int min = 0;
+    typedef unsigned int type;
+};
+template <> struct TypeDesc < const unsigned int > : TypeDesc < unsigned int >
+{
+    static const bln is_const = false;
+};
+
+template <> struct TypeDesc < signed short int >
+{
+    typedef unsigned short int uint_variant;
+    typedef signed short int int_variant;
     static const bln is_array = false;
     static const bln is_const = false;
     static const bln is_unsigned = false;
@@ -716,35 +795,33 @@ template <> struct TypeDesc < i16 >
     static const uiw bits = 16;
     static const uiw decDigits = 5;
     static const uiw hexDigits = 4;
-    static const i16 max = i16_max;
-    static const i16 min = i16_min;
-    typedef i16 type;
+    static const signed short int max = SHRT_MAX;
+    static const signed short int min = SHRT_MIN;
+    typedef signed short int type;
 };
-template <> struct TypeDesc < const i16 > : TypeDesc < i16 >
+template <> struct TypeDesc < const signed short int > : TypeDesc < signed short int >
 {
     static const bln is_const = true;
-    typedef const i16 type;
 };
-template <> struct TypeDesc < ui16 > : TypeDesc < i16 >
+template <> struct TypeDesc < unsigned short int > : TypeDesc < signed short int >
 {
     static const bln is_const = false;
     static const bln is_unsigned = true;
     static const bln is_signed = !is_unsigned;
     static const uiw decDigits = 5;
-    static const ui16 max = ui16_max;
-    static const ui16 min = ui16_min;
-    typedef ui16 type;
+    static const unsigned short int max = USHRT_MAX;
+    static const unsigned short int min = 0;
+    typedef unsigned short int type;
 };
-template <> struct TypeDesc < const ui16 > : TypeDesc < ui16 >
+template <> struct TypeDesc < const unsigned short int > : TypeDesc < unsigned short int >
 {
     static const bln is_const = true;
-    typedef const ui16 type;
 };
 
-template <> struct TypeDesc < i8 >
+template <> struct TypeDesc < signed char >
 {
-    typedef ui8 uint_variant;
-    typedef i8 int_variant;
+    typedef unsigned char uint_variant;
+    typedef signed char int_variant;
     static const bln is_array = false;
     static const bln is_const = false;
     static const bln is_unsigned = false;
@@ -758,32 +835,30 @@ template <> struct TypeDesc < i8 >
     static const uiw bits = 8;
     static const uiw decDigits = 3;
     static const uiw hexDigits = 2;
-    static const i8 max = i8_max;
-    static const i8 min = i8_min;
-    typedef i8 type;
+    static const signed char max = 127;
+    static const signed char min = -128;
+    typedef signed char type;
 };
-template <> struct TypeDesc < const i8 > : TypeDesc < i8 >
+template <> struct TypeDesc < const signed char > : TypeDesc < signed char >
 {
     static const bln is_const = true;
-    typedef const i8 type;
 };
-template <> struct TypeDesc < ui8 > : TypeDesc < i8 >
+template <> struct TypeDesc < unsigned char > : TypeDesc < signed char >
 {
     static const bln is_const = false;
     static const bln is_unsigned = true;
     static const bln is_signed = !is_unsigned;
     static const uiw decDigits = 3;
-    static const ui8 max = ui8_max;
-    static const ui8 min = ui8_min;
-    typedef ui8 type;
+    static const unsigned char max = UCHAR_MAX;
+    static const unsigned char min = 0;
+    typedef unsigned char type;
 };
-template <> struct TypeDesc < const ui8 > : TypeDesc < ui8 >
+template <> struct TypeDesc < const unsigned char > : TypeDesc < unsigned char >
 {
     static const bln is_const = true;
-    typedef const ui8 type;
 };
 
-template <> struct TypeDesc < f32 >
+template <> struct TypeDesc < float >
 {
     static const bln is_array = false;
     static const bln is_const = false;
@@ -796,17 +871,16 @@ template <> struct TypeDesc < f32 >
     static const bln is_pod = true;
     static const bln is_movableAsPOD = true;
     static const uiw bits = 32;
-    static constexpr f32 max() { return f32_max; }
-    static constexpr f32 min() { return f32_min; }
-    typedef f32 type;
+    static constexpr float max() { return f32_max; }
+    static constexpr float min() { return f32_min; }
+    typedef float type;
 };
-template <> struct TypeDesc < const f32 > : TypeDesc < f32 >
+template <> struct TypeDesc < const float > : TypeDesc < float >
 {
     static const bln is_const = true;
-    typedef const f32 type;
 };
 
-template <> struct TypeDesc < f64 >
+template <> struct TypeDesc < double >
 {
     static const bln is_array = false;
     static const bln is_const = false;
@@ -819,17 +893,16 @@ template <> struct TypeDesc < f64 >
     static const bln is_pod = true;
     static const bln is_movableAsPOD = true;
     static const uiw bits = 64;
-    static constexpr f64 max() { return f64_max; }
-    static constexpr f64 min() { return f64_min; }
-    typedef f64 type;
+    static constexpr double max() { return f64_max; }
+    static constexpr double min() { return f64_min; }
+    typedef double type;
 };
-template <> struct TypeDesc < const f64 > : TypeDesc < f64 >
+template <> struct TypeDesc < const double > : TypeDesc < double >
 {
     static const bln is_const = true;
-    typedef const f64 type;
 };
 
-template <> struct TypeDesc < bln >
+template <> struct TypeDesc < bool >
 {
     static const bln is_array = false;
     static const bln is_const = false;
@@ -840,14 +913,13 @@ template <> struct TypeDesc < bln >
     static const bln is_pod = true;
     static const bln is_movableAsPOD = true;
     static const uiw bits = 8;
-    static const bln max = bln_max;
-    static const bln min = bln_min;
-    typedef bln type;
+    static const bool max = true;
+    static const bool min = false;
+    typedef bool type;
 };
-template <> struct TypeDesc < const bln > : TypeDesc < bln >
+template <> struct TypeDesc < const bool > : TypeDesc < bool >
 {
     static const bln is_const = true;
-    typedef const bln type;
 };
 
 class CNoInit {};

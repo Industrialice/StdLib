@@ -50,12 +50,13 @@
         #define ASSUME( what ) __assume( what )
     #endif
 
-    #if _MSC_VER >= 1300  //  Visual Studio 2003
+    #if _MSC_VER >= 1310  //  Visual Studio 2003
         #define COUNTER_SUPPORTED
         #define SWAP_SUPPORTED
         #define ALIGNOF( what ) __alignof( what )
         #define NATIVE_ALIGNOF
         #define EXTERN_TEMPLATES_SUPPORTED
+        #define LONGLONG_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1400  //  Visual Studio 2005
@@ -190,6 +191,7 @@
     #define NOEXCEPT noexcept
     #define INITIALIZER_LISTS_SUPPORTED
     #define RANGE_BASED_FOR_SUPPORTED
+    #define LONGLONG_SUPPORTED
 
     #if GCC_VERSION >= 40500
         #ifdef DEBUG
