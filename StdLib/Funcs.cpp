@@ -2095,7 +2095,7 @@ h - integer 32 as hex str [param - when non-zero, use upper case]
 i - i32
 j - integer 64 as hex str [param - when non-zero, use upper case]
 k -
-l -
+l - i64
 m - integer 64 as bin str [param - when non-zero, use upper case]
 n - integer 32 as bin str [param - when non-zero, use upper case]
 o - signed word
@@ -2105,7 +2105,7 @@ r -
 s - string [param - max length]
 t -
 u - ui32
-v -
+v - ui64
 w - unsigned word
 x -
 y -
@@ -2181,6 +2181,12 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
     case 'u':  //  ui32
         len = Funcs::IntToStrDec( *(ui32 *)p_source, a_buf );
         goto retBuf;
+	case 'l':  //  i64
+        len = Funcs::IntToStrDec( *(i64 *)p_source, a_buf );
+		goto retBuf;
+	case 'v':  //  ui64
+        len = Funcs::IntToStrDec( *(ui64 *)p_source, a_buf );
+		goto retBuf;
     case 'b':  //  bln [param]
         len = *(ui32 *)p_source ? _StrLen( "true" ) : _StrLen( "false" );
         if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, len, ob, RequestMoreSize ) )
@@ -2317,12 +2323,12 @@ template < bln is_validateStep > Nullable < uiw > PrintToStrArgListImpl( const F
         else if( (expectedType) == _ArgType::int64 ) \
         { \
             if( is_validateStep && argTypes[ argIndex ] != _ArgType::int64 ) { DBGBREAK; return nullv; } \
-            *(ui32 *)&target = va_arg( args, ui64 ); \
+            *(ui64 *)&target = va_arg( args, ui64 ); \
         } \
         else if( (expectedType) == _ArgType::string ) \
         { \
             if( is_validateStep && argTypes[ argIndex ] != _ArgType::string ) { DBGBREAK; return nullv; } \
-            *(ui32 *)&target = va_arg( args, uiw ); \
+            *(uiw *)&target = va_arg( args, uiw ); \
         } \
         else \
         { \
@@ -2361,7 +2367,7 @@ template < bln is_validateStep > Nullable < uiw > PrintToStrArgListImpl( const F
                     case 's':
                         LOAD_ARG( _ArgType::string, argumentData );
                         break;
-                    case 'j': case 'm':
+					case 'j': case 'm': case 'l': case 'v':
                         LOAD_ARG( _ArgType::int64, argumentData );
                         break;
                     case 'f': case 'd':

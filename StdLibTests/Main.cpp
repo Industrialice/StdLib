@@ -500,7 +500,7 @@ int __cdecl main()
 
     CStr str;
     bln boolean = true;
-    Funcs::PrintToContainer( &str, "int %u string %s char %c bool %b ui8 %u pointer %p fp32 %f fp64 %f int64 %j", 52, "apples", 'c', boolean, ui8( 5 ), &boolean, 15.4f, 152.7, i64( 66 ) );
+    Funcs::PrintToContainer( &str, "int %u string %s char %c bool %b ui8 %u pointer %p fp32 %f fp64 %f int64_hex %j int64 %l", 52, "apples", 'c', boolean, ui8( 5 ), &boolean, 15.4f, 152.7, i64( 66 ), i64( 555 ) );
     ::printf( "%s\n", str.CStr() );
 
     /*char buf[ 512 ];
