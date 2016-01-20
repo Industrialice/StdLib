@@ -2083,58 +2083,29 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ui32 *p_para
     return cp_fmt;
 }
 
-/*
-a - pointer, integer word as bin str [param - when non-zero, use upper case]
-b - boolean [param - when non-zero, use upper case]
-c - char
-d - f64 [param - precision]
-e -
-f - f32 [param - precision]
-g -
-h - integer 32 as hex str [param - when non-zero, use upper case]
-i - i32
-j - integer 64 as hex str [param - when non-zero, use upper case]
-k -
-l - i64
-m - integer 64 as bin str [param - when non-zero, use upper case]
-n - integer 32 as bin str [param - when non-zero, use upper case]
-o - signed word
-p - pointer, integer word as hex str [param - when non-zero, use upper case]
-q -
-r -
-s - string [param - max length]
-t -
-u - ui32
-v - ui64
-w - unsigned word
-x -
-y -
-z -
-*/
-
-static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, uiw appendedLen, uiw *availibleLen, uiw *p_parsed, void *ob, char *(*RequestMoreSize)(void *ob, uiw size) )
+static bln ArgParserHelper( char type, void *p_source, ui32 param, char **pp_buf, uiw appendedLen, uiw *availibleLen, uiw *p_parsed, void *ob, char *(*RequestMoreSize)(void *ob, uiw size) )
 {
-    ASSUME( p_buf && p_parsed );
+    ASSUME( pp_buf && p_parsed );
 
     char a_buf[ 128 ];
     uiw len;
-    p_buf += appendedLen;
+    char *p_buf = *pp_buf + appendedLen;
 
     struct NoName
     {
-        static FORCEINLINE bln CheckSize( char **pp_buf, uiw appendedLen, uiw *availibleLen, uiw neededLen, void *ob, char *(*RequestMoreSize)(void *, uiw) )
+        static FORCEINLINE bln CheckSize( char **containerBuf, char **curBuf, uiw appendedLen, uiw *availibleLen, uiw neededLen, void *ob, char *(*RequestMoreSize)(void *, uiw) )
         {
             if( neededLen > *availibleLen )
             {
                 uiw sizeAddition = Funcs::Max < uiw >( 32, neededLen - *availibleLen );
-                *pp_buf = RequestMoreSize( ob, sizeAddition );
-                if( *pp_buf == 0 )
+                *containerBuf = RequestMoreSize( ob, sizeAddition );
+                if( *containerBuf == 0 )
                 {
                     DBGBREAK;
                     return false;
                 }
                 *availibleLen += sizeAddition;
-                *pp_buf += appendedLen;
+				*curBuf = *containerBuf + appendedLen;
             }
             return true;
         }
@@ -2154,7 +2125,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         {
             len = Funcs::Min < uiw >( _StrLen( sourceStr ), param );
         }
-        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, len, ob, RequestMoreSize ) )
+        if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, len, ob, RequestMoreSize ) )
         {
             DBGBREAK;
             return false;
@@ -2189,7 +2160,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
 		goto retBuf;
     case 'b':  //  bln [param]
         len = *(ui32 *)p_source ? _StrLen( "true" ) : _StrLen( "false" );
-        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, len, ob, RequestMoreSize ) )
+        if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, len, ob, RequestMoreSize ) )
         {
             DBGBREAK;
             return false;
@@ -2201,7 +2172,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         _MemCpy( p_buf, *(ui32 *)p_source ? (param ? "TRUE" : "true") : (param ? "FALSE" : "false"), len );
         goto retLen;
     case 'c':  //  char
-        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 1, ob, RequestMoreSize ) )
+        if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, 1, ob, RequestMoreSize ) )
         {
             DBGBREAK;
             return false;
@@ -2210,7 +2181,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         len = 1;
         goto retLen;
     case 'h':  //  integer 32 as hex str [param]
-        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 8, ob, RequestMoreSize ) )
+        if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, 8, ob, RequestMoreSize ) )
         {
             DBGBREAK;
             return false;
@@ -2218,7 +2189,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         len = Funcs::IntToStrHex( param == FMT_PARSER_HELPER_NO_PARAM ? true : param != 0, false, false, p_buf, *(ui32 *)p_source );
         goto retLen;
     case 'j':  //  integer 64 as hex str [param]
-        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 16, ob, RequestMoreSize ) )
+        if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, 16, ob, RequestMoreSize ) )
         {
             DBGBREAK;
             return false;
@@ -2226,7 +2197,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         len = Funcs::IntToStrHex( param == FMT_PARSER_HELPER_NO_PARAM ? true : param != 0, false, false, p_buf, *(ui64 *)p_source );
         goto retLen;
     case 'p':  //  pointer, integer word as hex str [param]
-        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, sizeof(void *) * 2, ob, RequestMoreSize ) )
+        if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, sizeof(void *) * 2, ob, RequestMoreSize ) )
         {
             DBGBREAK;
             return false;
@@ -2234,7 +2205,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         len = Funcs::IntToStrHex( param == FMT_PARSER_HELPER_NO_PARAM ? true : param != 0, false, false, p_buf, *(uiw *)p_source );
         goto retLen;
     case 'n':  //  integer 32 as bin str [param]
-        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 32, ob, RequestMoreSize ) )
+        if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, 32, ob, RequestMoreSize ) )
         {
             DBGBREAK;
             return false;
@@ -2242,7 +2213,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         len = Funcs::IntToStrBin( *(ui32 *)p_source, p_buf, false, param == FMT_PARSER_HELPER_NO_PARAM ? false : param != 0 );
         goto retLen;
     case 'm':  //  integer 64 as bin str [param]
-        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 64, ob, RequestMoreSize ) )
+        if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, 64, ob, RequestMoreSize ) )
         {
             DBGBREAK;
             return false;
@@ -2250,7 +2221,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         len = Funcs::IntToStrBin( *(ui64 *)p_source, p_buf, false, param == FMT_PARSER_HELPER_NO_PARAM ? false : param != 0 );
         goto retLen;
     case 'a':  //  pointer, integer word as bin str [param]
-        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, WORD_SIZE, ob, RequestMoreSize ) )
+        if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, WORD_SIZE, ob, RequestMoreSize ) )
         {
             DBGBREAK;
             return false;
@@ -2274,7 +2245,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
         }
         goto retBuf;
     case '%':  //  % symbol
-        if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, 1, ob, RequestMoreSize ) )
+        if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, 1, ob, RequestMoreSize ) )
         {
             DBGBREAK;
             return false;
@@ -2287,7 +2258,7 @@ static bln ArgParserHelper( char type, void *p_source, ui32 param, char *p_buf, 
     }
 
 retBuf:
-    if( !NoName::CheckSize( &p_buf, appendedLen, availibleLen, len, ob, RequestMoreSize ) )
+    if( !NoName::CheckSize( pp_buf, &p_buf, appendedLen, availibleLen, len, ob, RequestMoreSize ) )
     {
         DBGBREAK;
         return false;
@@ -2298,7 +2269,7 @@ retLen:
     return true;
 }
 
-template < bln is_validateStep > Nullable < uiw > PrintToStrArgListImpl( const Funcs::_ArgType::argType *argTypes, uiw argsCount, char *p_str, uiw availibleSize, const char *cp_fmt, va_list args, void *ob, char *(*RequestMoreSize)(void *, uiw) )
+template < bln is_validateStep > Nullable < uiw > PrintToStrArgListImpl( const Funcs::_ArgType *argTypes, uiw argsCount, char *p_str, uiw availibleSize, const char *cp_fmt, va_list args, void *ob, char *(*RequestMoreSize)(void *, uiw) )
 {
     using namespace Funcs;
 
@@ -2310,25 +2281,20 @@ template < bln is_validateStep > Nullable < uiw > PrintToStrArgListImpl( const F
 
     #define LOAD_ARG( expectedType, target ) \
         if( is_validateStep && argIndex >= argsCount ) { DBGBREAK; return nullv; } \
-        if( (expectedType) == _ArgType::fp ) \
+        if( expectedType.is_fp ) \
         { \
-            if( is_validateStep && argTypes[ argIndex ] != _ArgType::fp ) { DBGBREAK; return nullv; } \
+            if( is_validateStep && (!argTypes[ argIndex ].is_fp || argTypes[ argIndex ].is_pointer) ) { DBGBREAK; return nullv; } \
             *(f64 *)&target = va_arg( args, f64 ); \
         } \
-        else if( (expectedType) == _ArgType::int32 ) \
+        else if( expectedType.size == 4 ) \
         { \
-            if( is_validateStep && argTypes[ argIndex ] != _ArgType::int32 ) { DBGBREAK; return nullv; } \
+            if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size)) ) { DBGBREAK; return nullv; } \
             *(ui32 *)&target = va_arg( args, ui32 ); \
         } \
-        else if( (expectedType) == _ArgType::int64 ) \
+        else if( expectedType.size == 8 ) \
         { \
-            if( is_validateStep && argTypes[ argIndex ] != _ArgType::int64 ) { DBGBREAK; return nullv; } \
+            if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size)) ) { DBGBREAK; return nullv; } \
             *(ui64 *)&target = va_arg( args, ui64 ); \
-        } \
-        else if( (expectedType) == _ArgType::string ) \
-        { \
-            if( is_validateStep && argTypes[ argIndex ] != _ArgType::string ) { DBGBREAK; return nullv; } \
-            *(uiw *)&target = va_arg( args, uiw ); \
         } \
         else \
         { \
@@ -2346,39 +2312,32 @@ template < bln is_validateStep > Nullable < uiw > PrintToStrArgListImpl( const F
             {
                 if( param == FMT_PARSER_HELPER_EXTRA_PARAM )
                 {
-                    LOAD_ARG( _ArgType::int32, param );
+                    LOAD_ARG( _ArgType( sizeof(int), false, false, false ), param );
                 }
 
                 switch( ch )
                 {
                     case 'i': case 'u': case 'b': case 'c': case 'h': case 'n':
-                        LOAD_ARG( _ArgType::int32, argumentData );
+                        LOAD_ARG( _ArgType( 4, false, false, false ), argumentData );
                         break;
                     case 'p': case 'w': case 'o': case 'a':
-                        if( sizeof(void *) == 4 )
-                        {
-                            LOAD_ARG( _ArgType::int32, argumentData );
-                        }
-                        else
-                        {
-                            LOAD_ARG( _ArgType::int64, argumentData );
-                        }
+						LOAD_ARG( _ArgType( sizeof(void *), false, false, false ), argumentData );
                         break;
                     case 's':
-                        LOAD_ARG( _ArgType::string, argumentData );
+                        LOAD_ARG( _ArgType( sizeof( void * ), false, false, true ), argumentData );
                         break;
 					case 'j': case 'm': case 'l': case 'v':
-                        LOAD_ARG( _ArgType::int64, argumentData );
+                        LOAD_ARG( _ArgType( 8, false, false, false ), argumentData );
                         break;
                     case 'f': case 'd':
-                        LOAD_ARG( _ArgType::fp, argumentData );
+                        LOAD_ARG( _ArgType( 8, false, true, false ), argumentData );
                         break;
                     default:
                         DBGBREAK;
                         return nullv;
                 }
 
-                if( is_validateStep || ArgParserHelper( ch, &argumentData, param, p_str, appendedLen, &availibleSize, &parsedLen, ob, RequestMoreSize ) )
+                if( is_validateStep || ArgParserHelper( ch, &argumentData, param, &p_str, appendedLen, &availibleSize, &parsedLen, ob, RequestMoreSize ) )
                 {
                     appendedLen += parsedLen;
                     availibleSize -= parsedLen;
@@ -2448,7 +2407,7 @@ uiw Funcs::_PrintToContainer( void *cont, char *(*RequestMoreSize)(void *, uiw),
 }
 
 #if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
-bln Funcs::_PrintCheckArgs( const _ArgType::argType *argTypes, uiw argsCount, const char *cp_fmt, ... )
+bln Funcs::_PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... )
 {
     ASSUME( argTypes );
 

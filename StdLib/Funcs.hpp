@@ -260,43 +260,91 @@ namespace Funcs
     EXTERNAL uiw F64ToStr( f64 val, char *p_buf );
     EXTERNAL uiw F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf );
 
+	/*
+	a - pointer, integer word as bin str [param - when non-zero, use upper case]
+	b - boolean [param - when non-zero, use upper case]
+	c - char
+	d - f64 [param - precision]
+	e -
+	f - f32 [param - precision]
+	g -
+	h - integer 32 as hex str [param - when non-zero, use upper case]
+	i - i32
+	j - integer 64 as hex str [param - when non-zero, use upper case]
+	k -
+	l - i64
+	m - integer 64 as bin str [param - when non-zero, use upper case]
+	n - integer 32 as bin str [param - when non-zero, use upper case]
+	o - signed word
+	p - pointer, integer word as hex str [param - when non-zero, use upper case]
+	q -
+	r -
+	s - string [param - max length]
+	t -
+	u - ui32
+	v - ui64
+	w - unsigned word
+	x -
+	y -
+	z -
+	*/
+
     EXTERNAL uiw PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args );
 
     //  internal
     EXTERNAL uiw _PrintToContainer( void *cont, char *(*RequestMoreSize)(void *, uiw), const char *cp_fmt, va_list args );
-    namespace _ArgType
+    struct _ArgType
     {
-        enum argType { fp, int32, int64, string };
-    }
+		uiw size;
+		bln is_pointer;
+		bln is_fp;
+		bln is_string;
+
+		_ArgType( uiw size = 0, bln is_pointer = false, bln is_fp = false, bln is_string = false ) :
+			size( size ), is_pointer( is_pointer ), is_fp( is_fp ), is_string( is_string )
+		{}
+    };
 
 #if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
-    EXTERNAL bln _PrintCheckArgs( const _ArgType::argType *argTypes, uiw argsCount, const char *cp_fmt, ... );
+    EXTERNAL bln _PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... );
 
     EXTERNAL uiw _PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
 
-    template < typename X > _ArgType::argType _AnalyzeArg( const X &arg )
+    template < typename X > _ArgType _AnalyzeArg( const X &arg )
     {
         STATIC_CHECK( TypeDesc < X >::is_pod, "you can't pass non-pod args to variadic functions" );
-        STATIC_CHECK( sizeof(X) > 0 && sizeof(X) <= 8, "you can't use weird-sized types with variadic functions" );
+        STATIC_CHECK( TypeDesc < X >::is_array || (sizeof(X) > 0 && sizeof(X) <= 8), "you can't use weird-sized types with variadic functions" );
+		_ArgType argType = { sizeof(X), false, false, false };
         if( TypeDesc < X >::is_fp )
         {
-            return _ArgType::fp;
+			argType.is_fp = true;
+            return argType;
         }
-        if( TypeDesc < X >::is_integer || TypeDesc < X >::is_pointer || TypeDesc < X >::is_array || typeid(X) == typeid(bln) || typeid(X) == typeid(char) )
+		if( TypeDesc < X >::is_pointer || TypeDesc < X >::is_array )
+		{
+			argType.size = sizeof(uiw); //  when array, size can be off
+			argType.is_pointer = true;
+			if( typeid(TypeDesc < X >::type) == typeid(char) )
+			{
+				argType.is_string = true;
+			}
+			return argType;
+		}
+        if( TypeDesc < X >::is_integer || typeid(X) == typeid(bln) || typeid(X) == typeid(char) )
         {
-            if( (TypeDesc < X >::is_pointer || TypeDesc < X >::is_array) && typeid(TypeDesc < X >::type) == typeid(char) )
-            {
-                return _ArgType::string;
-            }
-            return sizeof(X) <= 4 ? _ArgType::int32 : _ArgType::int64;
+			if( sizeof(X) < sizeof(int) )
+			{
+				argType.size = sizeof( int );
+			}
+			return argType;
         }
         DBGBREAK;
-        return _ArgType::int32;
+        return _ArgType();
     }
 
     template < typename... Args > bln _AreArgsValid( const char *cp_fmt, const Args &... args )
     {
-        static const _ArgType::argType argTypes[] = { _ArgType::int32, _AnalyzeArg( args )... };
+        static const _ArgType argTypes[] = { _ArgType(), _AnalyzeArg( args )... };
         return _PrintCheckArgs( argTypes + 1, COUNTOF( argTypes ) - 1, cp_fmt, args... );
     }
 
