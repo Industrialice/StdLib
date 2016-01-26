@@ -2440,16 +2440,10 @@ NOINLINE uiw Funcs::PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ...
 {
     ASSUME( p_str && cp_fmt && maxLen != uiw_max && maxLen );
 
-	if( maxLen == 0 )
-	{
-		return 0;
-	}
-	--maxLen;
-
     va_list args;
     va_start( args, cp_fmt );
 
-    uiw printedLen = Funcs::PrintToStrArgList( p_str, maxLen, cp_fmt, args );
+    uiw printedLen = Funcs::PrintToStrArgList( p_str, maxLen, cp_fmt, args );  //  will check str length
 
     va_end( args );
 
