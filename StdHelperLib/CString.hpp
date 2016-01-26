@@ -781,14 +781,14 @@ public:
 
     ownType &Insert( const ownType &str, uiw pos )
     {
-        InsertString < true >( pos, str.CStr(), str.Length() );
+        InsertString < true >( pos, str.CStr(), str.Size() );
         return *this;
     }
 
     ownType &Insert( const ownType &str, uiw pos, uiw subpos, uiw sublen )
     {
         ASSUME( subpos <= str._count );
-        InsertString < true >( pos, str.CStr() + subpos, Funcs::Min < uiw >( str.Length() - subpos, sublen ) );
+        InsertString < true >( pos, str.CStr() + subpos, Funcs::Min < uiw >( str.Size() - subpos, sublen ) );
         return *this;
     }
 
@@ -850,13 +850,13 @@ public:
 
     Iter Insert( const charType *str, IterConst where, uiw n = uiw_max )
     {
+		uiw pos = where.Ptr() - Str();
         if( str == 0 )
         {
             ASSUME( n == 0 || n == uiw_max );
         }
         else
         {
-            uiw pos = where.Ptr() - Str();
             ASSUME( pos <= _count );
             if( n == uiw_max )
             {
@@ -886,7 +886,7 @@ public:
             if( first.iteratorType == Iterator::Type::Random )
             {
                 uiw len = Iterator::_IterDist < InputIterator, InputIterator::iteratorType >::Dist( first, last );
-                charType *thisStr = InsertSpace( pos, len ) + pos;
+                thisStr = InsertSpace( pos, len ) + pos;
                 _MemCpyStr( thisStr, first.Ptr(), len );
             }
             else
@@ -1116,7 +1116,7 @@ public:
             else
             {
                 uiw pos = _count;
-                charType *str = AddSpace( dist ) + pos;
+                str = AddSpace( dist ) + pos;
                 for( ; first != last; ++first )
                 {
                     *str = *first;

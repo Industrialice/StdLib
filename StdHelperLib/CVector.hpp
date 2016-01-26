@@ -307,45 +307,45 @@ public:
     }
 
 #ifdef MOVE_SUPPORTED
-    template < typename X, bln is_useMoveContructor > struct _MoveTo;
+    template < typename Type, bln is_useMoveContructor > struct _MoveTo;
 
-    template < typename X > struct _MoveTo < X, true >
+    template < typename Type > struct _MoveTo < Type, true >
     {
-        static void Move( X *target, X *source )
+        static void Move( Type *target, Type *source )
         {
-            new (target) X( std::move( *source ) );
-            source->~X();
+            new (target) Type( std::move( *source ) );
+            source->~Type();
         }
     };
 
-    template < typename X > struct _MoveTo < X, false >
+    template < typename Type > struct _MoveTo < Type, false >
     {
-        static void Move( X *target, X *source )
+        static void Move( Type *target, Type *source )
         {
-            new (target) X( *source );
-            source->~X();
+            new (target) Type( *source );
+            source->~Type();
         }
     };
 #endif
 
-    template < typename X, bln is_destroySource > struct _CopySelector;
-    template < typename X > struct _CopySelector < X, true >
+    template < typename Type, bln is_destroySource > struct _CopySelector;
+    template < typename Type > struct _CopySelector < Type, true >
     {
-        static void Copy( X *target, X *source )
+        static void Copy( Type *target, Type *source )
         {
 #           ifdef MOVE_SUPPORTED
-                _MoveTo < X, std::is_move_constructible < X >::value >::Move( target, source );
+                _MoveTo < Type, std::is_move_constructible < Type >::value >::Move( target, source );
 #           else
-                new (target) X( *source );
-                source->~X();
+                new (target) Type( *source );
+                source->~Type();
 #           endif
         }
     };
-    template < typename X > struct _CopySelector < X, false >
+    template < typename Type > struct _CopySelector < Type, false >
     {
-        static void Copy( X *target, const X *source )
+        static void Copy( Type *target, const Type *source )
         {
-            new (target) X( *source );
+            new (target) Type( *source );
         }
     };
 
@@ -643,7 +643,7 @@ public:
                 ASSUME( this->_IsStatic() == false );
                 arrType newArr;
                 newArr._Transfer( this );
-                new (this) arrType( newCount, newReserve );
+                new (this) arrType( newArr._Size(), newReserve );
                 _Copy < true >( this->_GetArr(), newArr._GetArr(), newArr._Size() );
             }
         }
@@ -938,8 +938,8 @@ public:
         uiw index = &source - this->_GetArr();
         ASSUME( index >= curCount );  //  overlapping isn't allowed
         _Destroy( this->_GetArr(), curCount );
-        _SizeToUnknown( 0, count );
-        for( curCount = 0; curCount < count; ++curCount )
+        _SizeToUnknown( 0, source.Size() );
+        for( curCount = 0; curCount < source.Size(); ++curCount )
         {
             new (&this->_GetArr()[ curCount ]) X( std::move( source ) );
         }

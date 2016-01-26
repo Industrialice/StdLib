@@ -289,6 +289,7 @@ namespace Funcs
 	z -
 	*/
 
+	//  maxLen means size of the p_str, including null-terminator. must be at least 1( to hold the null-terminator ). 0 will be returned if maxLen was less than one, debug will halt the program
     EXTERNAL uiw PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args );
 
     //  internal
@@ -334,7 +335,7 @@ namespace Funcs
         {
 			if( sizeof(X) < sizeof(int) )
 			{
-				argType.size = sizeof( int );
+				argType.size = sizeof(int);
 			}
 			return argType;
         }
