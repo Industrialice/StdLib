@@ -152,6 +152,10 @@
       <PrecompiledHeaderFile>PreHeader.hpp</PrecompiledHeaderFile>
       <TreatSpecificWarningsAsErrors>4715;4172;4099;</TreatSpecificWarningsAsErrors>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

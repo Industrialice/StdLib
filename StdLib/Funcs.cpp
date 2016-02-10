@@ -4,14 +4,19 @@ using namespace StdLib;
 
 #include <stdio.h>
 
+static ui32 WideRandom()
+{
+	return rand() | (rand() << 15) | (rand() << 30);
+}
+
 i32 Funcs::RandomI32()
 {
-    return rand() * rand() * rand();
+    return (i32)WideRandom();
 }
 
 ui32 Funcs::RandomUI32()
 {
-    return rand() * rand() * rand();
+    return WideRandom();
 }
 
 f32 Funcs::RandomF32()
@@ -21,22 +26,22 @@ f32 Funcs::RandomF32()
 
 i32 Funcs::RandomRangeI32( i32 from, i32 to )
 {
-    return (rand() * rand() * rand() & 0x7FffFFff) % ((to - from) + 1) + from;
+    return (WideRandom() & 0x7FffFFff) % ((to - from) + 1) + from;
 }
 
 ui32 Funcs::RandomRangeUI32( ui32 from, ui32 to )
 {
-    return rand() * rand() * rand() % ((to - from) + 1) + from;
+    return WideRandom() % ((to - from) + 1) + from;
 }
 
 f32 Funcs::RandomRangeF32( f32 from, f32 to )
 {
-    return from + rand() / (f32)RAND_MAX * (to - from);
+    return from + (rand() / (f32)RAND_MAX) * (to - from);
 }
 
 ui32 Funcs::RandomUI32Limit( ui32 limit )
 {
-    return (rand() * rand() * rand()) % limit;
+    return WideRandom() % limit;
 }
 
 i32 Funcs::RoundF32( f32 val )  //  TODO: bullshit

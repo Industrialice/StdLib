@@ -498,12 +498,12 @@ int __cdecl main()
     //CStr entry = LogEntry( "you have ", 52, " apples" );
     //CStr entry = Concat( CStr{ "one" }, CStr{ "two" } );
 
-    CStr str;
+    /*CStr str;
     bln boolean = true;
 	const char testStr[ 64 ] = "apples";
 	char target[ 512 ];
     Funcs::PrintToStr( target, 512, "int %u string %s char %c bool %b ui8 %u pointer %p fp32 %f fp64 %f int64_hex %j int64 %l", 52, testStr, 'c', boolean, ui8( 5 ), &boolean, 15.4f, 152.7, i64( 66 ), i64( 555 ) );
-    ::printf( "%s\n", target );
+    ::printf( "%s\n", target );*/
 
 	/*const char testStr[ 64 ] = "what";
 	CStr str;
@@ -693,7 +693,7 @@ int __cdecl main()
 
     //Words();
 
-    //UniquePtr < DeleteShit, DeleteShit::Deleter >( DeleteShit::Create() )->Perform();
+    UniquePtr < DeleteShit, DeleteShit::Deleter >( DeleteShit::Create() )->Perform();
 
 #if 0
     CStr str( "fuck" );

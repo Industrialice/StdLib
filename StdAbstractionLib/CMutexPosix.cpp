@@ -46,4 +46,8 @@ bln CMutex::TryLock()
     return ::pthread_mutex_trylock( &_handle ) == 0;
 }
 
+void CMutex::Initialize()
+{
+}
+
 #endif

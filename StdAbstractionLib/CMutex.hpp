@@ -5,47 +5,50 @@
 
 namespace StdLib
 {
-    class CMutex
-    {
-        mutexHandle _handle;
+	class CMutex
+	{
+		mutexHandle _handle;
 
-        CMutex( const CMutex & );
-        CMutex & operator = ( const CMutex & );
+		CMutex( const CMutex & );
+		CMutex & operator = ( const CMutex & );
 
-    public:
-        ~CMutex();
-        CMutex( unsigned int spinCount = 0 );
-        void Lock();
-        void Unlock();
-        bool TryLock();  //  will return true if lock succeeded
-    };
+	public:
+		~CMutex();
+		CMutex( unsigned int spinCount = 0 );
+		void Lock();
+		void Unlock();
+		bool TryLock();  //  will return true if lock succeeded
 
-    template < bool is_nullable = false > class CScopeLock
-    {
-        CMutex *_mutex;
+	protected:
+		static void Initialize();
+	};
 
-        CScopeLock();
-        CScopeLock( const CScopeLock & );
-        CScopeLock & operator = ( const CScopeLock & );
+	template < bool is_nullable = false > class CScopeLock
+	{
+		CMutex *_mutex;
 
-    public:
-        ~CScopeLock()
-        {
-            if( is_nullable == false || _mutex )
-            {
-                _mutex->Unlock();
-            }
-        }
+		CScopeLock();
+		CScopeLock( const CScopeLock & );
+		CScopeLock & operator = ( const CScopeLock & );
 
-        CScopeLock( CMutex *mutex )
-        {
-            if( is_nullable == false || mutex )
-            {
-                mutex->Lock();
-            }
-            _mutex = mutex;
-        }
-    };
+	public:
+		~CScopeLock()
+		{
+			if( is_nullable == false || _mutex )
+			{
+				_mutex->Unlock();
+			}
+		}
+
+		CScopeLock( CMutex *mutex )
+		{
+			if( is_nullable == false || mutex )
+			{
+				mutex->Lock();
+			}
+			_mutex = mutex;
+		}
+	};
 }
 
 #endif __CMUTEX_HPP__

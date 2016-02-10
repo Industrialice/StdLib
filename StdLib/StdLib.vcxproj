@@ -141,6 +141,9 @@
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <ErrorReporting>None</ErrorReporting>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
