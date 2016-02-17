@@ -7,7 +7,7 @@ namespace StdLib {
 
 class CThread
 {
-    DBGCODE( bool _is_created; )
+    DBGCODE( bln _is_created; )
     threadHandle _thread;
 
     CThread( const CThread & );
@@ -27,9 +27,9 @@ public:
 
     ~CThread();
     CThread();
-    CThread( size_t stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority = PriorityNormal );
-    void Create( size_t stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority = PriorityNormal );
-    static void SleepCurrent( unsigned int msecs );
+    CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority = PriorityNormal );
+    void Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority = PriorityNormal );
+    static void SleepCurrent( ui32 msecs );
 };
 
 }  //  namespace StdLib

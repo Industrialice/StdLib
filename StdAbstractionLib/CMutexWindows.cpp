@@ -15,7 +15,7 @@ CMutex::~CMutex()
     ::DeleteCriticalSection( &_handle );
 }
 
-CMutex::CMutex( unsigned int spinCount /* = 0 */ )
+CMutex::CMutex( ui32 spinCount /* = 0 */ )
 {
 	DWORD flags = 0;
 #ifndef DEBUG
@@ -43,7 +43,7 @@ void CMutex::Unlock()
     ::LeaveCriticalSection( &_handle );
 }
 
-bool CMutex::TryLock()
+bln CMutex::TryLock()
 {
     return ::TryEnterCriticalSection( &_handle ) == TRUE;
 }
@@ -53,7 +53,7 @@ void CMutex::Initialize()
 	HMODULE k32 = GetModuleHandleA( "kernel32.dll" );
 	if( !k32 )
 	{
-		FatalAppExitA( 1, "StdLib: failed to aquire kernel32.dll handle, can't initialize mutex" );
+		FatalAppExitA( 1, "StdLib: failed to acquire kernel32.dll handle, can't initialize mutex" );
 		return;
 	}
 	*(uiw *)&StdLib_InitializeCriticalSectionEx = (uiw)GetProcAddress( k32, "InitializeCriticalSectionEx" );

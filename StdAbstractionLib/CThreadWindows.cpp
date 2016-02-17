@@ -36,13 +36,13 @@ CThread::CThread()
     _thread = 0;
 }
 
-CThread::CThread( size_t stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority)
+CThread::CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority)
 {
     _thread = 0;
     CThread::Create( stackSize, ExecutionFunc, argument, priority );
 }
 
-void CThread::Create( size_t stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority )
+void CThread::Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority )
 {
     ASSUME( _thread == 0 );
 
@@ -77,7 +77,7 @@ void CThread::Create( size_t stackSize, void (*ExecutionFunc)( void *argument ),
     }
 }
 
-void CThread::SleepCurrent( unsigned int msecs )  //  static
+void CThread::SleepCurrent( ui32 msecs )  //  static
 {
     ::Sleep( msecs );
 }

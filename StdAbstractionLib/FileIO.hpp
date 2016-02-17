@@ -38,18 +38,18 @@ namespace FileIO
 
     struct SStats
     {
-        unsigned int writesToBufferCount;
-        unsigned int writesToFileCount;
-        unsigned int readsFromBufferCount;
-        unsigned int readsFromFileCount;
-        unsigned int bytesFromBufferReaded;
-        unsigned int bytesFromFileReaded;
-        unsigned int bytesToBufferWritten;
-        unsigned int bytesToFileWritten;
-        unsigned int bufferedWrites;
-        unsigned int unbufferedWrites;
-        unsigned int bufferedReads;
-        unsigned int unbufferedReads;
+        ui32 writesToBufferCount;
+        ui32 writesToFileCount;
+        ui32 readsFromBufferCount;
+        ui32 readsFromFileCount;
+        ui32 bytesFromBufferReaded;
+        ui32 bytesFromFileReaded;
+        ui32 bytesToBufferWritten;
+        ui32 bytesToFileWritten;
+        ui32 bufferedWrites;
+        ui32 unbufferedWrites;
+        ui32 bufferedReads;
+        ui32 unbufferedReads;
     };
 
     namespace Private
@@ -63,11 +63,11 @@ namespace FileIO
             FileIO::SStats stats;
 
             byte *buffer;
-            bool is_customBuffer;
-            bool is_reading;
-            unsigned int bufferSize;
-            unsigned int bufferPos;
-            unsigned int readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
+            bln is_customBuffer;
+            bln is_reading;
+            ui32 bufferSize;
+            ui32 bufferPos;
+            ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
 
             #ifdef WINDOWS
                 CStr pnn;
@@ -77,23 +77,23 @@ namespace FileIO
         /*  Core Functions  */
         EXTERNAL void Initialize( CFileBasis *file );
         EXTERNAL void Destroy( CFileBasis *file );
-        EXTERNAL bool Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error );
+        EXTERNAL bln Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error );
         EXTERNAL void Close( CFileBasis *file );
-        EXTERNAL bool IsValid( const CFileBasis *file );
-        EXTERNAL bool Write( CFileBasis *file, const void *cp_source, unsigned int len );
-        EXTERNAL bool Read( CFileBasis *file, void *p_target, unsigned int len, unsigned int *p_readed );
-        EXTERNAL bool BufferSet( CFileBasis *file, unsigned int size, void *buffer = 0 );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
-        EXTERNAL unsigned int BufferSizeGet( CFileBasis *file );
+        EXTERNAL bln IsValid( const CFileBasis *file );
+        EXTERNAL bln Write( CFileBasis *file, const void *cp_source, ui32 len );
+        EXTERNAL bln Read( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
+        EXTERNAL bln BufferSet( CFileBasis *file, ui32 size, void *buffer = 0 );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
+        EXTERNAL ui32 BufferSizeGet( CFileBasis *file );
         EXTERNAL void StatsGet( const CFileBasis *file, SStats *po_stats );
         EXTERNAL void StatsReset( CFileBasis *file );
-        EXTERNAL bool Flush( CFileBasis *file );  //  false if writing to file failed to complete
+        EXTERNAL bln Flush( CFileBasis *file );  //  false if writing to file failed to complete
         EXTERNAL i64 OffsetGet( CFileBasis *file );  //  -1 on fail, current offset on success
         EXTERNAL i64 OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, SError *po_error );  //  -1 on fail, current offset on success
         EXTERNAL ui64 SizeGet( CFileBasis *file );
-        EXTERNAL bool SizeSet( CFileBasis *file, ui64 newSize );
+        EXTERNAL bln SizeSet( CFileBasis *file, ui64 newSize );
         EXTERNAL OpenMode::OpenMode_t OpenModeGet( const CFileBasis *file );
         EXTERNAL ProcMode::ProcMode_t ProcModeGet( const CFileBasis *file );
-        EXTERNAL unsigned int PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len
+        EXTERNAL ui32 PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len
     }
 
     struct CFile : private Private::CFileBasis
@@ -159,27 +159,27 @@ namespace FileIO
             Private::Close( this );
         }
 
-        bool IsOpened() const
+        bln IsOpened() const
         {
             return Private::IsValid( this );
         }
 
-        bool Write( const void *cp_source, unsigned int len )
+        bln Write( const void *cp_source, ui32 len )
         {
             return Private::Write( this, cp_source, len );
         }
 
-        bool Read( void *p_target, unsigned int len, unsigned int *p_readed )
+        bln Read( void *p_target, ui32 len, ui32 *p_readed )
         {
             return Private::Read( this, p_target, len, p_readed );
         }
 
-        bool BufferSet( unsigned int size, void *buffer = 0 )  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
+        bln BufferSet( ui32 size, void *buffer = 0 )  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
         {
             return Private::BufferSet( this, size, buffer );
         }
 
-        unsigned int BufferSizeGet()
+        ui32 BufferSizeGet()
         {
             return Private::BufferSizeGet( this );
         }
@@ -194,7 +194,7 @@ namespace FileIO
             Private::StatsReset( this );
         }
 
-        bool Flush()  //  false if writing to file failed to complete
+        bln Flush()  //  false if writing to file failed to complete
         {
             return Private::Flush( this );
         }
@@ -214,7 +214,7 @@ namespace FileIO
             return Private::SizeGet( this );
         }
 
-        bool SizeSet( ui64 newSize )
+        bln SizeSet( ui64 newSize )
         {
             return Private::SizeSet( this, newSize );
         }
@@ -229,7 +229,7 @@ namespace FileIO
             return Private::ProcModeGet( this );
         }
 
-        unsigned int PNNGet( char *p_buf ) const  //  pass 0 as p_buf to get only len
+        ui32 PNNGet( char *p_buf ) const  //  pass 0 as p_buf to get only len
         {
             return Private::PNNGet( this, p_buf );
         }
@@ -259,7 +259,7 @@ namespace FileIO
 
     namespace FileError
     {
-        const unsigned int CanNotOpenFile = Error::Private::MaxDefaultError + 0;
+        const ui32 CanNotOpenFile = Error::Private::MaxDefaultError + 0;
     }
 
     namespace Private

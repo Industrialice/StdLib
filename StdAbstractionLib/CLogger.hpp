@@ -22,7 +22,7 @@ public:
                 important = 5 )
     };
 
-    typedef void (*DirectionFunc)( Tag::messageTag_t tag, const char *cp_text, size_t len );
+    typedef void (*DirectionFunc)( Tag::messageTag_t tag, const char *cp_text, uiw len );
     
 #if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
     void _Message( Tag::messageTag_t tag, const char *cp_fmt, ... );
@@ -41,10 +41,10 @@ public:
 #endif
     void AddDirection( DirectionFunc dir );
     void PopDirection();
-    size_t DirectionsCount() const;
-    DirectionFunc DirectionByIndexGet( size_t index ) const;
-    void DirectionByIndexSet( size_t index, DirectionFunc dir );
-    void IsOnSet( bool is_on );
+    uiw DirectionsCount() const;
+    DirectionFunc DirectionByIndexGet( uiw index ) const;
+    void DirectionByIndexSet( uiw index, DirectionFunc dir );
+    void IsOnSet( bln is_on );
     bool IsOnGet() const;
     bool IsOnToggle();  //  return new state
     bool IsMultithreadedGet() const;

@@ -2,6 +2,7 @@
 
 using namespace StdLib;
 
+#include <typeinfo>
 #include <stdio.h>
 
 static ui32 WideRandom()
@@ -2005,28 +2006,88 @@ bln Funcs::IsBinBase( const char *cp_str )
     return cp_str[ 0 ] == '0' && (cp_str[ 1 ] == 'b' || cp_str[ 1 ] == 'B');
 }
 
-NOINLINE uiw Funcs::F32ToStr( f32 val, char *p_buf )
+template < typename ft > uiw FloatToStr( ft val, char *p_buf, uiw precise, bln is_cutToShortest )  //  TODO: this code is fail
 {
-    ASSUME( p_buf );
-    return ::sprintf( p_buf, "%g", val );
+	ASSUME( p_buf );
+	ASSUME( typeid(ft) == typeid(f32) || typeid(ft) == typeid(f64) );
+#ifdef _MSC_VER
+	char *result = ::_gcvt( val, 31, p_buf );
+	ASSUME( result == p_buf );
+	uiw len = 0;
+	char *dotLocation = 0;
+	bln is_scientific = false;
+	for( ; p_buf[ len ]; ++len )
+	{
+		if( p_buf[ len ] == '.' )
+		{
+			ASSUME( dotLocation == 0 );
+			dotLocation = p_buf + len;
+		}
+		else if( p_buf[ len ] == 'e' || p_buf[ len ] == 'E' )
+		{
+			ASSUME( is_scientific == false );
+			is_scientific = true;
+		}
+	}
+	ASSUME( len );
+	if( is_cutToShortest == false || is_scientific || dotLocation == 0 )  //  no shortening for the scientific notation
+	{
+		return len;
+	}
+	++dotLocation;
+	for( char *startTest = dotLocation; *startTest; ++startTest )
+	{
+		if( startTest[ 0 ] == startTest[ 1 ] && startTest[ 1 ] == startTest[ 2 ] )  //  we encountered 3 identical numbers, cut the number off
+		{
+			len = &startTest[ 2 ] - result;
+			startTest[ 2 ] = '\0';
+			goto toRet;
+		}
+	}
+	uiw nonPreciseLen = dotLocation - result;
+	uiw preciseLen = len - nonPreciseLen;
+	if( preciseLen > precise )
+	{
+		uiw diff = preciseLen - precise;
+		len -= diff;
+	}
+toRet:
+	ASSUME( len );
+	while( p_buf[ len - 1 ] == '0' )
+	{
+		--len;
+	}
+	p_buf[ len ] = '\0';
+	return len;
+#else
+	const char *modifier0 = typeid(ft) == typeid(f32) ? "%g" : "%lg";
+	const char *modifier1 = typeid(ft) == typeid(f32) ? "%.*f" : "%.*lf";
+	if( is_cutToShortest )
+	{
+		return ::sprintf( p_buf, modifier0, val );
+	}
+	return ::sprintf( p_buf, modifier1, precise, val );
+#endif
 }
 
-uiw Funcs::F32ToStrWithPrecise( f32 val, ui32 precise, char *p_buf )
+NOINLINE uiw Funcs::F32ToStr( f32 val, char *p_buf )
 {
-    ASSUME( p_buf );
-    return ::sprintf( p_buf, "%.*f", precise, val );
+	return FloatToStr( val, p_buf, 6, true );
+}
+
+NOINLINE uiw Funcs::F32ToStrWithPrecise( f32 val, ui32 precise, char *p_buf )
+{
+	return FloatToStr( val, p_buf, precise, false );
 }
 
 NOINLINE uiw Funcs::F64ToStr( f64 val, char *p_buf )
 {
-    ASSUME( p_buf );
-    return ::sprintf( p_buf, "%lg", val );
+	return FloatToStr( val, p_buf, 6, true );
 }
 
-uiw Funcs::F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf )
+NOINLINE uiw Funcs::F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf )
 {
-    ASSUME( p_buf );
-    return ::sprintf( p_buf, "%.*lf", precise, val );
+	return FloatToStr( val, p_buf, precise, false );
 }
 
 #define FMT_PARSER_HELPER_NO_PARAM ui32_max

@@ -14,16 +14,16 @@ namespace StdLib
 
 	public:
 		~CMutex();
-		CMutex( unsigned int spinCount = 0 );
+		CMutex( ui32 spinCount = 0 );
 		void Lock();
 		void Unlock();
-		bool TryLock();  //  will return true if lock succeeded
+		bln TryLock();  //  will return true if lock succeeded
 
 	protected:
 		static void Initialize();
 	};
 
-	template < bool is_nullable = false > class CScopeLock
+	template < bln is_nullable = false > class CScopeLock
 	{
 		CMutex *_mutex;
 

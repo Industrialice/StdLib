@@ -26,10 +26,10 @@ SError Error::Get( ui32 code, ui32 addition /* = 0 */ )
     return o_error;
 }
 
-SError Error::GetOther( ui32 code, const char *const capc_descs[], ui32 addition /* = 0 */ )
+SError Error::GetOther( ui32 code, const char *const descs[], ui32 addition /* = 0 */ )
 {
-    ASSUME( code >= Error::Private::MaxDefaultError && capc_descs );
+    ASSUME( code >= Error::Private::MaxDefaultError && descs );
     ui32 otherCode = code - Error::Private::MaxDefaultError;
-    SError o_error = { otherCode, addition, capc_descs[ otherCode ] };
+    SError o_error = { otherCode, addition, descs[ otherCode ] };
     return o_error;
 }

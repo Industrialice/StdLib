@@ -7,13 +7,13 @@ struct SError
 {
     ui32 code;
     ui32 addition;
-    const char *cp_desc;
+    const char *description;
 };
 
 namespace Error
 {
     EXTERNAL SError Get( ui32 code, ui32 addition = 0 );
-    EXTERNAL SError GetOther( ui32 code, const char *const capc_descs[], ui32 addition = 0 );
+    EXTERNAL SError GetOther( ui32 code, const char *const descs[], ui32 addition = 0 );
 
     const ui32 Ok = 0;
     const ui32 Unknown = 1;
