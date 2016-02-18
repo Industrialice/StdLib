@@ -56,8 +56,5 @@
     <ClCompile Include="StdCoreLib.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Error.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

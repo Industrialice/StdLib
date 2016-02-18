@@ -19,39 +19,40 @@ CannotOpenFile
 
 namespace StdLib {
 
-namespace Error
-{
-	namespace Private
-	{
-		EXTERNAL const char *GetErrorDesc( ui32 code );
-		const ui32 MaxDefaultError = 128;
-	}
-}
-
 class CError
 {
-protected:
 	ui32 code;
+	const char *errorClass;
 	const char *description;
 
 public:
 	CError()
 	{
 		code = 0;
-		description = Error::Private::GetErrorDesc( 0 );
+		errorClass = "DEFAULT";
+		description = "OK";
 	}
 
-	CError( ui32 code, const char *description ) : code( code ), description( description )
-	{}
-
-	bln operator == ( const CError &other )
+	CError( ui32 code, const char *errorClass, const char *description ) : code( code ), errorClass( errorClass ), description( description )
 	{
-		return this->code == other.code;
+		ASSUME( errorClass && description );
 	}
 
-	bln operator != ( const CError &other )
+	bln operator == ( const CError &other ) const
 	{
-		return this->code != other.code;
+		ASSUME( other.errorClass );
+		return this->code == other.code && !strcmp( this->errorClass, other.errorClass );
+	}
+
+	bln operator != ( const CError &other ) const
+	{
+		ASSUME( other.errorClass );
+		return this->code != other.code || strcmp( this->errorClass, other.errorClass );
+	}
+
+	const char *Class() const
+	{
+		return errorClass;
 	}
 
 	const char *Description() const
@@ -68,7 +69,7 @@ public:
 	CTError() : CError(), addition( additionT() )
 	{}
 
-	CTError( ui32 code, const char *description, const additionT &addition ) : CError( code, description ), addition( addition )
+	CTError( ui32 code, const char *errorClass, const char *description, const additionT &addition ) : CError( code, errorClass, description ), addition( addition )
 	{}
 
 	const additionT &Addition() const
@@ -79,18 +80,20 @@ public:
 
 namespace Error
 {
-	inline CError Ok() { return CError( 0, Private::GetErrorDesc( 0 ) ); }
-	inline CError Unknown() { return CError( 1, Private::GetErrorDesc( 1 ) ); }
-	inline CError InvalidArgument() { return CError( 2, Private::GetErrorDesc( 2 ) ); }
-	inline CError OutOfMemory() { return CError( 3, Private::GetErrorDesc( 3 ) ); }
-	inline CError AlreadyExists() { return CError( 4, Private::GetErrorDesc( 4 ) ); }
-	inline CError DoesNotExist() { return CError( 5, Private::GetErrorDesc( 5 ) ); }
-	inline CError NoAccess() { return CError( 6, Private::GetErrorDesc( 6 ) ); }
-	inline CError Unsupported() { return CError( 7, Private::GetErrorDesc( 7 ) ); }
-	inline CError Unimplemented() { return CError( 8, Private::GetErrorDesc( 8 ) ); }
-	inline CError Obsolete() { return CError( 9, Private::GetErrorDesc( 9 ) ); }
-	inline CError Interrupted() { return CError( 10, Private::GetErrorDesc( 10 ) ); }
-	inline CError CannotOpenFile() { return CError( 11, Private::GetErrorDesc( 11 ) ); }
+	inline CError Ok() { return CError( 0, "DEFAULT", "OK" ); }
+	inline CError Unknown() { return CError( 1, "DEFAULT", "UNKNOWN" ); }
+	inline CError InvalidArgument() { return CError( 2, "DEFAULT", "INVALID_ARGUMENT" ); }
+	inline CError OutOfMemory() { return CError( 3, "DEFAULT", "OUT_OF_MEMORY" ); }
+	inline CError AlreadyExists() { return CError( 4, "DEFAULT", "ALREADY_EXISTS" ); }
+	inline CError DoesNotExist() { return CError( 5, "DEFAULT", "DOES_NOT_EXISTS" ); }
+	inline CError NoAccess() { return CError( 6, "DEFAULT", "NO_ACCESS" ); }
+	inline CError Unsupported() { return CError( 7, "DEFAULT", "UNSUPPORTED" ); }
+	inline CError Unimplemented() { return CError( 8, "DEFAULT", "UNIMPLEMENTED" ); }
+	inline CError Obsolete() { return CError( 9, "DEFAULT", "OBSOLETE" ); }
+	inline CError Interrupted() { return CError( 10, "DEFAULT", "INTERRUPTED" ); }
+	inline CError CannotOpenFile() { return CError( 11, "DEFAULT", "CANNOT_OPEN_FILE" ); }
+
+	const ui32 _MaxDefaultError = 128;
 }
 
 }  //  namespace StdLib

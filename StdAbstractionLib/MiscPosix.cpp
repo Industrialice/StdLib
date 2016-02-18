@@ -187,13 +187,6 @@ const tcs &CTC::TCSGet() const
     return _tc;
 }
 
-const char *GetErrorDesc( ui32 code )
-{
-	static const char *const errors[] = { "INCONSISTENT_PROTECTION" };
-	ASSUME( code < COUNTOF( errors ) );
-	return errors[ code ];
-}
-
 void Misc::Private::Initialize()
 {
 }

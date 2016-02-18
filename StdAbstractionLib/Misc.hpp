@@ -24,10 +24,7 @@ namespace VirtualMem
     EXTERNAL bln ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode );  //  can commit uncommited memory
     EXTERNAL ui32 PageSize();
 
-    namespace VirtualMemError
-    {
-		inline CError InconsistentProtection() { return CError( Error::Private::MaxDefaultError + 0, 0 ); }
-    }
+	inline CError Error_InconsistentProtection() { return CError( Error::_MaxDefaultError + 0, "VIRTUAL_MEM", "INCONSISTENT_PROTECTION" ); }
 }
 
 namespace CPU
@@ -59,7 +56,6 @@ namespace Misc
 {
     namespace Private
     {
-        EXTERNAL const char *GetErrorDesc( ui32 code );
         void Initialize();
     }
 }
