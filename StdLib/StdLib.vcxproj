@@ -192,6 +192,7 @@
     <ClInclude Include="CCustomF16.hpp" />
     <ClInclude Include="CF16.hpp" />
     <ClInclude Include="CompilerDefines.hpp" />
+    <ClInclude Include="Error.hpp" />
     <ClInclude Include="Funcs.hpp" />
     <ClInclude Include="PlatformDefines.hpp" />
     <ClInclude Include="PlatformTypes.hpp" />
@@ -200,6 +201,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CF16.cpp" />
+    <ClCompile Include="Error.cpp" />
     <ClCompile Include="Funcs.cpp" />
     <ClCompile Include="PreHeader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

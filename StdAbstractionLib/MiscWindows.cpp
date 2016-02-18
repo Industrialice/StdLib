@@ -117,21 +117,21 @@ ui32 VirtualMem::PageSize()
     return MiscData.MemPageSize();
 }
 
-NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_mem, uiw size, SError *po_error )
+NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_mem, uiw size, CError *po_error )
 {
     MEMORY_BASIC_INFORMATION o_mbi;
     PageMode::PageMode_t mode = PageMode::Error;
-    SError o_error = Error::Get( Error::Ok );
+    CError error = Error::Ok();
     size = Funcs::RoundUIUpToStep( size, PageSize() );
     SIZE_T infSize = ::VirtualQuery( p_mem, &o_mbi, sizeof(o_mbi) );
     if( !infSize )
     {
-        o_error = Error::Get( Error::Unknown );
+		error = Error::Unknown();
         goto toExit;
     }
     if( o_mbi.RegionSize < size )
     {
-        o_error = Error::GetOther( VirtualMemError::InconsistentProtection, Misc::Private::GetErrorsDesc() );
+        error = VirtualMemError::InconsistentProtection();
         goto toExit;
     }
 
@@ -147,7 +147,7 @@ NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_
     ASSUME( mode != PageMode::Error );
 
 toExit:
-    DSA( po_error, o_error );
+    DSA( po_error, error );
     return mode;
 }
 
@@ -273,10 +273,11 @@ const tcs &CTC::TCSGet() const
     return _tc;
 }
 
-const char *const *Misc::Private::GetErrorsDesc()
+const char *GetErrorDesc( ui32 code )
 {
     static const char *const errors[] = { "INCONSISTENT_PROTECTION" };
-    return errors;
+	ASSUME( code < COUNTOF( errors ) );
+    return errors[ code ];
 }
 
 void Misc::Private::Initialize()

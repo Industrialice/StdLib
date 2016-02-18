@@ -51,6 +51,7 @@
 #include "Funcs.hpp"
 #include "CF16.hpp"
 #include "CCustomF16.hpp"
+#include "Error.hpp"
 
 void StdCoreLib_Initialize();
 

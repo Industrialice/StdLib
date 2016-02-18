@@ -20,13 +20,13 @@ namespace VirtualMem
     EXTERNAL bln Commit( void *p_mem, uiw size, PageMode::PageMode_t mode );
     EXTERNAL void *Alloc( uiw size, PageMode::PageMode_t mode );
     EXTERNAL bln Free( void *p_mem );
-    EXTERNAL PageMode::PageMode_t ProtectGet( const void *p_mem, uiw size, SError *po_error );  //  PageMode::Error if pages have different protection, always PageMode::Error on POSIX
+    EXTERNAL PageMode::PageMode_t ProtectGet( const void *p_mem, uiw size, CError *po_error );  //  PageMode::Error if pages have different protection, always PageMode::Error on POSIX
     EXTERNAL bln ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode );  //  can commit uncommited memory
     EXTERNAL ui32 PageSize();
 
     namespace VirtualMemError
     {
-        const ui32 InconsistentProtection = Error::Private::MaxDefaultError + 0;
+		inline CError InconsistentProtection() { return CError( Error::Private::MaxDefaultError + 0, 0 ); }
     }
 }
 
@@ -59,7 +59,7 @@ namespace Misc
 {
     namespace Private
     {
-        EXTERNAL const char *const *GetErrorsDesc();
+        EXTERNAL const char *GetErrorDesc( ui32 code );
         void Initialize();
     }
 }

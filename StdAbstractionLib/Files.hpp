@@ -11,15 +11,15 @@ namespace Files
     class CFileEnumInfo;
     typedef void (*EnumFilesCallback)( CFileEnumInfo *info, void *argument );
 
-    EXTERNAL bln RemoveFile( const char *cp_pnn, SError *po_error );
-    EXTERNAL bln RemoveFolder( const char *cp_path, SError *po_error );
+    EXTERNAL bln RemoveFile( const char *cp_pnn, CError *po_error );
+    EXTERNAL bln RemoveFolder( const char *cp_path, CError *po_error );
     EXTERNAL bln IsFileOrFolderExists( const char *cp_papn );
     EXTERNAL bln IsFileExists( const char *cp_pnn );
     EXTERNAL bln IsFolderExists( const char *cp_path );
     EXTERNAL bln IsFileReadOnlyGet( const char *cp_pnn );  //  false if the file does not exist or an error occured  TODO: add errors struct?
     EXTERNAL bln IsFileReadOnlySet( const char *cp_pnn, bln is_ro );
     EXTERNAL bln IsAbsolutePath( const char *pnn, uiw parseLen = uiw_max );
-    EXTERNAL bln CreateFolder( const char *cp_where, const char *cp_name, SError *po_error );
+    EXTERNAL bln CreateFolder( const char *cp_where, const char *cp_name, CError *po_error );
     EXTERNAL uiw ExtractPathFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  with the last slash
     EXTERNAL uiw ExtractNameFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  without slashes or something
     EXTERNAL uiw ExtractNameWOExtFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );

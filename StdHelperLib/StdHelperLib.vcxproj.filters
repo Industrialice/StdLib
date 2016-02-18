@@ -17,9 +17,6 @@
     <ClInclude Include="PreHeader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Error.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StdHelperLib.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -73,9 +70,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Error.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PreHeader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

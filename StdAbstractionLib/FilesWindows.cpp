@@ -9,7 +9,7 @@
     #pragma optimize( "s", on )  //  TODO: global solution
 #endif
 
-NOINLINE bln Files::RemoveFile( const char *cp_pnn, SError *po_error )
+NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *po_error )
 {
     ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
 
@@ -20,27 +20,27 @@ NOINLINE bln Files::RemoveFile( const char *cp_pnn, SError *po_error )
         {
             if( ::GetLastError() == ERROR_ACCESS_DENIED )
             {
-                *po_error = Error::Get( Error::NoAccess );
+                *po_error = Error::NoAccess();
             }
             else if( ::GetLastError() == ERROR_FILE_NOT_FOUND )
             {
-                *po_error = Error::Get( Error::DoesNotExists );
+                *po_error = Error::DoesNotExist();
             }
             else
             {
-                *po_error = Error::Get( Error::Unknown );
+                *po_error = Error::Unknown();
             }
         }
         else
         {
-            *po_error = Error::Get( Error::Ok );
+            *po_error = Error::Ok();
         }
     }
 
     return funcResult;
 }
 
-NOINLINE bln Files::RemoveFolder( const char *cp_path, SError *po_error )
+NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *po_error )
 {
     ASSUME( cp_path && _StrLen( cp_path ) + 2 < MAX_PATH );
 
@@ -50,12 +50,12 @@ NOINLINE bln Files::RemoveFolder( const char *cp_path, SError *po_error )
     ++cpy;
     WIN32_FIND_DATAA o_find;
     HANDLE h_find;
-    SError o_error = Error::Get( Error::Ok );
+	CError o_error = Error::Ok();
     bln funcResult = false;
 
     if( !IsFolderExists( cp_path ) )
     {
-        o_error = Error::Get( Error::DoesNotExists );
+        o_error = Error::DoesNotExist();
         goto toExit;
     }
 
@@ -92,7 +92,7 @@ NOINLINE bln Files::RemoveFolder( const char *cp_path, SError *po_error )
     funcResult = ::RemoveDirectoryA( cp_path ) != 0;
     if( !funcResult )
     {
-        o_error = Error::Get( Error::Unknown );
+        o_error = Error::Unknown();
     }
 
 toExit:
@@ -177,7 +177,7 @@ bln Files::IsAbsolutePath( const char *pnn, uiw parseLen /* = uiw_max */ )
     return Funcs::IsChrAlpha( pnn[ 0 ] ) && pnn[ 1 ] == ':' && (pnn[ 2 ] == '/' || pnn[ 2 ] == '\\');
 }
 
-NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, SError *po_error )
+NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, CError *po_error )
 {
     ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH) );
 
@@ -185,18 +185,18 @@ NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, SEr
     uiw len = Funcs::StrCpyAndCountWONull( a_buf, cp_where );
     _StrCpy( a_buf + len, cp_name );
     bln funcResult = false;
-    SError o_error = Error::Get( Error::Ok );
+    CError o_error = Error::Ok();
 
     if( IsFolderExists( a_buf ) )
     {
-        o_error = Error::Get( Error::AlreadyExists );
+        o_error = Error::AlreadyExists();
         goto toExit;
     }
 
     funcResult = ::CreateDirectoryA( a_buf, 0 ) != 0;
     if( !funcResult )
     {
-        o_error = Error::Get( Error::Unknown );
+        o_error = Error::Unknown();
     }
 
 toExit:

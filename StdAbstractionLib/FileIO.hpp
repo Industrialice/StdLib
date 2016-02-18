@@ -77,7 +77,7 @@ namespace FileIO
         /*  Core Functions  */
         EXTERNAL void Initialize( CFileBasis *file );
         EXTERNAL void Destroy( CFileBasis *file );
-        EXTERNAL bln Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error );
+        EXTERNAL bln Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CError *po_error );
         EXTERNAL void Close( CFileBasis *file );
         EXTERNAL bln IsValid( const CFileBasis *file );
         EXTERNAL bln Write( CFileBasis *file, const void *cp_source, ui32 len );
@@ -88,7 +88,7 @@ namespace FileIO
         EXTERNAL void StatsReset( CFileBasis *file );
         EXTERNAL bln Flush( CFileBasis *file );  //  false if writing to file failed to complete
         EXTERNAL i64 OffsetGet( CFileBasis *file );  //  -1 on fail, current offset on success
-        EXTERNAL i64 OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, SError *po_error );  //  -1 on fail, current offset on success
+        EXTERNAL i64 OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error );  //  -1 on fail, current offset on success
         EXTERNAL ui64 SizeGet( CFileBasis *file );
         EXTERNAL bln SizeSet( CFileBasis *file, ui64 newSize );
         EXTERNAL OpenMode::OpenMode_t OpenModeGet( const CFileBasis *file );
@@ -108,7 +108,7 @@ namespace FileIO
             Private::Initialize( this );
         }
 
-        CFile( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error )
+        CFile( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CError *po_error )
         {
             Private::Initialize( this );
             Private::Open( this, pnn, openMode, procMode, po_error );
@@ -148,7 +148,7 @@ namespace FileIO
         }
 #endif
 
-        void Open( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error )
+        void Open( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CError *po_error )
         {
             Close();
             Private::Open( this, pnn, openMode, procMode, po_error );
@@ -204,7 +204,7 @@ namespace FileIO
             return Private::OffsetGet( this );
         }
 
-        i64 OffsetSet( OffsetMode::OffsetMode_t mode, i64 offset, SError *po_error )  //  -1 on fail, current offset on success
+        i64 OffsetSet( OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error )  //  -1 on fail, current offset on success
         {
             return Private::OffsetSet( this, mode, offset, po_error );
         }
@@ -256,16 +256,6 @@ namespace FileIO
         }
 #endif
     };
-
-    namespace FileError
-    {
-        const ui32 CanNotOpenFile = Error::Private::MaxDefaultError + 0;
-    }
-
-    namespace Private
-    {
-        EXTERNAL const char *const *GetErrorsDesc();
-    }
 }
 
 }  //  namespace StdLib

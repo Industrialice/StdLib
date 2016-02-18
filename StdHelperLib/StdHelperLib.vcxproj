@@ -213,7 +213,6 @@
     <ClInclude Include="deprecatedCPreallocatedContainer.hpp" />
     <ClInclude Include="deprecatedCString.hpp" />
     <ClInclude Include="deprecatedCVector.hpp" />
-    <ClInclude Include="Error.hpp" />
     <ClInclude Include="LiceMathTypes.hpp" />
     <ClInclude Include="PackedIntArray.hpp" />
     <ClInclude Include="PreHeader.hpp" />
@@ -222,7 +221,6 @@
     <ClInclude Include="_CVectorBase.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Error.cpp" />
     <ClCompile Include="LiceMathFuncs.cpp" />
     <ClCompile Include="LiceMathTypes.cpp" />
     <ClCompile Include="PreHeader.cpp">

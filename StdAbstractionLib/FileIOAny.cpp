@@ -51,12 +51,6 @@ void FileIO::Private::Destroy( CFileBasis *file )
     }
 }
 
-const char *const *FileIO::Private::GetErrorsDesc()
-{
-    static const char *const errors[] = { "CAN_NOT_OPEN_FILE" };
-    return errors;
-}
-
 NOINLINE bln FileIO::Private::Write( CFileBasis *file, const void *cp_source, ui32 len )
 {
     ASSUME( IsValid( file ) && (cp_source || len == 0) );

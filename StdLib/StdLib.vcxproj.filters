@@ -39,6 +39,9 @@
     <ClInclude Include="StdCoreLib.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Error.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CF16.cpp">
@@ -51,6 +54,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="StdCoreLib.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Error.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

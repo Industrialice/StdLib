@@ -18,13 +18,13 @@ namespace StdLib
     }
 }
 
-NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error )
+NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CError *po_error )
 {
     ASSUME( cp_pnn && file );
 
     file->handle = INVALID_HANDLE_VALUE;
 
-    SError o_error = Error::Get( Error::InvalidArgument );
+    CError o_error = Error::InvalidArgument();
     DWORD dwFlagsAndAttributes = 0;
     DWORD dwDesiredAccess = 0;
     DWORD dwCreationDisposition;
@@ -78,19 +78,19 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
         DWORD error = ::GetLastError();
         if( error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND )
         {
-            o_error = Error::Get( Error::DoesNotExists );
+            o_error = Error::DoesNotExist();
         }
         else if( error == ERROR_ACCESS_DENIED || error == ERROR_WRITE_PROTECT || error == ERROR_SHARING_VIOLATION || error == ERROR_LOCK_VIOLATION )
         {
-            o_error = Error::Get( Error::NoAccess );
+            o_error = Error::NoAccess();
         }
         else if( error == ERROR_NOT_ENOUGH_MEMORY || error == ERROR_OUTOFMEMORY )
         {
-            o_error = Error::Get( Error::OutOfMemory );
+            o_error = Error::OutOfMemory();
         }
         else
         {
-            o_error = Error::GetOther( FileError::CanNotOpenFile, Private::GetErrorsDesc() );
+            o_error = Error::CannotOpenFile();
         }
         goto toExit;
     }
@@ -99,7 +99,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     {
         if( ::SetFilePointer( h_file, 0, 0, FILE_END ) == INVALID_SET_FILE_POINTER )
         {
-            o_error = Error::Get( Error::Unknown );
+            o_error = Error::Unknown();
             BOOL result = ::CloseHandle( h_file );
             ASSUME( result );
             goto toExit;
@@ -115,7 +115,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     file->bufferPos = 0;
     file->readBufferCurrentSize = 0;
 
-    o_error = Error::Get( Error::Ok );
+    o_error = Error::Ok();
 
 toExit:
     DSA( po_error, o_error );
@@ -158,22 +158,22 @@ i64 FileIO::Private::OffsetGet( CFileBasis *file )
     return o_pos.QuadPart + (LONGLONG)file->bufferPos;
 }
 
-NOINLINE i64 FileIO::Private::OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, SError *po_error )
+NOINLINE i64 FileIO::Private::OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error )
 {
     ASSUME( IsValid( file ) );
-    SError o_error = Error::Get( Error::Ok );
+    CError o_error = Error::Ok();
     i64 result = -1;
     LARGE_INTEGER o_move;
     DWORD moveMethod;
 
     if( !CancelCachedRead( file ) )
     {
-        o_error = Error::Get( Error::Unknown );
+        o_error = Error::Unknown();
         goto toExit;
     }
     if( !Flush( file ) )
     {
-        o_error = Error::Get( Error::Unknown );
+        o_error = Error::Unknown();
         goto toExit;
     }
 
@@ -191,14 +191,14 @@ NOINLINE i64 FileIO::Private::OffsetSet( CFileBasis *file, OffsetMode::OffsetMod
     }
     else
     {
-        o_error = Error::Get( Error::InvalidArgument );
+        o_error = Error::InvalidArgument();
         goto toExit;
     }
     o_move.QuadPart = offset;
 
     if( !::SetFilePointerEx( file->handle, o_move, &o_move, moveMethod ) )
     {
-        o_error = Error::Get( Error::Unknown );
+        o_error = Error::Unknown();
         goto toExit;
     }
 
