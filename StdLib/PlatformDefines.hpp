@@ -80,4 +80,4 @@
     #undef max
 #endif
 
-#endif __PLATFORM_DEFINES_HPP__
+#endif

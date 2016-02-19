@@ -130,8 +130,8 @@ public:
     typedef typename baseType::count_type count_type;
 
 public:
-    /*using baseType::IterConst;
-    using baseType::IterRevConst;*/
+    using typename baseType::IterConst;
+    using typename baseType::IterRevConst;
     typedef Iterator::_IterRandom < X, 1 > Iter;
     typedef Iterator::_IterRandom < X, -1 > IterRev;
     using baseType::Data;
@@ -222,6 +222,11 @@ template < typename X, typename reservator, typename allocator, TypeSemantic_t t
     typedef _CBaseVec < X, reservator, allocator, typeSemantic, static_size > ownType;
 
 public:
+	using typename baseType::IterConst;
+	using typename baseType::IterRevConst;
+	using typename baseType::Iter;
+	using typename baseType::IterRev;
+
     typedef typename baseType::count_type count_type;
 
     static const count_type count_type_max = TypeDesc < count_type >::max;
@@ -239,7 +244,7 @@ public:
 
         if( _cis_MoveAsPOD == false )
         {
-            count_type newReserve = _TryIncSizeLocally( newCount );
+            count_type newReserve = this->_TryIncSizeLocally( newCount );
             if( newReserve != TypeDesc < count_type >::max )
             {
                 arrType newArr( newCount, newReserve );
@@ -250,7 +255,7 @@ public:
         }
         else
         {
-            _IncSize( newCount );
+            this->_IncSize( newCount );
         }
     }
 
@@ -260,7 +265,7 @@ public:
 
         if( _cis_MoveAsPOD == false )
         {
-            count_type newReserve = _TryDecSizeLocally( newCount );
+            count_type newReserve = this->_TryDecSizeLocally( newCount );
             if( newReserve != TypeDesc < count_type >::max )
             {
                 ASSUME( this->_IsStatic() == false );
@@ -272,7 +277,7 @@ public:
         }
         else
         {
-            _DecSize( newCount );
+            this->_DecSize( newCount );
         }
     }
 
@@ -282,7 +287,7 @@ public:
 
         if( _cis_MoveAsPOD == false )
         {
-            count_type newReserve = _TryUnkSizeLocally( newCount );
+            count_type newReserve = this->_TryUnkSizeLocally( newCount );
             if( newReserve != TypeDesc < count_type >::max )
             {
                 arrType newArr( newCount, newReserve );
@@ -302,7 +307,7 @@ public:
         }
         else
         {
-            _UnkSize( newCount );
+            this->_UnkSize( newCount );
         }
     }
 
@@ -877,9 +882,11 @@ public:
 private:
     NOINLINE void InsertOverlapped( count_type start, count_type count, count_type index )
     {
-        CVec < X, void > tempVec( 0, this->_GetArr() + index, count );  //  TODO: bad
+		X *tempArray = allocator::template Alloc < X >( count );  //  TODO: bad
+		_Copy < false, false >( tempArray, this->_GetArr() + index, count );
         X *target = _InsertRaw( start, count );
-        _Copy < false, false >( target, tempVec.Data(), count );
+        _Copy < false, false >( target, tempArray, count );
+		allocator::Free( tempArray );
     }
 
     NOINLINE void AssignOverlappedSingle( count_type count, count_type index )
@@ -1200,13 +1207,13 @@ public:
 
     CCRefVec < X > ToRef() const
     {
-        typedef _CBaseVecConstStatic < X, reservator, allocator, static_size > constBaseType;
+        typedef Private::_CBaseVecConstStatic < X, reservator, allocator, static_size > constBaseType;
         return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
     }
 
     CCRefVec < X > ToCRef() const
     {
-        typedef _CBaseVecConstStatic < X, reservator, allocator, static_size > constBaseType;
+        typedef Private::_CBaseVecConstStatic < X, reservator, allocator, static_size > constBaseType;
         return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
     }
 

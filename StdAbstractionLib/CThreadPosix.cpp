@@ -26,18 +26,18 @@ CThread::~CThread()
 
 CThread::CThread()
 {
-    DEBUGCODE( _is_created = false; )
+    DBGCODE( _is_created = false; )
 }
 
 CThread::CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority )
 {
-    DEBUGCODE( _is_created = false; )
+    DBGCODE( _is_created = false; )
     CThread::Create( stackSize, ExecutionFunc, argument, priority );
 }
 
 void CThread::Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority )
 {
-    DEBUGCODE( ASSUME( _is_created == false ); )
+    DBGCODE( ASSUME( _is_created == false ); )
 
     pthread_attr_t *attrPtr = 0;
     pthread_attr_t attributes;

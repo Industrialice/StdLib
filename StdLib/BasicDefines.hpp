@@ -125,4 +125,4 @@ public: \
 #define TERSWITCH2( case0check, code0, case1check, code1, defaultcode ) ((case0check) ? (code0) : ((case1check) ? (code1) : (defaultcode)))
 #define TERSWITCH3( case0check, code0, case1check, code1, case2check, code2, defaultcode ) ((case0check) ? (code0) : ((case1check) ? (code1) : ((case2check) ? (code2) : (defaultcode))))
 
-#endif __BASIC_DEFINES_HPP__
+#endif

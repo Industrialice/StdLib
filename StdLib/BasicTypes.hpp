@@ -109,10 +109,10 @@ const f64 f64_pi = 3.141592653589793238463;
 
 template < typename Candidate, typename Of > class IsDerivedFrom
 {
-    template < typename Candidate, typename Of > struct Converter
+    template < typename Candidate2, typename Of2 > struct Converter
     {
-        operator Of *() const;
-        operator Candidate *();
+        operator Of2 *() const;
+        operator Candidate2 *();
     };
 
     template < typename X > static int Func( volatile Candidate *, X val );
@@ -215,7 +215,9 @@ public:
 };
 
 static const struct Nullv
-{} nullv;
+{
+	Nullv() {}
+} nullv;
 
 /*  References aren't supported!  */
 template < typename X > class Nullable
@@ -313,6 +315,16 @@ public:
     {
         ASSUME( _is_null == false );
         return ToRef();
+    }
+
+	X &Get()
+    {
+	    return ToRef();
+    }
+
+	const X &Get() const
+    {
+	    return ToRef();
     }
 };
 
@@ -496,12 +508,12 @@ template < typename X, typename Deleter > class UniquePtr < X[], Deleter > : pub
 public:
     UniquePtr()
     {
-        _ptr = 0;
+        this->_ptr = 0;
     }
 
     UniquePtr( X *ptr )
     {
-        _ptr = ptr;
+        this->_ptr = ptr;
     }
 };
 
@@ -871,8 +883,8 @@ template <> struct TypeDesc < float >
     static const bln is_pod = true;
     static const bln is_movableAsPOD = true;
     static const uiw bits = 32;
-    static constexpr float max() { return f32_max; }
-    static constexpr float min() { return f32_min; }
+    static float max() { return f32_max; }
+    static float min() { return f32_min; }
     typedef float type;
 };
 template <> struct TypeDesc < const float > : TypeDesc < float >
@@ -893,8 +905,8 @@ template <> struct TypeDesc < double >
     static const bln is_pod = true;
     static const bln is_movableAsPOD = true;
     static const uiw bits = 64;
-    static constexpr double max() { return f64_max; }
-    static constexpr double min() { return f64_min; }
+    static double max() { return f64_max; }
+    static double min() { return f64_min; }
     typedef double type;
 };
 template <> struct TypeDesc < const double > : TypeDesc < double >
@@ -1016,4 +1028,4 @@ template < typename ret, typename a0, typename a1, typename a2, typename a3, typ
     return ret();
 }
 
-#endif __BASIC_TYPES_HPP__
+#endif

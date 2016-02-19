@@ -148,7 +148,7 @@
 
 #elif defined(__GNUC__)
 
-    #define REMOVE_COMMA ##
+    //#define REMOVE_COMMA ##
     #define ALIGNED_PRE( al )
     #define ALIGNED_POST( al ) __attribute__((aligned(al)))
     #ifdef WINDOWS
@@ -170,50 +170,105 @@
     #define INT64_CHANGE_ENDIANNESS( val ) __builtin_bswap64( val )
     #define RETURN_ADDRESS __builtin_extract_return_addr( __builtin_return_address() )
 
-    #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+	/*  TODO: actual checks  */
+	#define MOVE_SUPPORTED
+	#define VAR_TEMPLATES_SUPPORTED
+	#define DEFAULT_FUNC_PARAMS_SUPPORTED
+	#define DEFINE_VARARGS_SUPPORTED
+	#define EXTERN_TEMPLATES_SUPPORTED
+	#define NOEXCEPT noexcept
+	#define INITIALIZER_LISTS_SUPPORTED
+	#define RANGE_BASED_FOR_SUPPORTED
+	#define LONGLONG_SUPPORTED
+	#define NATIVE_ALIGNOF
+	#define TYPETRAITS_SUPPORTED
 
-    #if GCC_VERSION >= 40300
-        #define STATIC_ASSERTION_SUPPORTED
-        #define COUNTER_SUPPORTED
-    #endif
+	#ifndef __clang__
+		#define NULLPTR_SUPPORTED
 
-    #if GCC_VERSION >= 40400
-        #define TYPETRAITS_SUPPORTED  /*  TODO: 4.4 is not for sure  */
-    #endif
+		#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
-    /*  TODO: actual checks  */
-    #define MOVE_SUPPORTED
-    #define VAR_TEMPLATES_SUPPORTED
-    #define DEFAULT_FUNC_PARAMS_SUPPORTED
-    #define DEFINE_VARARGS_SUPPORTED
-    #define NULLPTR_SUPPORTED
-    #define EXTERN_TEMPLATES_SUPPORTED
-    #define NOEXCEPT noexcept
-    #define INITIALIZER_LISTS_SUPPORTED
-    #define RANGE_BASED_FOR_SUPPORTED
-    #define LONGLONG_SUPPORTED
+		#if GCC_VERSION >= 40300
+			#define STATIC_ASSERTION_SUPPORTED
+			#define COUNTER_SUPPORTED
+		#endif
 
-    #if GCC_VERSION >= 40500
-        #ifdef DEBUG
-            #define UNREACHABLE DBGBREAK
-            #define ASSUME( what ) CHECK( what )
-        #else
-            #define UNREACHABLE __builtin_unreachable()
-            #define ASSUME( what ) do { if( !(what) ) { __builtin_unreachable(); } } while( 0 )
-        #endif
-    #else
-        #define UNREACHABLE DBGBREAK
-        #define ASSUME( what ) CHECK( what )
-    #endif
+		#if GCC_VERSION >= 40400
+			#define TYPETRAITS_SUPPORTED  /*  TODO: 4.4 is not for sure  */
+		#endif
 
-    #if GCC_VERSION >= 40600
-        #define CONSTEXPR_SUPPORTED
-    #endif
+		#if GCC_VERSION >= 40500
+			#ifdef DEBUG
+				#define UNREACHABLE DBGBREAK
+				#define ASSUME( what ) CHECK( what )
+			#else
+				#define UNREACHABLE __builtin_unreachable()
+				#define ASSUME( what ) do { if( !(what) ) { __builtin_unreachable(); } } while( 0 )
+			#endif
+		#else
+			#define UNREACHABLE DBGBREAK
+			#define ASSUME( what ) CHECK( what )
+		#endif
 
-    #if GCC_VERSION >= 40700
-        #define OVERRIDE_SUPPORTED
-        #define FINAL_SUPPORTED
-    #endif
+		#if GCC_VERSION >= 40600
+			#define CONSTEXPR_SUPPORTED
+		#endif
+
+		#if GCC_VERSION >= 40700
+			#define OVERRIDE_SUPPORTED
+			#define FINAL_SUPPORTED
+		#endif
+	#else
+		#ifndef __has_feature
+			#error something is wrong
+		#endif
+
+		#if __has_feature(cxx_static_assert)
+			#define STATIC_ASSERTION_SUPPORTED
+		#endif
+
+		#if __has_feature(cxx_nullptr)
+			#define NULLPTR_SUPPORTED
+		#endif
+
+		#if __has_feature(cxx_alignof)
+			#define NATIVE_ALIGNOF
+		#endif
+
+		#if __has_feature(cxx_constexpr)
+			#define CONSTEXPR_SUPPORTED
+		#endif
+
+		#if __has_feature(cxx_override_control)
+			#define OVERRIDE_SUPPORTED
+		#endif
+
+		#if __has_feature(cxx_range_for)
+			#define RANGE_BASED_FOR_SUPPORTED
+		#endif
+
+		#if __has_feature(cxx_variadic_templates)
+			#define VAR_TEMPLATES_SUPPORTED
+		#endif
+
+		#if __has_feature(cxx_noexcept)
+			#define NOEXCEPT noexcept
+		#endif
+
+		#if __has_feature(cxx_default_function_template_args)
+			#define DEFAULT_FUNC_PARAMS_SUPPORTED
+		#endif
+
+		#ifdef DEBUG
+			#define UNREACHABLE DBGBREAK
+			#define ASSUME( what ) CHECK( what )
+		#else
+			#define UNREACHABLE __builtin_unreachable()
+			#define ASSUME( what ) do { if( !(what) ) { __builtin_unreachable(); } } while( 0 )
+		#endif
+
+		#undef TYPETRAITS_SUPPORTED /* temporary */
+	#endif
 
     #define INT64_NUMBER long long
     #define UINT64_NUMBER unsigned long long
@@ -287,8 +342,7 @@
 #endif
 
 #ifndef ALIGNOF
-    template <typename type>
-    struct __AlignmentCheck
+    template < typename type > struct __AlignmentCheck
     {
         char c;
         type t;
@@ -309,4 +363,4 @@
     #define NOINLINE
 #endif
 
-#endif __COMPILER_DEFINES_HPP__
+#endif

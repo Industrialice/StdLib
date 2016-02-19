@@ -4,9 +4,9 @@
 namespace StdLib
 { namespace Reservator
   {
-    template < typename count_type = uiw > struct Simple
+    template < typename cnt_type = uiw > struct Simple
     {
-        typedef count_type count_type;
+        typedef cnt_type count_type;
 
         static bln Up( count_type newSize, count_type *reserved )
         {
@@ -26,9 +26,9 @@ namespace StdLib
         };
     };
 
-    template < typename count_type = uiw > struct SimpleDowning : Simple < count_type >
+    template < typename cnt_type = uiw > struct SimpleDowning : Simple < cnt_type >
     {
-        typedef count_type count_type;
+        typedef cnt_type count_type;
 
         static bln Down( count_type newSize, count_type *reserved )
         {
@@ -42,9 +42,9 @@ namespace StdLib
         };
     };
 
-    template < typename count_type = uiw > struct Half
+    template < typename cnt_type = uiw > struct Half
     {
-        typedef count_type count_type;
+        typedef cnt_type count_type;
 
         static bln Up( count_type newSize, count_type *reserved )
         {
@@ -64,9 +64,9 @@ namespace StdLib
         };
     };
 
-    template < uiw downingDiv, typename count_type = uiw > struct HalfDowning : Half < count_type >
+    template < uiw downingDiv, typename cnt_type = uiw > struct HalfDowning : Half < cnt_type >
     {
-        typedef count_type count_type;
+        typedef cnt_type count_type;
 
         static bln Down( count_type newSize, count_type *reserved )
         {
@@ -80,9 +80,9 @@ namespace StdLib
         };
     };
 
-    template < uiw fixed, typename count_type = uiw > struct Fixed
+    template < uiw fixed, typename cnt_type = uiw > struct Fixed
     {
-        typedef count_type count_type;
+        typedef cnt_type count_type;
 
         static bln Up( count_type newSize, count_type *reserved )
         {
@@ -102,9 +102,9 @@ namespace StdLib
         };
     };
 
-    template < uiw fixed, typename count_type = uiw > struct FixedDowning : Fixed < fixed, count_type >
+    template < uiw fixed, typename cnt_type = uiw > struct FixedDowning : Fixed < fixed, cnt_type >
     {
-        typedef count_type count_type;
+        typedef cnt_type count_type;
 
         static bln Down( count_type newSize, count_type *reserved )
         {

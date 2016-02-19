@@ -17,19 +17,19 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
 {
     typedef TCStr < charType, basicSize, reservator, allocator > ownType;
 
-    static __forceinline i32 StringCompare( const char *first, const char *second )
+    static FORCEINLINE i32 StringCompare( const char *first, const char *second )
     {
         ASSUME( first && second );
         return strcmp( first, second );
     }
 
-    static __forceinline i32 StringCompare( const wchar_t *first, const wchar_t *second )
+    static FORCEINLINE i32 StringCompare( const wchar_t *first, const wchar_t *second )
     {
         ASSUME( first && second );
         return wcscmp( first, second );
     }
 
-    template < typename type > static __forceinline i32 StringCompare( const type *first, const type *second )
+    template < typename type > static FORCEINLINE i32 StringCompare( const type *first, const type *second )
     {
         ASSUME( first && second );
         for( ; *first == *second && *first; ++first, ++second );
@@ -44,7 +44,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         return 1;
     }
 
-    template < typename type > static __forceinline uiw GetStringLength( const type *str )
+    template < typename type > static FORCEINLINE uiw GetStringLength( const type *str )
     {
         ASSUME( str );
         if( sizeof( type ) == 1 )
@@ -60,26 +60,26 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         return len;
     }
 
-    static __forceinline bln IsStringEquals( const char *first, const char *second )
+    static FORCEINLINE bln IsStringEquals( const char *first, const char *second )
     {
         ASSUME( first && second );
         return strcmp( first, second ) == 0;
     }
 
-    static __forceinline bln IsStringEquals( const wchar_t *first, const wchar_t *second )
+    static FORCEINLINE bln IsStringEquals( const wchar_t *first, const wchar_t *second )
     {
         ASSUME( first && second );
         return wcscmp( first, second ) == 0;
     }
 
-    template < typename type > static __forceinline bln IsStringEquals( const type *first, const type *second )
+    template < typename type > static FORCEINLINE bln IsStringEquals( const type *first, const type *second )
     {
         ASSUME( first && second );
         for( ; *first == *second && *first; ++first, ++second );
         return *first == *second;
     }
 
-    static __forceinline bln IsStrInRange( const charType *str, const charType *lower, const charType *upper )
+    static FORCEINLINE bln IsStrInRange( const charType *str, const charType *lower, const charType *upper )
     {
         ASSUME( str );
         return !(str < lower || str >= upper);
@@ -121,7 +121,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
     {
         _static_str[ static_last ] = (charType)0x1;
         _reserved = reserve;
-        _dynamic_str = allocator::Alloc < charType >( _reserved + 1 );
+        _dynamic_str = allocator::template Alloc < charType >( _reserved + 1 );
     }
 
     void _ProcReservationUp( uiw newCount )
@@ -167,7 +167,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             if( _count + len >= static_size )
             {
                 uiw reserved = _count + len;
-                charType *newStr = allocator::Alloc < charType >( reserved + 1 );
+                charType *newStr = allocator::template Alloc < charType >( reserved + 1 );
                 _MemCpyStr( newStr, _static_str, _count );
                 if( isCanBeAliased && IsStrInRange( str, _static_str, _static_str + _count ) )
                 {
@@ -206,7 +206,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             if( _count + len >= static_size )
             {
                 uiw reserved = _count + len;
-                charType *newStr = allocator::Alloc < charType >( reserved + 1 );
+                charType *newStr = allocator::template Alloc < charType >( reserved + 1 );
                 _MemCpyStr( newStr, _static_str, _count );
                 thisStr = newStr;
                 SetDynamic();
@@ -237,7 +237,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             {
                 if( IsStrInRange( str, _dynamic_str, _dynamic_str + _count ) )
                 {
-                    dynPtr = allocator::Alloc < charType >( len );
+                    dynPtr = allocator::template Alloc < charType >( len );
                     _MemCpyStr( dynPtr, str, len );
                     str = dynPtr;
                 }
@@ -259,7 +259,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             if( _count + len >= static_size )
             {
                 uiw reserved = _count + len;
-                charType *newStr = allocator::Alloc < charType >( reserved + 1 );
+                charType *newStr = allocator::template Alloc < charType >( reserved + 1 );
                 _MemCpyStr( newStr, _static_str, index );
                 _MemCpyStr( newStr + index, str, len );
                 _MemCpyStr( newStr + index + len, _static_str + index, _count - index + 1 );
@@ -298,7 +298,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             if( _count + len >= static_size )
             {
                 uiw reserved = _count + len;
-                charType *newStr = allocator::Alloc < charType >( reserved + 1 );
+                charType *newStr = allocator::template Alloc < charType >( reserved + 1 );
                 _MemCpyStr( newStr, _static_str, index );
                 _MemCpyStr( newStr + index + len, _static_str + index, _count - index + 1 );
                 SetDynamic();
@@ -679,7 +679,7 @@ public:
             {
                 if( reserve >= static_size )
                 {
-                    charType *dyn = allocator::Alloc < charType >( reserve + 1 );
+                    charType *dyn = allocator::template Alloc < charType >( reserve + 1 );
                     _MemCpyStr( dyn, _static_str, _count + 1 );
                     SetDynamic();
                     _dynamic_str = dyn;

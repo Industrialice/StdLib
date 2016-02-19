@@ -25,6 +25,7 @@
 #include <new>
 #include <math.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "CompilerDefines.hpp"
 
@@ -41,7 +42,7 @@
 #endif
 
 #if defined(LITTLE_ENDIAN) && defined(BIG_ENDIAN)
-    #error both LITTLE_ENDIAN and BIG_ENDIAN are specified
+    //#error both LITTLE_ENDIAN and BIG_ENDIAN are specified
 #endif
 
 #include "BasicDefines.hpp"
@@ -55,4 +56,4 @@
 
 void StdCoreLib_Initialize();
 
-#endif __STD_LIB_HEADER_HPP__
+#endif

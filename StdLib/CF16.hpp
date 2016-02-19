@@ -56,4 +56,4 @@ const i32 f16_int_min = -65504;
 
 }  //  namespace StdLib
 
-#endif __C_F16_HPP__
+#endif

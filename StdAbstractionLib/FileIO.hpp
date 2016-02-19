@@ -56,7 +56,7 @@ namespace FileIO
     {
         struct CFileBasis : CharMovable
         {
-            HANDLE handle;
+            fileHandle handle;
             OpenMode::OpenMode_t openMode;
             FileIO::ProcMode::ProcMode_t procMode;
 

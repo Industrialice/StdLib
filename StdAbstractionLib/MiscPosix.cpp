@@ -48,7 +48,7 @@ void *VirtualMem::Alloc( uiw size, PageMode::PageMode_t mode )
     if( !prot )
     {
         DBGBREAK;
-        return false;
+        return 0;
     }
     return ::mmap( 0, size, prot, MAP_PRIVATE | MAP_ANON, -1, 0);
 }
@@ -64,9 +64,9 @@ ui32 VirtualMem::PageSize()
     return PAGESIZE;
 }
 
-VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_mem, uiw size, SError *po_error )
+VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_mem, uiw size, CError *po_error )
 {
-    DSA( po_error, Error::Get( Error::Unsupported ) );
+    DSA( po_error, Error::Unsupported() );
     return PageMode::Error;
 }
 
@@ -86,12 +86,12 @@ bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
 
 ui32 CPU::CoresNum()
 {
-#error
+	DBGBREAK;  //  TODO:
 }
 
 //  TC
 
-CTC::CTC( bln is_set = false )
+CTC::CTC( bln is_set )
 {
     if( is_set )
     {
@@ -99,7 +99,7 @@ CTC::CTC( bln is_set = false )
     }
     else
     {
-        _MemSet( &tc, 0, sizeof(tc) );
+        _MemSet( &_tc, 0, sizeof(_tc) );
     }
 }
 

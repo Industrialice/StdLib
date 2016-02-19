@@ -2159,11 +2159,11 @@ template < bln is_extendable > bln ArgParserHelper( char type, void *p_source, u
 
     struct NoName
     {
-        static FORCEINLINE bln CheckSize( bln is_extendable, char **containerBuf, char **curBuf, uiw appendedLen, uiw *availibleLen, uiw neededLen, void *ob, char *(*RequestMoreSize)(void *, uiw) )
+        static FORCEINLINE bln CheckSize( bln is_ext, char **containerBuf, char **curBuf, uiw appendedLen, uiw *availibleLen, uiw neededLen, void *ob, char *(*RequestMoreSize)(void *, uiw) )
         {
             if( neededLen > *availibleLen )
             {
-				if( is_extendable == false )
+				if( is_ext == false )
 				{
 					DBGBREAK;
 					return false;
@@ -2471,7 +2471,7 @@ uiw Funcs::PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_li
 	--maxLen;
 
     Nullable < uiw > written = PrintToStrArgListImpl < false, false >( 0, 0, p_str, maxLen, cp_fmt, args, 0, 0 );
-    p_str[ written.IsNull() ? 0 : written ] = '\0';
+    p_str[ written.IsNull() ? 0 : written.Get() ] = '\0';
     return written;
 }
 
@@ -2479,7 +2479,7 @@ uiw Funcs::_PrintToContainer( void *cont, char *(*RequestMoreSize)(void *, uiw),
 {
     ASSUME( cont && RequestMoreSize && cp_fmt );
     Nullable < uiw > written = PrintToStrArgListImpl < false, true >( 0, 0, 0, 0, cp_fmt, args, cont, RequestMoreSize );
-    return written.IsNull() ? 0 : written;
+    return written.IsNull() ? 0 : written.Get();
 }
 
 #if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)

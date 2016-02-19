@@ -11,7 +11,7 @@
 #include <errno.h>
 #include <dirent.h>
 
-NOINLINE bln Files::RemoveFile( const char *cp_pnn, SError *po_error )
+NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *po_error )
 {
     ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
 
@@ -22,32 +22,32 @@ NOINLINE bln Files::RemoveFile( const char *cp_pnn, SError *po_error )
         {
             if( errno == EACCES )
             {
-                *po_error = Error::Get( Error::NoAccess );
+                *po_error = Error::NoAccess();
             }
             else if( errno == ENOENT )
             {
-                *po_error = Error::Get( Error::DoesNotExists );
+                *po_error = Error::DoesNotExist();
             }
             else
             {
-                *po_error = Error::Get( Error::Unknown );
+                *po_error = Error::Unknown();
             }
         }
         else
         {
-            *po_error = Error::Get( Error::Ok );
+            *po_error = Error::Ok();
         }
     }
 
     return funcResult;
 }
 
-NOINLINE bln Files::RemoveFolder( const char *cp_path, SError *po_error )
+NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *po_error )
 {
     ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH );
     DIR *p_dir;
     struct dirent *po_dir;
-    SError o_error = Error::Get( Error::Ok );
+    CError o_error = Error::Ok();
     bln funcResult = false;
     char a_buf[ MAX_PATH ];
     uiw cpyIndex = Funcs::StrCpyAndCountWONull( a_buf, cp_path );
@@ -55,7 +55,7 @@ NOINLINE bln Files::RemoveFolder( const char *cp_path, SError *po_error )
 
     if( !IsFolderExists( cp_path ) )
     {
-        o_error = Error::Get( Error::DoesNotExists );
+        o_error = Error::DoesNotExist();
         goto toExit;
     }
 
@@ -80,7 +80,7 @@ NOINLINE bln Files::RemoveFolder( const char *cp_path, SError *po_error )
             struct stat o_stat;
             if( ::stat( a_buf, &o_stat ) != 0 )
             {
-                o_error = Error::Get( Error::Unknown );
+                o_error = Error::Unknown();
                 ::closedir( p_dir );
                 goto toExit;
             }
@@ -110,7 +110,7 @@ NOINLINE bln Files::RemoveFolder( const char *cp_path, SError *po_error )
     funcResult = ::rmdir( cp_path ) == 0;
     if( !funcResult )
     {
-        o_error = Error::Get( Error::Unknown );
+        o_error = Error::Unknown();
     }
 
 toExit:
@@ -152,13 +152,13 @@ bln Files::IsFileReadOnlySet( const char *cp_pnn, bln is_ro )
     return false;
 }
 
-bln Files::IsAbsolutePath( const char *pnn, uiw parseLen = uiw_max )
+bln Files::IsAbsolutePath( const char *pnn, uiw parseLen )
 {
     DBGBREAK;  //  TODO: complete
     return true;
 }
 
-NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, SError *po_error )
+NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, CError *po_error )
 {
     ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH) );
 
@@ -166,12 +166,12 @@ NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, SEr
     uiw len = Funcs::StrCpyAndCountWONull( a_buf, cp_where );
     _StrCpy( a_buf + len, cp_name );
     bln funcResult = false;
-    SError o_error = Error::Get( Error::Ok );
+    CError o_error = Error::Ok();
     mode_t process_mask;
 
     if( IsFolderExists( a_buf ) )
     {
-        o_error = Error::Get( Error::AlreadyExists );
+        o_error = Error::AlreadyExists();
         goto toExit;
     }
 
@@ -180,7 +180,7 @@ NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, SEr
     ::umask( process_mask );
     if( !funcResult )
     {
-        o_error = Error::Get( Error::Unknown );
+        o_error = Error::Unknown();
     }
 
 toExit:
@@ -261,19 +261,19 @@ NOINLINE uiw Files::ExtractExtensionFromString( const char *cp_str, char *RSTR p
 
 bln Files::EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask )
 {
-#error
+	DBGBREAK;  //  TODO:
     return false;
 }
 
 bln Files::EnumNextFile( CFileEnumInfo *info )
 {
-#error
+	DBGBREAK;  //  TODO:
     return false;
 }
 
 void Files::EnumFilesRecursively( const char *path, const char *mask, EnumFilesCallback callback, void *argument )
 {
-#error
+	DBGBREAK;  //  TODO:
 }
 
 #endif POSIX

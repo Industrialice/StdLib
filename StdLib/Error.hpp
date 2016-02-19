@@ -98,4 +98,4 @@ namespace Error
 
 }  //  namespace StdLib
 
-#endif __ERROR_HPP__
+#endif

@@ -140,7 +140,7 @@ public:
         {
             _reserved = _count;
         }
-        _arr = allocator::Alloc < X >( _reserved );
+        _arr = allocator::template Alloc < X >( _reserved );
     }
 
     void _Transfer( _CBasisVec *source )
@@ -295,7 +295,7 @@ public:
 
     ~_CBasisVec()
     {
-        allocator::Free < X >( _arr );
+        allocator::template Free < X >( _arr );
     }
 
     _CBasisVec() : _arr( 0 ), _count( 0 )
@@ -304,12 +304,12 @@ public:
     _CBasisVec( count_type count, count_type reserve ) : _count( count )
     {
         ASSUME( reserve != TypeDesc < count_type >::max );
-        _arr = allocator::Alloc < X >( count );
+        _arr = allocator::template Alloc < X >( count );
     }
 
     void _Transfer( _CBasisVec *source )
     {
-        allocator::Free < X >( _arr );
+        allocator::template Free < X >( _arr );
         _arr = source->_arr;
         source->_arr = 0;
         _count = source->_count;
@@ -440,7 +440,7 @@ public:
     {
         if( _count > static_size )
         {
-            allocator::Free < X >( _dynamicArr );
+            allocator::template Free < X >( _dynamicArr );
         }
     }
 
@@ -452,7 +452,7 @@ public:
         ASSUME( reserve != TypeDesc < count_type >::max );
         if( _count > static_size )
         {
-            _dynamicArr = allocator::Alloc < X >( count );
+            _dynamicArr = allocator::template Alloc < X >( count );
         }
     }
 
@@ -460,7 +460,7 @@ public:
     {
         if( _count > static_size )
         {
-            allocator::Free( _dynamicArr );
+            allocator::template Free( _dynamicArr );
         }
         if( source->_count > static_size )  //  static move can't be handled here, do nothing if static
         {
@@ -492,7 +492,7 @@ public:
             {
                 if( _count <= static_size )  //  we're currently using a static array
                 {
-                    X *tempArr = allocator::Alloc < X >( newCount );
+                    X *tempArr = allocator::template Alloc < X >( newCount );
                     _MemCpy( tempArr, (X *)&_preallocatedArr, sizeof(X) * _count );
                     _dynamicArr = tempArr;
                 }

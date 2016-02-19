@@ -14,7 +14,7 @@ CEvent::~CEvent()
 
 CEvent::CEvent( bln isInitiallySignaling /* = false */, bln isResetAfterWait /* = false */ )
 {
-    _handle.isResetAfterWait = isResetAfterWait;
+    _handle.is_resetAfterWait = isResetAfterWait;
     _handle.is_set = isInitiallySignaling;
 
     int result = pthread_cond_init( &_handle.cond, NULL );
@@ -25,7 +25,7 @@ CEvent::CEvent( bln isInitiallySignaling /* = false */, bln isResetAfterWait /* 
 
 void CEvent::WaitFor( ui32 timeout )
 {
-#error
+	DBGBREAK;  //  WTF?  //  TODO:
     int result = pthread_mutex_lock( &_handle.lock );
     ASSUME( result == 0 );
 
@@ -35,7 +35,7 @@ void CEvent::WaitFor( ui32 timeout )
         ASSUME( result == 0 );
     }
 
-    if( _handle.isResetAfterWait )
+    if( _handle.is_resetAfterWait )
     {
         _handle.is_set = false;
     }

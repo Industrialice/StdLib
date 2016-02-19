@@ -19,6 +19,25 @@ struct I32Color;
 struct F96Color;
 struct F128Color;
 
+typedef struct Plane : CharPOD
+{
+	f32 a, b, c, d;
+} plane;
+
+typedef ui32 colori32web;
+
+#define COLORI32WEB_ARGB( a, r, g, b ) ((a) << 24 | (r) << 16 | (g) << 8 | (b))
+#define COLORI32WEB_RGB( r, g, b ) (0xFF000000 | (r) << 16 | (g) << 8 | (b))
+#define COLORI32WEB_GETA( color ) ((color) >> 24)
+#define COLORI32WEB_GETR( color ) ((color) >> 16 & 0xFF)
+#define COLORI32WEB_GETG( color ) ((color) >> 8 & 0xFF)
+#define COLORI32WEB_GETB( color ) ((color) & 0xFF)
+
+const f32 FULLTURN = f32_pi * 2.f;
+
+#define DEGREETORADIAN( deg ) ((deg) * (f32_pi / 180.f))
+#define RADIANTODEGREE( rad ) ((rad) * (180.f / f32_pi))
+
 typedef struct M4x4 : CharPOD
 {
     union
@@ -423,16 +442,16 @@ template < ui32 rbits, ui32 gbits, ui32 bbits, ui32 abits = 0 > struct TColorRGB
     {
         if( rbits == 8 && gbits == 8 && bbits == 8 && abits == 0 )
         {
-            color = colorInA8R8B8G8 & 0xFFffFF;
+            color = colorInA8R8B8G8.rgba & 0xFFffFF;
         }
         else if( rbits == 8 && gbits == 8 && bbits == 8 && abits == 8 )
         {
-            color = colorInA8R8B8G8 << 8;
-            color |= colorInA8R8B8G8 >> 24;
+            color = colorInA8R8B8G8.rgba << 8;
+            color |= colorInA8R8B8G8.rgba >> 24;
         }
         else
         {
-            Construct( COLORI32WEB_GETR( colorInA8R8B8G8 ), COLORI32WEB_GETG( colorInA8R8B8G8 ), COLORI32WEB_GETB( colorInA8R8B8G8 ), COLORI32WEB_GETA( colorInA8R8B8G8 ) );
+            Construct( COLORI32WEB_GETR( colorInA8R8B8G8.rgba ), COLORI32WEB_GETG( colorInA8R8B8G8.rgba ), COLORI32WEB_GETB( colorInA8R8B8G8.rgba ), COLORI32WEB_GETA( colorInA8R8B8G8.rgba ) );
         }
     }
 
@@ -509,30 +528,11 @@ private:
     }
 };
 
-typedef struct Plane : CharPOD
-{
-    f32 a, b, c, d;
-} plane;
-
-typedef ui32 colori32web;
-
-#define COLORI32WEB_ARGB( a, r, g, b ) ((a) << 24 | (r) << 16 | (g) << 8 | (b))
-#define COLORI32WEB_RGB( r, g, b ) (0xFF000000 | (r) << 16 | (g) << 8 | (b))
-#define COLORI32WEB_GETA( color ) ((color) >> 24)
-#define COLORI32WEB_GETR( color ) ((color) >> 16 & 0xFF)
-#define COLORI32WEB_GETG( color ) ((color) >> 8 & 0xFF)
-#define COLORI32WEB_GETB( color ) ((color) & 0xFF)
-
-const f32 FULLTURN = f32_pi * 2.f;
-
 const m4x4 co_Iden4x4( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
 const m4x3 co_Iden4x3( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 );
 const m3x4 co_Iden3x4( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0 );
 const m3x3 co_Iden3x3( 1, 0, 0, 0, 1, 0, 0, 0, 1 );
 const m2x2 co_Iden2x2( 1, 0, 0, 1 );
-
-#define DEGREETORADIAN( deg ) ((deg) * (f32_pi / 180.f))
-#define RADIANTODEGREE( rad ) ((rad) * (180.f / f32_pi))
 
 }  //  namespace StdLib
 

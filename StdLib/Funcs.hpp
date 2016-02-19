@@ -325,7 +325,7 @@ namespace Funcs
 		{
 			argType.size = sizeof(uiw); //  when array, size can be off
 			argType.is_pointer = true;
-			if( typeid(TypeDesc < X >::type) == typeid(char) )
+			if( typeid(typename TypeDesc < X >::type) == typeid(char) )
 			{
 				argType.is_string = true;
 			}
@@ -907,4 +907,4 @@ namespace Funcs
 
 }  //  namespace StdLib
 
-#endif __FUNCS_HPP__
+#endif

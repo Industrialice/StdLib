@@ -22,6 +22,8 @@ static const char FSPathSep = '\\';
 #elif defined(POSIX)
 
 #include <unistd.h>
+#include <pthread.h>
+#include <dirent.h> 
 
 typedef timespec tcs;
 typedef DIR * fileEnumHandle;
@@ -45,4 +47,4 @@ static const char FSPathSep = '/';
 
 #endif
 
-#endif __PLATFORM_TYPES_HPP__
+#endif
