@@ -72,6 +72,28 @@ public:
 	CTError( ui32 code, const char *errorClass, const char *description, const additionT &addition ) : CError( code, errorClass, description ), addition( addition )
 	{}
 
+	CTError( const CError &error, const additionT &addition ) : CError( error ), addition( addition )
+	{}
+
+	CTError( const CError &source ) : CError( source )
+	{}
+
+	CTError &operator = ( const CError &source )
+	{
+		CError::operator =( source );
+		return *this;
+	}
+
+	bln operator == ( const CError &other ) const
+	{
+		return CError::operator ==( other );
+	}
+
+	bln operator != ( const CError &other ) const
+	{
+		return CError::operator !=( other );
+	}
+
 	const additionT &Addition() const
 	{
 		return addition;

@@ -238,18 +238,6 @@ bln FileIO::Private::SizeSet( CFileBasis *file, ui64 newSize )
     return false;
 }
 
-FileIO::OpenMode::OpenMode_t FileIO::Private::OpenModeGet( const CFileBasis *file )
-{
-    ASSUME( IsValid( file ) );
-    return file->openMode;
-}
-
-FileIO::ProcMode::ProcMode_t FileIO::Private::ProcModeGet( const CFileBasis *file )
-{
-    ASSUME( IsValid( file ) );
-    return file->procMode;
-}
-
 NOINLINE ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
 {
     ASSUME( IsValid( file ) );

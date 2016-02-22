@@ -29,7 +29,7 @@ void GetSizes()
         }
     }
 
-    FileIO::CFile file( "widths.txt", FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write, 0 );
+    FileIO::CFile file( "widths.txt", FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write );
     if( !file.IsOpened() )
     {
         ::printf( "failed to create file widths.txt\n" );

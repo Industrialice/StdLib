@@ -46,7 +46,7 @@ public:
     {
         CTC tc = CTC( true );
 
-        FileIO::CFile extensions = FileIO::CFile( "exts.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read | FileIO::ProcMode::SequentialScan, 0 );
+        FileIO::CFile extensions = FileIO::CFile( "exts.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read, FileIO::CacheMode::LinearRead, 0 );
         if( !extensions.IsOpened() )
         {
             ::printf( "can't open file exts.txt\n" );

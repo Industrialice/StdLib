@@ -221,3 +221,21 @@ void FileIO::Private::StatsReset( CFileBasis *file )
     ASSUME( IsValid( file ) );
     _Clear( &file->stats );
 }
+
+FileIO::OpenMode::OpenMode_t FileIO::Private::OpenModeGet( const CFileBasis *file )
+{
+	ASSUME( IsValid( file ) );
+	return file->openMode;
+}
+
+FileIO::ProcMode::ProcMode_t FileIO::Private::ProcModeGet( const CFileBasis *file )
+{
+	ASSUME( IsValid( file ) );
+	return file->procMode;
+}
+
+FileIO::CacheMode::CacheMode_t FileIO::Private::CacheModeGet( const CFileBasis *file )
+{
+	ASSUME( IsValid( file ) );
+	return file->cacheMode;
+}

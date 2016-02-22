@@ -14,7 +14,7 @@ static void MakeFixes( const char *pnn, TextFixerMode::mode_t fixMode )
 {
     uiw localFixes = GlobalFixes;
 
-    FileIO::CFile file( pnn, FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read | FileIO::ProcMode::SequentialScan, 0 );
+    FileIO::CFile file( pnn, FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read, FileIO::CacheMode::LinearRead );
     if( !file.IsOpened() )
     {
         ::printf( "failed to open %s to read\n", pnn );
@@ -271,7 +271,7 @@ static void MakeFixes( const char *pnn, TextFixerMode::mode_t fixMode )
 
     if( localFixes != GlobalFixes )
     {
-        file.Open( pnn, FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write, 0 );
+        file.Open( pnn, FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write );
         if( !file.IsOpened() )
         {
             ::printf( "failed to open %s to write\n", pnn );

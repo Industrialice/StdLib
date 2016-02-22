@@ -506,6 +506,35 @@ int __cdecl main()
 		::printf( "%s\n", path );
 	}
 
+	CTError < CStr > error;
+	FileIO::CFile testFile( "test.txt", FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write, FileIO::CacheMode::Default, &error );
+	if( !testFile.IsOpened() )
+	{
+		::printf( "failed to 0 open file error %s addition %s\n", error.Description(), error.Addition() );
+		getchar();
+		return 1;
+	}
+
+	::printf( "size 0 %u\n", testFile.SizeGet() );
+
+	testFile.Write( "hey", 3 );
+
+	testFile.Close();
+
+	testFile.Open( "test.txt", FileIO::OpenMode::CreateIfDoesNotExist, FileIO::ProcMode::Write | FileIO::ProcMode::Append, FileIO::CacheMode::Default, &error );
+	if( !testFile.IsOpened() )
+	{
+		::printf( "failed to 1 open file error %s addition %s\n", error.Description(), error.Addition() );
+		getchar();
+		return 1;
+	}
+
+	::printf( "size 0 %u\n", testFile.SizeGet() );
+
+	testFile.Write( "yo", 2 );
+	
+	testFile.Close();
+
     //CStr entry = LogEntry( "you have ", 52, " apples" );
     //CStr entry = Concat( CStr{ "one" }, CStr{ "two" } );
 

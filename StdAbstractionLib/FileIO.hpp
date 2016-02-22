@@ -24,9 +24,17 @@ namespace FileIO
         CONSTS_OPED( ProcMode_t,
                 Read = BIT( 1 ),
                 Write = BIT( 2 ),
-                SequentialScan = BIT( 3 ),  /*  required Read  */
-                Append = BIT( 4 ) )  /*  required Write, will set the pointer to the end of the file when opening  */
+                Append = BIT( 3 ) )  /*  requires Write, will set the pointer to the end of the file when opening, makes existing part of the file virtually invisible( isn't reported with Size calls, isn't accessible through offset sets )  */
     }
+
+	namespace CacheMode
+	{
+		CONSTS_OPED( CacheMode_t,
+			Default = 0,
+			LinearRead = BIT( 1 ),  //  requires ProcMode::Read, can't be used with RandomRead
+			RandomRead = BIT( 2 ),  //  requires ProcMode::Read, can't be used with LinearRead
+			DisableSystemWriteCache = BIT( 3 ) )  //  requires ProcMode::Write
+	}
 
     namespace OffsetMode
     {
@@ -58,10 +66,10 @@ namespace FileIO
         struct CFileBasis : CharMovable
         {
             fileHandle handle;
-            OpenMode::OpenMode_t openMode;
-            ProcMode::ProcMode_t procMode;
 
             FileIO::SStats stats;
+
+			ui64 offsetToStart;  //  used only when you're using ProcMode::Append, the file will be opened as usual, then the offset will be added so you can't work with the existing part of the file
 
             byte *buffer;
             bln is_customBuffer;
@@ -69,6 +77,10 @@ namespace FileIO
             ui32 bufferSize;
             ui32 bufferPos;
             ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
+
+			OpenMode::OpenMode_t openMode;
+			ProcMode::ProcMode_t procMode;
+			CacheMode::CacheMode_t cacheMode;
 
             #ifdef WINDOWS
                 CStr pnn;
@@ -78,7 +90,7 @@ namespace FileIO
         /*  Core Functions  */
         EXTERNAL void Initialize( CFileBasis *file );
         EXTERNAL void Destroy( CFileBasis *file );
-        EXTERNAL bln Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CError *po_error );
+        EXTERNAL bln Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, CTError < CStr > *po_error );
         EXTERNAL void Close( CFileBasis *file );
         EXTERNAL bln IsValid( const CFileBasis *file );
         EXTERNAL bln Write( CFileBasis *file, const void *cp_source, ui32 len );
@@ -89,11 +101,12 @@ namespace FileIO
         EXTERNAL void StatsReset( CFileBasis *file );
         EXTERNAL bln Flush( CFileBasis *file );  //  false if writing to file failed to complete
         EXTERNAL i64 OffsetGet( CFileBasis *file );  //  -1 on fail, current offset on success
-        EXTERNAL i64 OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error );  //  -1 on fail, current offset on success
-        EXTERNAL ui64 SizeGet( CFileBasis *file );
+        EXTERNAL i64 OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error );  //  -1 on fail, current offset on success, will Flush buffers
+        EXTERNAL ui64 SizeGet( CFileBasis *file, CError *error = 0 );  //  returns 0 on error
         EXTERNAL bln SizeSet( CFileBasis *file, ui64 newSize );
         EXTERNAL OpenMode::OpenMode_t OpenModeGet( const CFileBasis *file );
         EXTERNAL ProcMode::ProcMode_t ProcModeGet( const CFileBasis *file );
+		EXTERNAL CacheMode::CacheMode_t CacheModeGet( const CFileBasis *file );
         EXTERNAL ui32 PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len
     }
 
@@ -109,10 +122,10 @@ namespace FileIO
             Private::Initialize( this );
         }
 
-        CFile( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CError *po_error )
+        CFile( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, CTError < CStr > *po_error = 0 )
         {
             Private::Initialize( this );
-            Private::Open( this, pnn, openMode, procMode, po_error );
+            Private::Open( this, pnn, openMode, procMode, cacheMode, po_error );
         }
 
         CFile( const CFile &source )  //  bufferization will not be derived  TODO: file position?
@@ -120,7 +133,7 @@ namespace FileIO
             Private::Initialize( this );
             char pnn[ MAX_PATH ];
             source.PNNGet( pnn );
-            Private::Open( this, pnn, source.OpenModeGet(), source.ProcModeGet(), 0 );
+            Private::Open( this, pnn, source.OpenModeGet(), source.ProcModeGet(), source.CacheModeGet(), 0 );
         }
 
         CFile & operator = ( const CFile &source )  //  bufferization will not be derived  TODO: file position?
@@ -130,7 +143,7 @@ namespace FileIO
                 Close();
                 char pnn[ MAX_PATH ];
                 source.PNNGet( pnn );
-                Private::Open( this, pnn, source.OpenModeGet(), source.ProcModeGet(), 0 );
+                Private::Open( this, pnn, source.OpenModeGet(), source.ProcModeGet(), source.CacheModeGet(), 0 );
             }
             return *this;
         }
@@ -149,10 +162,10 @@ namespace FileIO
         }
 #endif
 
-        void Open( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CError *po_error )
+        void Open( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, CTError < CStr > *po_error = 0 )
         {
             Close();
-            Private::Open( this, pnn, openMode, procMode, po_error );
+            Private::Open( this, pnn, openMode, procMode, cacheMode, po_error );
         }
 
         void Close()
@@ -229,6 +242,11 @@ namespace FileIO
         {
             return Private::ProcModeGet( this );
         }
+
+		CacheMode::CacheMode_t CacheModeGet() const
+		{
+			return Private::CacheModeGet( this );
+		}
 
         ui32 PNNGet( char *p_buf ) const  //  pass 0 as p_buf to get only len
         {
