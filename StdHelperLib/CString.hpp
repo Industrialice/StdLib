@@ -1,10 +1,13 @@
 #ifndef __CSTRING_HPP__
 #define __CSTRING_HPP__
 
+#include <wchar.h>
+
 #include <StdCoreLib.hpp>
 #include "Reservators.hpp"
 #include "Allocators.hpp"
 #include "Iterator.hpp"
+#include "Algorithm.hpp"
 
 #define _MemCpyStr( a, b, c ) memcpy( a, b, (c) * sizeof(charType) )
 #define _MemMoveStr( a, b, c ) memmove( a, b, (c) * sizeof(charType) )
@@ -12,6 +15,31 @@
 namespace StdLib
 {
 const uiw StringDefReserve = 16;
+
+template < typename forCharType > struct _EmptyStr
+{
+    static FORCEINLINE const forCharType *Get()
+    {
+        static const forCharType ret[ 1 ] = {};
+        return ret;
+    }
+};
+
+template <> struct _EmptyStr < char >
+{
+    static FORCEINLINE const char *Get()
+    {
+        return "";
+    }
+};
+
+template <> struct _EmptyStr < wchar_t >
+{
+    static FORCEINLINE const wchar_t *Get()
+    {
+        return L"";
+    }
+};
 
 template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType), typename reservator = Reservator::Half <>, typename allocator = Allocator::Simple > class TCStr : CharMovable
 {
@@ -368,11 +396,6 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         thisStr[ _count ] = (charType)0;
     }
 
-    charType *Str()
-    {
-        return IsStatic() ? _static_str : _dynamic_str;
-    }
-
 public:
     typedef Iterator::_IterRandom < charType, 1 > Iter;
     typedef Iterator::_IterRandomConst < charType, 1 > IterConst;
@@ -473,7 +496,7 @@ public:
     {
         if( str == 0 )
         {
-            str = "";
+            str = _EmptyStr < charType >::Get();
         }
 
         uiw len = GetStringLength( str );
@@ -514,8 +537,8 @@ public:
 
     NOINLINE TCStr( const charType *str0, uiw len0, const charType *str1, uiw len1 )
     {
-        ASSUME( str0 |= 0 || len0 == 0 );
-        ASSUME( str1 |= 0 || len1 == 0 );
+        ASSUME( str0 != 0 || len0 == 0 );
+        ASSUME( str1 != 0 || len1 == 0 );
 
         _count = len0 + len1;
         charType *thisStr;
@@ -621,6 +644,16 @@ public:
         }
         thisStr[ _count ] = (charType)0;
     }
+
+	charType *Str()
+	{
+		return IsStatic() ? _static_str : _dynamic_str;
+	}
+
+	const charType *Str() const
+	{
+		return IsStatic() ? _static_str : _dynamic_str;
+	}
 
     const charType *CStr() const
     {
@@ -796,7 +829,7 @@ public:
     {
         if( s == 0 )
         {
-            return;
+            return *this;
         }
         InsertString < true >( pos, s, GetStringLength( s ) );
         return *this;
@@ -1179,7 +1212,7 @@ public:
         if( s == 0 )
         {
             ASSUME( n == 0 || n == uiw_max );
-            s = "";
+            s = _EmptyStr < charType >::Get();
         }
 
         if( n == uiw_max )
@@ -1339,7 +1372,7 @@ public:
     {
         if( str == 0 )
         {
-            str = "";
+            str = _EmptyStr < charType >::Get();
         }
         return TCStr( this->CStr(), this->_count, str, GetStringLength( str ) );
     }
@@ -1353,7 +1386,7 @@ public:
     {
         if( str == 0 )
         {
-            str = "";
+            str = _EmptyStr < charType >::Get();
         }
         return TCStr( str, GetStringLength( str ), second.CStr(), second._count );
     }
@@ -1373,7 +1406,7 @@ public:
     {
         if( str == 0 )
         {
-            str = "";
+            str = _EmptyStr < charType >::Get();
         }
         AddString < true >( str, GetStringLength( str ) );
         return *this;
@@ -1398,7 +1431,7 @@ public:
     {
         if( str == 0 )
         {
-            str = "";
+            str = _EmptyStr < charType >::Get();
         }
         return IsStringEquals( CStr(), str );
     }
@@ -1422,7 +1455,7 @@ public:
     {
         if( str == 0 )
         {
-            str = "";
+            str = _EmptyStr < charType >::Get();
         }
         return StringCompare( CStr(), str ) < 0;
     }
@@ -1436,7 +1469,7 @@ public:
     {
         if( str == 0 )
         {
-            str = "";
+            str = _EmptyStr < charType >::Get();
         }
         return StringCompare( CStr(), str ) > 0;
     }
@@ -1452,7 +1485,7 @@ public:
     }
 };
 
-//  TODO: I really need to instantiate them somewhere
+//  defined in StdHelperLib.cpp
 #if defined(EXTERN_TEMPLATES_SUPPORTED) && defined(EXTERN_TEMPLATES_ALLOWED)
     extern template class TCStr< char, StringDefReserve, Reservator::Half <>, Allocator::Simple >;
     extern template class TCStr< wchar_t, StringDefReserve, Reservator::Half <>, Allocator::Simple >;

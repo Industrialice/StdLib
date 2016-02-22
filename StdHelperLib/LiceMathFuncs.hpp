@@ -270,4 +270,4 @@ namespace LiceMath
 }
 }
 
-#endif __LICE_MATH_FUNCS_HPP__
+#endif

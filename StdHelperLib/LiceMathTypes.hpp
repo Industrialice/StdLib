@@ -536,4 +536,4 @@ const m2x2 co_Iden2x2( 1, 0, 0, 1 );
 
 }  //  namespace StdLib
 
-#endif __LICE_MATH_TYPES_HPP__
+#endif

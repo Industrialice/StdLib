@@ -62,4 +62,4 @@ namespace Misc
 
 }  //  namespace StdLib
 
-#endif __MISC_HPP__
+#endif

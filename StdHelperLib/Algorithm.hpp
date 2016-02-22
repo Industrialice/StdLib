@@ -108,4 +108,4 @@ namespace StdLib
   }
 }
 
-#endif __ALGORITHM_HPP__
+#endif

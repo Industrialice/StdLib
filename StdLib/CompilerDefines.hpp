@@ -102,7 +102,7 @@
         #endif
 
         #ifdef BIG_ENDIAN
-            #error your CPU isn't BIG_ENDIAN
+            #error your CPU isn not BIG_ENDIAN
         #endif
     #endif
 
@@ -266,8 +266,6 @@
 			#define UNREACHABLE __builtin_unreachable()
 			#define ASSUME( what ) do { if( !(what) ) { __builtin_unreachable(); } } while( 0 )
 		#endif
-
-		#undef TYPETRAITS_SUPPORTED /* temporary */
 	#endif
 
     #define INT64_NUMBER long long

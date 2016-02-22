@@ -19,6 +19,26 @@ namespace
         PROT_EXEC | PROT_READ,  //  6 - Execute + Read
         PROT_EXEC | PROT_WRITE | PROT_READ  //  7 - Execute + Write + Read
     };
+
+    bln is_Initialized;
+
+    class __MiscData
+    {
+        ui32 _cpuCoresCount;
+
+    public:
+        void Initialize( ui32 cpuCoresCount )
+        {
+            _cpuCoresCount = cpuCoresCount;
+            is_Initialized = true;
+        }
+
+        ui32 CpuCoresCount() const
+        {
+            ASSUME( is_Initialized );
+            return _cpuCoresCount;
+        }
+    } MiscData;
 }
 
 //  VirtualMem
@@ -86,7 +106,7 @@ bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
 
 ui32 CPU::CoresNum()
 {
-	DBGBREAK;  //  TODO:
+    return MiscData.CpuCoresCount();
 }
 
 //  TC
@@ -189,6 +209,8 @@ const tcs &CTC::TCSGet() const
 
 void Misc::Private::Initialize()
 {
+    int cpuCores = sysconf( _SC_NPROCESSORS_ONLN );
+    MiscData.Initialize( cpuCores );
 }
 
-#endif POSIX
+#endif

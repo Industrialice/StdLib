@@ -14,7 +14,7 @@ namespace FileIO
     namespace OpenMode
     {
         CONSTS( OpenMode_t,
-                CreateIfNotExists,
+                CreateIfDoesNotExist,
                 CreateAlways,
                 OpenExisting )
     }
@@ -38,18 +38,19 @@ namespace FileIO
 
     struct SStats
     {
-        ui32 writesToBufferCount;
-        ui32 writesToFileCount;
-        ui32 readsFromBufferCount;
-        ui32 readsFromFileCount;
-        ui32 bytesFromBufferReaded;
-        ui32 bytesFromFileReaded;
-        ui32 bytesToBufferWritten;
-        ui32 bytesToFileWritten;
-        ui32 bufferedWrites;
-        ui32 unbufferedWrites;
-        ui32 bufferedReads;
-        ui32 unbufferedReads;
+		typedef ui64 counter_t;
+		counter_t writesToBufferCount;
+		counter_t writesToFileCount;
+		counter_t readsFromBufferCount;
+		counter_t readsFromFileCount;
+		counter_t bytesFromBufferReaded;
+		counter_t bytesFromFileReaded;
+		counter_t bytesToBufferWritten;
+		counter_t bytesToFileWritten;
+		counter_t bufferedWrites;
+		counter_t unbufferedWrites;
+		counter_t bufferedReads;
+		counter_t unbufferedReads;
     };
 
     namespace Private
@@ -58,7 +59,7 @@ namespace FileIO
         {
             fileHandle handle;
             OpenMode::OpenMode_t openMode;
-            FileIO::ProcMode::ProcMode_t procMode;
+            ProcMode::ProcMode_t procMode;
 
             FileIO::SStats stats;
 
@@ -260,4 +261,4 @@ namespace FileIO
 
 }  //  namespace StdLib
 
-#endif __FILE_IO_HPP__
+#endif

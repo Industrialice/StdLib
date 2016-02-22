@@ -42,4 +42,4 @@ namespace StdLib
   }
 }
 
-#endif __ALLOCATORS_HPP__
+#endif

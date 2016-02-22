@@ -23,4 +23,4 @@ namespace StdLib
     };
 }
 
-#endif __EVENT_HPP__
+#endif

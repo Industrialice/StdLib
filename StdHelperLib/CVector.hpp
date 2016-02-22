@@ -1250,4 +1250,4 @@ template < typename X, uiw count > CRefVec < X > MakeRefVec( X (&source)[ count 
 
 }  //  namespace StdLib
 
-#endif __CVECTOR_HPP__
+#endif

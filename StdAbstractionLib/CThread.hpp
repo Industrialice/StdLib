@@ -34,4 +34,4 @@ public:
 
 }  //  namespace StdLib
 
-#endif __CTHREAD_HPP__
+#endif

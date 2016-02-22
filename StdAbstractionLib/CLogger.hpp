@@ -56,4 +56,4 @@ public:
 
 }  //  namespace StdLib
 
-#endif __CLOGGER_HPP__
+#endif

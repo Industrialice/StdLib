@@ -290,4 +290,4 @@ void Misc::Private::Initialize()
     MiscData.Initialize( memPageSize, cpuCoresCount, freqMult32, freqMult64, freqDivU64 );
 }
 
-#endif WINDOWS
+#endif

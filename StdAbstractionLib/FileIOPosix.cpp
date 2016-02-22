@@ -2,73 +2,34 @@
 
 #ifdef POSIX
 
-#define _LARGEFILE64_SOURCE
-#define _FILE_OFFSET_BITS 64
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #include "FileIO.hpp"
-#include "Funcs.hpp"
+#include "Files.hpp"
 
-struct SFile
+namespace StdLib
 {
-    int handle;
-    FileIO::ProcMode::ProcMode_t attribs;
-
-    union
+    namespace FileIO
     {
-        struct
+        namespace Private
         {
-            ui32 writesToBufferCount;
-            ui32 writesToFileCount;
-            ui32 readsFromBufferCount;
-            ui32 readsFromFileCount;
-            ui32 bytesFromBufferReaded;
-            ui32 bytesFromFileReaded;
-            ui32 bytesToBufferWritten;
-            ui32 bytesToFileWritten;
-            ui32 bufferedWrites;
-            ui32 unbufferedWrites;
-            ui32 bufferedReads;
-            ui32 unbufferedReads;
-        };
-        FileIO::SStats stats;
-    };
-
-    byte *buffer;
-    ui32 bufferSize;
-    ui32 bufferPos;
-    ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
-    ui32 bufferSize;
-    ui32 bufferPos;
-};
-
-#define dis ((SFile *)file.GetVal())
-
-namespace
-{
-    CVector < SFile * > o_Files;
-}
-
-namespace FileIO
-{
-    namespace Private
-    {
-        NOINLINE bln WriteToFile( filehdl file, const void *cp_source, ui32 len );
-        NOINLINE bln ReadFromFile( filehdl file, void *p_target, ui32 len, ui32 *p_readed );
-        NOINLINE bln CancelCachedRead( filehdl file );
+            NOINLINE bln WriteToFile( CFileBasis *file, const void *cp_source, ui32 len );
+            NOINLINE bln ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
+            NOINLINE bln CancelCachedRead( CFileBasis *file );
+        }
     }
 }
 
-NOINLINE filehdl FileIO::Open( const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, SError *po_error )
+NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CError *po_error )
 {
     ASSUME( cp_pnn );
-    SError o_error = Error::Get( Error::InvalidArgument );
-    filehdl retHdl = 0;
-    int file;
-    SFile *po_file;
+    file->handle = -1;
+    CError o_error = Error::InvalidArgument();
+    int fileHandle;
     mode_t process_mask;
     int flags = 0;
     int seekResult;
@@ -108,13 +69,24 @@ NOINLINE filehdl FileIO::Open( const char *cp_pnn, OpenMode::OpenMode_t openMode
         }
     }
 
-    if( openMode == OpenMode::CreateIfNotExists )
+    if( openMode == OpenMode::CreateIfDoesNotExist )
     {
         flags |= O_CREAT;
     }
     else if( openMode == OpenMode::CreateAlways )
     {
-        flags |= O_CREAT | O_TRUNC;
+        if( flags == O_CREAT )  //  we need to truncate file, but we can't do it if we can't write to it
+        {
+            if( !Files::RemoveFile( cp_pnn, &o_error ) )
+            {
+                goto toExit;
+            }
+            flags |= O_CREAT;
+        }
+        else
+        {
+            flags |= O_CREAT | O_TRUNC;
+        }
     }
     else  //  if( openMode == OpenMode::OpenExisting )
     {
@@ -122,87 +94,101 @@ NOINLINE filehdl FileIO::Open( const char *cp_pnn, OpenMode::OpenMode_t openMode
     }
 
     process_mask = ::umask( 0 );
-    file = ::open( cp_pnn, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH );
+    fileHandle = ::open( cp_pnn, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH );
     ::umask( process_mask );
-    if( file == -1 )
+    if( fileHandle == -1 )
     {
-        o_error = Error::GetOther( FileError::CanNotOpenFile, Private::GetErrorsDesc() );
+		switch( errno )
+		{
+		case EACCES:
+		case EFAULT:
+		case EROFS:
+		case ETXTBSY:
+			o_error = Error::NoAccess();
+			break;
+		case EEXIST:
+			o_error = Error::AlreadyExists();
+			break;
+		case EINTR:
+			o_error = Error::Interrupted();
+			break;
+		case ENOENT:
+			o_error = Error::DoesNotExist();
+			break;
+		case ENOMEM:
+		case ENFILE:
+		case EMFILE:
+		case ENOSPC:
+			o_error = Error::OutOfMemory();
+			break;
+		default:
+			o_error = Error::CannotOpenFile();
+		}
         goto toExit;
     }
 
     if( procMode & ProcMode::Append )
     {
-        seekResult = ::lseek64( file, 0, SEEK_END );
+        seekResult = ::lseek64( fileHandle, 0, SEEK_END );
         if( seekResult == -1 )
         {
-            o_error = Error::Get( Error::Unknown );
+            o_error = Error::Unknown();
             goto toExit;
         }
     }
 
-    po_file = (SFile *)::malloc( sizeof(SFile) );
-    _Clear( po_file );
-    o_Files.PushBack( po_file );
+    file->openMode = openMode;
+    file->procMode = procMode;
+    file->handle = fileHandle;
+    file->bufferPos = 0;
+    file->readBufferCurrentSize = 0;
 
-    po_file->attribs = procMode;
-    po_file->handle = file;
-
-    retHdl = po_file;
-
-    o_error = Error::Get( Error::Ok );
+    o_error = Error::Ok();
 
 toExit:
     DSA( po_error, o_error );
-    return retHdl;
+    return file->handle != -1;
 }
 
-NOINLINE void FileIO::Close( filehdl file )
+NOINLINE void FileIO::Private::Close( CFileBasis *file )
 {
-    ASSUME( IsValid( dis ) );
-    uiw index;
-    bln is_finded = o_Files.Find( dis, &index );
-    if( !is_finded )
+    ASSUME( file );
+    if( file->handle == -1 )
     {
-        DBGBREAK;
         return;
     }
-    ASSUME( dis->handle != -1 );
-    Flush( dis );
-    int result = ::close( dis->handle );
+    Flush( file );
+    int result = ::close( file->handle );
     ASSUME( result == 0 );
-    ::free( dis );
-    o_Files.Erase( index, 1 );
+    file->handle = -1;
 }
 
-bln FileIO::IsValid( filehdl file )
+bln FileIO::Private::IsValid( const CFileBasis *file )
 {
-    bln is_valid = dis != 0 && o_Files.Find( dis, 0 );
-    ASSUME( !is_valid || dis->handle != -1 );
-    return is_valid;
+    ASSUME( file );
+    return file->handle != -1;
 }
 
-#include "FileIOAny.priv"  //  FileIO platform independent code is placed here
-
-i64 FileIO::OffsetGet( filehdl file )
+i64 FileIO::Private::OffsetGet( CFileBasis *file )
 {
-    ASSUME( dis && dis->handle != -1 );
-    off64_t offset = ::lseek64( dis->handle, 0, SEEK_CUR );
+    ASSUME( IsValid( file ) );
+    off64_t offset = ::lseek64( file->handle, 0, SEEK_CUR );
     ASSUME( offset != -1 );
-    return offset + (off64_t)dis->bufferPos - (off64_t)dis->bufferPos;
+    return offset + (off64_t)file->bufferPos - (off64_t)file->bufferPos;
 }
 
-NOINLINE i64 FileIO::OffsetSet( filehdl file, OffsetMode::OffsetMode_t mode, i64 offset, SError *po_error )
+NOINLINE i64 FileIO::Private::OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error )
 {
-    ASSUME( dis && dis->handle != -1 );
-    SError o_error = Error::Get( Error::Ok );
+    ASSUME( IsValid( file ) );
+    CError o_error = Error::Ok();
     off64_t result = -1;
     int whence;
 
-    if( !CancelCachedRead( dis ) )
+    if( !CancelCachedRead( file ) )
     {
         return false;
     }
-    if( !Flush( dis ) )
+    if( !Flush( file ) )
     {
         return false;
     }
@@ -221,14 +207,14 @@ NOINLINE i64 FileIO::OffsetSet( filehdl file, OffsetMode::OffsetMode_t mode, i64
     }
     else
     {
-        o_error = Error::Get( Error::InvalidArgument );
+        o_error = Error::InvalidArgument();
         goto toExit;
     }
 
-    result = ::lseek64( dis->handle, offset, whence );
+    result = ::lseek64( file->handle, offset, whence );
     if( result == -1 )
     {
-        o_error = Error::Get( Error::Unknown );
+        o_error = Error::Unknown();
         goto toExit;
     }
 
@@ -237,26 +223,38 @@ toExit:
     return result;
 }
 
-ui64 FileIO::SizeGet( filehdl file )
+ui64 FileIO::Private::SizeGet( CFileBasis *file )
 {
-    ASSUME( dis && dis->handle != -1 );
+    ASSUME( IsValid( file ) );
     struct stat64 o_stat;
-    int result = ::fstat64( dis->handle, &o_stat );
+    int result = ::fstat64( file->handle, &o_stat );
     ASSUME( result != -1 );
     return o_stat.st_size;
 }
 
-FileIO::ProcMode::ProcMode_t FileIO::ProcModeGet( filehdl file )
+bln FileIO::Private::SizeSet( CFileBasis *file, ui64 newSize )
 {
-    ASSUME( dis && dis->handle != -1 );
-    return dis->attribs;
+    DBGBREAK;  //  TODO:
+    return false;
 }
 
-NOINLINE ui32 FileIO::PNNGet( filehdl file, char *p_buf )
+FileIO::OpenMode::OpenMode_t FileIO::Private::OpenModeGet( const CFileBasis *file )
 {
-    ASSUME( dis && dis->handle != -1 );
+    ASSUME( IsValid( file ) );
+    return file->openMode;
+}
+
+FileIO::ProcMode::ProcMode_t FileIO::Private::ProcModeGet( const CFileBasis *file )
+{
+    ASSUME( IsValid( file ) );
+    return file->procMode;
+}
+
+NOINLINE ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
+{
+    ASSUME( IsValid( file ) );
     char a_proc[ 512 ] = "/proc/self/fd/";
-    Funcs::IntToStrDec( dis->handle, a_proc + sizeof("/proc/self/fd/") - 1 );
+    Funcs::IntToStrDec( file->handle, a_proc + sizeof("/proc/self/fd/") - 1 );
     char a_buf[ 4096 ];
     ssize_t len = ::readlink( a_proc, a_buf, sizeof(a_buf) - 1 );
     if( len == -1 )
@@ -275,51 +273,51 @@ NOINLINE ui32 FileIO::PNNGet( filehdl file, char *p_buf )
     return len;
 }
 
-NOINLINE bln FileIO::Private::CancelCachedRead( filehdl file )
+NOINLINE bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len )
 {
-    ASSUME( FileIO::IsValid( dis ) );
-    if( dis->bufferPos == dis->readBufferCurrentSize )
-    {
-        return true;
-    }
-    i32 move = (i32)dis->bufferPos - (i32)dis->readBufferCurrentSize;
-    off64_t result = ::lseek64( dis->handle, move, SEEK_CUR );
-    dis->bufferPos = dis->readBufferCurrentSize = dis->bufferSize;
-    return result != -1;
-}
-
-NOINLINE bln FileIO::Private::WriteToFile( filehdl file, const void *cp_source, ui32 len )
-{
-    ASSUME( FileIO::IsValid( dis ) && (cp_source || len == 0) );
-    ++dis->writesToFileCount;
+    ASSUME( IsValid( file ) && (cp_source || len == 0) );
+    ++file->stats.writesToFileCount;
     if( !len )
     {
         return true;
     }
-    ssize_t written = ::write( dis->handle, cp_source, len );
+    ssize_t written = ::write( file->handle, cp_source, len );
     if( written == -1 )
     {
         return false;
     }
-    dis->bytesToFileWritten += len;
+    file->stats.bytesToFileWritten += len;
     return true;
 }
 
-NOINLINE bln FileIO::Private::ReadFromFile( filehdl file, void *p_target, ui32 len, ui32 *p_readed )
+NOINLINE bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
 {
-    ASSUME( FileIO::IsValid( dis ) && p_target );
-    DSA( p_readed, 0 );
-    ++dis->readsFromFileCount;
-    ssize_t readed = ::read( dis->handle, p_target, len );
+    ASSUME( IsValid( file ) && (p_target || len == 0) );
+    ++file->stats.readsFromFileCount;
+    ssize_t readed = ::read( file->handle, p_target, len );
     if( readed == -1 )
     {
         return false;
     }
-    dis->bytesFromFileReaded += readed;
-    DSA( p_readed, readed );
+    file->stats.bytesFromFileReaded += readed;
+    if( p_readed )
+    {
+        *p_readed += readed;
+    }
     return true;
 }
 
-#undef dis
+NOINLINE bln FileIO::Private::CancelCachedRead( CFileBasis *file )
+{
+    ASSUME( IsValid( file ) );
+    if( file->bufferPos == file->readBufferCurrentSize )
+    {
+        return true;
+    }
+    i32 move = (i32)file->bufferPos - (i32)file->readBufferCurrentSize;
+    off64_t result = ::lseek64( file->handle, move, SEEK_CUR );
+    file->bufferPos = file->readBufferCurrentSize = file->bufferSize;
+    return result != -1;
+}
 
-#endif POSIX
+#endif

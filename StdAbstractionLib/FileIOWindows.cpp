@@ -53,7 +53,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
         goto toExit;
     }
 
-    if( openMode == OpenMode::CreateIfNotExists )
+    if( openMode == OpenMode::CreateIfDoesNotExist )
     {
         dwCreationDisposition = OPEN_ALWAYS;
     }
@@ -275,9 +275,9 @@ ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
     return file->pnn.Size();
 }
 
-NOINLINE bln FileIO::Private::WriteToFile( FileIO::Private::CFileBasis *file, const void *cp_source, ui32 len )
+NOINLINE bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len )
 {
-    ASSUME( FileIO::Private::IsValid( file ) && (cp_source || len == 0) );
+    ASSUME( IsValid( file ) && (cp_source || len == 0) );
     ++file->stats.writesToFileCount;
     if( !len )
     {
@@ -292,9 +292,9 @@ NOINLINE bln FileIO::Private::WriteToFile( FileIO::Private::CFileBasis *file, co
     return true;
 }
 
-NOINLINE bln FileIO::Private::ReadFromFile( FileIO::Private::CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
+NOINLINE bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
 {
-    ASSUME( FileIO::Private::IsValid( file ) && (p_target || len == 0) );
+    ASSUME( IsValid( file ) && (p_target || len == 0) );
     DWORD readed = 0;
     ++file->stats.readsFromFileCount;
     if( len != 0 )
@@ -312,9 +312,9 @@ NOINLINE bln FileIO::Private::ReadFromFile( FileIO::Private::CFileBasis *file, v
     return true;
 }
 
-NOINLINE bln FileIO::Private::CancelCachedRead( FileIO::Private::CFileBasis *file )
+NOINLINE bln FileIO::Private::CancelCachedRead( CFileBasis *file )
 {
-    ASSUME( FileIO::Private::IsValid( file ) );
+    ASSUME( IsValid( file ) );
     if( !file->is_reading || file->bufferPos == file->readBufferCurrentSize )
     {
         return true;
@@ -327,4 +327,4 @@ NOINLINE bln FileIO::Private::CancelCachedRead( FileIO::Private::CFileBasis *fil
     return result != FALSE;
 }
 
-#endif WINDOWS
+#endif

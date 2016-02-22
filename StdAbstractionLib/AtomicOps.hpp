@@ -57,24 +57,24 @@ namespace StdLib
 
             typedef volatile int atomic32;
 
-            FORCEINLINE atomic32 Acquire_Load( const volatile atomic32 *value )
+            inline atomic32 Acquire_Load( const volatile atomic32 *value )
             {
                 atomic32 ret = *value;
                 //__sync_synchronize();  following Epic Games
                 return ret;
             }
 
-            FORCEINLINE atomic32 Increment( volatile atomic32 *value )
+            inline atomic32 Increment( volatile atomic32 *value )
             {
                 return __sync_add_and_fetch( value, 1 );
             }
 
-            FORCEINLINE atomic32 Decrement( volatile atomic32 *value )
+            inline atomic32 Decrement( volatile atomic32 *value )
             {
                 return __sync_add_and_fetch( value, -1 );
             }
 
-            FORCEINLINE atomic32 Exchange( volatile atomic32 *value, atomic32 exchange )
+            inline atomic32 Exchange( volatile atomic32 *value, atomic32 exchange )
             {
                 atomic32 oldVal;
                 do
@@ -84,7 +84,7 @@ namespace StdLib
                 return oldVal;
             }
 
-            FORCEINLINE void Set( volatile atomic32 *value, atomic32 set )
+            inline void Set( volatile atomic32 *value, atomic32 set )
             {
                 atomic32 oldVal;
                 do
@@ -93,7 +93,7 @@ namespace StdLib
                 } while ( !__sync_bool_compare_and_swap( value, oldVal, set ) );
             }
 
-            FORCEINLINE atomic32 CompareExchange( volatile atomic32 *value, atomic32 exchange, atomic32 comparand )
+            inline atomic32 CompareExchange( volatile atomic32 *value, atomic32 exchange, atomic32 comparand )
             {
                 return __sync_val_compare_and_swap( value, comparand, exchange );
             }

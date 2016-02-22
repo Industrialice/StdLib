@@ -172,11 +172,6 @@ NOINLINE bln Files::IsFileReadOnlySet( const char *cp_pnn, bln is_ro )
     return true;
 }
 
-bln Files::IsAbsolutePath( const char *pnn, uiw parseLen /* = uiw_max */ )
-{
-    return Funcs::IsChrAlpha( pnn[ 0 ] ) && pnn[ 1 ] == ':' && (pnn[ 2 ] == '/' || pnn[ 2 ] == '\\');
-}
-
 NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, CError *po_error )
 {
     ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH) );
@@ -275,13 +270,37 @@ NOINLINE uiw Files::ExtractExtensionFromString( const char *cp_str, char *RSTR p
     return Funcs::StrCpyAndCount( p_buf, cp_str + lastDot + 1 );
 }
 
-NOINLINE uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char a_procedPath[ MAX_PATH ] )
+bln Files::IsAbsolutePath( const char *pnn, uiw parseLen /* = uiw_max */ )
+{
+	return Funcs::IsChrAlpha( pnn[ 0 ] ) && pnn[ 1 ] == ':' && (pnn[ 2 ] == '/' || pnn[ 2 ] == '\\');  //  TODO:
+}
+
+NOINLINE uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char (&a_procedPath)[ MAX_PATH ] )
 {
     #ifdef _WIN32_WCE
         return Funcs::StrCpyAndCount( a_procedPath, cp_sourcePath );
     #else
         return ::GetFullPathNameA( cp_sourcePath, MAX_PATH, a_procedPath, 0 );
     #endif
+}
+
+bln Files::CurrentWorkingPath( char *buf, uiw maxLen, uiw *copied )
+{
+	DWORD result = ::GetCurrentDirectoryA( maxLen, buf );
+	if( result == 0 || result >= maxLen )  //  if result bigger than maxLen, maxLen wasn't enough
+	{
+		if( result == 0 )
+		{
+			DSA( copied, 0 );
+		}
+		else
+		{
+			DSA( copied, uiw_max );
+		}
+		return false;
+	}
+	DSA( copied, result );
+	return true;
 }
 
 struct CFileEnumerator : public Files::CFileEnumInfo
@@ -430,4 +449,4 @@ void Files::Private::CloseEnumHandle( fileEnumHandle handle )
     ::FindClose( handle );
 }
 
-#endif WINDOWS
+#endif

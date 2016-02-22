@@ -158,6 +158,31 @@ bln Files::IsAbsolutePath( const char *pnn, uiw parseLen )
     return true;
 }
 
+uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char(&a_procedPath)[ MAX_PATH ] )
+{
+	DBGBREAK;  //  TODO: complete
+	return 0;
+}
+
+bln Files::CurrentWorkingPath( char *buf, uiw maxLen, uiw *copied )
+{
+	char *result = ::getcwd( buf, maxLen );
+	if( result == NULL )
+	{
+		if( errno == ERANGE )
+		{
+			DSA( copied, uiw_max );
+		}
+		else
+		{
+			DSA( copied, 0 );
+		}
+		return false;
+	}
+	DSA( copied, _StrLen( buf ) );
+	return true;
+}
+
 NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, CError *po_error )
 {
     ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH) );
@@ -276,4 +301,4 @@ void Files::EnumFilesRecursively( const char *path, const char *mask, EnumFilesC
 	DBGBREAK;  //  TODO:
 }
 
-#endif POSIX
+#endif

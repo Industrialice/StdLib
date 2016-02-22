@@ -51,4 +51,4 @@ namespace StdLib
 	};
 }
 
-#endif __CMUTEX_HPP__
+#endif
