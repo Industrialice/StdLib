@@ -16,6 +16,7 @@ namespace FileIO
         CONSTS( OpenMode_t,
                 CreateIfDoesNotExist,
                 CreateAlways,
+				CreateNew,  //  creates a new file only if such file doesn't exist
                 OpenExisting )
     }
 
@@ -24,7 +25,7 @@ namespace FileIO
         CONSTS_OPED( ProcMode_t,
                 Read = BIT( 1 ),
                 Write = BIT( 2 ),
-                Append = BIT( 3 ) )  /*  requires Write, will set the pointer to the end of the file when opening, makes existing part of the file virtually invisible( isn't reported with Size calls, isn't accessible through offset sets )  */
+                Append = BIT( 3 ) )  //  requires Write, will set the pointer to the end of the file when opening, makes existing part of the file virtually invisible( isn't reported with Size calls, isn't accessible through offset sets )
     }
 
 	namespace CacheMode

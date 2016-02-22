@@ -24,11 +24,14 @@ namespace StdLib
     }
 }
 
-NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CError *po_error )
+NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, CTError < CStr > *po_error )
 {
-    ASSUME( cp_pnn );
+    ASSUME( cp_pnn && file );
+
     file->handle = -1;
-    CError o_error = Error::InvalidArgument();
+    file->offsetToStart = 0;
+
+    CTError < CStr > o_error;
     int fileHandle;
     mode_t process_mask;
     int flags = 0;
@@ -36,62 +39,103 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
 
     if( (procMode & (ProcMode::Read | ProcMode::Write)) == 0 )
     {
+		o_error = CTError < CStr >( Error::InvalidArgument(), "No read or write was requested" );
         goto toExit;
     }
-    if( procMode & ProcMode::Write )
+
+    if( (procMode & ProcMode::Read) && (procMode & ProcMode::Write) )
     {
-        if( procMode & ProcMode::Read )
-        {
-            flags |= O_RDWR;
-        }
-        else
-        {
-            if( procMode & ProcMode::SequentialScan )
-            {
-                  goto toExit;
-            }
-            flags |= O_WRONLY;
-        }
+        flags |= O_RDWR;
     }
-    else
+    else if( procMode & ProcMode::Read )
     {
         if( procMode & ProcMode::Append )
         {
+            o_error = CTError < CStr >( Error::InvalidArgument(), "ProcMode::Append was requested without ProcMode::Write" );
             goto toExit;
         }
-        if( procMode & ProcMode::Read )
-        {
-            flags |= O_RDONLY;
-        }
-        else
-        {
-            goto toExit;
-        }
+        flags |= O_RDONLY;
+    }
+    else if( procMode & ProcMode::Write )
+    {
+        flags |= O_WRONLY;
+    }
+    else
+    {
+		o_error = CTError < CStr >( Error::InvalidArgument(), "No read or write was requested" );
+        goto toExit;
     }
 
     if( openMode == OpenMode::CreateIfDoesNotExist )
     {
         flags |= O_CREAT;
     }
-    else if( openMode == OpenMode::CreateAlways )
+    else if( openMode == OpenMode::CreateAlways || openMode == OpenMode::CreateNew )
     {
-        if( flags == O_CREAT )  //  we need to truncate file, but we can't do it if we can't write to it
-        {
-            if( !Files::RemoveFile( cp_pnn, &o_error ) )
+		if( procMode & ProcMode::Append )
+		{
+			o_error = CTError < CStr >( Error::InvalidArgument(), "ProcMode::Append can't be used with OpenMode::CreateAlways or OpenMode::CreateNew" );
+			goto toExit;
+		}
+
+		if( openMode == OpenMode::CreateAlways )
+		{
+            if( (procMode & ProcMode::Write) == 0 )  //  we need to truncate file, but we can't do it if we can't write to it, so we just remove it
             {
-                goto toExit;
+                if( !Files::RemoveFile( cp_pnn, &o_error ) )
+                {
+                    goto toExit;
+                }
+                flags |= O_CREAT;
             }
-            flags |= O_CREAT;
+            else
+            {
+                flags |= O_CREAT | O_TRUNC;
+            }
         }
         else
         {
-            flags |= O_CREAT | O_TRUNC;
+            flags |= O_CREAT | O_EXCL;
         }
     }
     else  //  if( openMode == OpenMode::OpenExisting )
     {
         ASSUME( openMode == OpenMode::OpenExisting );
     }
+
+    if( cacheMode & (CacheMode::LinearRead | CacheMode::RandomRead) )
+    {
+		if( (cacheMode & (CacheMode::LinearRead | CacheMode::RandomRead)) == (CacheMode::LinearRead | CacheMode::RandomRead) )
+		{
+			o_error = CTError < CStr >( Error::InvalidArgument(), "Both CacheMode::LinearRead and CacheMode::RandomRead are specified" );
+			goto toExit;
+		}
+
+		if( (procMode & ProcMode::Read) == 0 )
+		{
+			o_error = CTError < CStr >( Error::InvalidArgument(), "CacheMode::LinearRead or CacheMode::RandomRead must be used only when ProcMode::Read is specified" );
+			goto toExit;
+		}
+
+		if( cacheMode & CacheMode::LinearRead )
+		{
+			//  TODO:
+		}
+		else
+		{
+			//  TODO:
+		}
+    }
+	if( cacheMode & CacheMode::DisableSystemWriteCache )
+	{
+		if( (procMode & ProcMode::Write) == 0 )
+		{
+			o_error = CTError < CStr >( Error::InvalidArgument(), "CacheMode::DisableSystemWriteCache must be used only when ProcMode::Write is specified" );
+			goto toExit;
+		}
+
+		//  TODO:
+	}
 
     process_mask = ::umask( 0 );
     fileHandle = ::open( cp_pnn, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH );
@@ -135,10 +179,13 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
             o_error = Error::Unknown();
             goto toExit;
         }
+        file->offsetToStart = seekResult;
     }
 
+	_MemZero( &file->stats, sizeof(SStats) );
     file->openMode = openMode;
     file->procMode = procMode;
+	file->cacheMode = cacheMode;
     file->handle = fileHandle;
     file->bufferPos = 0;
     file->readBufferCurrentSize = 0;
@@ -174,6 +221,7 @@ i64 FileIO::Private::OffsetGet( CFileBasis *file )
     ASSUME( IsValid( file ) );
     off64_t offset = ::lseek64( file->handle, 0, SEEK_CUR );
     ASSUME( offset != -1 );
+    offset += file->offsetToStart;
     return offset + (off64_t)file->bufferPos - (off64_t)file->bufferPos;
 }
 
@@ -186,15 +234,18 @@ NOINLINE i64 FileIO::Private::OffsetSet( CFileBasis *file, OffsetMode::OffsetMod
 
     if( !CancelCachedRead( file ) )
     {
+        o_error = Error::Unknown();
         return false;
     }
     if( !Flush( file ) )
     {
+        o_error = Error::Unknown();
         return false;
     }
 
     if( mode == OffsetMode::FromBegin )
     {
+        offset += file->offsetToStart;
         whence = SEEK_SET;
     }
     else if( mode == OffsetMode::FromCurrent )
@@ -218,18 +269,43 @@ NOINLINE i64 FileIO::Private::OffsetSet( CFileBasis *file, OffsetMode::OffsetMod
         goto toExit;
     }
 
+	if( file->procMode & ProcMode::Append )
+	{
+		if( mode != OffsetMode::FromBegin )
+		{
+			if( result < file->offsetToStart )
+			{
+				result = file->offsetToStart;
+				result = ::lseek64( file->handle, file->offsetToStart, SEEK_SET );
+				if( result == -1 )
+				{
+					o_error = Error::Unknown();
+					goto toExit;
+				}
+			}
+		}
+		ASSUME( result >= file->offsetToStart );
+		result -= file->offsetToStart;
+	}
+
 toExit:
     DSA( po_error, o_error );
     return result;
 }
 
-ui64 FileIO::Private::SizeGet( CFileBasis *file )
+ui64 FileIO::Private::SizeGet( CFileBasis *file, CError *error )
 {
     ASSUME( IsValid( file ) );
     struct stat64 o_stat;
     int result = ::fstat64( file->handle, &o_stat );
-    ASSUME( result != -1 );
-    return o_stat.st_size;
+    if( result == -1 )
+    {
+        DSA( error, Error::Unknown() );
+        return 0;
+    }
+    ASSUME( o_stat.st_size >= file->offsetToStart );
+    DSA( error, Error::Ok() );
+    return o_stat.st_size - file->offsetToStart;
 }
 
 bln FileIO::Private::SizeSet( CFileBasis *file, ui64 newSize )

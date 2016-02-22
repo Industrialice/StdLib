@@ -59,14 +59,22 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     {
         dwCreationDisposition = OPEN_ALWAYS;
     }
-    else if( openMode == OpenMode::CreateAlways )
+    else if( openMode == OpenMode::CreateAlways || openMode == OpenMode::CreateNew )
     {
 		if( procMode & ProcMode::Append )
 		{
-			o_error = CTError < CStr >( Error::InvalidArgument(), "OpenMode::CreateAlways can't be used with ProcMode::Append" );
+			o_error = CTError < CStr >( Error::InvalidArgument(), "ProcMode::Append can't be used with OpenMode::CreateAlways or OpenMode::CreateNew" );
 			goto toExit;
 		}
-        dwCreationDisposition = CREATE_ALWAYS;
+
+		if( openMode == OpenMode::CreateAlways )
+		{
+			dwCreationDisposition = CREATE_ALWAYS;
+		}
+		else
+		{
+			dwCreationDisposition = CREATE_NEW;
+		}
     }
     else  //  if( openMode == OpenMode::OpenExisting )
     {
@@ -126,6 +134,10 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
 		case ERROR_NOT_ENOUGH_MEMORY:
 		case ERROR_OUTOFMEMORY:
 			o_error = Error::OutOfMemory();
+			break;
+		case ERROR_FILE_EXISTS:
+		case ERROR_ALREADY_EXISTS:
+			o_error = Error::AlreadyExists();
 			break;
 		default:
 			o_error = Error::CannotOpenFile();
@@ -259,6 +271,7 @@ NOINLINE i64 FileIO::Private::OffsetSet( CFileBasis *file, OffsetMode::OffsetMod
 				}
 			}
 		}
+		ASSUME( o_move.QuadPart >= file->offsetToStart );
 		o_move.QuadPart -= file->offsetToStart;
 	}
 

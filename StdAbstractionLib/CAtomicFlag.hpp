@@ -95,4 +95,4 @@ namespace StdLib
     #endif
 }
 
-#endif __CATOMIC_FLAG_HPP__
+#endif

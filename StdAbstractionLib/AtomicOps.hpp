@@ -112,4 +112,4 @@ namespace StdLib
     #endif
 }
 
-#endif __ATOMIC_OPS_HPP__
+#endif
