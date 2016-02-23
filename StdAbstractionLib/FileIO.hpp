@@ -72,12 +72,12 @@ namespace FileIO
 
 			ui64 offsetToStart;  //  used only when you're using ProcMode::Append, the file will be opened as usual, then the offset will be added so you can't work with the existing part of the file
 
-            byte *buffer;
-            bln is_customBuffer;
+			UniquePtr < byte, MallocDeleter > internalBuffer;
+			byte *bufferRef;
+			ui32 bufferSize;
+			ui32 bufferPos;
+			ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
             bln is_reading;
-            ui32 bufferSize;
-            ui32 bufferPos;
-            ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
 
 			OpenMode::OpenMode_t openMode;
 			ProcMode::ProcMode_t procMode;
@@ -259,11 +259,21 @@ namespace FileIO
         void Transfer( CFile &&source )
         {
             this->handle = source.handle;
+			this->offsetToStart = source.offsetToStart;
             this->openMode = source.openMode;
             this->procMode = source.procMode;
+			this->cacheMode = source.cacheMode;
             this->stats = source.stats;
-            this->buffer = source.buffer;
-            this->is_customBuffer = source.is_customBuffer;
+			if( source.internalBuffer == source.bufferRef )
+			{
+				this->internalBuffer = std::move( source.internalBuffer );
+				this->bufferRef = this->internalBuffer;
+			}
+			else
+			{
+				this->internalBuffer = 0;
+				this->bufferRef = source.bufferRef;
+			}
             this->is_reading = source.is_reading;
             this->bufferSize = source.bufferSize;
             this->bufferPos = source.bufferPos;

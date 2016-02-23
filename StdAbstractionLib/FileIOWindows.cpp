@@ -159,14 +159,15 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
 
     absPathLen = Files::AbsolutePath( cp_pnn, a_absPath ) + 1;
 
-	_MemZero( &file->stats, sizeof(SStats) );
     file->pnn.Assign( a_absPath, absPathLen );
     file->openMode = openMode;
     file->procMode = procMode;
 	file->cacheMode = cacheMode;
     file->handle = h_file;
     file->bufferPos = 0;
-    file->readBufferCurrentSize = 0;
+	_Clear( &file->stats );
+	file->readBufferCurrentSize = 0;
+	file->is_reading = false;
 
 toExit:
     DSA( po_error, o_error );

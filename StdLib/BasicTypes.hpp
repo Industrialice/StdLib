@@ -366,9 +366,9 @@ template < typename X > struct NewDeleter < X [] >
     }
 };
 
-template < typename X = void > struct MallocDeleter
+struct MallocDeleter
 {
-    MallocDeleter( X *something )
+    MallocDeleter( void *something )
     {
         ::free( something );
     }
