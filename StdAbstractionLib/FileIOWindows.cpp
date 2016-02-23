@@ -357,14 +357,18 @@ NOINLINE ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
 	{
 		ui32 len = p_buf ? MAX_PATH - 1 : 0;
 		DWORD result = StdLib_GetFinalPathNameByHandleA( file->handle, p_buf, MAX_PATH - 1, FILE_NAME_NORMALIZED );
-		if( result == 0 || result > MAX_PATH )
+		if( result < 2 || result > MAX_PATH )
 		{
 			return 0;
 		}
-		return result;
+		return result - 1;  //  subtracting null-terminator length
 	}
 	else
 	{
+		if( p_buf == 0 )
+		{
+			return file->pnn->Size();
+		}
 		ASSUME( file->pnn.Get() );
 		_MemCpy( p_buf, file->pnn->Data(), file->pnn->Size() + 1 );
 		return file->pnn->Size();

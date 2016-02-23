@@ -207,6 +207,7 @@
     <ClInclude Include="CEvent.hpp" />
     <ClInclude Include="CLogger.hpp" />
     <ClInclude Include="FileIO.hpp" />
+    <ClInclude Include="FileMapping.hpp" />
     <ClInclude Include="Files.hpp" />
     <ClInclude Include="Misc.hpp" />
     <ClInclude Include="CMutex.hpp" />
@@ -223,6 +224,8 @@
     <ClCompile Include="FileIOAny.cpp" />
     <ClCompile Include="FileIOPosix.cpp" />
     <ClCompile Include="FileIOWindows.cpp" />
+    <ClCompile Include="FileMappingPosix.cpp" />
+    <ClCompile Include="FileMappingWindows.cpp" />
     <ClCompile Include="FilesPosix.cpp" />
     <ClCompile Include="FilesWindows.cpp" />
     <ClCompile Include="MiscPosix.cpp" />

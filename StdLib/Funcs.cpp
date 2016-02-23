@@ -2201,7 +2201,7 @@ template < bln is_extendable > bln ArgParserHelper( char type, void *p_source, u
             DBGBREAK;
             return false;
         }
-        _MemCpy( p_buf, *(char **)p_source, len );
+        _MemCpy( p_buf, sourceStr, len );
         goto retLen;
     }
     case 'f':  //  f32 [param]
@@ -2359,12 +2359,12 @@ template < bln is_validateStep, bln is_extendable > Nullable < uiw > PrintToStrA
         } \
         else if( expectedType.size == 4 ) \
         { \
-            if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size)) ) { DBGBREAK; return nullv; } \
+            if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size) || argTypes[ argIndex ].size > 4) ) { DBGBREAK; return nullv; } \
             *(ui32 *)&target = va_arg( args, ui32 ); \
         } \
         else if( expectedType.size == 8 ) \
         { \
-            if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size)) ) { DBGBREAK; return nullv; } \
+            if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size) || argTypes[ argIndex ].size > 8) ) { DBGBREAK; return nullv; } \
             *(ui64 *)&target = va_arg( args, ui64 ); \
         } \
         else \

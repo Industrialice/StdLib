@@ -47,6 +47,9 @@
     <ClInclude Include="StdAbstractionLib.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FileMapping.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileIOPosix.cpp">
@@ -98,6 +101,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StdAbstractionLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileMappingWindows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileMappingPosix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

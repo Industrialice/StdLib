@@ -10,6 +10,7 @@
 #include <Misc.hpp>
 //#include <FileIO.hpp>
 //#include <Files.hpp>
+#include <FileMapping.hpp>
 
 #include <PackedIntArray.hpp>
 #include "DeleteShit.hpp"
@@ -499,10 +500,23 @@ int __cdecl main()
 
 	//FindBrokenNames();
 
-	FileIO::CFile file( "test.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read );
-	char path[ MAX_PATH ];
-	ui32 len = file.PNNGet( path );
-	::printf( "path %s len %u\n", path, len );
+	FileMapping::mappingError error;
+	FileIO::CFile testFile( "test.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read );
+	FileMapping::Mapping mapping( &testFile, 0, uiw_max, false, &error );
+	if( !mapping.IsCreated() )
+	{
+		::printf( "failed to create mapping, error %s:%s", error.Description(), error.Addition() );
+		getchar();
+		return 1;
+	}
+
+	ui64 fileSize = testFile.SizeGet();
+	testFile.Close();
+	const char *str = (char *)mapping.Memory();
+
+	char buf[ 128 ];
+	Funcs::PrintToStr( buf, sizeof(buf), "mapping content %[*]s\n", (ui32)fileSize, str );
+	::printf( "%s\n", buf );
 
 #if 0
 	uiw copied;

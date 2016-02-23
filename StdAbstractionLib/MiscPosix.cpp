@@ -46,7 +46,7 @@ namespace
 void *VirtualMem::Reserve( uiw size )
 {
     ASSUME( size );
-    return ::mmap( 0, size, PROT_NONE, MAP_PRIVATE | MAP_ANON, -1, 0);
+    return ::mmap( 0, size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 }
 
 bln VirtualMem::Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
@@ -70,7 +70,7 @@ void *VirtualMem::Alloc( uiw size, PageMode::PageMode_t mode )
         DBGBREAK;
         return 0;
     }
-    return ::mmap( 0, size, prot, MAP_PRIVATE | MAP_ANON, -1, 0);
+    return ::mmap( 0, size, prot, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 }
 
 bln VirtualMem::Free( void *p_mem )
