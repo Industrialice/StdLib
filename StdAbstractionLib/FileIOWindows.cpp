@@ -37,6 +37,13 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     HANDLE h_file;
 	LARGE_INTEGER curPos;
 
+	if( StdLib_GetFinalPathNameByHandleA == 0 )
+	{
+		char fullPath[ MAX_PATH ];
+		Files::AbsolutePath( cp_pnn, fullPath );
+		file->pnn = new CStr( fullPath );
+	}
+
     if( (procMode & (ProcMode::Read | ProcMode::Write)) == 0 )
     {
 		o_error = fileError( Error::InvalidArgument(), "No read or write was requested" );
@@ -348,13 +355,20 @@ NOINLINE ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
     ASSUME( IsValid( file ) );
 	if( StdLib_GetFinalPathNameByHandleA )
 	{
-		//  TODO:
+		ui32 len = p_buf ? MAX_PATH - 1 : 0;
+		DWORD result = StdLib_GetFinalPathNameByHandleA( file->handle, p_buf, MAX_PATH - 1, FILE_NAME_NORMALIZED );
+		if( result == 0 || result > MAX_PATH )
+		{
+			return 0;
+		}
+		return result;
 	}
 	else
 	{
-		//  TODO:
+		ASSUME( file->pnn.Get() );
+		_MemCpy( p_buf, file->pnn->Data(), file->pnn->Size() + 1 );
+		return file->pnn->Size();
 	}
-	return 0;
 }
 
 bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len )

@@ -499,6 +499,12 @@ int __cdecl main()
 
 	//FindBrokenNames();
 
+	FileIO::CFile file( "test.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read );
+	char path[ MAX_PATH ];
+	ui32 len = file.PNNGet( path );
+	::printf( "path %s len %u\n", path, len );
+
+#if 0
 	uiw copied;
 	char buf[ MAX_PATH * 2 ];
 	if( Files::CurrentWorkingPathGet( buf, sizeof(buf), &copied ) == false )
@@ -523,6 +529,7 @@ int __cdecl main()
 	{
 		::printf( "%s\n", buf );
 	}
+#endif
 
 #if 0
 	::printf( "sizeof %u\n", sizeof(FileIO::CFile) );

@@ -84,6 +84,10 @@ namespace FileIO
 			OpenMode::OpenMode_t openMode;
 			ProcMode::ProcMode_t procMode;
 			CacheMode::CacheMode_t cacheMode;
+
+			#ifdef WINDOWS
+				UniquePtr < CStr > pnn;  //  used only on WindowsXP where you can't get PNN from file handle
+			#endif
         };
 
         /*  Core Functions  */
@@ -106,7 +110,7 @@ namespace FileIO
         EXTERNAL OpenMode::OpenMode_t OpenModeGet( const CFileBasis *file );
         EXTERNAL ProcMode::ProcMode_t ProcModeGet( const CFileBasis *file );
 		EXTERNAL CacheMode::CacheMode_t CacheModeGet( const CFileBasis *file );
-        EXTERNAL ui32 PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len
+        EXTERNAL ui32 PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len, returns 0 at failure
 
 		EXTERNAL void Initialize();
     }
@@ -278,6 +282,9 @@ namespace FileIO
             this->bufferSize = source.bufferSize;
             this->bufferPos = source.bufferPos;
             this->readBufferCurrentSize = source.readBufferCurrentSize;
+			#ifdef WINDOWS
+				this->pnn = std::move( source.pnn );
+			#endif
 
             Private::Initialize( &source );
         }
