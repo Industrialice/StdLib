@@ -29,6 +29,9 @@
     <ClCompile Include="DeleteShit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FindBrokenNames.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TextFixer.hpp">

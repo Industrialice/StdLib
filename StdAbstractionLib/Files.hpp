@@ -23,10 +23,11 @@ namespace Files
     EXTERNAL uiw ExtractNameFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  without slashes or something
     EXTERNAL uiw ExtractNameWOExtFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );
     EXTERNAL uiw ExtractExtensionFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  without a dot
+	EXTERNAL bln IsRelativePathSupported();
     EXTERNAL bln IsAbsolutePath( const char *pnn, uiw parseLen = uiw_max );
     EXTERNAL uiw AbsolutePath( const char *RSTR cp_sourcePath, char (&a_procedPath)[ MAX_PATH ] );
-	EXTERNAL bln CurrentWorkingPath( char *buf, uiw maxLen, uiw *copied /* optional */ );  //  maxLen include null-symbol, if buffer was too small, returns false and sets copied to uiw_max, if error, returns false and sets copied to 0
-	//  TODO: add "is relative path supported" and "set relative path"
+	EXTERNAL bln CurrentWorkingPathGet( char *buf, uiw maxLen, uiw *copied /* optional */ );  //  maxLen include null-symbol, if buffer was too small, returns false and sets copied to uiw_max, if error, returns false and sets copied to 0
+	EXTERNAL bln CurrentWorkingPathSet( const char *path );
     EXTERNAL bln EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask );
     EXTERNAL bln EnumNextFile( CFileEnumInfo *info );
     EXTERNAL void EnumFilesRecursively( const char *path, const char *mask, EnumFilesCallback callback, void *argument );

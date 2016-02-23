@@ -152,6 +152,11 @@ bln Files::IsFileReadOnlySet( const char *cp_pnn, bln is_ro )
     return false;
 }
 
+bln Files::IsRelativePathSupported()
+{
+	return true;
+}
+
 bln Files::IsAbsolutePath( const char *pnn, uiw parseLen )
 {
     DBGBREAK;  //  TODO: complete
@@ -164,7 +169,7 @@ uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char(&a_procedPath)[ MA
 	return 0;
 }
 
-bln Files::CurrentWorkingPath( char *buf, uiw maxLen, uiw *copied )
+bln Files::CurrentWorkingPathGet( char *buf, uiw maxLen, uiw *copied )
 {
 	char *result = ::getcwd( buf, maxLen );
 	if( result == NULL )
@@ -181,6 +186,12 @@ bln Files::CurrentWorkingPath( char *buf, uiw maxLen, uiw *copied )
 	}
 	DSA( copied, _StrLen( buf ) );
 	return true;
+}
+
+bln Files::CurrentWorkingPathSet( const char *path )
+{
+	ASSUME( path );
+	return chdir( path ) == 0;
 }
 
 NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, CError *po_error )
@@ -230,7 +241,7 @@ NOINLINE uiw Files::ExtractPathFromString( const char *cp_str, char *RSTR p_buf,
     return lastSlash;
 }
 
-NOINLINE uiw Files::ExtractNameFromString( const char *cp_str, char *p_buf, uiw parseLen/* = uiw_max */ )
+NOINLINE uiw Files::ExtractNameFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen/* = uiw_max */ )
 {
     ASSUME( cp_str && p_buf );
     uiw lastSlash = 0;
@@ -244,7 +255,7 @@ NOINLINE uiw Files::ExtractNameFromString( const char *cp_str, char *p_buf, uiw 
     return Funcs::StrCpyAndCount( p_buf, cp_str + lastSlash + 1 );
 }
 
-NOINLINE uiw Files::ExtractNameWOExtFromString( const char *cp_str, char *p_buf, uiw parseLen/* = uiw_max */ )
+NOINLINE uiw Files::ExtractNameWOExtFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen/* = uiw_max */ )
 {
     ASSUME( cp_str && p_buf );
     uiw lastSlash = 0;

@@ -62,6 +62,8 @@ namespace FileIO
 		counter_t unbufferedReads;
     };
 
+	typedef CTError < const char * > fileError;
+
     namespace Private
     {
         struct CFileBasis : CharMovable
@@ -82,16 +84,12 @@ namespace FileIO
 			OpenMode::OpenMode_t openMode;
 			ProcMode::ProcMode_t procMode;
 			CacheMode::CacheMode_t cacheMode;
-
-            #ifdef WINDOWS
-                CStr pnn;
-            #endif
         };
 
         /*  Core Functions  */
         EXTERNAL void Initialize( CFileBasis *file );
         EXTERNAL void Destroy( CFileBasis *file );
-        EXTERNAL bln Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, CTError < CStr > *po_error );
+        EXTERNAL bln Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error );
         EXTERNAL void Close( CFileBasis *file );
         EXTERNAL bln IsValid( const CFileBasis *file );
         EXTERNAL bln Write( CFileBasis *file, const void *cp_source, ui32 len );
@@ -109,6 +107,8 @@ namespace FileIO
         EXTERNAL ProcMode::ProcMode_t ProcModeGet( const CFileBasis *file );
 		EXTERNAL CacheMode::CacheMode_t CacheModeGet( const CFileBasis *file );
         EXTERNAL ui32 PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len
+
+		EXTERNAL void Initialize();
     }
 
     struct CFile : private Private::CFileBasis
@@ -123,7 +123,7 @@ namespace FileIO
             Private::Initialize( this );
         }
 
-        CFile( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, CTError < CStr > *po_error = 0 )
+        CFile( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, fileError *po_error = 0 )
         {
             Private::Initialize( this );
             Private::Open( this, pnn, openMode, procMode, cacheMode, po_error );
@@ -163,7 +163,7 @@ namespace FileIO
         }
 #endif
 
-        void Open( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, CTError < CStr > *po_error = 0 )
+        void Open( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, fileError *po_error = 0 )
         {
             Close();
             Private::Open( this, pnn, openMode, procMode, cacheMode, po_error );
@@ -278,9 +278,6 @@ namespace FileIO
             this->bufferSize = source.bufferSize;
             this->bufferPos = source.bufferPos;
             this->readBufferCurrentSize = source.readBufferCurrentSize;
-            #ifdef WINDOWS
-                this->pnn = std::move( source.pnn );
-            #endif
 
             Private::Initialize( &source );
         }

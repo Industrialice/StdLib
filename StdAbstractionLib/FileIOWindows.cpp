@@ -18,25 +18,28 @@ namespace StdLib
     }
 }
 
-NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, CTError < CStr > *po_error )
+namespace
+{
+	DWORD( WINAPI *StdLib_GetFinalPathNameByHandleA )(HANDLE hFile, LPSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+}
+
+NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error )
 {
     ASSUME( cp_pnn && file );
 
     file->handle = INVALID_HANDLE_VALUE;
 	file->offsetToStart = 0;
 
-    CTError < CStr > o_error;
+    fileError o_error;
     DWORD dwFlagsAndAttributes = 0;
     DWORD dwDesiredAccess = 0;
     DWORD dwCreationDisposition;
     HANDLE h_file;
-    char a_absPath[ MAX_PATH ];
-    uiw absPathLen;
 	LARGE_INTEGER curPos;
 
     if( (procMode & (ProcMode::Read | ProcMode::Write)) == 0 )
     {
-		o_error = CTError < CStr >( Error::InvalidArgument(), "No read or write was requested" );
+		o_error = fileError( Error::InvalidArgument(), "No read or write was requested" );
         goto toExit;
     }
 
@@ -46,7 +49,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     }
 	else if( procMode & ProcMode::Append )
 	{
-		o_error = CTError < CStr >( Error::InvalidArgument(), "ProcMode::Append was requested without ProcMode::Write" );
+		o_error = fileError( Error::InvalidArgument(), "ProcMode::Append was requested without ProcMode::Write" );
 		goto toExit;
 	}
 
@@ -63,7 +66,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     {
 		if( procMode & ProcMode::Append )
 		{
-			o_error = CTError < CStr >( Error::InvalidArgument(), "ProcMode::Append can't be used with OpenMode::CreateAlways or OpenMode::CreateNew" );
+			o_error = fileError( Error::InvalidArgument(), "ProcMode::Append can't be used with OpenMode::CreateAlways or OpenMode::CreateNew" );
 			goto toExit;
 		}
 
@@ -86,13 +89,13 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     {
 		if( (cacheMode & (CacheMode::LinearRead | CacheMode::RandomRead)) == (CacheMode::LinearRead | CacheMode::RandomRead) )
 		{
-			o_error = CTError < CStr >( Error::InvalidArgument(), "Both CacheMode::LinearRead and CacheMode::RandomRead are specified" );
+			o_error = fileError( Error::InvalidArgument(), "Both CacheMode::LinearRead and CacheMode::RandomRead are specified" );
 			goto toExit;
 		}
 
 		if( (procMode & ProcMode::Read) == 0 )
 		{
-			o_error = CTError < CStr >( Error::InvalidArgument(), "CacheMode::LinearRead or CacheMode::RandomRead must be used only when ProcMode::Read is specified" );
+			o_error = fileError( Error::InvalidArgument(), "CacheMode::LinearRead or CacheMode::RandomRead must be used only when ProcMode::Read is specified" );
 			goto toExit;
 		}
 
@@ -109,7 +112,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
 	{
 		if( (procMode & ProcMode::Write) == 0 )
 		{
-			o_error = CTError < CStr >( Error::InvalidArgument(), "CacheMode::DisableSystemWriteCache must be used only when ProcMode::Write is specified" );
+			o_error = fileError( Error::InvalidArgument(), "CacheMode::DisableSystemWriteCache must be used only when ProcMode::Write is specified" );
 			goto toExit;
 		}
 
@@ -149,7 +152,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     {
         if( !::SetFilePointerEx( h_file, LARGE_INTEGER(), &curPos, FILE_END ) )
         {
-            o_error = CTError < CStr >( Error::Unknown(), "Failed to set file pointer to the end of the file( append )" );
+            o_error = fileError( Error::Unknown(), "Failed to set file pointer to the end of the file( append )" );
             BOOL result = ::CloseHandle( h_file );
             ASSUME( result );
             goto toExit;
@@ -157,9 +160,6 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
 		file->offsetToStart = curPos.QuadPart;
     }
 
-    absPathLen = Files::AbsolutePath( cp_pnn, a_absPath ) + 1;
-
-    file->pnn.Assign( a_absPath, absPathLen );
     file->openMode = openMode;
     file->procMode = procMode;
 	file->cacheMode = cacheMode;
@@ -343,14 +343,18 @@ NOINLINE bln FileIO::Private::SizeSet( CFileBasis *file, ui64 newSize )
     return true;
 }
 
-ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
+NOINLINE ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
 {
     ASSUME( IsValid( file ) );
-    if( p_buf )
-    {
-        _MemCpy( p_buf, file->pnn.Data(), file->pnn.Size() + 1 );
-    }
-    return file->pnn.Size();
+	if( StdLib_GetFinalPathNameByHandleA )
+	{
+		//  TODO:
+	}
+	else
+	{
+		//  TODO:
+	}
+	return 0;
 }
 
 bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len )
@@ -404,6 +408,17 @@ NOINLINE bln FileIO::Private::CancelCachedRead( CFileBasis *file )
     BOOL result = ::SetFilePointerEx( file->handle, o_move, 0, FILE_CURRENT );
     file->bufferPos = file->readBufferCurrentSize = file->bufferSize;
     return result != FALSE;
+}
+
+void FileIO::Private::Initialize()
+{
+	HMODULE k32 = GetModuleHandleA( "kernel32.dll" );
+	if( !k32 )
+	{
+		FatalAppExitA( 1, "StdLib: failed to acquire kernel32.dll handle, can't initialize FileIO" );
+		return;
+	}
+	*(uiw *)&StdLib_GetFinalPathNameByHandleA = (uiw)GetProcAddress( k32, "GetFinalPathNameByHandleA" );
 }
 
 #endif

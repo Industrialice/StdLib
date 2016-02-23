@@ -491,9 +491,42 @@ template < typename... Args > CStr Concat( const Args &... strings )
     static_assert( typeid(strings) == typeid(CStr) )...;
 }
 
+void FindBrokenNames();
+
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
+
+	//FindBrokenNames();
+
+	uiw copied;
+	char buf[ MAX_PATH * 2 ];
+	if( Files::CurrentWorkingPathGet( buf, sizeof(buf), &copied ) == false )
+	{
+		::printf( "failed to get working path, copied %u\n", copied );
+	}
+	else
+	{
+		::printf( "%s\n", buf );
+	}
+
+	if( Files::CurrentWorkingPathSet( "C:/" ) == false )
+	{
+		::printf( "failed to set working dir\n" );
+	}
+
+	if( Files::CurrentWorkingPathGet( buf, sizeof(buf), &copied ) == false )
+	{
+		::printf( "failed to get working path 2, copied %u\n", copied );
+	}
+	else
+	{
+		::printf( "%s\n", buf );
+	}
+
+#if 0
+	::printf( "sizeof %u\n", sizeof(FileIO::CFile) );
+	::printf( "sizeof %u\n", sizeof(FileIO::SStats) );
 
 	char path[ 64 ];
 	uiw copied;
@@ -506,7 +539,7 @@ int __cdecl main()
 		::printf( "%s\n", path );
 	}
 
-	CTError < CStr > error;
+	FileIO::fileError error;
 	FileIO::CFile testFile( "test.txt", FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write, FileIO::CacheMode::Default, &error );
 	if( !testFile.IsOpened() )
 	{
@@ -534,6 +567,7 @@ int __cdecl main()
 	testFile.Write( "yo", 2 );
 	
 	testFile.Close();
+#endif
 
     //CStr entry = LogEntry( "you have ", 52, " apples" );
     //CStr entry = Concat( CStr{ "one" }, CStr{ "two" } );

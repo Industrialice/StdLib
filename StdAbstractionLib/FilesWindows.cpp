@@ -216,7 +216,7 @@ NOINLINE uiw Files::ExtractPathFromString( const char *cp_str, char *RSTR p_buf,
     return lastSlash;
 }
 
-NOINLINE uiw Files::ExtractNameFromString( const char *cp_str, char *p_buf, uiw parseLen/* = uiw_max */ )
+NOINLINE uiw Files::ExtractNameFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen/* = uiw_max */ )
 {
     ASSUME( cp_str && p_buf );
     uiw lastSlash = 0;
@@ -230,7 +230,7 @@ NOINLINE uiw Files::ExtractNameFromString( const char *cp_str, char *p_buf, uiw 
     return Funcs::StrCpyAndCount( p_buf, cp_str + lastSlash );
 }
 
-NOINLINE uiw Files::ExtractNameWOExtFromString( const char *cp_str, char *p_buf, uiw parseLen/* = uiw_max */ )
+NOINLINE uiw Files::ExtractNameWOExtFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen/* = uiw_max */ )
 {
     ASSUME( cp_str && p_buf );
     uiw lastSlash = 0;
@@ -270,6 +270,15 @@ NOINLINE uiw Files::ExtractExtensionFromString( const char *cp_str, char *RSTR p
     return Funcs::StrCpyAndCount( p_buf, cp_str + lastDot + 1 );
 }
 
+bln Files::IsRelativePathSupported()
+{
+#ifdef _WIN32_WCE
+	return false;
+#else
+	return true;
+#endif
+}
+
 bln Files::IsAbsolutePath( const char *pnn, uiw parseLen /* = uiw_max */ )
 {
 	return Funcs::IsChrAlpha( pnn[ 0 ] ) && pnn[ 1 ] == ':' && (pnn[ 2 ] == '/' || pnn[ 2 ] == '\\');  //  TODO:
@@ -284,7 +293,7 @@ NOINLINE uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char (&a_proce
     #endif
 }
 
-bln Files::CurrentWorkingPath( char *buf, uiw maxLen, uiw *copied )
+bln Files::CurrentWorkingPathGet( char *buf, uiw maxLen, uiw *copied )
 {
 	DWORD result = ::GetCurrentDirectoryA( maxLen, buf );
 	if( result == 0 || result >= maxLen )  //  if result bigger than maxLen, maxLen wasn't enough
@@ -301,6 +310,12 @@ bln Files::CurrentWorkingPath( char *buf, uiw maxLen, uiw *copied )
 	}
 	DSA( copied, result );
 	return true;
+}
+
+bln Files::CurrentWorkingPathSet( const char *path )
+{
+	ASSUME( path );
+	return ::SetCurrentDirectoryA( path ) != FALSE;
 }
 
 struct CFileEnumerator : public Files::CFileEnumInfo

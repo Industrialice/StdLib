@@ -24,14 +24,14 @@ namespace StdLib
     }
 }
 
-NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, CTError < CStr > *po_error )
+NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error )
 {
     ASSUME( cp_pnn && file );
 
     file->handle = -1;
     file->offsetToStart = 0;
 
-    CTError < CStr > o_error;
+    fileError o_error;
     int fileHandle;
     mode_t process_mask;
     int flags = 0;
@@ -39,7 +39,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
 
     if( (procMode & (ProcMode::Read | ProcMode::Write)) == 0 )
     {
-		o_error = CTError < CStr >( Error::InvalidArgument(), "No read or write was requested" );
+		o_error = fileError( Error::InvalidArgument(), "No read or write was requested" );
         goto toExit;
     }
 
@@ -51,7 +51,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     {
         if( procMode & ProcMode::Append )
         {
-            o_error = CTError < CStr >( Error::InvalidArgument(), "ProcMode::Append was requested without ProcMode::Write" );
+            o_error = fileError( Error::InvalidArgument(), "ProcMode::Append was requested without ProcMode::Write" );
             goto toExit;
         }
         flags |= O_RDONLY;
@@ -62,7 +62,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     }
     else
     {
-		o_error = CTError < CStr >( Error::InvalidArgument(), "No read or write was requested" );
+		o_error = fileError( Error::InvalidArgument(), "No read or write was requested" );
         goto toExit;
     }
 
@@ -74,7 +74,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     {
 		if( procMode & ProcMode::Append )
 		{
-			o_error = CTError < CStr >( Error::InvalidArgument(), "ProcMode::Append can't be used with OpenMode::CreateAlways or OpenMode::CreateNew" );
+			o_error = fileError( Error::InvalidArgument(), "ProcMode::Append can't be used with OpenMode::CreateAlways or OpenMode::CreateNew" );
 			goto toExit;
 		}
 
@@ -107,13 +107,13 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
     {
 		if( (cacheMode & (CacheMode::LinearRead | CacheMode::RandomRead)) == (CacheMode::LinearRead | CacheMode::RandomRead) )
 		{
-			o_error = CTError < CStr >( Error::InvalidArgument(), "Both CacheMode::LinearRead and CacheMode::RandomRead are specified" );
+			o_error = fileError( Error::InvalidArgument(), "Both CacheMode::LinearRead and CacheMode::RandomRead are specified" );
 			goto toExit;
 		}
 
 		if( (procMode & ProcMode::Read) == 0 )
 		{
-			o_error = CTError < CStr >( Error::InvalidArgument(), "CacheMode::LinearRead or CacheMode::RandomRead must be used only when ProcMode::Read is specified" );
+			o_error = fileError( Error::InvalidArgument(), "CacheMode::LinearRead or CacheMode::RandomRead must be used only when ProcMode::Read is specified" );
 			goto toExit;
 		}
 
@@ -130,7 +130,7 @@ NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMo
 	{
 		if( (procMode & ProcMode::Write) == 0 )
 		{
-			o_error = CTError < CStr >( Error::InvalidArgument(), "CacheMode::DisableSystemWriteCache must be used only when ProcMode::Write is specified" );
+			o_error = fileError( Error::InvalidArgument(), "CacheMode::DisableSystemWriteCache must be used only when ProcMode::Write is specified" );
 			goto toExit;
 		}
 
@@ -383,5 +383,8 @@ NOINLINE bln FileIO::Private::CancelCachedRead( CFileBasis *file )
     file->bufferPos = file->readBufferCurrentSize = file->bufferSize;
     return result != -1;
 }
+
+void FileIO::Private::Initialize()
+{}
 
 #endif
