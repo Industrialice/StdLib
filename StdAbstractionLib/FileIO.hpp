@@ -9,8 +9,6 @@ namespace StdLib {
 
 namespace FileIO
 {
-    struct CFile;
-
     namespace OpenMode
     {
         CONSTS( OpenMode_t,
@@ -86,7 +84,7 @@ namespace FileIO
 			CacheMode::CacheMode_t cacheMode;
 
 			#ifdef WINDOWS
-				UniquePtr < CStr > pnn;  //  used only on WindowsXP where you can't get PNN from file handle
+				UniquePtr < CStr > pnn;  //  used only on WindowsXP where you can't get PNN from the file handle
 			#endif
         };
 
@@ -115,8 +113,12 @@ namespace FileIO
 		EXTERNAL void Initialize();
     }
 
-    struct CFile : private Private::CFileBasis
+    class CFile : private Private::CFileBasis
     {
+		CFile( const CFile &source );
+		CFile & operator = ( const CFile &source );
+
+	public:
         ~CFile()
         {
             Private::Destroy( this );
@@ -131,26 +133,6 @@ namespace FileIO
         {
             Private::Initialize( this );
             Private::Open( this, pnn, openMode, procMode, cacheMode, po_error );
-        }
-
-        CFile( const CFile &source )  //  bufferization will not be derived  TODO: file position?
-        {
-            Private::Initialize( this );
-            char pnn[ MAX_PATH ];
-            source.PNNGet( pnn );
-            Private::Open( this, pnn, source.OpenModeGet(), source.ProcModeGet(), source.CacheModeGet(), 0 );
-        }
-
-        CFile & operator = ( const CFile &source )  //  bufferization will not be derived  TODO: file position?
-        {
-            if( this != &source )
-            {
-                Close();
-                char pnn[ MAX_PATH ];
-                source.PNNGet( pnn );
-                Private::Open( this, pnn, source.OpenModeGet(), source.ProcModeGet(), source.CacheModeGet(), 0 );
-            }
-            return *this;
         }
 
 #ifdef MOVE_SUPPORTED
@@ -253,10 +235,33 @@ namespace FileIO
 			return Private::CacheModeGet( this );
 		}
 
-        ui32 PNNGet( char *p_buf ) const  //  pass 0 as p_buf to get only len
+        ui32 PNNGet( char *p_buf ) const  //  pass 0 as p_buf to get only len, will return 0 on error
         {
             return Private::PNNGet( this, p_buf );
         }
+
+		void TransferTo( CFile *target )  //  use this method if std::move isn't supported
+		{
+			target->Close();
+
+			target->handle = this->handle;
+			target->offsetToStart = this->offsetToStart;
+			target->openMode = this->openMode;
+			target->procMode = this->procMode;
+			target->cacheMode = this->cacheMode;
+			target->stats = this->stats;
+			target->bufferRef = this->bufferRef;
+			target->internalBuffer = this->internalBuffer.TakeAway();
+			target->is_reading = this->is_reading;
+			target->bufferSize = this->bufferSize;
+			target->bufferPos = this->bufferPos;
+			target->readBufferCurrentSize = this->readBufferCurrentSize;
+			#ifdef WINDOWS
+				target->pnn = this->pnn.TakeAway();
+			#endif
+
+			Private::Initialize( this );
+		}
         
 #ifdef MOVE_SUPPORTED
     private:
