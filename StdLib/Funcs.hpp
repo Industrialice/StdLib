@@ -49,66 +49,66 @@ namespace StdLib {
 
 namespace Funcs
 {
-    EXTERNAL i32 RandomI32();  //  [ 0x80000000 ; 0x7FffFFff ]
-    EXTERNAL ui32 RandomUI32();  //  [ 0 ; 0xFFffFFff ]
-    EXTERNAL f32 RandomF32();  //  [ 0.f ; 1.f ]
-    EXTERNAL i32 RandomRangeI32( i32 from, i32 to );
-    EXTERNAL ui32 RandomRangeUI32( ui32 from, ui32 to );
-    EXTERNAL f32 RandomRangeF32( f32 from, f32 to );
-    EXTERNAL ui32 RandomUI32Limit( ui32 limit );  //  [ 0; limit )
+    EXTERNALS i32 RandomI32();  //  [ 0x80000000 ; 0x7FffFFff ]
+    EXTERNALS ui32 RandomUI32();  //  [ 0 ; 0xFFffFFff ]
+    EXTERNALS f32 RandomF32();  //  [ 0.f ; 1.f ]
+    EXTERNALS i32 RandomRangeI32( i32 from, i32 to );
+    EXTERNALS ui32 RandomRangeUI32( ui32 from, ui32 to );
+    EXTERNALS f32 RandomRangeF32( f32 from, f32 to );
+    EXTERNALS ui32 RandomUI32Limit( ui32 limit );  //  [ 0; limit )
 
-    EXTERNAL i32 RoundF32( f32 val );
-    EXTERNAL i32 RoundF32WithPrecise( f32 val, ui32 precise );
-    EXTERNAL f32 RoundF32DownToStep( f32 val, f32 step );
-    EXTERNAL f32 RoundF32UpToStep( f32 val, f32 step );
-    EXTERNAL f32 RoundF32ToNearestStep( f32 val, f32 step );
-    EXTERNAL i32 RoundF64( f64 val );
-    EXTERNAL i32 RoundF64WithPrecise( f64 val, ui32 precise );
-    EXTERNAL f64 RoundF64DownToStep( f64 val, f64 step );
-    EXTERNAL f64 RoundF64UpToStep( f64 val, f64 step );
-    EXTERNAL f64 RoundF64ToNearestStep( f64 val, f64 step );
-    EXTERNAL uiw RoundUIDownToStep( uiw val, uiw step );
-    EXTERNAL uiw RoundUIUpToStep( uiw val, uiw step );
-    EXTERNAL uiw RoundUIToNearestStep( uiw val, uiw step );
-    EXTERNAL iw RoundIDownToStep( iw val, iw step );  //  TODO: complete
-    EXTERNAL iw RoundIUpToStep( iw val, iw step );  //  TODO: complete
-    EXTERNAL iw RoundIToNearestStep( iw val, iw step );  //  TODO: complete
+    EXTERNALS i32 RoundF32( f32 val );
+    EXTERNALS i32 RoundF32WithPrecise( f32 val, ui32 precise );
+    EXTERNALS f32 RoundF32DownToStep( f32 val, f32 step );
+    EXTERNALS f32 RoundF32UpToStep( f32 val, f32 step );
+    EXTERNALS f32 RoundF32ToNearestStep( f32 val, f32 step );
+    EXTERNALS i32 RoundF64( f64 val );
+    EXTERNALS i32 RoundF64WithPrecise( f64 val, ui32 precise );
+    EXTERNALS f64 RoundF64DownToStep( f64 val, f64 step );
+    EXTERNALS f64 RoundF64UpToStep( f64 val, f64 step );
+    EXTERNALS f64 RoundF64ToNearestStep( f64 val, f64 step );
+    EXTERNALS uiw RoundUIDownToStep( uiw val, uiw step );
+    EXTERNALS uiw RoundUIUpToStep( uiw val, uiw step );
+    EXTERNALS uiw RoundUIToNearestStep( uiw val, uiw step );
+    EXTERNALS iw RoundIDownToStep( iw val, iw step );  //  TODO: complete
+    EXTERNALS iw RoundIUpToStep( iw val, iw step );  //  TODO: complete
+    EXTERNALS iw RoundIToNearestStep( iw val, iw step );  //  TODO: complete
 
     #define _PowF32( fp, power ) ::powf( fp, (i32)power )
     #define _PowF64( fp, power ) ::pow( fp, (i32)power )
-    EXTERNAL bln IsF32Equal( f32 first, f32 second, f32 epsilon );
+    EXTERNALS bln IsF32Equal( f32 first, f32 second, f32 epsilon );
     #define _IsF32Equal( first, second, epsilon ) (::fabsf( first - second ) < epsilon)
-    EXTERNAL bln IsF64Equal( f64 first, f64 second, f64 epsilon );
+    EXTERNALS bln IsF64Equal( f64 first, f64 second, f64 epsilon );
     #define _IsF64Equal( first, second, epsilon ) (::fabs( first - second ) < epsilon)
-    EXTERNAL f32 CeilF32Precise( f32 val, ui32 precise );
-    EXTERNAL f64 CeilF64Precise( f64 val, ui32 precise );
-    EXTERNAL f32 SaturateF32( f32 val );
-    EXTERNAL f64 SaturateF64( f64 val );
-    EXTERNAL f32 F32NormalizeRadian( f32 rad );
-    EXTERNAL f32 F32FracPart( f32 val );
-    EXTERNAL f64 F64FracPart( f64 val );
-    EXTERNAL bln IsF32NaN( f32 val );
-    EXTERNAL bln IsF64NaN( f64 val );
-    EXTERNAL bln IsF32Inf( f32 val );
-    EXTERNAL bln IsF32InfPos( f32 val );
-    EXTERNAL bln IsF32InfNeg( f32 val );
-    EXTERNAL bln IsF64Inf( f64 val );
-    EXTERNAL bln IsF64InfPos( f64 val );
-    EXTERNAL bln IsF64InfNeg( f64 val );
-    EXTERNAL f32 MakeF32ByBits( ui32 sign1, ui32 exp8, ui32 significand23 );
-    EXTERNAL f64 MakeF64ByBits( uiw sign1, uiw exp11, ui64 significand52 );
-    EXTERNAL f32 MakeF32ByND( i32 numerator, i32 denominator );
-    EXTERNAL f64 MakeF64ByND( i32 numerator, i32 denominator );
+    EXTERNALS f32 CeilF32Precise( f32 val, ui32 precise );
+    EXTERNALS f64 CeilF64Precise( f64 val, ui32 precise );
+    EXTERNALS f32 SaturateF32( f32 val );
+    EXTERNALS f64 SaturateF64( f64 val );
+    EXTERNALS f32 F32NormalizeRadian( f32 rad );
+    EXTERNALS f32 F32FracPart( f32 val );
+    EXTERNALS f64 F64FracPart( f64 val );
+    EXTERNALS bln IsF32NaN( f32 val );
+    EXTERNALS bln IsF64NaN( f64 val );
+    EXTERNALS bln IsF32Inf( f32 val );
+    EXTERNALS bln IsF32InfPos( f32 val );
+    EXTERNALS bln IsF32InfNeg( f32 val );
+    EXTERNALS bln IsF64Inf( f64 val );
+    EXTERNALS bln IsF64InfPos( f64 val );
+    EXTERNALS bln IsF64InfNeg( f64 val );
+    EXTERNALS f32 MakeF32ByBits( ui32 sign1, ui32 exp8, ui32 significand23 );
+    EXTERNALS f64 MakeF64ByBits( uiw sign1, uiw exp11, ui64 significand52 );
+    EXTERNALS f32 MakeF32ByND( i32 numerator, i32 denominator );
+    EXTERNALS f64 MakeF64ByND( i32 numerator, i32 denominator );
 
-    EXTERNAL ui32 CheckSum32( const byte *source, uiw len );
-    EXTERNAL ui64 CheckSum64( const byte *source, uiw len );
-    EXTERNAL uiw CheckSumWord( const byte *source, uiw len );
+    EXTERNALS ui32 CheckSum32( const byte *source, uiw len );
+    EXTERNALS ui64 CheckSum64( const byte *source, uiw len );
+    EXTERNALS uiw CheckSumWord( const byte *source, uiw len );
 
-    EXTERNAL uiw NormalizeMem32( ui32 val, char *p_buf );  //  buffer size after normalize
-    EXTERNAL uiw NormalizeMem64( ui64 val, char *p_buf );  //  buffer size after normalize
-    EXTERNAL uiw NormalizeMemWord( uiw val, char *p_buf );  //  buffer size after normalize
+    EXTERNALD uiw NormalizeMem32( ui32 val, char *p_buf );  //  buffer size after normalize
+    EXTERNALD uiw NormalizeMem64( ui64 val, char *p_buf );  //  buffer size after normalize
+    EXTERNALD uiw NormalizeMemWord( uiw val, char *p_buf );  //  buffer size after normalize
 
-    EXTERNAL uiw MemCpy( void *RSTR p_target, const void *cp_source, uiw size );
+    EXTERNALS uiw MemCpy( void *RSTR p_target, const void *cp_source, uiw size );
     #define _MemCpy( dest, source, size ) (::memcpy( dest, source, size ), size)
     #define _MemCpyIncr( dest, source, size ) (::memcpy( dest, source, size ), (byte *&)(dest) += size, size)
     #define _MemCpyIncrRev( dest, source, size ) (::memcpy( dest, source, size ), (byte *&)(source) += size, size)
@@ -117,148 +117,148 @@ namespace Funcs
     #define _MemCpyOffsetRev( dest, source, size, offset ) (::memcpy( dest, (byte *)(source) + offset, size ), size)
     #define _MemCpyOffsetIncrRev( dest, source, size, offset ) (::memcpy( dest, (byte *)(source) + offset, size ), offset += size, size)
     #define _MemMove( dest, source, size ) (::memmove( dest, source, size ), size)
-    EXTERNAL uiw MemZero( void *p_mem, uiw size );
+    EXTERNALS uiw MemZero( void *p_mem, uiw size );
     #define _MemZero( mem, size ) (::memset( mem, 0, size ), size)
-    EXTERNAL uiw MemSet( void *p_mem, byte val, uiw size );
+    EXTERNALS uiw MemSet( void *p_mem, byte val, uiw size );
     #define _MemSet( mem, value, size ) (::memset( mem, (byte)value, size ), size)
-    EXTERNAL bln MemTest( void *p_mem, byte val, uiw size );  //  true if size is 0
-    EXTERNAL bln MemEquals( const void *cp_mem0, const void *cp_mem1, uiw size );  //  true if size is 0
+    EXTERNALS bln MemTest( void *p_mem, byte val, uiw size );  //  true if size is 0
+    EXTERNALS bln MemEquals( const void *cp_mem0, const void *cp_mem1, uiw size );  //  true if size is 0
     #define _MemEquals( mem0, mem1, size ) (!::memcmp( mem0, mem1, size ))
-    EXTERNAL void *MemFindSeq( const void *cp_mem, const void *cp_seq, uiw memSize, uiw seqSize );  //  assume output is const if unput was const
+    EXTERNALS void *MemFindSeq( const void *cp_mem, const void *cp_seq, uiw memSize, uiw seqSize );  //  assume output is const if unput was const
     #define _Clear( mem ) ::memset( mem, 0, sizeof(*mem) )
 
     typedef bln (*ChrTestFunc)( char );
 
-    EXTERNAL bln IsChrUpperAlpha( char source );
-    EXTERNAL bln IsChrLowerAlpha( char source );
-    EXTERNAL bln IsChrAlpha( char source );
-    EXTERNAL bln IsChrDec( char source );
-    EXTERNAL bln IsChrHex( char source );
-    EXTERNAL bln IsChrOct( char source );
-    EXTERNAL bln IsChrBin( char source );
+    EXTERNALS bln IsChrUpperAlpha( char source );
+    EXTERNALS bln IsChrLowerAlpha( char source );
+    EXTERNALS bln IsChrAlpha( char source );
+    EXTERNALS bln IsChrDec( char source );
+    EXTERNALS bln IsChrHex( char source );
+    EXTERNALS bln IsChrOct( char source );
+    EXTERNALS bln IsChrBin( char source );
 
     //  all with bases but without signes, must contain at least one digit
-    EXTERNAL bln IsStrHex( const char *cp_str, uiw maxLen = uiw_max );
-    EXTERNAL bln IsStrBin( const char *cp_str, uiw maxLen = uiw_max );
-    EXTERNAL bln IsStrFP( const char *cp_str, uiw maxLen = uiw_max );
-    EXTERNAL bln IsStrDec( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALS bln IsStrHex( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALS bln IsStrBin( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALS bln IsStrFP( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALS bln IsStrDec( const char *cp_str, uiw maxLen = uiw_max );
 
-    EXTERNAL char ChrToLower( char source );
-    EXTERNAL char ChrToUpper( char source );
+    EXTERNALS char ChrToLower( char source );
+    EXTERNALS char ChrToUpper( char source );
 
-    EXTERNAL bln IsChrEqual( char one, char two );  //  compare chars
-    EXTERNAL bln IsChrEqualWOR( char one, char two );  //  compare chars without register
+    EXTERNALS bln IsChrEqual( char one, char two );  //  compare chars
+    EXTERNALS bln IsChrEqualWOR( char one, char two );  //  compare chars without register
 
     //  maxLen without zero symbol
 
-    EXTERNAL uiw StrToLower( char *RSTR p_dest, const char *cp_source );
-    EXTERNAL uiw StrToLowerAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
-    EXTERNAL uiw StrToLowerInplace( char *p_str );
-    EXTERNAL uiw StrToLowerInplaceAdv( char *p_str, uiw maxLen = uiw_max, char aes = '\0' );
-    EXTERNAL uiw StrToUpper( char *RSTR p_dest, const char *cp_source );
-    EXTERNAL uiw StrToUpperAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
-    EXTERNAL uiw StrToUpperInplace( char *p_str );
-    EXTERNAL uiw StrToUpperInplaceAdv( char *p_str, uiw maxLen = uiw_max, char aes = '\0' );
-    EXTERNAL bln StrEqual( const char *cp_one, const char *cp_two );  //  true if both strings are zero
-    EXTERNAL bln StrEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen = uiw_max, char aes = '\0' );  //  true if both strings are zero
+    EXTERNALS uiw StrToLower( char *RSTR p_dest, const char *cp_source );
+    EXTERNALS uiw StrToLowerAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS uiw StrToLowerInplace( char *p_str );
+    EXTERNALS uiw StrToLowerInplaceAdv( char *p_str, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS uiw StrToUpper( char *RSTR p_dest, const char *cp_source );
+    EXTERNALS uiw StrToUpperAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS uiw StrToUpperInplace( char *p_str );
+    EXTERNALS uiw StrToUpperInplaceAdv( char *p_str, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS bln StrEqual( const char *cp_one, const char *cp_two );  //  true if both strings are zero
+    EXTERNALS bln StrEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen = uiw_max, char aes = '\0' );  //  true if both strings are zero
     #define _StrEqual( one, two ) (!::strcmp( one, two ))
-    EXTERNAL bln StrNEqual( const char *cp_one, const char *cp_two, uiw count );  //  true if both strings are zero or count is zero
-    EXTERNAL bln StrNEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes = '\0' );  //  true if both strings are zero or count is zero
+    EXTERNALS bln StrNEqual( const char *cp_one, const char *cp_two, uiw count );  //  true if both strings are zero or count is zero
+    EXTERNALS bln StrNEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes = '\0' );  //  true if both strings are zero or count is zero
     #define _StrNEqual( one, two, count ) (!::strncmp( one, two, count ))
-    EXTERNAL bln StrIEqual( const char *cp_one, const char *cp_two );  //  true if both strings are zero
-    EXTERNAL bln StrIEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen = uiw_max, char aes = '\0' );  //  true if both strings are zero
-    EXTERNAL bln StrINEqual( const char *cp_one, const char *cp_two, uiw count );  //  true if both strings are zero or count is zero
-    EXTERNAL bln StrINEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes = '\0' );  //  true if both strings are zero or count is zero
-    EXTERNAL uiw StrLen( const char *cp_str );
-    EXTERNAL uiw StrLenAdv( const char *cp_str, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS bln StrIEqual( const char *cp_one, const char *cp_two );  //  true if both strings are zero
+    EXTERNALS bln StrIEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen = uiw_max, char aes = '\0' );  //  true if both strings are zero
+    EXTERNALS bln StrINEqual( const char *cp_one, const char *cp_two, uiw count );  //  true if both strings are zero or count is zero
+    EXTERNALS bln StrINEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes = '\0' );  //  true if both strings are zero or count is zero
+    EXTERNALS uiw StrLen( const char *cp_str );
+    EXTERNALS uiw StrLenAdv( const char *cp_str, uiw maxLen = uiw_max, char aes = '\0' );
     #define _StrLen( str ) ::strlen( str )
-    EXTERNAL void StrCat( char *RSTR p_dest, const char *cp_source );
-    EXTERNAL uiw StrCatAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aesDest = '\0', char aesSrc = '\0' );
+    EXTERNALS void StrCat( char *RSTR p_dest, const char *cp_source );
+    EXTERNALS uiw StrCatAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aesDest = '\0', char aesSrc = '\0' );
     #define _StrCat( dest, source ) (void)::strcat( dest, source )
-    EXTERNAL void StrCpy( char *RSTR p_dest, const char *cp_source );
-    EXTERNAL uiw StrCpyAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS void StrCpy( char *RSTR p_dest, const char *cp_source );
+    EXTERNALS uiw StrCpyAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
     #define _StrCpy( dest, source ) (void)::strcpy( dest, source )
-    EXTERNAL uiw StrNCpy( char *RSTR p_dest, const char *cp_source, uiw count );
+    EXTERNALS uiw StrNCpy( char *RSTR p_dest, const char *cp_source, uiw count );
     #define _StrNCpy( dest, source, count ) (::strncpy( dest, source, count ), count)
     #define _StrNCpyCS( dest, source, minus ) (::strncpy( dest, source, sizeof(source) - minus ), sizeof(source) - minus)
 //    #define _StrNCpyCSC( dest, source, minus, counter ) (::strncpy( dest, source, sizeof(source) - minus ), counter += (sizeof(source) - minus), sizeof(source) - minus)
-    EXTERNAL void StrConnect( char *RSTR p_dest, const char *cp_first, const char *cp_second );
-    EXTERNAL void StrCpyWONull( char *RSTR p_dest, const char *cp_source );
-    EXTERNAL void StrCpyWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
-    EXTERNAL uiw StrCpyAndCount( char *RSTR p_dest, const char *cp_source );
-    EXTERNAL uiw StrCpyAndCountWONull( char *RSTR p_dest, const char *cp_source );
-    EXTERNAL uiw StrCpyAndCountWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
-    EXTERNAL uiw StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw maxLen );
-    EXTERNAL uiw StrSafeCpyAndCountWONull( char *RSTR p_dest, const char *cp_source, uiw maxLen );
-    EXTERNAL uiw StrSafeCpyAndCountWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen, char aes = '\0' );
-    EXTERNAL uiw StrDelim( char **pp_output, char *p_source, char delim );  //  you can pass null as pp_output only to get a number of the final strings
-    EXTERNAL uiw StrDelimConst( char **pp_output, const char *cp_source, char delim );  //  TODO: incomplete  //  you can pass null as pp_output only to get a number of the final strings
-    EXTERNAL char *StrChr( const char *cp_source, char symbol );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrChrAdv( const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS void StrConnect( char *RSTR p_dest, const char *cp_first, const char *cp_second );
+    EXTERNALS void StrCpyWONull( char *RSTR p_dest, const char *cp_source );
+    EXTERNALS void StrCpyWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS uiw StrCpyAndCount( char *RSTR p_dest, const char *cp_source );
+    EXTERNALS uiw StrCpyAndCountWONull( char *RSTR p_dest, const char *cp_source );
+    EXTERNALS uiw StrCpyAndCountWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS uiw StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw maxLen );
+    EXTERNALS uiw StrSafeCpyAndCountWONull( char *RSTR p_dest, const char *cp_source, uiw maxLen );
+    EXTERNALS uiw StrSafeCpyAndCountWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen, char aes = '\0' );
+    EXTERNALS uiw StrDelim( char **pp_output, char *p_source, char delim );  //  you can pass null as pp_output only to get a number of the final strings
+    EXTERNALS uiw StrDelimConst( char **pp_output, const char *cp_source, char delim );  //  TODO: incomplete  //  you can pass null as pp_output only to get a number of the final strings
+    EXTERNALS char *StrChr( const char *cp_source, char symbol );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrChrAdv( const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
     #define _StrChr( source, symbol ) ((char *)::strchr( source, symbol ))
-    EXTERNAL char *StrNotChr( const char *cp_source, char symbol );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrNotChrAdv( const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrChrs( const char *cp_source, const char *cp_chars );
-    EXTERNAL char *StrChrsAdv( const char *cp_source, const char *cp_chars, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL char *StrNotChrs( const char *cp_source, const char *cp_chars );
-    EXTERNAL char *StrNotChrsAdv( const char *cp_source, const char *cp_chars, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL char *StrIChr( const char *cp_source, char symbol );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrIChrAdv( const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrINotChrs( const char *cp_source, const char *cp_chars );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrINotChrsAdv( const char *cp_source, const char *cp_chars, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrINotChr( const char *cp_source, char symbol );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrINotChrAdv( const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrIChrs( const char *cp_source, const char *cp_chars );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrIChrsAdv( const char *cp_source, const char *cp_chars, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrChrMask( const char *cp_source, char mask, char symbol );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrChrMaskAdv( const char *cp_source, char mask, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrIChrMask( const char *cp_source, char mask, char symbol );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrIChrMaskAdv( const char *cp_source, char mask, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrStr( const char *cp_source, const char *cp_under );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrStrAdv( const char *cp_source, const char *cp_under, uiw countSrc = uiw_max, uiw countUnder = uiw_max, char aesSrc = '\0', char aesUnder = '\0' );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrNotChr( const char *cp_source, char symbol );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrNotChrAdv( const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrChrs( const char *cp_source, const char *cp_chars );
+    EXTERNALS char *StrChrsAdv( const char *cp_source, const char *cp_chars, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS char *StrNotChrs( const char *cp_source, const char *cp_chars );
+    EXTERNALS char *StrNotChrsAdv( const char *cp_source, const char *cp_chars, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS char *StrIChr( const char *cp_source, char symbol );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrIChrAdv( const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrINotChrs( const char *cp_source, const char *cp_chars );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrINotChrsAdv( const char *cp_source, const char *cp_chars, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrINotChr( const char *cp_source, char symbol );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrINotChrAdv( const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrIChrs( const char *cp_source, const char *cp_chars );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrIChrsAdv( const char *cp_source, const char *cp_chars, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrChrMask( const char *cp_source, char mask, char symbol );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrChrMaskAdv( const char *cp_source, char mask, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrIChrMask( const char *cp_source, char mask, char symbol );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrIChrMaskAdv( const char *cp_source, char mask, char symbol, uiw count = uiw_max, char aes = '\0' );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrStr( const char *cp_source, const char *cp_under );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrStrAdv( const char *cp_source, const char *cp_under, uiw countSrc = uiw_max, uiw countUnder = uiw_max, char aesSrc = '\0', char aesUnder = '\0' );  //  returning value of the same string - assume it is const if source is const
     #define _StrStr( source, under ) ((char *)::strstr( source, under ))
-    EXTERNAL char *StrIStr( const char *cp_source, const char *cp_under );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL char *StrIStrAdv( const char *cp_source, const char *cp_under, uiw countSrc = uiw_max, uiw countUnder = uiw_max, char aesSrc = '\0', char aesUnder = '\0' );  //  returning value of the same string - assume it is const if source is const
-    EXTERNAL bln IsStrIsFromThisSymbols( const char *cp_str, const char *cp_symbols );  //  true if both have zero length, false if only one of them have zero length
-    EXTERNAL bln IsStrIsFromThisSymbol( const char *cp_str, char symbol, uiw count = uiw_max );  //  false on zero length string
-    EXTERNAL bln IsStrMatch( const char *cp_str, ChrTestFunc func );  //  false on zero length string
-    EXTERNAL bln IsStrMatchAdv( const char *cp_str, ChrTestFunc func, uiw count = uiw_max, char aes = '\0' );  //  false on zero length string
-    EXTERNAL uiw StrExclude( char *RSTR p_target, const char *cp_source, char symbol );  //  you can pass null as p_target to get only proced len
-    EXTERNAL uiw StrExcludeAdv( char *RSTR p_target, const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  you can pass null as p_target to get only proced len
-    EXTERNAL uiw StrExcludeMask( char *RSTR p_target, const char *cp_source, char mask, char symbol );  //  you can pass null as p_target to get only proced len
-    EXTERNAL uiw StrExcludeMaskAdv( char *RSTR p_target, const char *cp_source, char mask, char symbol, uiw count = uiw_max, char aes = '\0' );  //  you can pass null as p_target to get only proced len
-    EXTERNAL uiw StrExcludeInplace( char *p_str, char symbol );
-    EXTERNAL uiw StrExcludeInplaceAdv( char *p_str, char symbol, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL uiw StrExcludeMaskInplace( char *p_str, char mask, char symbol );
-    EXTERNAL uiw StrExcludeMaskInplaceAdv( char *p_str, char mask, char symbol, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS char *StrIStr( const char *cp_source, const char *cp_under );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS char *StrIStrAdv( const char *cp_source, const char *cp_under, uiw countSrc = uiw_max, uiw countUnder = uiw_max, char aesSrc = '\0', char aesUnder = '\0' );  //  returning value of the same string - assume it is const if source is const
+    EXTERNALS bln IsStrIsFromThisSymbols( const char *cp_str, const char *cp_symbols );  //  true if both have zero length, false if only one of them have zero length
+    EXTERNALS bln IsStrIsFromThisSymbol( const char *cp_str, char symbol, uiw count = uiw_max );  //  false on zero length string
+    EXTERNALS bln IsStrMatch( const char *cp_str, ChrTestFunc func );  //  false on zero length string
+    EXTERNALS bln IsStrMatchAdv( const char *cp_str, ChrTestFunc func, uiw count = uiw_max, char aes = '\0' );  //  false on zero length string
+    EXTERNALS uiw StrExclude( char *RSTR p_target, const char *cp_source, char symbol );  //  you can pass null as p_target to get only proced len
+    EXTERNALS uiw StrExcludeAdv( char *RSTR p_target, const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  you can pass null as p_target to get only proced len
+    EXTERNALS uiw StrExcludeMask( char *RSTR p_target, const char *cp_source, char mask, char symbol );  //  you can pass null as p_target to get only proced len
+    EXTERNALS uiw StrExcludeMaskAdv( char *RSTR p_target, const char *cp_source, char mask, char symbol, uiw count = uiw_max, char aes = '\0' );  //  you can pass null as p_target to get only proced len
+    EXTERNALS uiw StrExcludeInplace( char *p_str, char symbol );
+    EXTERNALS uiw StrExcludeInplaceAdv( char *p_str, char symbol, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS uiw StrExcludeMaskInplace( char *p_str, char mask, char symbol );
+    EXTERNALS uiw StrExcludeMaskInplaceAdv( char *p_str, char mask, char symbol, uiw count = uiw_max, char aes = '\0' );
 
     //  *p_value is not changed if no suitable conversion is possible TODO: add cp_str capacity info
-    EXTERNAL bln StrDecToI32Quest( const char *cp_str, i32 *p_value, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL bln StrDecToUI32Quest( const char *cp_str, ui32 *p_value, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL bln StrDecToI64Quest( const char *cp_str, i64 *p_value, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL bln StrDecToUI64Quest( const char *cp_str, ui64 *p_value, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL bln StrDecToIWQuest( const char *cp_str, iw *p_value, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL bln StrDecToUIWQuest( const char *cp_str, uiw *p_value, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS bln StrDecToI32Quest( const char *cp_str, i32 *p_value, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS bln StrDecToUI32Quest( const char *cp_str, ui32 *p_value, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS bln StrDecToI64Quest( const char *cp_str, i64 *p_value, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS bln StrDecToUI64Quest( const char *cp_str, ui64 *p_value, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS bln StrDecToIWQuest( const char *cp_str, iw *p_value, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS bln StrDecToUIWQuest( const char *cp_str, uiw *p_value, uiw count = uiw_max, char aes = '\0' );
 
     //  TODO: add cp_str capacity info
-    EXTERNAL i32  StrDecToI32( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL ui32 StrDecToUI32( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL i64  StrDecToI64( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL ui64 StrDecToUI64( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL iw   StrDecToIW( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
-    EXTERNAL uiw  StrDecToUIW( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS i32  StrDecToI32( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS ui32 StrDecToUI32( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS i64  StrDecToI64( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS ui64 StrDecToUI64( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS iw   StrDecToIW( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS uiw  StrDecToUIW( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
 
-    EXTERNAL f32 StrToF32( const char *cp_str );
-    EXTERNAL f64 StrToF64( const char *cp_str );
+    EXTERNALS f32 StrToF32( const char *cp_str );
+    EXTERNALS f64 StrToF64( const char *cp_str );
 
-    EXTERNAL bln IsHexBase( const char *cp_str );
-    EXTERNAL bln IsOctBase( const char *cp_str );
-    EXTERNAL bln IsBinBase( const char *cp_str );
+    EXTERNALS bln IsHexBase( const char *cp_str );
+    EXTERNALS bln IsOctBase( const char *cp_str );
+    EXTERNALS bln IsBinBase( const char *cp_str );
 
-    EXTERNAL uiw F32ToStr( f32 val, char *p_buf );
-    EXTERNAL uiw F32ToStrWithPrecise( f32 val, ui32 precise, char *p_buf );
-    EXTERNAL uiw F64ToStr( f64 val, char *p_buf );
-    EXTERNAL uiw F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf );
+    EXTERNALS uiw F32ToStr( f32 val, char *p_buf );
+    EXTERNALS uiw F32ToStrWithPrecise( f32 val, ui32 precise, char *p_buf );
+    EXTERNALS uiw F64ToStr( f64 val, char *p_buf );
+    EXTERNALS uiw F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf );
 
 	/*
 	a - pointer, integer word as bin str [param - when non-zero, use upper case]
@@ -290,10 +290,10 @@ namespace Funcs
 	*/
 
 	//  maxLen means size of the p_str, including null-terminator. must be at least 1( to hold the null-terminator ). 0 will be returned if maxLen was less than one, debug will halt the program
-    EXTERNAL uiw PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args );
+    EXTERNALD uiw PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args );
 
     //  internal
-    EXTERNAL uiw _PrintToContainer( void *cont, char *(*RequestMoreSize)(void *, uiw), const char *cp_fmt, va_list args );
+    EXTERNALD uiw _PrintToContainer( void *cont, char *(*RequestMoreSize)(void *, uiw), const char *cp_fmt, va_list args );
     struct _ArgType
     {
 		uiw size;
@@ -307,9 +307,9 @@ namespace Funcs
     };
 
 #if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
-    EXTERNAL bln _PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... );
+    EXTERNALD bln _PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... );
 
-    EXTERNAL uiw _PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
+    EXTERNALD uiw _PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
 
     template < typename X > _ArgType _AnalyzeArg( const X &arg )
     {
@@ -359,7 +359,7 @@ namespace Funcs
         return _PrintToStr( p_str, maxLen, cp_fmt, args... );
     }
 #else
-    EXTERNAL uiw PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
+    EXTERNALD uiw PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
 #endif
 
 //  container storage must be linear, allowed to be non-zero size, will be cleared if not empty

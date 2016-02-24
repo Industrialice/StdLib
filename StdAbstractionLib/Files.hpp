@@ -11,30 +11,30 @@ namespace Files
     class CFileEnumInfo;
     typedef void (*EnumFilesCallback)( CFileEnumInfo *info, void *argument );
 
-    EXTERNAL bln RemoveFile( const char *cp_pnn, CError *po_error );
-    EXTERNAL bln RemoveFolder( const char *cp_path, CError *po_error );
-    EXTERNAL bln IsFileOrFolderExists( const char *cp_papn );
-    EXTERNAL bln IsFileExists( const char *cp_pnn );
-    EXTERNAL bln IsFolderExists( const char *cp_path );
-    EXTERNAL bln IsFileReadOnlyGet( const char *cp_pnn );  //  false if the file does not exist or an error occured  TODO: add errors struct?
-    EXTERNAL bln IsFileReadOnlySet( const char *cp_pnn, bln is_ro );
-    EXTERNAL bln CreateFolder( const char *cp_where, const char *cp_name, CError *po_error );
-    EXTERNAL uiw ExtractPathFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  with the last slash
-    EXTERNAL uiw ExtractNameFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  without slashes or something
-    EXTERNAL uiw ExtractNameWOExtFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );
-    EXTERNAL uiw ExtractExtensionFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  without a dot
-	EXTERNAL bln IsRelativePathSupported();
-    EXTERNAL bln IsAbsolutePath( const char *pnn, uiw parseLen = uiw_max );
-    EXTERNAL uiw AbsolutePath( const char *RSTR cp_sourcePath, char (&a_procedPath)[ MAX_PATH ] );
-	EXTERNAL bln CurrentWorkingPathGet( char *buf, uiw maxLen, uiw *copied /* optional */ );  //  maxLen include null-symbol, if buffer was too small, returns false and sets copied to uiw_max, if error, returns false and sets copied to 0
-	EXTERNAL bln CurrentWorkingPathSet( const char *path );
-    EXTERNAL bln EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask );
-    EXTERNAL bln EnumNextFile( CFileEnumInfo *info );
-    EXTERNAL void EnumFilesRecursively( const char *path, const char *mask, EnumFilesCallback callback, void *argument );
+    EXTERNALS bln RemoveFile( const char *cp_pnn, CError *po_error );
+    EXTERNALS bln RemoveFolder( const char *cp_path, CError *po_error );
+    EXTERNALS bln IsFileOrFolderExists( const char *cp_papn );
+    EXTERNALS bln IsFileExists( const char *cp_pnn );
+    EXTERNALS bln IsFolderExists( const char *cp_path );
+    EXTERNALS bln IsFileReadOnlyGet( const char *cp_pnn );  //  false if the file does not exist or an error occured  TODO: add errors struct?
+    EXTERNALS bln IsFileReadOnlySet( const char *cp_pnn, bln is_ro );
+    EXTERNALS bln CreateFolder( const char *cp_where, const char *cp_name, CError *po_error );
+    EXTERNALS uiw ExtractPathFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  with the last slash
+    EXTERNALS uiw ExtractNameFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  without slashes or something
+    EXTERNALS uiw ExtractNameWOExtFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );
+    EXTERNALS uiw ExtractExtensionFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  without a dot
+	EXTERNALS bln IsRelativePathSupported();
+    EXTERNALS bln IsAbsolutePath( const char *pnn, uiw parseLen = uiw_max );
+    EXTERNALS uiw AbsolutePath( const char *RSTR cp_sourcePath, char (&a_procedPath)[ MAX_PATH ] );
+	EXTERNALS bln CurrentWorkingPathGet( char *buf, uiw maxLen, uiw *copied /* optional */ );  //  maxLen include null-symbol, if buffer was too small, returns false and sets copied to uiw_max, if error, returns false and sets copied to 0
+	EXTERNALS bln CurrentWorkingPathSet( const char *path );
+    EXTERNALS bln EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask );
+    EXTERNALS bln EnumNextFile( CFileEnumInfo *info );
+    EXTERNALS void EnumFilesRecursively( const char *path, const char *mask, EnumFilesCallback callback, void *argument );
 
     namespace Private
     {
-        EXTERNAL void CloseEnumHandle( fileEnumHandle handle );
+        EXTERNALS void CloseEnumHandle( fileEnumHandle handle );
     }
 
     class CFileEnumInfo

@@ -36,8 +36,6 @@ NOINLINE void CLogger::_Message( Tag::messageTag_t tag, const char *cp_fmt, ... 
 NOINLINE void CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
 #endif
 {
-    ASSUME( dis );
-
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
 
     ASSUME( cp_fmt && dis->_buffer.Size() == 0 );
@@ -66,67 +64,53 @@ NOINLINE void CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
     }
 }
 
-void CLogger::AddDirection( DirectionFunc dir )
+void CLogger::DirectionAdd( DirectionFunc dir )
 {
-    ASSUME( dis && dir );
+    ASSUME( dir );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     dis->_o_dirs.PushBack( dir );
 }
 
-void CLogger::PopDirection()
-{
-    ASSUME( dis );
-    CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
-    dis->_o_dirs.PopBackSafe();
-}
-
 uiw CLogger::DirectionsCount() const
 {
-    ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     return dis->_o_dirs.Size();
 }
 
-CLogger::DirectionFunc CLogger::DirectionByIndexGet( uiw index ) const
+CLogger::DirectionFunc CLogger::DirectionGet( uiw index ) const
 {
-    ASSUME( dis );
-    CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
-    ASSUME( index < dis->_o_dirs.Size() );
-    if( index < dis->_o_dirs.Size() )
-    {
-        return dis->_o_dirs[ index ];
-    }
-    return 0;
+	CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
+	return dis->_o_dirs[ index ];
 }
 
-void CLogger::DirectionByIndexSet( uiw index, DirectionFunc dir )
+void CLogger::DirectionRemove( uiw index )
 {
-    ASSUME( dis );
-    CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
-    ASSUME( index < dis->_o_dirs.Size() && dir );
-    if( index < dis->_o_dirs.Size() )
-    {
-        dis->_o_dirs[ index ] = dir;
-    }
+	CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
+	dis->_o_dirs.Erase( index, 1 );
+}
+
+void CLogger::DirectionToTheTop( uiw index )
+{
+	CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
+	DirectionFunc func = dis->_o_dirs[ index ];
+	dis->_o_dirs.Erase( index, 1 );
+	dis->_o_dirs.Insert( 0, func );
 }
 
 void CLogger::IsOnSet( bln is_on )
 {
-    ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     dis->_is_on = is_on;
 }
 
 bln CLogger::IsOnGet() const
 {
-    ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     return dis->_is_on;
 }
 
 bln CLogger::IsOnToggle()
 {
-    ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     dis->_is_on = !dis->_is_on;
     return dis->_is_on;
@@ -134,21 +118,18 @@ bln CLogger::IsOnToggle()
 
 bln CLogger::IsMultithreadedGet() const
 {
-    ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     return dis->_is_multithreaded;
 }
 
 void CLogger::IsMitlithreadedSet( bln is_multithreaded )
 {
-    ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     dis->_is_multithreaded = is_multithreaded;
 }
 
 const char *CLogger::NameGet() const
 {
-    ASSUME( dis );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     ASSUME( dis->name() );
     return dis->name();

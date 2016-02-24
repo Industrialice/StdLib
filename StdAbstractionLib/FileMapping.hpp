@@ -22,8 +22,8 @@ namespace FileMapping
 			#endif
 		};
 
-		EXTERNAL MappingStruct Create( FileIO::CFile *file, uiw offset, uiw size, bln is_writeCopy, mappingError *error );
-		EXTERNAL void Destroy( MappingStruct *mapping );
+		EXTERNALS MappingStruct Create( FileIO::CFile *file, uiw offset, uiw size, bln is_writeCopy, mappingError *error );
+		EXTERNALS void Destroy( MappingStruct *mapping );
 	}
 
 	//  Note that file must be opened as readable, writable is optional

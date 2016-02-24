@@ -89,28 +89,28 @@ namespace FileIO
         };
 
         /*  Core Functions  */
-        EXTERNAL void Initialize( CFileBasis *file );
-        EXTERNAL void Destroy( CFileBasis *file );
-        EXTERNAL bln Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error );
-        EXTERNAL void Close( CFileBasis *file );
-        EXTERNAL bln IsValid( const CFileBasis *file );
-        EXTERNAL bln Write( CFileBasis *file, const void *cp_source, ui32 len );
-        EXTERNAL bln Read( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
-        EXTERNAL bln BufferSet( CFileBasis *file, ui32 size, void *buffer = 0 );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
-        EXTERNAL ui32 BufferSizeGet( CFileBasis *file );
-        EXTERNAL void StatsGet( const CFileBasis *file, SStats *po_stats );
-        EXTERNAL void StatsReset( CFileBasis *file );
-        EXTERNAL bln Flush( CFileBasis *file );  //  false if writing to file failed to complete
-        EXTERNAL i64 OffsetGet( CFileBasis *file );  //  -1 on fail, current offset on success
-        EXTERNAL i64 OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error );  //  -1 on fail, current offset on success, will Flush buffers
-        EXTERNAL ui64 SizeGet( CFileBasis *file, CError *error = 0 );  //  returns 0 on error
-        EXTERNAL bln SizeSet( CFileBasis *file, ui64 newSize );
-        EXTERNAL OpenMode::OpenMode_t OpenModeGet( const CFileBasis *file );
-        EXTERNAL ProcMode::ProcMode_t ProcModeGet( const CFileBasis *file );
-		EXTERNAL CacheMode::CacheMode_t CacheModeGet( const CFileBasis *file );
-        EXTERNAL ui32 PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len, returns 0 at failure
+        EXTERNALS void Initialize( CFileBasis *file );
+        EXTERNALS void Destroy( CFileBasis *file );
+        EXTERNALS bln Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error );
+        EXTERNALS void Close( CFileBasis *file );
+        EXTERNALS bln IsValid( const CFileBasis *file );
+        EXTERNALS bln Write( CFileBasis *file, const void *cp_source, ui32 len );
+        EXTERNALS bln Read( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
+        EXTERNALS bln BufferSet( CFileBasis *file, ui32 size, void *buffer = 0 );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
+        EXTERNALS ui32 BufferSizeGet( CFileBasis *file );
+        EXTERNALS void StatsGet( const CFileBasis *file, SStats *po_stats );
+        EXTERNALS void StatsReset( CFileBasis *file );
+        EXTERNALS bln Flush( CFileBasis *file );  //  false if writing to file failed to complete
+        EXTERNALS i64 OffsetGet( CFileBasis *file );  //  -1 on fail, current offset on success
+        EXTERNALS i64 OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error );  //  -1 on fail, current offset on success, will Flush buffers
+        EXTERNALS ui64 SizeGet( CFileBasis *file, CError *error = 0 );  //  returns 0 on error
+        EXTERNALS bln SizeSet( CFileBasis *file, ui64 newSize );
+        EXTERNALS OpenMode::OpenMode_t OpenModeGet( const CFileBasis *file );
+        EXTERNALS ProcMode::ProcMode_t ProcModeGet( const CFileBasis *file );
+		EXTERNALS CacheMode::CacheMode_t CacheModeGet( const CFileBasis *file );
+        EXTERNALS ui32 PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len, returns 0 at failure
 
-		EXTERNAL void Initialize();
+		EXTERNALS void Initialize();
     }
 
     class CFile : private Private::CFileBasis

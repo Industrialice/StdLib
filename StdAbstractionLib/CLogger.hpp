@@ -39,14 +39,14 @@ public:
 #else
     void Message( Tag::messageTag_t tag, const char *cp_fmt, ... );
 #endif
-    void AddDirection( DirectionFunc dir );
-    void PopDirection();
+    void DirectionAdd( DirectionFunc dir );
     uiw DirectionsCount() const;
-    DirectionFunc DirectionByIndexGet( uiw index ) const;
-    void DirectionByIndexSet( uiw index, DirectionFunc dir );
+    DirectionFunc DirectionGet( uiw index ) const;
+	void DirectionRemove( uiw index );
+	void DirectionToTheTop( uiw index );
     void IsOnSet( bln is_on );
     bool IsOnGet() const;
-    bool IsOnToggle();  //  return new state
+    bool IsOnToggle();  //  returns new state
     bool IsMultithreadedGet() const;
     void IsMitlithreadedSet( bool is_multithreaded );
     const char *NameGet() const;

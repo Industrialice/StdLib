@@ -19,8 +19,6 @@
 
 #define EXTERN_TEMPLATES_ALLOWED
 
-#define EXTERNAL
-
 #include <stddef.h>
 #include <new>
 #include <math.h>
@@ -28,6 +26,18 @@
 #include <stdarg.h>
 
 #include "CompilerDefines.hpp"
+	
+#define EXTERNALS extern "C"
+
+#ifdef STDLIB_DYNAMIC
+	#ifdef STDLIB_EXPORT
+		#define EXTERNALD extern "C" SYMBOLEXPORT
+	#else
+		#define EXTERNALD extern "C" SYMBOLIMPORT
+	#endif
+#else
+	#define EXTERNALD
+#endif
 
 #ifndef WORD_SIZE
     #error you must define machine word size in bits
@@ -54,6 +64,6 @@
 #include "CCustomF16.hpp"
 #include "Error.hpp"
 
-void StdCoreLib_Initialize();
+EXTERNALS void StdCoreLib_Initialize();
 
 #endif

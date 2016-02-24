@@ -7,7 +7,6 @@
 namespace
 {
 	BOOL (WINAPI *StdLib_InitializeCriticalSectionEx)( LPCRITICAL_SECTION lpCriticalSection, DWORD dwSpinCount, DWORD Flags );
-	VOID (WINAPI *StdLib_InitializeCriticalSection)( LPCRITICAL_SECTION lpCriticalSection );
 }
 
 CMutex::~CMutex()
@@ -28,8 +27,7 @@ CMutex::CMutex( ui32 spinCount /* = 0 */ )
 	}
 	else
 	{
-		ASSUME( StdLib_InitializeCriticalSection );
-		StdLib_InitializeCriticalSection( &_handle );
+		::InitializeCriticalSection( &_handle );
 	}
 }
 
@@ -57,11 +55,6 @@ void CMutex::Initialize()
 		return;
 	}
 	*(uiw *)&StdLib_InitializeCriticalSectionEx = (uiw)GetProcAddress( k32, "InitializeCriticalSectionEx" );
-	*(uiw *)&StdLib_InitializeCriticalSection = (uiw)GetProcAddress( k32, "InitializeCriticalSection" );
-	if( !StdLib_InitializeCriticalSectionEx && !StdLib_InitializeCriticalSection )
-	{
-		FatalAppExitA( 1, "StdLib: failed to find neither InitializeCriticalSectionEx nor InitializeCriticalSection, can't initialize mutex" );
-	}
 }
 
 #endif

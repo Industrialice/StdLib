@@ -688,7 +688,7 @@ public:
     }
 
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
-    void Insert( count_type pos, const X &source, count_type count )
+    void Insert( count_type pos, const X &source, count_type count = 1 )
     {
         uiw offset = &source - this->_GetArr();
         bln is_belongs = offset < this->_Size();
