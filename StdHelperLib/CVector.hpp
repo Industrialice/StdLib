@@ -398,7 +398,7 @@ public:
         {
             count_type curCount = this->_Size();
             count_type newCount = curCount - count;
-            count_type newReserve = _TryDecSizeLocally( newCount );
+            count_type newReserve = this->_TryDecSizeLocally( newCount );
             if( newReserve != TypeDesc < count_type >::max )
             {
                 ASSUME( this->_IsStatic() == false );
@@ -427,7 +427,7 @@ public:
         }
         else
         {
-            count_type newReserve = _TryIncSizeLocally( newCount );
+            count_type newReserve = this->_TryIncSizeLocally( newCount );
             if( newReserve != TypeDesc < count_type >::max )
             {
                 arrType newArr( newCount, newReserve );

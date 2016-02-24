@@ -91,6 +91,7 @@ namespace FileMapping
 			ASSUME( this != &source );
 			this->mappingStruct = source.mappingStruct;
 			source.mappingStruct.memory = 0;
+			return *this;
 		}
 	#endif
 	};

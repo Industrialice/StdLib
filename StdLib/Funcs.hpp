@@ -138,10 +138,10 @@ namespace Funcs
     EXTERNALS bln IsChrBin( char source );
 
     //  all with bases but without signes, must contain at least one digit
-    EXTERNALS bln IsStrHex( const char *cp_str, uiw maxLen = uiw_max );
-    EXTERNALS bln IsStrBin( const char *cp_str, uiw maxLen = uiw_max );
-    EXTERNALS bln IsStrFP( const char *cp_str, uiw maxLen = uiw_max );
-    EXTERNALS bln IsStrDec( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALD bln IsStrHex( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALD bln IsStrBin( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALD bln IsStrFP( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALD bln IsStrDec( const char *cp_str, uiw maxLen = uiw_max );
 
     EXTERNALS char ChrToLower( char source );
     EXTERNALS char ChrToUpper( char source );

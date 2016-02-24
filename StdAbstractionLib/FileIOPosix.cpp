@@ -24,7 +24,7 @@ namespace StdLib
     }
 }
 
-NOINLINE bln FileIO::Private::Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error )
+NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error )
 {
     ASSUME( cp_pnn && file );
 
@@ -197,37 +197,37 @@ toExit:
     return file->handle != -1;
 }
 
-NOINLINE void FileIO::Private::Close( CFileBasis *file )
+NOINLINE void FileIO::Private::FileIO_Close( CFileBasis *file )
 {
     ASSUME( file );
     if( file->handle == -1 )
     {
         return;
     }
-    Flush( file );
+    FileIO_Flush( file );
     int result = ::close( file->handle );
     ASSUME( result == 0 );
     file->handle = -1;
 }
 
-bln FileIO::Private::IsValid( const CFileBasis *file )
+bln FileIO::Private::FileIO_IsValid( const CFileBasis *file )
 {
     ASSUME( file );
     return file->handle != -1;
 }
 
-i64 FileIO::Private::OffsetGet( CFileBasis *file )
+i64 FileIO::Private::FileIO_OffsetGet( CFileBasis *file )
 {
-    ASSUME( IsValid( file ) );
+    ASSUME( FileIO_IsValid( file ) );
     off64_t offset = ::lseek64( file->handle, 0, SEEK_CUR );
     ASSUME( offset != -1 );
     offset += file->offsetToStart;
     return offset + (off64_t)file->bufferPos - (off64_t)file->bufferPos;
 }
 
-NOINLINE i64 FileIO::Private::OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error )
+NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error )
 {
-    ASSUME( IsValid( file ) );
+    ASSUME( FileIO_IsValid( file ) );
     CError o_error = Error::Ok();
     off64_t result = -1;
     int whence;
@@ -237,7 +237,7 @@ NOINLINE i64 FileIO::Private::OffsetSet( CFileBasis *file, OffsetMode::OffsetMod
         o_error = Error::Unknown();
         return false;
     }
-    if( !Flush( file ) )
+    if( !FileIO_Flush( file ) )
     {
         o_error = Error::Unknown();
         return false;
@@ -293,9 +293,9 @@ toExit:
     return result;
 }
 
-ui64 FileIO::Private::SizeGet( CFileBasis *file, CError *error )
+ui64 FileIO::Private::FileIO_SizeGet( CFileBasis *file, CError *error )
 {
-    ASSUME( IsValid( file ) );
+    ASSUME( FileIO_IsValid( file ) );
     struct stat64 o_stat;
     int result = ::fstat64( file->handle, &o_stat );
     if( result == -1 )
@@ -308,15 +308,15 @@ ui64 FileIO::Private::SizeGet( CFileBasis *file, CError *error )
     return o_stat.st_size - file->offsetToStart;
 }
 
-bln FileIO::Private::SizeSet( CFileBasis *file, ui64 newSize )
+bln FileIO::Private::FileIO_SizeSet( CFileBasis *file, ui64 newSize )
 {
     DBGBREAK;  //  TODO:
     return false;
 }
 
-NOINLINE ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
+NOINLINE ui32 FileIO::Private::FileIO_PNNGet( const CFileBasis *file, char *p_buf )
 {
-    ASSUME( IsValid( file ) );
+    ASSUME( FileIO_IsValid( file ) );
     char a_proc[ 512 ] = "/proc/self/fd/";
     Funcs::IntToStrDec( file->handle, a_proc + sizeof("/proc/self/fd/") - 1 );
     char a_buf[ 4096 ];
@@ -339,7 +339,7 @@ NOINLINE ui32 FileIO::Private::PNNGet( const CFileBasis *file, char *p_buf )
 
 NOINLINE bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len )
 {
-    ASSUME( IsValid( file ) && (cp_source || len == 0) );
+    ASSUME( FileIO_IsValid( file ) && (cp_source || len == 0) );
     ++file->stats.writesToFileCount;
     if( !len )
     {
@@ -356,7 +356,7 @@ NOINLINE bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_sour
 
 NOINLINE bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
 {
-    ASSUME( IsValid( file ) && (p_target || len == 0) );
+    ASSUME( FileIO_IsValid( file ) && (p_target || len == 0) );
     ++file->stats.readsFromFileCount;
     ssize_t readed = ::read( file->handle, p_target, len );
     if( readed == -1 )
@@ -373,7 +373,7 @@ NOINLINE bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui
 
 NOINLINE bln FileIO::Private::CancelCachedRead( CFileBasis *file )
 {
-    ASSUME( IsValid( file ) );
+    ASSUME( FileIO_IsValid( file ) );
     if( file->bufferPos == file->readBufferCurrentSize )
     {
         return true;
@@ -384,7 +384,7 @@ NOINLINE bln FileIO::Private::CancelCachedRead( CFileBasis *file )
     return result != -1;
 }
 
-void FileIO::Private::Initialize()
+void FileIO::Private::FileIO_InitializeFileIOSystem()
 {}
 
 #endif

@@ -40,6 +40,10 @@ void FileIO::Private::FileIO_Initialize( CFileBasis *file )
 void FileIO::Private::FileIO_Destroy( CFileBasis *file )
 {
     FileIO_Close( file );
+	file->internalBuffer = 0;
+	#ifdef WINDOWS
+		file->pnn = 0;
+	#endif
 }
 
 NOINLINE bln FileIO::Private::FileIO_Write( CFileBasis *file, const void *cp_source, ui32 len )
