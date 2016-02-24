@@ -4,7 +4,7 @@
 
 #include "FileMapping.hpp"
 
-FileMapping::Private::MappingStruct FileMapping::Private::Create( FileIO::CFile *file, uiw offset, uiw size, bln is_writeCopy, mappingError *error )
+FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( FileIO::CFile *file, uiw offset, uiw size, bln is_writeCopy, mappingError *error )
 {
 	ASSUME( file );
 
@@ -82,7 +82,7 @@ toExit:
 	return retStruct;
 }
 
-void FileMapping::Private::Destroy( MappingStruct *mapping )
+void FileMapping::Private::FileMapping_Destroy( MappingStruct *mapping )
 {
 	if( mapping->memory )
 	{

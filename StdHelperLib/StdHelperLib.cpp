@@ -7,7 +7,7 @@ namespace StdLib
 	template class TCStr< wchar_t, StringDefReserve, Reservator::Half <>, Allocator::Simple >;
 }
 
-void StdHelperLib_Initialize()
+EXTERNALS void StdHelperLib_Initialize()
 {
     StdCoreLib_Initialize();
 }

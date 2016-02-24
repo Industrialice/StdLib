@@ -16,20 +16,20 @@ namespace VirtualMem
                 Read = BIT( 1 ),
                 Execute = BIT( 2 ) )
     }
-    EXTERNALS void *Reserve( uiw size );
-    EXTERNALS bln Commit( void *p_mem, uiw size, PageMode::PageMode_t mode );
-    EXTERNALS void *Alloc( uiw size, PageMode::PageMode_t mode );
-    EXTERNALS bln Free( void *p_mem );
-    EXTERNALS PageMode::PageMode_t ProtectGet( const void *p_mem, uiw size, CError *po_error );  //  PageMode::Error if pages have different protection, always PageMode::Error on POSIX
-    EXTERNALS bln ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode );  //  can commit uncommited memory
-    EXTERNALS ui32 PageSize();
+    EXTERNALD void *VM_Reserve( uiw size );
+    EXTERNALD bln VM_Commit( void *p_mem, uiw size, PageMode::PageMode_t mode );
+    EXTERNALD void *VM_Alloc( uiw size, PageMode::PageMode_t mode );
+    EXTERNALD bln VM_Free( void *p_mem );
+    EXTERNALD PageMode::PageMode_t VM_ProtectGet( const void *p_mem, uiw size, CError *po_error );  //  PageMode::Error if pages have different protection, always PageMode::Error on POSIX
+    EXTERNALD bln VM_ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode );  //  can commit uncommited memory
+    EXTERNALS ui32 VM_PageSize();
 
 	inline CError Error_InconsistentProtection() { return CError( Error::_MaxDefaultError + 0, "VIRTUAL_MEM", "INCONSISTENT_PROTECTION" ); }
 }
 
 namespace CPU
 {
-    EXTERNALS ui32 CoresNum();
+    EXTERNALS ui32 CPUCoresNum();
 }
 
 class CTC

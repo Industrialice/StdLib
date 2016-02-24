@@ -12,10 +12,10 @@ struct MutexInitializer : public CMutex
 	}
 };
 
-void StdAbstractionLib_Initialize()
+EXTERNALS void StdAbstractionLib_Initialize()
 {
     StdHelperLib_Initialize();
 	MutexInitializer::Initialize();
-	FileIO::Private::Initialize();
+	FileIO::Private::FileIO_InitializeFileIOSystem();
     Misc::Private::Initialize();
 }

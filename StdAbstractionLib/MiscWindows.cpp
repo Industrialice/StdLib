@@ -77,12 +77,12 @@ namespace
 
 //  VirtualMem
 
-void *VirtualMem::Reserve( uiw size )
+void *VirtualMem::VM_Reserve( uiw size )
 {
     return ::VirtualAlloc( 0, size, MEM_RESERVE, PAGE_NOACCESS );
 }
 
-bln VirtualMem::Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
+bln VirtualMem::VM_Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
 {
     ASSUME( p_mem && size && mode );
     DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
@@ -94,7 +94,7 @@ bln VirtualMem::Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
     return ::VirtualAlloc( p_mem, size, MEM_COMMIT, protect ) != 0;
 }
 
-void *VirtualMem::Alloc( uiw size, PageMode::PageMode_t mode )
+void *VirtualMem::VM_Alloc( uiw size, PageMode::PageMode_t mode )
 {
     ASSUME( size && mode );
     DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
@@ -106,23 +106,23 @@ void *VirtualMem::Alloc( uiw size, PageMode::PageMode_t mode )
     return ::VirtualAlloc( 0, size, MEM_RESERVE | MEM_COMMIT, protect );
 }
 
-bln VirtualMem::Free( void *p_mem )
+bln VirtualMem::VM_Free( void *p_mem )
 {
     ASSUME( p_mem );
     return ::VirtualFree( p_mem, 0, MEM_RELEASE ) != 0;
 }
 
-ui32 VirtualMem::PageSize()
+ui32 VirtualMem::VM_PageSize()
 {
     return MiscData.MemPageSize();
 }
 
-NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_mem, uiw size, CError *po_error )
+NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::VM_ProtectGet( const void *p_mem, uiw size, CError *po_error )
 {
     MEMORY_BASIC_INFORMATION o_mbi;
     PageMode::PageMode_t mode = PageMode::Error;
     CError error = Error::Ok();
-    size = Funcs::RoundUIUpToStep( size, PageSize() );
+    size = Funcs::RoundUIUpToStep( size, VM_PageSize() );
     SIZE_T infSize = ::VirtualQuery( p_mem, &o_mbi, sizeof(o_mbi) );
     if( !infSize )
     {
@@ -151,7 +151,7 @@ toExit:
     return mode;
 }
 
-bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
+bln VirtualMem::VM_ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
 {
     ASSUME( p_mem && size && mode );
     DWORD oldProtect;
@@ -166,7 +166,7 @@ bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
 
 //  CPU
 
-ui32 CPU::CoresNum()
+ui32 CPU::CPUCoresNum()
 {
     return MiscData.CpuCoresCount();
 }

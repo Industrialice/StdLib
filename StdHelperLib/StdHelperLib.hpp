@@ -5,4 +5,4 @@
 #include "LiceMathFuncs.hpp"
 #include "PackedIntArray.hpp"
 
-void StdHelperLib_Initialize();
+EXTERNALS void StdHelperLib_Initialize();

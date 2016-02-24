@@ -43,13 +43,13 @@ namespace
 
 //  VirtualMem
 
-void *VirtualMem::Reserve( uiw size )
+void *VirtualMem::VM_Reserve( uiw size )
 {
     ASSUME( size );
     return ::mmap( 0, size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 }
 
-bln VirtualMem::Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
+bln VirtualMem::VM_Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
 {
     ASSUME( p_mem && size && mode );
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
@@ -61,7 +61,7 @@ bln VirtualMem::Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
     return ::mprotect( p_mem, size, prot ) == 0;
 }
 
-void *VirtualMem::Alloc( uiw size, PageMode::PageMode_t mode )
+void *VirtualMem::VM_Alloc( uiw size, PageMode::PageMode_t mode )
 {
     ASSUME( size && mode );
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
@@ -73,24 +73,24 @@ void *VirtualMem::Alloc( uiw size, PageMode::PageMode_t mode )
     return ::mmap( 0, size, prot, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 }
 
-bln VirtualMem::Free( void *p_mem )
+bln VirtualMem::VM_Free( void *p_mem )
 {
     ASSUME( p_mem );
     return ::munmap( p_mem, 0 ) == 0;
 }
 
-ui32 VirtualMem::PageSize()
+ui32 VirtualMem::VM_PageSize()
 {
     return PAGESIZE;
 }
 
-VirtualMem::PageMode::PageMode_t VirtualMem::ProtectGet( const void *p_mem, uiw size, CError *po_error )
+VirtualMem::PageMode::PageMode_t VirtualMem::VM_ProtectGet( const void *p_mem, uiw size, CError *po_error )
 {
     DSA( po_error, Error::Unsupported() );
     return PageMode::Error;
 }
 
-bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
+bln VirtualMem::VM_ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
 {
     ASSUME( p_mem && size && mode );
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
@@ -104,7 +104,7 @@ bln VirtualMem::ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
 
 //  CPU
 
-ui32 CPU::CoresNum()
+ui32 CPU::CPUCoresNum()
 {
     return MiscData.CpuCoresCount();
 }

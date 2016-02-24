@@ -1,4 +1,4 @@
 #include "PreHeader.hpp"
 
-void StdCoreLib_Initialize()
+EXTERNALS void StdCoreLib_Initialize()
 {}

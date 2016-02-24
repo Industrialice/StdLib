@@ -82,7 +82,7 @@ public:
         ::GetModuleFileNameA( ::GetModuleHandleA( 0 ), moduleName, MAX_PATH );
         Files::ExtractPathFromString( moduleName, path );
 
-        ThreadsCount = CPU::CoresNum();
+        ThreadsCount = CPU::CPUCoresNum();
         ::printf( "creating %u threads\n", ThreadsCount );
         ThreadInfos = new SThreadInfo[ ThreadsCount ];
         for( ui32 index = 0; index < ThreadsCount; ++index )

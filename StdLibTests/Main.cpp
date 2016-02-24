@@ -1,6 +1,6 @@
 #include <StdAbstractionLib.hpp>
 
-#pragma comment( lib, "StdCoreLib.lib" )
+#pragma comment( lib, "StdCoreLib_Static.lib" )
 #pragma comment( lib, "StdHelperLib.lib" )
 #pragma comment( lib, "StdAbstractionLib.lib" )
 

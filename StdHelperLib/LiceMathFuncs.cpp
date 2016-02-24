@@ -1297,7 +1297,7 @@ void LiceMath::M3x2Mult3x2( m3x2 *RSTR m0, const m3x2 *m1, const m3x2 *m2 )
     m0->m[ 2 ][ 1 ] += m2->m[ 2 ][ 1 ];
 }
 
-void LiceMath::M3x2Mult3x2( m3x3 *RSTR m0, const m3x2 *m1, const m3x2 *m2 )
+void LiceMath::M3x2Mult3x2ToM3x3( m3x3 *RSTR m0, const m3x2 *m1, const m3x2 *m2 )
 {
     for( uiw h = 0; h < 3; ++h )
     {

@@ -14,6 +14,6 @@
 #include "Misc.hpp"
 #include "WinCEFuncs.hpp"
 
-void StdAbstractionLib_Initialize();
+EXTERNALS void StdAbstractionLib_Initialize();
 
 #endif

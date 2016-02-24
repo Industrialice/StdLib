@@ -17,32 +17,32 @@ namespace StdLib
 
                 typedef volatile LONG atomic32;
 
-                FORCEINLINE atomic32 Acquire_Load( const volatile atomic32 *value )
+                inline atomic32 Acquire_Load( const volatile atomic32 *value )
                 {
                     return *value;
                 }
 
-                FORCEINLINE atomic32 Increment( volatile atomic32 *value )
+                inline atomic32 Increment( volatile atomic32 *value )
                 {
                     return _InterlockedIncrement( value );
                 }
 
-                FORCEINLINE atomic32 Decrement( volatile atomic32 *value )
+                inline atomic32 Decrement( volatile atomic32 *value )
                 {
                     return _InterlockedDecrement( value );
                 }
 
-                FORCEINLINE atomic32 Exchange( volatile atomic32 *value, atomic32 exchange )
+                inline atomic32 Exchange( volatile atomic32 *value, atomic32 exchange )
                 {
                     return _InterlockedExchange( value, exchange );
                 }
 
-                FORCEINLINE void Set( volatile atomic32 *value, atomic32 set )
+                inline void Set( volatile atomic32 *value, atomic32 set )
                 {
                     _InterlockedExchange( value, set );
                 }
 
-                FORCEINLINE atomic32 CompareExchange( volatile atomic32 *value, atomic32 exchange, atomic32 comparand )
+                inline atomic32 CompareExchange( volatile atomic32 *value, atomic32 exchange, atomic32 comparand )
                 {
                     return _InterlockedCompareExchange( value, exchange, comparand );
                 }
