@@ -148,7 +148,6 @@ void CLogger::Delete( CLogger *po_logger )
 {
     ASSUME( po_logger );
     SLogger *slogger = ((SLogger *)po_logger);
-    CScopeLock < true > lock( slogger->_is_multithreaded ? &slogger->_mutex : 0 );
     slogger->~SLogger();
     ::free( slogger );
 }
