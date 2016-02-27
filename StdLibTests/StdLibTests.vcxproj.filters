@@ -32,6 +32,9 @@
     <ClCompile Include="FindBrokenNames.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FileEnumBenchmark.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TextFixer.hpp">

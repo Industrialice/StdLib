@@ -13,7 +13,7 @@
 
 NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *po_error )
 {
-    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
+    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
 
     bln funcResult = ::unlink( cp_pnn ) == 0;
     if( po_error )
@@ -44,12 +44,12 @@ NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *po_error )
 
 NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *po_error )
 {
-    ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH );
+    ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH_LENGTH );
     DIR *p_dir;
     struct dirent *po_dir;
     CError o_error = Error::Ok();
     bln funcResult = false;
-    char a_buf[ MAX_PATH ];
+    char a_buf[ MAX_PATH_LENGTH ];
     uiw cpyIndex = Funcs::StrCpyAndCountWONull( a_buf, cp_path );
     a_buf[ cpyIndex++ ] = '/';
 
@@ -120,34 +120,34 @@ toExit:
 
 bln Files::IsFileOrFolderExists( const char *cp_papn )
 {
-    ASSUME( cp_papn && _StrLen( cp_papn ) < MAX_PATH );
+    ASSUME( cp_papn && _StrLen( cp_papn ) < MAX_PATH_LENGTH );
     struct stat o_stat;
     return ::stat( cp_papn, &o_stat ) == 0 && (S_ISDIR( o_stat.st_mode ) || S_ISREG( o_stat.st_mode ));
 }
 
 bln Files::IsFileExists( const char *cp_pnn )
 {
-    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
+    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
     return ::access( cp_pnn, F_OK ) == 0;
 }
 
 bln Files::IsFolderExists( const char *cp_path )
 {
-    ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH );
+    ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH_LENGTH );
     struct stat o_stat;
     return ::stat( cp_path, &o_stat ) == 0 && S_ISDIR( o_stat.st_mode );
 }
 
 bln Files::IsFileReadOnlyGet( const char *cp_pnn )
 {
-    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
+    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
     DBGBREAK;  //  TODO: complete
     return false;
 }
 
 bln Files::IsFileReadOnlySet( const char *cp_pnn, bln is_ro )
 {
-    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
+    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
     DBGBREAK;  //  TODO: complete
     return false;
 }
@@ -163,7 +163,7 @@ bln Files::IsAbsolutePath( const char *pnn, uiw parseLen )
     return true;
 }
 
-uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char(&a_procedPath)[ MAX_PATH ] )
+uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char *absPath, uiw maxLen )
 {
 	DBGBREAK;  //  TODO: complete
 	return 0;
@@ -196,9 +196,9 @@ bln Files::CurrentWorkingPathSet( const char *path )
 
 NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, CError *po_error )
 {
-    ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH) );
+    ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH_LENGTH) );
 
-    char a_buf[ MAX_PATH ];
+    char a_buf[ MAX_PATH_LENGTH ];
     uiw len = Funcs::StrCpyAndCountWONull( a_buf, cp_where );
     _StrCpy( a_buf + len, cp_name );
     bln funcResult = false;
@@ -307,7 +307,7 @@ bln Files::EnumNextFile( CFileEnumInfo *info )
     return false;
 }
 
-void Files::EnumFilesRecursively( const char *path, const char *mask, EnumFilesCallback callback, void *argument )
+void Files::EnumFilesRecursively( const char *path, const char *mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
 {
 	DBGBREAK;  //  TODO:
 }

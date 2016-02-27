@@ -78,8 +78,8 @@ public:
             ++next;
         }
 
-        char moduleName[ MAX_PATH ], path[ MAX_PATH ];
-        ::GetModuleFileNameA( ::GetModuleHandleA( 0 ), moduleName, MAX_PATH );
+        char moduleName[ MAX_PATH_LENGTH ], path[ MAX_PATH_LENGTH ];
+        ::GetModuleFileNameA( ::GetModuleHandleA( 0 ), moduleName, MAX_PATH_LENGTH );
         Files::ExtractPathFromString( moduleName, path );
 
         ThreadsCount = CPU::CPUCoresNum();
@@ -93,7 +93,7 @@ public:
 
         for( uiw index = 0; index < exts.Size(); ++index )
         {
-            AddFileJob( CCRefVec < char >( path, MAX_PATH ), exts[ index ] );
+            AddFileJob( CCRefVec < char >( path, MAX_PATH_LENGTH ), exts[ index ] );
         }
 
         WaitingForFinish();
@@ -135,7 +135,7 @@ private:
             if( ti->is_continue.IsSet() )
             {
                 Files::CFileEnumInfo info;
-                Files::EnumFilesRecursively( ti->path.Data(), ti->extensionToProcess.Data(), EnumFilesCallback, ti );
+                Files::EnumFilesRecursively( ti->path.Data(), ti->extensionToProcess.Data(), false, EnumFilesCallback, ti );
             }
 
             ti->is_finished.Set();

@@ -5,7 +5,7 @@
 class CToWChar
 {
     ui16 *_ptr;
-    ui16 _str[ MAX_PATH ];
+    ui16 _str[ MAX_PATH_LENGTH ];
 
 public:
     ~CToWChar()
@@ -55,8 +55,8 @@ WINBASEAPI HMODULE WINAPI LoadLibraryA( LPCSTR lpLibFileName )
 
 WINBASEAPI DWORD WINAPI GetModuleFileNameA( HMODULE hModule, LPCH lpFilename, DWORD nSize )
 {
-    wchar_t temp[ MAX_PATH ];
-    DWORD len = ::GetModuleFileNameW( hModule, temp, Funcs::Min < DWORD >( MAX_PATH, nSize ) );
+    wchar_t temp[ MAX_PATH_LENGTH ];
+    DWORD len = ::GetModuleFileNameW( hModule, temp, Funcs::Min < DWORD >( MAX_PATH_LENGTH, nSize ) );
     for( uiw index = 0; index < len; ++index )
     {
         *lpFilename++ = temp[ index ];
@@ -165,7 +165,7 @@ static void DataAtoW( LPWIN32_FIND_DATAA output, LPWIN32_FIND_DATAW source )
     output->nFileSizeLow = source->nFileSizeLow;
     output->dwReserved0 = 0;
     output->dwReserved1 = 0;
-    for( uiw index = 0; index < MAX_PATH; ++index )
+    for( uiw index = 0; index < MAX_PATH_LENGTH; ++index )
     {
         output->cFileName[ index ] = source->cFileName[ index ];
     }

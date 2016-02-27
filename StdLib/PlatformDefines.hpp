@@ -7,6 +7,10 @@
 
     #include <Windows.h>
 
+	//  actual symbols count + null terminator
+	#define MAX_PATH_LENGTH MAX_PATH
+	#define MAX_FILENAME_LENGTH 256
+
     #if defined(DEBUG) || defined(ALLOW_ASSERTIONS)
         #define WHRCHECK( a ) if( FAILED( a ) ) __debugbreak()
         #define CHECK( a ) if( !(a) ) __debugbreak()
@@ -33,7 +37,9 @@
 
 #elif defined(POSIX)
 
-    #define MAX_PATH 256
+	//  actual symbols count + null terminator
+    #define MAX_PATH_LENGTH PATH_MAX
+	#define MAX_FILENAME_LENGTH (NAME_MAX + 1)
 
     #if defined(DEBUG) || defined(ALLOW_ASSERTIONS)
         #ifdef ANDROID

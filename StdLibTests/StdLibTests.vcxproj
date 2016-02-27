@@ -70,7 +70,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>..\StdLib;..\StdHelperLib;..\StdAbstractionLib;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\Debug_x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>..\StdLib;..\StdHelperLib;..\StdAbstractionLib;$(IncludePath)</IncludePath>
@@ -185,6 +185,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DeleteShit.cpp" />
+    <ClCompile Include="FileEnumBenchmark.cpp" />
     <ClCompile Include="FindBrokenNames.cpp" />
     <ClCompile Include="GLFuncsCreate.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

@@ -1,8 +1,8 @@
 #include <StdAbstractionLib.hpp>
 
 #pragma comment( lib, "StdCoreLib_Static.lib" )
-#pragma comment( lib, "StdHelperLib.lib" )
-#pragma comment( lib, "StdAbstractionLib.lib" )
+#pragma comment( lib, "StdHelperLib_Static.lib" )
+#pragma comment( lib, "StdAbstractionLib_Static.lib" )
 
 #include <stdio.h>
 
@@ -493,14 +493,16 @@ template < typename... Args > CStr Concat( const Args &... strings )
 }
 
 void FindBrokenNames();
+void FileEnumBenchmark();
 
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
 	//FindBrokenNames();
+	FileEnumBenchmark();
 
-	FileMapping::mappingError error;
+	/*FileMapping::mappingError error;
 	FileIO::CFile testFile( "test.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read );
 	FileMapping::Mapping mapping( &testFile, 0, uiw_max, false, &error );
 	if( !mapping.IsCreated() )
@@ -516,11 +518,11 @@ int __cdecl main()
 
 	char buf[ 128 ];
 	Funcs::PrintToStr( buf, sizeof(buf), "mapping content %[*]s\n", (ui32)fileSize, str );
-	::printf( "%s\n", buf );
+	::printf( "%s\n", buf );*/
 
 #if 0
 	uiw copied;
-	char buf[ MAX_PATH * 2 ];
+	char buf[ MAX_PATH_LENGTH * 2 ];
 	if( Files::CurrentWorkingPathGet( buf, sizeof(buf), &copied ) == false )
 	{
 		::printf( "failed to get working path, copied %u\n", copied );

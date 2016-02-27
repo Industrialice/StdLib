@@ -11,7 +11,7 @@
 
 NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *po_error )
 {
-    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
+    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
 
     bln funcResult = ::DeleteFileA( cp_pnn ) != 0;
     if( po_error )
@@ -42,9 +42,9 @@ NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *po_error )
 
 NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *po_error )
 {
-    ASSUME( cp_path && _StrLen( cp_path ) + 2 < MAX_PATH );
+    ASSUME( cp_path && _StrLen( cp_path ) + 2 < MAX_PATH_LENGTH );
 
-    char a_buf[ MAX_PATH ];
+    char a_buf[ MAX_PATH_LENGTH ];
     uiw cpy = Funcs::StrCpyAndCountWONull( a_buf, cp_path );
     _StrCpy( a_buf + cpy, "/*" );
     ++cpy;
@@ -102,14 +102,14 @@ toExit:
 
 bln Files::IsFileOrFolderExists( const char *cp_papn )
 {
-    ASSUME( cp_papn && _StrLen( cp_papn ) < MAX_PATH );
+    ASSUME( cp_papn && _StrLen( cp_papn ) < MAX_PATH_LENGTH );
     DWORD attribs = ::GetFileAttributesA( cp_papn );
     return attribs != INVALID_FILE_ATTRIBUTES;
 }
 
 NOINLINE bln Files::IsFileExists( const char *cp_pnn )
 {
-    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
+    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
     DWORD attribs = ::GetFileAttributesA( cp_pnn );
     if( attribs == INVALID_FILE_ATTRIBUTES )
     {
@@ -124,7 +124,7 @@ NOINLINE bln Files::IsFileExists( const char *cp_pnn )
 
 NOINLINE bln Files::IsFolderExists( const char *cp_path )
 {
-    ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH );
+    ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH_LENGTH );
     DWORD attribs = ::GetFileAttributesA( cp_path );
     if( attribs == INVALID_FILE_ATTRIBUTES )
     {
@@ -139,7 +139,7 @@ NOINLINE bln Files::IsFolderExists( const char *cp_path )
 
 NOINLINE bln Files::IsFileReadOnlyGet( const char *cp_pnn )
 {
-    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
+    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
     DWORD attribs = ::GetFileAttributesA( cp_pnn );
     if( attribs == INVALID_FILE_ATTRIBUTES )
     {
@@ -150,7 +150,7 @@ NOINLINE bln Files::IsFileReadOnlyGet( const char *cp_pnn )
 
 NOINLINE bln Files::IsFileReadOnlySet( const char *cp_pnn, bln is_ro )
 {
-    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH );
+    ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
     DWORD new_attribs;
     DWORD old_attribs = ::GetFileAttributesA( cp_pnn );
     if( old_attribs == INVALID_FILE_ATTRIBUTES )
@@ -174,9 +174,9 @@ NOINLINE bln Files::IsFileReadOnlySet( const char *cp_pnn, bln is_ro )
 
 NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, CError *po_error )
 {
-    ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH) );
+    ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH_LENGTH) );
 
-    char a_buf[ MAX_PATH ];
+    char a_buf[ MAX_PATH_LENGTH ];
     uiw len = Funcs::StrCpyAndCountWONull( a_buf, cp_where );
     _StrCpy( a_buf + len, cp_name );
     bln funcResult = false;
@@ -284,12 +284,16 @@ bln Files::IsAbsolutePath( const char *pnn, uiw parseLen /* = uiw_max */ )
 	return Funcs::IsChrAlpha( pnn[ 0 ] ) && pnn[ 1 ] == ':' && (pnn[ 2 ] == '/' || pnn[ 2 ] == '\\');  //  TODO:
 }
 
-NOINLINE uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char (&a_procedPath)[ MAX_PATH ] )
+NOINLINE uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char *absPath, uiw maxLen )
 {
     #ifdef _WIN32_WCE
+		if( _StrLen( cp_sourcePath ) + 1 > maxLen )
+		{
+			return 0;
+		}
         return Funcs::StrCpyAndCount( a_procedPath, cp_sourcePath );
     #else
-        return ::GetFullPathNameA( cp_sourcePath, MAX_PATH, a_procedPath, 0 );
+        return ::GetFullPathNameA( cp_sourcePath, maxLen, absPath, 0 );
     #endif
 }
 
@@ -331,23 +335,25 @@ struct CFileEnumerator : public Files::CFileEnumInfo
 
         for( _pathLen = 0; path[ _pathLen ]; ++_pathLen )
         {
-            _pnn[ _pathLen ] = path[ _pathLen ];
-            if( _pnn[ _pathLen ] == '/' )
-            {
-                _pnn[ _pathLen ] = '\\';
-            }
+			if( path[ _pathLen ] == '/' )
+			{
+				_pnn.PushBack( '\\' );
+			}
+			else
+			{
+				_pnn.PushBack( path[ _pathLen ] );
+			}
         }
 
-        if( _pathLen == 0 || _pnn[ _pathLen - 1 ] != '\\' )
-        {
-            _pnn[ _pathLen++ ] = '\\';
-        }
-
-        _StrCpy( _pnn + _pathLen, mask );
+		if( _pnn.IsEmpty() || _pnn.Back() != '\\' )
+		{
+			_pnn.PushBack( '\\' );
+			++_pathLen;
+		}
 
         WIN32_FIND_DATAA findData;
 
-        _handle = ::FindFirstFileA( _pnn, &findData );
+        _handle = ::FindFirstFileA( (_pnn + mask).CStr(), &findData );
 
         if( _handle == INVALID_HANDLE_VALUE )
         {
@@ -372,10 +378,10 @@ struct CFileEnumerator : public Files::CFileEnumInfo
             }
         }
 
-        _StrCpy( _pnn + _pathLen, findData.cFileName );
+		_pnn += findData.cFileName;
         if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
         {
-            _StrCat( _pnn + _pathLen, "\\" );
+			_pnn.PushBack( '\\' );
             _fileSize = ui64_max;
         }
         else
@@ -401,10 +407,11 @@ struct CFileEnumerator : public Files::CFileEnumInfo
             return false;
         }
 
-        _StrCpy( _pnn + _pathLen, findData.cFileName );
+		_pnn.Resize( _pathLen );
+		_pnn += findData.cFileName;
         if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
         {
-            _StrCat( _pnn + _pathLen, "\\" );
+			_pnn.PushBack( '\\' );
             _fileSize = ui64_max;
         }
         else
@@ -429,7 +436,7 @@ bln Files::EnumNextFile( CFileEnumInfo *info )
     return ((CFileEnumerator *)info)->EnumNextFile();
 }
 
-void Files::EnumFilesRecursively( const char *path, const char *mask, EnumFilesCallback callback, void *argument )
+void Files::EnumFilesRecursively( const char *path, const char *mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
 {
     UniquePtr < CFileEnumInfo > info( new CFileEnumInfo );
     if( !EnumFirstFile( info, path, "*.*" ) )
@@ -441,7 +448,11 @@ void Files::EnumFilesRecursively( const char *path, const char *mask, EnumFilesC
     {
         if( info->IsFolder() )
         {
-            EnumFilesRecursively( info->PNN(), mask, callback, argument );
+			if( is_reportFolders )
+			{
+				callback( info, argument );
+			}
+            EnumFilesRecursively( info->PNN(), mask, is_reportFolders, callback, argument );
         }
     } while( EnumNextFile( info ) );
 

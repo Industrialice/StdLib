@@ -5,7 +5,7 @@
 
 using namespace StdLib;
 
-void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
+static void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
 {
 	ASSUME( info->IsFolder() == false );
 	bln is_show = false;
@@ -17,7 +17,7 @@ void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
 			break;
 		}
 	}
-	if( is_show )
+	//if( is_show )
 	{
 		::printf( "%s\n", info->PNN() );
 	}
@@ -26,5 +26,5 @@ void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
 void FindBrokenNames()
 {
 	setlocale( LC_ALL, "Russian" );
-	Files::EnumFilesRecursively( "D:\\Pictures", "*.*", EnumFilesCallback, 0 );
+	Files::EnumFilesRecursively( "D:\\Pictures", "*.*", false, EnumFilesCallback, 0 );
 }

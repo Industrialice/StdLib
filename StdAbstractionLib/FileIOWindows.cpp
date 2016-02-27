@@ -39,8 +39,8 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn,
 
 	if( StdLib_GetFinalPathNameByHandleA == 0 )
 	{
-		char fullPath[ MAX_PATH ];
-		Files::AbsolutePath( cp_pnn, fullPath );
+		char fullPath[ MAX_PATH_LENGTH ];
+		Files::AbsolutePath( cp_pnn, fullPath, MAX_PATH_LENGTH );
 		file->pnn = new CStr( fullPath );
 	}
 
@@ -355,9 +355,9 @@ NOINLINE ui32 FileIO::Private::FileIO_PNNGet( const CFileBasis *file, char *p_bu
     ASSUME( FileIO_IsValid( file ) );
 	if( StdLib_GetFinalPathNameByHandleA )
 	{
-		ui32 len = p_buf ? MAX_PATH - 1 : 0;
-		DWORD result = StdLib_GetFinalPathNameByHandleA( file->handle, p_buf, MAX_PATH - 1, FILE_NAME_NORMALIZED );
-		if( result < 2 || result > MAX_PATH )
+		ui32 len = p_buf ? MAX_PATH_LENGTH - 1 : 0;
+		DWORD result = StdLib_GetFinalPathNameByHandleA( file->handle, p_buf, MAX_PATH_LENGTH - 1, FILE_NAME_NORMALIZED );
+		if( result < 2 || result > MAX_PATH_LENGTH )
 		{
 			return 0;
 		}

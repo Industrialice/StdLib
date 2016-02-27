@@ -2,7 +2,7 @@
 #define __FILES_HPP__
 
 #include <StdCoreLib.hpp>
-#include "Error.hpp"
+#include <CString.hpp>
 
 namespace StdLib {
 
@@ -25,12 +25,12 @@ namespace Files
 	EXTERNALD uiw ExtractExtensionFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  without a dot
 	EXTERNALD bln IsRelativePathSupported();
 	EXTERNALD bln IsAbsolutePath( const char *pnn, uiw parseLen = uiw_max );
-	EXTERNALD uiw AbsolutePath( const char *RSTR cp_sourcePath, char (&a_procedPath)[ MAX_PATH ] );
+	EXTERNALD uiw AbsolutePath( const char *RSTR cp_sourcePath, char *absPath, uiw maxLen );  //  maxLen include null-symbol, if buffer was too small, returns a zero
 	EXTERNALD bln CurrentWorkingPathGet( char *buf, uiw maxLen, uiw *copied /* optional */ );  //  maxLen include null-symbol, if buffer was too small, returns false and sets copied to uiw_max, if error, returns false and sets copied to 0
 	EXTERNALD bln CurrentWorkingPathSet( const char *path );
 	EXTERNALD bln EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask );
 	EXTERNALD bln EnumNextFile( CFileEnumInfo *info );
-	EXTERNALD void EnumFilesRecursively( const char *path, const char *mask, EnumFilesCallback callback, void *argument );
+	EXTERNALD void EnumFilesRecursively( const char *path, const char *mask, bln is_reportFolders, EnumFilesCallback callback, void *argument );
 
     namespace Private
     {
@@ -41,7 +41,7 @@ namespace Files
     {
     protected:
         fileEnumHandle _handle;
-        char _pnn[ MAX_PATH ];
+		TCStr < char, 128 > _pnn;  //  TODO: won't work from a dll
         uiw _pathLen;
         ui64 _fileSize;
 
@@ -53,13 +53,12 @@ namespace Files
 
         CFileEnumInfo() : _handle( fileEnumHandle_undefined )
         {
-            _pnn[ 0 ] = '\0';
             _pathLen = 0;
         }
 
         const char *PNN() const
         {
-            return _pnn;
+            return _pnn.CStr();
         }
 
         bln IsFolder() const
@@ -69,7 +68,7 @@ namespace Files
                 return false;
             }
 
-            const char *start = _pnn + _pathLen;
+            const char *start = _pnn.CStr() + _pathLen;
             if( _StrChr( start, FSPathSep ) )
             {
                 return true;
