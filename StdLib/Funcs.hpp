@@ -110,12 +110,6 @@ namespace Funcs
 
     EXTERNALS uiw MemCpy( void *RSTR p_target, const void *cp_source, uiw size );
     #define _MemCpy( dest, source, size ) (::memcpy( dest, source, size ), size)
-    #define _MemCpyIncr( dest, source, size ) (::memcpy( dest, source, size ), (byte *&)(dest) += size, size)
-    #define _MemCpyIncrRev( dest, source, size ) (::memcpy( dest, source, size ), (byte *&)(source) += size, size)
-    #define _MemCpyOffset( dest, source, size, offset ) (::memcpy( (byte *)(dest) + offset, source, size ), size)
-    #define _MemCpyOffsetIncr( dest, source, size, offset ) (::memcpy( (byte *)(dest) + offset, source, size ), offset += size, size)
-    #define _MemCpyOffsetRev( dest, source, size, offset ) (::memcpy( dest, (byte *)(source) + offset, size ), size)
-    #define _MemCpyOffsetIncrRev( dest, source, size, offset ) (::memcpy( dest, (byte *)(source) + offset, size ), offset += size, size)
     #define _MemMove( dest, source, size ) (::memmove( dest, source, size ), size)
     EXTERNALS uiw MemZero( void *p_mem, uiw size );
     #define _MemZero( mem, size ) (::memset( mem, 0, size ), size)
@@ -175,22 +169,17 @@ namespace Funcs
     EXTERNALS void StrCat( char *RSTR p_dest, const char *cp_source );
     EXTERNALS uiw StrCatAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aesDest = '\0', char aesSrc = '\0' );
     #define _StrCat( dest, source ) (void)::strcat( dest, source )
-    EXTERNALS void StrCpy( char *RSTR p_dest, const char *cp_source );
-    EXTERNALS uiw StrCpyAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS void StrCpy( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true );
+    EXTERNALS uiw StrCpyAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true, uiw maxLen = uiw_max, char aes = '\0' );
     #define _StrCpy( dest, source ) (void)::strcpy( dest, source )
     EXTERNALS uiw StrNCpy( char *RSTR p_dest, const char *cp_source, uiw count );
     #define _StrNCpy( dest, source, count ) (::strncpy( dest, source, count ), count)
-    #define _StrNCpyCS( dest, source, minus ) (::strncpy( dest, source, sizeof(source) - minus ), sizeof(source) - minus)
 //    #define _StrNCpyCSC( dest, source, minus, counter ) (::strncpy( dest, source, sizeof(source) - minus ), counter += (sizeof(source) - minus), sizeof(source) - minus)
     EXTERNALS void StrConnect( char *RSTR p_dest, const char *cp_first, const char *cp_second );
-    EXTERNALS void StrCpyWONull( char *RSTR p_dest, const char *cp_source );
-    EXTERNALS void StrCpyWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
-    EXTERNALS uiw StrCpyAndCount( char *RSTR p_dest, const char *cp_source );
-    EXTERNALS uiw StrCpyAndCountWONull( char *RSTR p_dest, const char *cp_source );
-    EXTERNALS uiw StrCpyAndCountWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
-    EXTERNALS uiw StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw maxLen );
-    EXTERNALS uiw StrSafeCpyAndCountWONull( char *RSTR p_dest, const char *cp_source, uiw maxLen );
-    EXTERNALS uiw StrSafeCpyAndCountWONullAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen, char aes = '\0' );
+	EXTERNALS uiw StrCpyAndCount( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true );
+	EXTERNALS uiw StrCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS uiw StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw maxLen, bln is_nullTerminate = true );
+	EXTERNALS uiw StrSafeCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen, bln is_nullTerminate = true, char aes = '\0' );
     EXTERNALS uiw StrDelim( char **pp_output, char *p_source, char delim );  //  you can pass null as pp_output only to get a number of the final strings
     EXTERNALS uiw StrDelimConst( char **pp_output, const char *cp_source, char delim );  //  TODO: incomplete  //  you can pass null as pp_output only to get a number of the final strings
     EXTERNALS char *StrChr( const char *cp_source, char symbol );  //  returning value of the same string - assume it is const if source is const

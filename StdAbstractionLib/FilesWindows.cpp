@@ -45,7 +45,7 @@ NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *po_error )
     ASSUME( cp_path && _StrLen( cp_path ) + 2 < MAX_PATH_LENGTH );
 
     char a_buf[ MAX_PATH_LENGTH ];
-    uiw cpy = Funcs::StrCpyAndCountWONull( a_buf, cp_path );
+    uiw cpy = Funcs::StrCpyAndCount( a_buf, cp_path, false );
     _StrCpy( a_buf + cpy, "/*" );
     ++cpy;
     WIN32_FIND_DATAA o_find;
@@ -177,7 +177,7 @@ NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, CEr
     ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH_LENGTH) );
 
     char a_buf[ MAX_PATH_LENGTH ];
-    uiw len = Funcs::StrCpyAndCountWONull( a_buf, cp_where );
+    uiw len = Funcs::StrCpyAndCount( a_buf, cp_where, false );
     _StrCpy( a_buf + len, cp_name );
     bln funcResult = false;
     CError o_error = Error::Ok();
@@ -287,11 +287,13 @@ bln Files::IsAbsolutePath( const char *pnn, uiw parseLen /* = uiw_max */ )
 NOINLINE uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char *absPath, uiw maxLen )
 {
     #ifdef _WIN32_WCE
-		if( _StrLen( cp_sourcePath ) + 1 > maxLen )
+		uiw len = _StrLen( cp_sourcePath );
+		if( len + 1 > maxLen )
 		{
 			return 0;
 		}
-        return Funcs::StrCpyAndCount( a_procedPath, cp_sourcePath );
+		_StrCpy( cp_sourcePath, cp_sourcePath );
+        return len;
     #else
         return ::GetFullPathNameA( cp_sourcePath, maxLen, absPath, 0 );
     #endif
