@@ -64,7 +64,7 @@ public:
         for( ; ; )
         {
             uiw len = Funcs::StrLenAdv( next, uiw_max, '\n' );
-            exts.PushBackNum();
+            exts.AppendNum();
             exts.Back().Resize( len + 1 );
             Funcs::StrCpyAdv( exts.Back().Data(), next, len );
 

@@ -68,7 +68,7 @@ void CLogger::DirectionAdd( DirectionFunc dir )
 {
     ASSUME( dir );
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
-    dis->_o_dirs.PushBack( dir );
+    dis->_o_dirs.Append( dir );
 }
 
 uiw CLogger::DirectionsCount() const

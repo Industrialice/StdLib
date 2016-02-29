@@ -305,12 +305,12 @@ void Fix( TextFixerMode::mode_t fixMode )
 
     if( fixMode == TextFixerMode::fanfic )
     {
-        extNum.PushBack( CStr( "*.txt" ) );
+        extNum.Append( CStr( "*.txt" ) );
     }
     else if( fixMode == TextFixerMode::codeSpaces )
     {
-        extNum.PushBack( CStr( "*.cpp" ) );
-        extNum.PushBack( CStr( "*.hpp" ) );
+        extNum.Append( CStr( "*.cpp" ) );
+        extNum.Append( CStr( "*.hpp" ) );
     }
 
     for( uiw index = 0; index < extNum.Size(); ++index )

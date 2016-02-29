@@ -499,8 +499,17 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
+	int test[ 10 ] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	CVecArr < int > arr;
+	arr.Set( test, 10, _countof(test) );
+
+	for( int v : arr )
+	{
+		::printf( "%i\n", v );
+	}
+
 	//FindBrokenNames();
-	FileEnumBenchmark();
+	//FileEnumBenchmark();
 
 	/*FileMapping::mappingError error;
 	FileIO::CFile testFile( "test.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read );

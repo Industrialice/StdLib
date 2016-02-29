@@ -634,38 +634,116 @@ public:
     {
         _arr = 0;
         _count = 0;
+		DBGCODE( _reserve = TypeDesc < count_type >::max; )
     }
 
-    _CBasisVec( X *arr, count_type count )
+	_CBasisVec( count_type count, count_type reserve = TypeDesc < count_type >::max )
+	{
+		_arr = 0;
+		_count = 0;
+		DBGCODE( _reserve = reserve; )
+	}
+
+    _CBasisVec( X *arr, count_type count, count_type reserve = TypeDesc < count_type >::max )
     {
         _arr = arr;
         _count = count;
-    }
-    
-    X *_GetArr()
-    {
-        return _arr;
+		DBGCODE( _reserve = reserve; )
     }
 
-    const X *_GetArr() const
-    {
-        return _arr;
-    }
+	void _Transfer( _CBasisVec *source )
+	{
+		_count = source->_count;
+		source->_count = 0;
+		_arr = source->_arr;
+		source->_arr = 0;
+		DBGCODE( _reserve = source->_reserve; )
+		DBGCODE( source->_reserve = 0; )
+	}
 
-    void _SetArr( X *arr, count_type count )
-    {
-        _arr = arr;
-        _count = count;
-    }
+	X *_GetArr()
+	{
+		return _arr;
+	}
 
-    count_type _Size() const
-    {
-        return _count;
-    }
+	const X *_GetArr() const
+	{
+		return _arr;
+	}
+
+	void _SetArr( X *arr, count_type count, count_type reserve = TypeDesc < count_type >::max )
+	{
+		_arr = arr;
+		_count = count;
+		DBGCODE( _reserve = reserve; )
+	}
+
+	void _IncSize( count_type newCount )
+	{
+		DBGCODE( ASSUME( newCount <= _reserve ); )
+		_count = newCount;
+	}
+
+	void _DecSize( count_type newCount )
+	{
+		DBGCODE( ASSUME( newCount <= _reserve ); )
+		_count = newCount;
+	}
+
+	void _UnkSize( count_type newCount )
+	{
+		DBGCODE( ASSUME( newCount <= _reserve ); )
+		_count = newCount;
+	}
+
+	count_type _TryIncSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
+	{
+		DBGCODE( ASSUME( newCount <= _reserve ); )
+		_count = newCount;
+		return TypeDesc < count_type >::max;
+	}
+
+	count_type _TryDecSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
+	{
+		DBGCODE( ASSUME( newCount <= _reserve ); )
+		_count = newCount;
+		return TypeDesc < count_type >::max;
+	}
+
+	count_type _TryUnkSizeLocally( count_type newCount )  //  will return TypeDesc < count_type >::max on success
+	{
+		DBGCODE( ASSUME( newCount <= _reserve ); )
+		_count = newCount;
+		return TypeDesc < count_type >::max;
+	}
+
+	void _FlushReserved()
+	{}
+
+	count_type _TryFlushReservedLocally()  //  will return TypeDesc < count_type >::max on success
+	{
+		return TypeDesc < count_type >::max;
+	}
+
+	count_type _Reserved() const
+	{
+		DBGBREAK;  //  inapplicable, should not be called
+	}
+
+	count_type _Size() const
+	{
+		return _count;
+	}
+
+	bln _IsStatic() const
+	{
+		return true;
+	}
 
 private:
     X *_arr;
     count_type _count;
+	DBGCODE( count_type _reserve; )
 };
 }  //  namespace Private
 }  //  namespace StdLib

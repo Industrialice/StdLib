@@ -463,6 +463,9 @@ public:
         _Destroy( this->_GetArr(), this->_Size() );
     }
 
+	_CBaseVec() : baseType()
+	{}
+
     _CBaseVec( count_type reserve ) : baseType( 0, reserve )
     {}
 
@@ -557,49 +560,6 @@ public:
         return *this;
     }
 
-    void PushBackNum( count_type num = 1 )
-    {
-        count_type curCount = this->_Size();
-        _SizeUp( curCount, curCount + num );
-        if( _cis_POD == false )
-        {
-            X *target = this->_GetArr() + curCount;
-            for( count_type counter = num; counter; --counter )
-            {
-                new (target) X();
-                ++target;
-            }
-        }
-    }
-
-    VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
-    void PushBack( const X &source )
-    {
-        count_type curCount = this->_Size();
-        if( !this->_IsStatic() && is_checkOverlap )
-        {
-            uiw index = &source - this->_GetArr();
-            _SizeUp( curCount, curCount + 1 );
-            new (this->_GetArr() + curCount ) X( index < curCount ? this->_GetArr()[ index ] : source );
-        }
-        else
-        {
-            _SizeUp( curCount, curCount + 1 );
-            new (this->_GetArr() + curCount ) X( source );
-        }
-    }
-
-#ifdef MOVE_SUPPORTED
-    void PushBack( X &&source )
-    {
-        count_type curCount = this->_Size();
-        uiw index = &source - this->_GetArr();
-        ASSUME( index >= curCount );  //  overlapping isn't allowed
-        _SizeUp( curCount, curCount + 1 );
-        new (this->_GetArr() + curCount ) X( std::move( source ) );
-    }
-#endif
-
 #ifdef VAR_TEMPLATES_SUPPORTED
     template < typename... Args > void EmplaceBack( Args &&... args )
     {
@@ -662,7 +622,7 @@ public:
     {
         if( size > this->_Size() )
         {
-            PushBackNum( size - this->_Size() );
+            AppendNum( size - this->_Size() );
         }
         else
         {
@@ -682,9 +642,19 @@ public:
     }
 #endif
 
-    X *InsertUninit( count_type pos, count_type count )
+    X *InsertNum( count_type pos, count_type num = 1, bln is_initialize = true )
     {
-        return _InsertRaw( pos, count );
+        X *target = _InsertRaw( pos, num );
+		if( _cis_POD == false && is_initialize )
+		{
+			X *cpy = target;
+			for( count_type counter = num; counter; --counter )
+			{
+				new (cpy) X();
+				++cpy;
+			}
+		}
+		return target;
     }
 
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
@@ -808,13 +778,50 @@ public:
         return Iter( this->_GetArr() + index );
     }
 
-    X *AppendUninit( count_type count )
-    {
-        count_type curCount = this->_Size();
-        _SizeUp( curCount, curCount + count );
-        X *ret = this->_GetArr() + curCount;
-        return ret;
-    }
+	VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
+	void Append( const X &source )
+	{
+		count_type curCount = this->_Size();
+		if( !this->_IsStatic() && is_checkOverlap )
+		{
+			uiw index = &source - this->_GetArr();
+			_SizeUp( curCount, curCount + 1 );
+			new (this->_GetArr() + curCount) X( index < curCount ? this->_GetArr()[ index ] : source );
+		}
+		else
+		{
+			_SizeUp( curCount, curCount + 1 );
+			new (this->_GetArr() + curCount) X( source );
+		}
+	}
+
+#ifdef MOVE_SUPPORTED
+	void Append( X &&source )
+	{
+		count_type curCount = this->_Size();
+		uiw index = &source - this->_GetArr();
+		ASSUME( index >= curCount );  //  overlapping isn't allowed
+		_SizeUp( curCount, curCount + 1 );
+		new (this->_GetArr() + curCount) X( std::move( source ) );
+	}
+#endif
+
+	X *AppendNum( count_type num = 1, bln is_initialize = true )
+	{
+		count_type curCount = this->_Size();
+		_SizeUp( curCount, curCount + num );
+		X *target = this->_GetArr() + curCount;
+		if( _cis_POD == false && is_initialize )
+		{
+			X *cpy = target;
+			for( count_type counter = num; counter; --counter )
+			{
+				new (cpy) X();
+				++cpy;
+			}
+		}
+		return target;
+	}
 
     VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
     void Append( const X *source, count_type count )
@@ -1226,6 +1233,37 @@ public:
     {
         return ToRef();
     }
+};
+
+//  there's no const version because there's no reason to have it. if you want const, use CCVecRef. I might as well create an aliased type, but I might not
+template < typename X, TypeSemantic_t typeSemantic = Sem_Strict > class CVecArr : public Private::_CBaseVec < X, void, void, typeSemantic, 0 >
+{
+	typedef Private::_CBaseVec < X, void, void, typeSemantic, 0 > baseType;
+
+public:
+	typedef typename baseType::count_type count_type;
+
+private:
+	void Reserve( count_type size );  //  overriding base method so it can't be used
+
+public:
+	~CVecArr()
+	{
+		this->_SetArr( 0, 0, 0 );
+	}
+
+	CVecArr()
+	{}
+
+	CVecArr( X *arr, count_type initialSize = 0, count_type maxSize = TypeDesc < count_type >::max )
+	{
+		this->_SetArr( arr, initialSize, maxSize );
+	}
+
+	void Set( X *arr, count_type initialSize = 0, count_type maxSize = TypeDesc < count_type >::max )
+	{
+		this->_SetArr( arr, initialSize, maxSize );
+	}
 };
 
 template < typename X > CCRefVec < X > MakeRefVec( const X *source, uiw count )

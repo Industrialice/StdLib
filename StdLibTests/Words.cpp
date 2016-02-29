@@ -62,7 +62,7 @@ void Words()
 
     while( words.Size() < range && pos < len )
     {
-        words.PushBackNum();
+        words.AppendNum();
         CVec < char > &word = words.Back();
         while( pos < len )
         {
@@ -71,10 +71,10 @@ void Words()
                 ++pos;
                 break;
             }
-            word.PushBack( buf[ pos ] );
+            word.Append( buf[ pos ] );
             ++pos;
         }
-        word.PushBack( '\0' );
+        word.Append( '\0' );
     }
 
     delete[] buf;
@@ -88,13 +88,13 @@ void Words()
     CVec < uiw > randomsSource( 0, words.Size() );
     for( uiw index = 0; index < words.Size(); ++index )
     {
-        randomsSource.PushBack( index );
+        randomsSource.Append( index );
     }
 
     for( uiw index = 0; index < words.Size(); ++index )
     {
         uiw r = Funcs::RandomRangeUI32( 0, randomsSource.Size() - 1 );
-        randoms.PushBack( randomsSource[ r ] );
+        randoms.Append( randomsSource[ r ] );
         randomsSource.Erase( r, 1 );
     }
 
