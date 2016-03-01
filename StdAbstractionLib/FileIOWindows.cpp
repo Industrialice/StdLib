@@ -172,7 +172,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn,
 	file->cacheMode = cacheMode;
     file->handle = h_file;
     file->bufferPos = 0;
-	_Clear( &file->stats );
+	Funcs::ClearPod( &file->stats );
 	file->readBufferCurrentSize = 0;
 	file->is_reading = false;
 

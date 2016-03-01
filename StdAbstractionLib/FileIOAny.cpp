@@ -196,7 +196,7 @@ void FileIO::Private::FileIO_StatsGet( const CFileBasis *file, SStats *po_stats 
 void FileIO::Private::FileIO_StatsReset( CFileBasis *file )
 {
     ASSUME( FileIO_IsValid( file ) );
-    _Clear( &file->stats );
+	Funcs::ClearPod( &file->stats );
 }
 
 FileIO::OpenMode::OpenMode_t FileIO::Private::FileIO_OpenModeGet( const CFileBasis *file )

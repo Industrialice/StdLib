@@ -328,96 +328,93 @@ f64 Funcs::MakeF64ByND( i32 numerator, i32 denominator )
     return (f64)numerator / denominator;
 }
 
+template < typename X > X CheckSum( const byte *source, uiw len )
+{
+	ASSUME( source );
+	ui32 sum = 0;
+	for( ui32 index = 0, rotate = 0; index < len; ++index, ++rotate )
+	{
+		if( rotate > sizeof(X) * 8 )
+		{
+			rotate = 0;
+		}
+		if( sizeof(X) == 4 )
+		{
+			sum += ROTATE32L( source[ index ], index );
+		}
+		else
+		{
+			ASSUME( sizeof(X) == 8 );
+			sum += ROTATE64L( source[ index ], index );
+		}
+	}
+	return sum;
+}
+
 ui32 Funcs::CheckSum32( const byte *source, uiw len )
 {
-    ASSUME( source );
-    ui32 sum = 0;
-    for( ui32 index = 0, rotate = 0; index < len; ++index, ++rotate )
-    {
-        if( rotate > 32 )
-        {
-            rotate = 0;
-        }
-        sum += ROTATE32L( source[ index ], index );
-    }
-    return sum;
+	return CheckSum < ui32 >( source, len );
 }
 
 ui64 Funcs::CheckSum64( const byte *source, uiw len )
 {
-    ASSUME( source );
-    ui64 sum = 0;
-    for( ui32 index = 0, rotate = 0; index < len; ++index, ++rotate )
-    {
-        if( rotate > 64 )
-        {
-            rotate = 0;
-        }
-        sum += ROTATE64L( source[ index ], index );
-    }
-    return sum;
+	return CheckSum < ui64 >( source, len );
 }
 
 uiw Funcs::CheckSumWord( const byte *source, uiw len )
 {
-    ASSUME( source );
-    return WSC( Funcs::CheckSum32, Funcs::CheckSum64 )( source, len );
+	return CheckSum < uiw >( source, len );
 }
 
-NOINLINE uiw Funcs::NormalizeMem32( ui32 val, char *p_buf )
+template < typename X > NOINLINE uiw NormalizeMem( X val, char *buf )
 {
-    ASSUME( p_buf );
-    if( val < 1024u )
-    {
-        uiw len = Funcs::IntToStrDec( val, p_buf );
-        _StrCpy( p_buf + len, " B" );
-        return len + 2;
-    }
-    else if( val < 1024u * 1024u )
-    {
-        return ::sprintf( p_buf, "%g KB", val / 1024.f );
-    }
-    else if( val < 1024u * 1024u * 1024u )
-    {
-        return ::sprintf( p_buf, "%g MB", val / 1048576.f );
-    }
-    else
-    {
-        return ::sprintf( p_buf, "%g GB", val / 1073741824.f );
-    }
+	ASSUME( buf );
+
+	f64 normalizedValue;
+	const char *execStr;
+
+	if( val < 1024 )
+	{
+		normalizedValue = val;
+		execStr = "%lg B";
+	}
+	else if( val < 1024 * 1024 )
+	{
+		normalizedValue = val / (f64)1024;
+		execStr = "%lg KB";
+	}
+	else if( val < (1024ull * 1024ull * 1024ull) )
+	{
+		normalizedValue = val / (f64)(1024ull * 1024ull);
+		execStr = "%lg MB";
+	}
+	else if( val < (1024ull * 1024ull * 1024ull * 1024ull) )
+	{
+		normalizedValue = val / (f64)(1024ull * 1024ull * 1024ull);
+		execStr = "%lg GB";
+	}
+	else
+	{
+		normalizedValue = val / (f64)(1024ull * 1024ull * 1024ull * 1024ull);
+		execStr = "%lg TB";
+	}
+
+	return ::sprintf( buf, execStr, normalizedValue );
 }
 
-NOINLINE uiw Funcs::NormalizeMem64( ui64 val, char *p_buf )
+uiw Funcs::NormalizeMem32( ui32 val, char *p_buf )
 {
-    ASSUME( p_buf );
-    if( val < 1024ull )
-    {
-        uiw len = Funcs::IntToStrDec( val, p_buf );
-        _StrCpy( p_buf + len, " B" );
-        return len + 2;
-    }
-    else if( val < 1024ull * 1024ull )
-    {
-        return ::sprintf( p_buf, "%lg KB", val / (f64)1024ull );
-    }
-    else if( val < 1024ull * 1024ull * 1024ull )
-    {
-        return ::sprintf( p_buf, "%lg MB", val / (f64)(1024ull * 1024ull) );
-    }
-    else if( val < 1024ull * 1024ull * 1024ull * 1024ull )
-    {
-        return ::sprintf( p_buf, "%lg GB", val / (f64)(1024ull * 1024ull * 1024ull) );
-    }
-    else
-    {
-        return ::sprintf( p_buf, "%lg TB", val / (f64)(1024ull * 1024ull * 1024ull * 1024ull) );
-    }
+	return NormalizeMem( val, p_buf );
+}
+
+uiw Funcs::NormalizeMem64( ui64 val, char *p_buf )
+{
+	return NormalizeMem( val, p_buf );
 }
 
 uiw Funcs::NormalizeMemWord( uiw val, char *p_buf )
 {
-    ASSUME( p_buf );
-    return WSC( Funcs::NormalizeMem32, Funcs::NormalizeMem64 )( val, p_buf );
+	return NormalizeMem( val, p_buf );
 }
 
 uiw Funcs::MemCpy( void *RSTR p_dest, const void *cp_source, uiw size )
@@ -975,23 +972,6 @@ uiw Funcs::StrCpyAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTermi
 		*p_dest = '\0';
 	}
     return cpy;
-}
-
-uiw Funcs::StrNCpy( char *RSTR p_dest, const char *cp_source, uiw count )
-{
-    ASSUME( p_dest && cp_source );
-    ::strncpy( p_dest, cp_source, count );
-    return count;
-}
-
-void Funcs::StrConnect( char *RSTR p_dest, const char *cp_first, const char *cp_second )
-{
-    ASSUME( p_dest && cp_first && cp_second );
-    while( *cp_first )
-    {
-        *p_dest++ = *cp_first++;
-    }
-    _StrCpy( p_dest, cp_second );
 }
 
 uiw Funcs::StrCpyAndCount( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate )

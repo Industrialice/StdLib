@@ -104,9 +104,9 @@ namespace Funcs
     EXTERNALS ui64 CheckSum64( const byte *source, uiw len );
     EXTERNALS uiw CheckSumWord( const byte *source, uiw len );
 
-    EXTERNALD uiw NormalizeMem32( ui32 val, char *p_buf );  //  buffer size after normalize
-    EXTERNALD uiw NormalizeMem64( ui64 val, char *p_buf );  //  buffer size after normalize
-    EXTERNALD uiw NormalizeMemWord( uiw val, char *p_buf );  //  buffer size after normalize
+    EXTERNALS uiw NormalizeMem32( ui32 val, char *p_buf );  //  returns buffer size after normalize
+    EXTERNALS uiw NormalizeMem64( ui64 val, char *p_buf );  //  returns buffer size after normalize
+    EXTERNALS uiw NormalizeMemWord( uiw val, char *p_buf );  //  returns buffer size after normalize
 
     EXTERNALS uiw MemCpy( void *RSTR p_target, const void *cp_source, uiw size );
     #define _MemCpy( dest, source, size ) (::memcpy( dest, source, size ), size)
@@ -118,8 +118,7 @@ namespace Funcs
     EXTERNALS bln MemTest( void *p_mem, byte val, uiw size );  //  true if size is 0
     EXTERNALS bln MemEquals( const void *cp_mem0, const void *cp_mem1, uiw size );  //  true if size is 0
     #define _MemEquals( mem0, mem1, size ) (!::memcmp( mem0, mem1, size ))
-    EXTERNALS void *MemFindSeq( const void *cp_mem, const void *cp_seq, uiw memSize, uiw seqSize );  //  assume output is const if unput was const
-    #define _Clear( mem ) ::memset( mem, 0, sizeof(*mem) )
+    EXTERNALS void *MemFindSeq( const void *cp_mem, const void *cp_seq, uiw memSize, uiw seqSize );  //  assume the output is const if the input was const
 
     typedef bln (*ChrTestFunc)( char );
 
@@ -172,10 +171,6 @@ namespace Funcs
     EXTERNALS void StrCpy( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true );
     EXTERNALS uiw StrCpyAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true, uiw maxLen = uiw_max, char aes = '\0' );
     #define _StrCpy( dest, source ) (void)::strcpy( dest, source )
-    EXTERNALS uiw StrNCpy( char *RSTR p_dest, const char *cp_source, uiw count );
-    #define _StrNCpy( dest, source, count ) (::strncpy( dest, source, count ), count)
-//    #define _StrNCpyCSC( dest, source, minus, counter ) (::strncpy( dest, source, sizeof(source) - minus ), counter += (sizeof(source) - minus), sizeof(source) - minus)
-    EXTERNALS void StrConnect( char *RSTR p_dest, const char *cp_first, const char *cp_second );
 	EXTERNALS uiw StrCpyAndCount( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true );
 	EXTERNALS uiw StrCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true, uiw maxLen = uiw_max, char aes = '\0' );
     EXTERNALS uiw StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw maxLen, bln is_nullTerminate = true );
@@ -892,6 +887,12 @@ namespace Funcs
         typename IntWithSize < sizeof(X) * 8 >::uint_t test = *(typename IntWithSize < sizeof(X) * 8 >::uint_t *)&val & -*(ui8 *)&is_reset;
         return *(X *)&test;
     }
+
+	template < typename X > void ClearPod( X *pod )
+	{
+		ASSUME( TypeDesc < X >::is_pod );
+		_MemSet( pod, 0, sizeof(X) );
+	}
 }
 
 }  //  namespace StdLib

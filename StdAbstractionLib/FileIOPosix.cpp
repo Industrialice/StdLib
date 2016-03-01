@@ -182,7 +182,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn,
         file->offsetToStart = seekResult;
     }
 
-	_MemZero( &file->stats, sizeof(SStats) );
+	Funcs::ClearPod( &file->stats );
     file->openMode = openMode;
     file->procMode = procMode;
 	file->cacheMode = cacheMode;
