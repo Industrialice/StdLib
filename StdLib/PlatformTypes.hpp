@@ -18,6 +18,7 @@ typedef CRITICAL_SECTION mutexHandle;
 typedef HANDLE fileHandle;
 static const fileHandle fileHandle_undefined = INVALID_HANDLE_VALUE;
 static const char FSPathSep = '\\';
+typedef wchar_t pathChar;
 
 #elif defined(POSIX)
 
@@ -43,6 +44,7 @@ typedef pthread_mutex_t mutexHandle;
 typedef int fileHandle;
 static const fileHandle fileHandle_undefined = -1;
 static const char FSPathSep = '/';
+typedef char pathChar;
 
 #else
 

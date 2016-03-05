@@ -1,8 +1,6 @@
 #ifndef __CMUTEX_HPP__
 #define __CMUTEX_HPP__
 
-#include <StdCoreLib.hpp>
-
 namespace StdLib
 {
 	class CMutex

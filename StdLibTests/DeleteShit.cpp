@@ -110,7 +110,8 @@ public:
 private:
     static void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
     {
-        SThreadInfo *ti = (SThreadInfo *)argument;
+		//  TODO:
+        /*SThreadInfo *ti = (SThreadInfo *)argument;
         bln result = Files::RemoveFile( info->PNN(), 0 );
         ti->printfMutexPointer->Lock();
         ::printf( "deleting file %s, result %s\n", info->PNN(), result ? "success" : "fail" );
@@ -122,12 +123,13 @@ private:
                 ti->totalSize += info->FileSize();
             }
             ++ti->deletedCount;
-        }
+        }*/
     }
 
     static void ThreadFunc( void *arg )
     {
-        SThreadInfo *ti = (SThreadInfo *)arg;
+		//  TODO:
+        /*SThreadInfo *ti = (SThreadInfo *)arg;
 
         do
         {
@@ -144,7 +146,7 @@ private:
                 ti->threadFreeEventPointer->Raise();
             }
             ti->endEvent.Raise();
-        } while( ti->is_continue.IsSet() );
+        } while( ti->is_continue.IsSet() );*/
     }
 
     void AddFileJob( const CCRefVec < char > &path, const CStr &ext )

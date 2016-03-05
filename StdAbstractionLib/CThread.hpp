@@ -1,8 +1,6 @@
 #ifndef __CTHREAD_HPP__
 #define __CTHREAD_HPP__
 
-#include <StdCoreLib.hpp>
-
 namespace StdLib {
 
 class CThread

@@ -10,21 +10,24 @@ using namespace StdLib;
 
 static uiw GlobalFixes;
 
-static void MakeFixes( const char *pnn, TextFixerMode::mode_t fixMode )
+static void MakeFixes( const wchar_t *pnn, TextFixerMode::mode_t fixMode )
 {
     uiw localFixes = GlobalFixes;
 
-    FileIO::CFile file( pnn, FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read, FileIO::CacheMode::LinearRead );
+	char narrowPnn[ MAX_PATH_LENGTH ];
+	::wcstombs( narrowPnn, pnn, sizeof(narrowPnn) );
+
+    FileIO::CFile file( narrowPnn, FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read, FileIO::CacheMode::LinearRead );
     if( !file.IsOpened() )
     {
-        ::printf( "failed to open %s to read\n", pnn );
+        ::printf( "failed to open %s to read\n", narrowPnn );
         return;
     }
 
     uiw size = file.SizeGet();
     if( size == 0 )
     {
-        ::printf( "%s is zero sized\n", pnn );
+        ::printf( "%s is zero sized\n", narrowPnn );
         return;
     }
 
@@ -271,10 +274,10 @@ static void MakeFixes( const char *pnn, TextFixerMode::mode_t fixMode )
 
     if( localFixes != GlobalFixes )
     {
-        file.Open( pnn, FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write );
+        file.Open( narrowPnn, FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write );
         if( !file.IsOpened() )
         {
-            ::printf( "failed to open %s to write\n", pnn );
+            ::printf( "failed to open %s to write\n", narrowPnn );
             return;
         }
 
@@ -285,11 +288,11 @@ static void MakeFixes( const char *pnn, TextFixerMode::mode_t fixMode )
 
     if( localFixes != GlobalFixes )
     {
-        ::printf( "fixed %u places in %s, size was %u now %u dt %i\n", GlobalFixes - localFixes, pnn, originalSize, to.Size(), (i32)to.Size() - (i32)originalSize );
+        ::printf( "fixed %u places in %s, size was %u now %u dt %i\n", GlobalFixes - localFixes, narrowPnn, originalSize, to.Size(), (i32)to.Size() - (i32)originalSize );
     }
     else
     {
-        ::printf( "no fixes for %s\n", pnn );
+        ::printf( "no fixes for %s\n", narrowPnn );
     }
 }
 
@@ -299,27 +302,30 @@ void Fix( TextFixerMode::mode_t fixMode )
     char buf[ 256 ];
     scanf( "%s", buf );
 
+	wchar_t wbuf[ 256 ];
+	::mbstowcs( wbuf, buf, sizeof(wbuf) );
+
     Files::CFileEnumInfo info;
 
-    CVec < CStr > extNum;
+    CVec < CWStr > extNum;
 
     if( fixMode == TextFixerMode::fanfic )
     {
-        extNum.Append( CStr( "*.txt" ) );
+        extNum.Append( CWStr( L"*.txt" ) );
     }
     else if( fixMode == TextFixerMode::codeSpaces )
     {
-        extNum.Append( CStr( "*.cpp" ) );
-        extNum.Append( CStr( "*.hpp" ) );
+        extNum.Append( CWStr( L"*.cpp" ) );
+        extNum.Append( CWStr( L"*.hpp" ) );
     }
 
     for( uiw index = 0; index < extNum.Size(); ++index )
     {
-        for( bln result = Files::EnumFirstFile( &info, buf, extNum[ index ].Data() ); result; result = Files::EnumNextFile( &info ) )
+        for( bln result = Files::EnumFirstFile( &info, wbuf, extNum[ index ].Data() ); result; result = Files::EnumNextFile( &info ) )
         {
             if( !info.IsFolder() )
             {
-                MakeFixes( info.PNN(), fixMode );
+                MakeFixes( info.PlatformPNN(), fixMode );
             }
         }
     }

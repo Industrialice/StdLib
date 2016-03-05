@@ -19,6 +19,12 @@
     #define MAKE_UNIC( name ) CONCAT( name, __LINE__ )  /*  not really unique  */
 #endif
 
+#ifdef MOVE_SUPPORTED
+	#define TRY_MOVE( arg ) std::move( arg )
+#else
+	#define TRY_MOVE( arg ) (arg)
+#endif
+
 #define AUTO_EXEC( code ) struct CONCAT( $__AUTO_EXEC_STRUCT__, __LINE__ ) { CONCAT( $__AUTO_EXEC_STRUCT__, __LINE__ )() \
         { \
             code; \

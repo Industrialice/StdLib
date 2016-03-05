@@ -7,11 +7,11 @@ using namespace StdLib;
 
 static void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
 {
-	ASSUME( info->IsFolder() == false );
+	//ASSUME( info->IsFolder() == false );
 	bln is_show = false;
-	for( uiw index = 0; info->PNN()[ index ]; ++index )
+	for( uiw index = 0; info->PlatformPNN()[ index ]; ++index )
 	{
-		if( info->PNN()[ index ] < 32 || info->PNN()[ index ] > 126 || info->PNN()[ index ] == '?' )
+		if( info->PlatformPNN()[ index ] < 32 || info->PlatformPNN()[ index ] > 126 || info->PlatformPNN()[ index ] == '?' )
 		{
 			is_show = true;
 			break;
@@ -19,12 +19,14 @@ static void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
 	}
 	//if( is_show )
 	{
-		::printf( "%s\n", info->PNN() );
+		::wprintf( L"%ls\n", info->PlatformPNN() );
 	}
 }
 
 void FindBrokenNames()
 {
 	setlocale( LC_ALL, "Russian" );
-	Files::EnumFilesRecursively( "D:\\Pictures", "*.*", false, EnumFilesCallback, 0 );
+	SetConsoleCP( 1251 );
+	SetConsoleOutputCP( 1251 );
+	Files::EnumFilesRecursively( L"D:\\Pictures", L"*.*", false, EnumFilesCallback, 0 );
 }

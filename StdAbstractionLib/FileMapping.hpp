@@ -1,7 +1,6 @@
 #ifndef __FILE_MAPPING_HPP__
 #define __FILE_MAPPING_HPP__
 
-#include <StdCoreLib.hpp>
 #include "FileIO.hpp"
 
 namespace StdLib

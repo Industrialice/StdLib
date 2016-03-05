@@ -1,9 +1,7 @@
 #ifndef __FILE_IO_HPP__
 #define __FILE_IO_HPP__
 
-#include <StdCoreLib.hpp>
-#include <Error.hpp>
-#include <CString.hpp>
+#include "FilePath.hpp"
 
 namespace StdLib {
 
@@ -84,14 +82,14 @@ namespace FileIO
 			CacheMode::CacheMode_t cacheMode;
 
 			#ifdef WINDOWS
-				UniquePtr < CStr > pnn;  //  used only on WindowsXP where you can't get PNN from the file handle
+				UniquePtr < FilePath > pnn;  //  used only on WindowsXP where you can't get PNN from the file handle
 			#endif
         };
 
         /*  Core Functions  */
         EXTERNALD void FileIO_Initialize( CFileBasis *file );
         EXTERNALD void FileIO_Destroy( CFileBasis *file );
-        EXTERNALD bln FileIO_Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error );
+        EXTERNALD bln FileIO_Open( CFileBasis *file, const FilePath &pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error );
         EXTERNALD void FileIO_Close( CFileBasis *file );
 		EXTERNALD bln FileIO_IsValid( const CFileBasis *file );
         EXTERNALD bln FileIO_Write( CFileBasis *file, const void *cp_source, ui32 len );
@@ -108,7 +106,7 @@ namespace FileIO
 		EXTERNALD OpenMode::OpenMode_t FileIO_OpenModeGet( const CFileBasis *file );
 		EXTERNALD ProcMode::ProcMode_t FileIO_ProcModeGet( const CFileBasis *file );
 		EXTERNALD CacheMode::CacheMode_t FileIO_CacheModeGet( const CFileBasis *file );
-        EXTERNALD ui32 FileIO_PNNGet( const CFileBasis *file, char *p_buf );  //  pass 0 as p_buf to get only len, returns 0 at failure
+        EXTERNALD FilePath FileIO_PNNGet( const CFileBasis *file );
 
 		EXTERNALD void FileIO_InitializeFileIOSystem();
     }
@@ -129,7 +127,7 @@ namespace FileIO
             Private::FileIO_Initialize( this );
         }
 
-        CFile( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, fileError *po_error = 0 )
+        CFile( const FilePath &pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, fileError *po_error = 0 )
         {
             Private::FileIO_Initialize( this );
             Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, po_error );
@@ -149,7 +147,7 @@ namespace FileIO
         }
 #endif
 
-        void Open( const char *pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, fileError *po_error = 0 )
+        void Open( const FilePath &pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, fileError *po_error = 0 )
         {
             Close();
             Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, po_error );
@@ -235,9 +233,9 @@ namespace FileIO
 			return Private::FileIO_CacheModeGet( this );
 		}
 
-        ui32 PNNGet( char *p_buf ) const  //  pass 0 as p_buf to get only len, will return 0 on error
+		FilePath PNNGet() const
         {
-            return Private::FileIO_PNNGet( this, p_buf );
+            return Private::FileIO_PNNGet( this );
         }
 
 		void TransferTo( CFile *target )  //  use this method if std::move isn't supported

@@ -1,8 +1,6 @@
 #ifndef __ATOMIC_OPS_HPP__
 #define __ATOMIC_OPS_HPP__
 
-#include <StdCoreLib.hpp>
-
 #if defined(WINDOWS) && !defined(_WIN32_WCE)
     #include <intrin.h>
 #endif

@@ -20,12 +20,12 @@ namespace StdLib
 
 namespace
 {
-	DWORD( WINAPI *StdLib_GetFinalPathNameByHandleA )(HANDLE hFile, LPSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+	DWORD( WINAPI *StdLib_GetFinalPathNameByHandleW )(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 }
 
-NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error )
+NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error )
 {
-    ASSUME( cp_pnn && file );
+    ASSUME( file );
 
     file->handle = INVALID_HANDLE_VALUE;
 	file->offsetToStart = 0;
@@ -37,11 +37,16 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn,
     HANDLE h_file;
 	LARGE_INTEGER curPos;
 
-	if( StdLib_GetFinalPathNameByHandleA == 0 )
+	if( StdLib_GetFinalPathNameByHandleW == 0 )
 	{
-		char fullPath[ MAX_PATH_LENGTH ];
-		Files::AbsolutePath( cp_pnn, fullPath, MAX_PATH_LENGTH );
-		file->pnn = new CStr( fullPath );
+		file->pnn = new FilePath( pnn );
+		file->pnn->MakeAbsolute();
+	}
+
+	if( !pnn.IsValid() )
+	{
+		o_error = fileError( Error::InvalidArgument(), "Path is invalid" );
+		goto toExit;
 	}
 
     if( (procMode & (ProcMode::Read | ProcMode::Write)) == 0 )
@@ -126,7 +131,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn,
 		dwFlagsAndAttributes |= FILE_FLAG_WRITE_THROUGH;
 	}
 
-    h_file = ::CreateFileA( cp_pnn, dwDesiredAccess, FILE_SHARE_READ, 0, dwCreationDisposition, dwFlagsAndAttributes, 0 );
+    h_file = ::CreateFileW( pnn.PlatformPath(), dwDesiredAccess, FILE_SHARE_READ, 0, dwCreationDisposition, dwFlagsAndAttributes, 0 );
     if( h_file == INVALID_HANDLE_VALUE )
     {
 		switch( ::GetLastError() )
@@ -350,28 +355,24 @@ NOINLINE bln FileIO::Private::FileIO_SizeSet( CFileBasis *file, ui64 newSize )
     return true;
 }
 
-NOINLINE ui32 FileIO::Private::FileIO_PNNGet( const CFileBasis *file, char *p_buf )
+NOINLINE FilePath FileIO::Private::FileIO_PNNGet( const CFileBasis *file )
 {
     ASSUME( FileIO_IsValid( file ) );
-	if( StdLib_GetFinalPathNameByHandleA )
+
+	if( StdLib_GetFinalPathNameByHandleW )
 	{
-		ui32 len = p_buf ? MAX_PATH_LENGTH - 1 : 0;
-		DWORD result = StdLib_GetFinalPathNameByHandleA( file->handle, p_buf, MAX_PATH_LENGTH - 1, FILE_NAME_NORMALIZED );
-		if( result < 2 || result > MAX_PATH_LENGTH )
+		wchar_t tempBuf[ MAX_PATH_LENGTH ];
+		DWORD result = StdLib_GetFinalPathNameByHandleW( file->handle, tempBuf, MAX_PATH_LENGTH - 1, FILE_NAME_NORMALIZED );
+		if( result < 2 || result >= MAX_PATH_LENGTH )
 		{
-			return 0;
+			return FilePath();
 		}
-		return result - 1;  //  subtracting null-terminator length
+		return FilePath( tempBuf );
 	}
 	else
 	{
-		if( p_buf == 0 )
-		{
-			return file->pnn->Size();
-		}
-		ASSUME( file->pnn.Get() );
-		_MemCpy( p_buf, file->pnn->Data(), file->pnn->Size() + 1 );
-		return file->pnn->Size();
+		ASSUME( file->pnn );
+		return *file->pnn;
 	}
 }
 
@@ -436,7 +437,7 @@ void FileIO::Private::FileIO_InitializeFileIOSystem()
 		FatalAppExitA( 1, "StdLib: failed to acquire kernel32.dll handle, can't initialize FileIO" );
 		return;
 	}
-	*(uiw *)&StdLib_GetFinalPathNameByHandleA = (uiw)GetProcAddress( k32, "GetFinalPathNameByHandleA" );
+	*(uiw *)&StdLib_GetFinalPathNameByHandleW = (uiw)GetProcAddress( k32, "GetFinalPathNameByHandleW" );
 }
 
 #endif

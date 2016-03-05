@@ -194,7 +194,7 @@ bln Files::CurrentWorkingPathSet( const char *path )
 	return chdir( path ) == 0;
 }
 
-NOINLINE bln Files::CreateFolder( const char *cp_where, const char *cp_name, CError *po_error )
+NOINLINE bln Files::CreateNewFolder( const char *cp_where, const char *cp_name, CError *po_error )
 {
     ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH_LENGTH) );
 

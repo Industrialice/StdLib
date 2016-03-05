@@ -1,4 +1,4 @@
-#include <StdAbstractionLib.hpp>
+﻿#include <StdAbstractionLib.hpp>
 
 #pragma comment( lib, "StdCoreLib_Static.lib" )
 #pragma comment( lib, "StdHelperLib_Static.lib" )
@@ -338,10 +338,10 @@ static void EnumFilesCallback( Files::CFileEnumInfo *info, void * )
         return;
     }*/
 
-    char buf[ 1024 ];
+    /*char buf[ 1024 ];
     char name[ 256 ];
     Files::ExtractNameFromString( info->PNN(), name );
-    ::printf( "%s\n", info->PNN() );
+    ::printf( "%s\n", info->PNN() );*/
 
     /*STARTUPINFO si = {};
     si.cb = sizeof(si);
@@ -495,11 +495,23 @@ template < typename... Args > CStr Concat( const Args &... strings )
 void FindBrokenNames();
 void FileEnumBenchmark();
 
+#include <locale>
+
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-	int test[ 15 ] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	FileIO::CFile testFile( L"щит.txt", FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write );
+	if( !testFile.IsOpened() )
+	{
+		::printf( "failed to open file\n" );
+	}
+	else
+	{
+		testFile.Write( "щит", 6 );
+	}
+
+	/*int test[ 15 ] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 	CVecArr < int > arr;
 	arr.Set( test, 10, _countof(test) );
 	arr.Insert( 1, 99 );
@@ -511,7 +523,7 @@ int __cdecl main()
 	for( int v : arr )
 	{
 		::printf( "%i\n", v );
-	}
+	}*/
 
 	//FindBrokenNames();
 	//FileEnumBenchmark();

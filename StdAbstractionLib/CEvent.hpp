@@ -1,8 +1,6 @@
 #ifndef __EVENT_HPP__
 #define __EVENT_HPP__
 
-#include <StdCoreLib.hpp>
-
 namespace StdLib
 {
     class CEvent

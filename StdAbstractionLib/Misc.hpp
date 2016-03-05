@@ -1,9 +1,6 @@
 #ifndef __MISC_HPP__
 #define __MISC_HPP__
 
-#include <StdCoreLib.hpp>
-#include <Error.hpp>
-
 namespace StdLib {
 
 namespace VirtualMem

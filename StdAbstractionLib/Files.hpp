@@ -1,36 +1,45 @@
 #ifndef __FILES_HPP__
 #define __FILES_HPP__
 
-#include <StdCoreLib.hpp>
-#include <CString.hpp>
+#include "FilePath.hpp"
 
 namespace StdLib {
+
+//  WARNING: there's no standard about folder name endings. It will be resolved in the future
 
 namespace Files
 {
     class CFileEnumInfo;
     typedef void (*EnumFilesCallback)( CFileEnumInfo *info, void *argument );
 
-    EXTERNALD bln RemoveFile( const char *cp_pnn, CError *po_error );
-    EXTERNALD bln RemoveFolder( const char *cp_path, CError *po_error );
-	EXTERNALD bln IsFileOrFolderExists( const char *cp_papn );
-	EXTERNALD bln IsFileExists( const char *cp_pnn );
-	EXTERNALD bln IsFolderExists( const char *cp_path );
-	EXTERNALD bln IsFileReadOnlyGet( const char *cp_pnn );  //  false if the file does not exist or an error occured  TODO: add errors struct?
-	EXTERNALD bln IsFileReadOnlySet( const char *cp_pnn, bln is_ro );
-	EXTERNALD bln CreateFolder( const char *cp_where, const char *cp_name, CError *po_error );
-	EXTERNALD uiw ExtractPathFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  with the last slash
-	EXTERNALD uiw ExtractNameFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  without slashes or something
-	EXTERNALD uiw ExtractNameWOExtFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );
-	EXTERNALD uiw ExtractExtensionFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen = uiw_max );  //  without a dot
+	EXTERNALD bln MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );  //  if moving across volumes, source removing is not guaranteed
+	EXTERNALD bln MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );  //  if moving across volumes, source removing is not guaranteed
+	EXTERNALD bln MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );  //  if moving across volumes, source removing is not guaranteed
+	EXTERNALD bln CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );
+	EXTERNALD bln CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );
+	EXTERNALD bln CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );
+	EXTERNALD bln RenameFile( const FilePath &sourcePnn, const char *newName, bln is_replace = false, CError *error = 0 );
+	EXTERNALD bln RenameFolder( const FilePath &sourcePnn, const char *newName, bln is_replace = false, CError *error = 0 );
+	EXTERNALD bln RenameObject( const FilePath &sourcePnn, const char *newName, bln is_replace = false, CError *error = 0 );
+    EXTERNALD bln RemoveFile( const FilePath &pnn, CError *po_error = 0 );
+    EXTERNALD bln RemoveFolder( const FilePath &path, CError *po_error = 0 );
+	EXTERNALD bln RemoveObject( const FilePath &path, CError *po_error = 0 );
+	EXTERNALD bln VolumeDriveName( const FilePath &path, char *RSTR output, uiw maxLen );  //  maxLen include null-symbol, if buffer was too small, returns a zero
+	EXTERNALD bln IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1, CError *error = 0 );  //  the function may fail if it cannot open one of the files
+	EXTERNALD bln IsExists( const FilePath &pnn, CError *error = 0 );  //  on fail returns false
+	EXTERNALD bln IsFile( const FilePath &pnn, CError *error = 0 );  //  on fail returns false
+	EXTERNALD bln IsFolder( const FilePath &pnn, CError *error = 0 );  //  on fail returns false
+	EXTERNALD bln IsEmpty( const FilePath &pnn, CError *error = 0 );  //  on fail returns true, pnn can point to a file or folder
+	EXTERNALD bln IsFileReadOnlyGet( const FilePath &pnn, CError *error = 0 );  //  on fail returns false
+	EXTERNALD bln IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *error = 0 );  //  on fail returns false
+	EXTERNALD bln CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject = false, CError *po_error = 0 );
+	EXTERNALD bln CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject = false, CError *po_error = 0 );
 	EXTERNALD bln IsRelativePathSupported();
-	EXTERNALD bln IsAbsolutePath( const char *pnn, uiw parseLen = uiw_max );
-	EXTERNALD uiw AbsolutePath( const char *RSTR cp_sourcePath, char *absPath, uiw maxLen );  //  maxLen include null-symbol, if buffer was too small, returns a zero
-	EXTERNALD bln CurrentWorkingPathGet( char *buf, uiw maxLen, uiw *copied /* optional */ );  //  maxLen include null-symbol, if buffer was too small, returns false and sets copied to uiw_max, if error, returns false and sets copied to 0
-	EXTERNALD bln CurrentWorkingPathSet( const char *path );
-	EXTERNALD bln EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask );
+	EXTERNALD FilePath CurrentWorkingPathGet();  //  empty FilePath on error
+	EXTERNALD bln CurrentWorkingPathSet( const FilePath &path );
+	EXTERNALD bln EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask );
 	EXTERNALD bln EnumNextFile( CFileEnumInfo *info );
-	EXTERNALD void EnumFilesRecursively( const char *path, const char *mask, bln is_reportFolders, EnumFilesCallback callback, void *argument );
+	EXTERNALD void EnumFilesRecursively( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument );
 
     namespace Private
     {
@@ -41,9 +50,10 @@ namespace Files
     {
     protected:
         fileEnumHandle _handle;
-		TCStr < char, 128 > _pnn;  //  TODO: won't work from a dll
+		FilePath _pnn;
         uiw _pathLen;
         ui64 _fileSize;
+		bln _is_folder;
 
     public:
         ~CFileEnumInfo()
@@ -54,27 +64,22 @@ namespace Files
         CFileEnumInfo() : _handle( fileEnumHandle_undefined )
         {
             _pathLen = 0;
+			_is_folder = false;
         }
 
-        const char *PNN() const
+        const pathChar *PlatformPNN() const
         {
-            return _pnn.CStr();
+            return _pnn.PlatformPath();
         }
+
+		const FilePath PNN() const
+		{
+			return _pnn;
+		}
 
         bln IsFolder() const
         {
-            if( _pathLen == 0 )
-            {
-                return false;
-            }
-
-            const char *start = _pnn.CStr() + _pathLen;
-            if( _StrChr( start, FSPathSep ) )
-            {
-                return true;
-            }
-
-            return false;
+			return _is_folder;
         }
 
         ui64 FileSize() const  //  ui64_max if not defined

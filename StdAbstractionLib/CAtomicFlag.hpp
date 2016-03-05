@@ -1,7 +1,6 @@
 #ifndef __CATOMIC_FLAG_HPP__
 #define __CATOMIC_FLAG_HPP__
 
-#include <StdCoreLib.hpp>
 #include "AtomicOps.hpp"
 
 #ifdef NO_ATOMIC_OPS
