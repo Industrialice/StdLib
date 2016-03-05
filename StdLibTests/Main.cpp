@@ -501,16 +501,6 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-	FileIO::CFile testFile( L"щит.txt", FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write );
-	if( !testFile.IsOpened() )
-	{
-		::printf( "failed to open file\n" );
-	}
-	else
-	{
-		testFile.Write( "щит", 6 );
-	}
-
 	/*int test[ 15 ] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 	CVecArr < int > arr;
 	arr.Set( test, 10, _countof(test) );
@@ -526,7 +516,7 @@ int __cdecl main()
 	}*/
 
 	//FindBrokenNames();
-	//FileEnumBenchmark();
+	FileEnumBenchmark();
 
 	/*FileMapping::mappingError error;
 	FileIO::CFile testFile( "test.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read );

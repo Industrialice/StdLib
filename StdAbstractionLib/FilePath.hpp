@@ -22,10 +22,10 @@ namespace StdLib
 		FilePath( const pathChar *path );
 		FilePath( const pathType &path );
 		const pathChar *PlatformPath() const;
+		//  + or += operators and Append won't add new levels, it's a simple append
 		void Append( const pathChar *path );
 		void Append( const FilePath &path );
 		void Append( const pathType &path );
-		//  + or += operators won't add new levels, it's a simple append
 		FilePath &operator += ( const pathChar *path );
 		FilePath &operator += ( pathChar ch );
 		FilePath &operator += ( const FilePath &path );
@@ -39,7 +39,7 @@ namespace StdLib
 		friend FilePath operator + ( pathType left, const FilePath &right );
 		FilePath &operator = ( const pathChar *path );
 		FilePath &operator = ( const pathType &path );
-		//  binary comparisions
+		//  binary comparisons
 		bln operator == ( const pathChar *path ) const;
 		bln operator == ( const FilePath &path ) const;
 		bln operator == ( const pathType &path ) const;

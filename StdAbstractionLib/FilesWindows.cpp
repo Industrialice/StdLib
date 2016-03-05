@@ -9,8 +9,10 @@
     #pragma optimize( "s", on )  //  TODO: global solution
 #endif
 
-NOINLINE static CError FileError( DWORD code )
+NOINLINE CError StdLib_FileError()
 {
+	DWORD code = ::GetLastError();
+
 	switch( code )
 	{
 	case ERROR_FILE_NOT_FOUND:
@@ -34,12 +36,6 @@ NOINLINE static CError FileError( DWORD code )
 
 bln Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
 {
-	if( !targetPnn.IsValid() )
-	{
-		DSA( error, Error::InvalidArgument() );
-		return false;
-	}
-
 	CError checkError;
 	if( !Files::IsFile( sourcePnn, &checkError ) )  //  will check the pnn
 	{
@@ -51,17 +47,11 @@ bln Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln
 		return false;
 	}
 
-	return Files::MoveObjectTo( sourcePnn, targetPnn, is_replace, error );
+	return Files::MoveObjectTo( sourcePnn, targetPnn, is_replace, error );  //  will check the pnn
 }
 
 bln Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
 {
-	if( !targetPnn.IsValid() )
-	{
-		DSA( error, Error::InvalidArgument() );
-		return false;
-	}
-
 	CError checkError;
 	if( !Files::IsFolder( sourcePnn, &checkError ) )  //  will check the pnn
 	{
@@ -73,7 +63,7 @@ bln Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, b
 		return false;
 	}
 
-	return Files::MoveObjectTo( sourcePnn, targetPnn, is_replace, error );
+	return Files::MoveObjectTo( sourcePnn, targetPnn, is_replace, error );  //  will check the pnn
 }
 
 NOINLINE bln Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
@@ -164,36 +154,16 @@ bln Files::CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, b
 		goto toExit;
 	}
 
+	//  TODO: Windows 7, Windows Server 2008 R2, Windows Server 2008, Windows Vista, Windows Server 2003, and Windows XP: Security resource properties for the existing file are not copied to the new file until Windows 8 and Windows Server 2012.
 	result = ::CopyFileW( sourcePnn.PlatformPath(), targetPnn.PlatformPath(), is_replace ? FALSE : TRUE );
 	if( result == FALSE )
 	{
-		retError = FileError( ::GetLastError() );
+		retError = StdLib_FileError();
 	}
 
 toExit:
 	DSA( error, retError );
 	return result == TRUE;
-}
-
-bln Files::RenameFile( const FilePath &sourcePnn, const char *newName, bln is_replace, CError *error )
-{
-	//  TODO:
-	DSA( error, Error::Unimplemented() );
-	return false;
-}
-
-bln Files::RenameFolder( const FilePath &sourcePnn, const char *newName, bln is_replace, CError *error )
-{
-	//  TODO:
-	DSA( error, Error::Unimplemented() );
-	return false;
-}
-
-bln Files::RenameObject( const FilePath &sourcePnn, const char *newName, bln is_replace, CError *error )
-{
-	//  TODO:
-	DSA( error, Error::Unimplemented() );
-	return false;
 }
 
 NOINLINE bln Files::RemoveFile( const FilePath &pnn, CError *po_error )
@@ -405,7 +375,7 @@ bln Files::IsFile( const FilePath &pnn, CError *error )
 	attribs = ::GetFileAttributesW( pnn.PlatformPath() );
 	if( attribs == INVALID_FILE_ATTRIBUTES )
 	{
-		retError = FileError( ::GetLastError() );
+		retError = StdLib_FileError();
 		goto toExit;
 	}
 
@@ -454,7 +424,7 @@ NOINLINE bln Files::IsFileReadOnlyGet( const FilePath &pnn, CError *error )
 	DWORD attribs = ::GetFileAttributesW( pnn.PlatformPath() );
     if( attribs == INVALID_FILE_ATTRIBUTES )
     {
-		DSA( error, FileError( ::GetLastError() ) );
+		DSA( error, StdLib_FileError() );
         return false;
     }
 	DSA( error, Error::Ok() );
@@ -473,7 +443,7 @@ NOINLINE bln Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *e
     DWORD old_attribs = ::GetFileAttributesW( pnn.PlatformPath() );
     if( old_attribs == INVALID_FILE_ATTRIBUTES )
     {
-		DSA( error, FileError( ::GetLastError() ) );
+		DSA( error, StdLib_FileError() );
         return false;
     }
 
@@ -490,7 +460,7 @@ NOINLINE bln Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *e
     {
         if( ::SetFileAttributesW( pnn.PlatformPath(), new_attribs ) != TRUE )
 		{
-			DSA( error, FileError( ::GetLastError() ) );
+			DSA( error, StdLib_FileError() );
 			return false;
 		}
     }
@@ -536,7 +506,7 @@ NOINLINE bln Files::CreateNewFolder( const FilePath &where, const FilePath &name
     funcResult = ::CreateDirectoryW( fullPath.PlatformPath(), 0 ) != 0;
     if( !funcResult )
     {
-        o_error = FileError( ::GetLastError() );
+        o_error = StdLib_FileError();
     }
 
 toExit:
@@ -582,7 +552,7 @@ NOINLINE bln Files::CreateNewFile( const FilePath &where, const FilePath &name, 
 	file = ::CreateFileW( fullPath.PlatformPath(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, is_overrideExistingObject ? CREATE_ALWAYS : CREATE_NEW, 0, 0 );
 	if( file == INVALID_HANDLE_VALUE )
 	{
-		o_error = FileError( ::GetLastError() );
+		o_error = StdLib_FileError();
 		goto toExit;
 	}
 
@@ -594,79 +564,6 @@ toExit:
 	return funcResult;
 }
 
-#if 0
-NOINLINE uiw Files::ExtractPathFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen/* = uiw_max */ )
-{
-    ASSUME( cp_str && p_buf );
-    uiw lastSlash = -1;
-    for( uiw index = 0; cp_str[ index ] && index < parseLen; ++index )
-    {
-        if( cp_str[ index ] == '\\' || cp_str[ index ] == '/' )
-        {
-            lastSlash = index;
-        }
-    }
-    ++lastSlash;
-    _MemCpy( p_buf, cp_str, lastSlash );
-    p_buf[ lastSlash ] = '\0';
-    return lastSlash;
-}
-
-NOINLINE uiw Files::ExtractNameFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen/* = uiw_max */ )
-{
-    ASSUME( cp_str && p_buf );
-    uiw lastSlash = 0;
-    for( uiw index = 0; cp_str[ index ] && index < parseLen; ++index )
-    {
-        if( cp_str[ index ] == '\\' || cp_str[ index ] == '/' )
-        {
-            lastSlash = index + 1;
-        }
-    }
-    return Funcs::StrCpyAndCount( p_buf, cp_str + lastSlash );
-}
-
-NOINLINE uiw Files::ExtractNameWOExtFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen/* = uiw_max */ )
-{
-    ASSUME( cp_str && p_buf );
-    uiw lastSlash = 0;
-    for( uiw index = 0; cp_str[ index ] && index < parseLen; ++index )
-    {
-        if( cp_str[ index ] == '\\' || cp_str[ index ] == '/' )
-        {
-            lastSlash = index + 1;
-        }
-    }
-    cp_str += lastSlash;
-    uiw len = 0;
-    for( ; cp_str[ len ] && cp_str[ len ] != '.'; ++len )
-    {
-        p_buf[ len ] = cp_str[ len ];
-    }
-    p_buf[ len ] = '\0';
-    return len;
-}
-
-NOINLINE uiw Files::ExtractExtensionFromString( const char *cp_str, char *RSTR p_buf, uiw parseLen/* = uiw_max */ )
-{
-    cp_str += *cp_str == '.';
-    uiw lastDot = ui32_max;
-    for( uiw index = 0; cp_str[ index ] && index < parseLen; ++index )
-    {
-        if( cp_str[ index ] == '.' )
-        {
-            lastDot = index;
-        }
-    }
-    if( lastDot == ui32_max )
-    {
-        *p_buf = '\0';
-        return 0;
-    }
-    return Funcs::StrCpyAndCount( p_buf, cp_str + lastDot + 1 );
-}
-#endif
-
 bln Files::IsRelativePathSupported()
 {
 #ifdef _WIN32_WCE
@@ -675,29 +572,6 @@ bln Files::IsRelativePathSupported()
 	return true;
 #endif
 }
-
-#if 0
-bln Files::IsAbsolutePath( const char *pnn, uiw parseLen /* = uiw_max */ )
-{
-	return Funcs::IsChrAlpha( pnn[ 0 ] ) && pnn[ 1 ] == ':' && (pnn[ 2 ] == '/' || pnn[ 2 ] == '\\');  //  TODO:
-}
-
-NOINLINE uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char *absPath, uiw maxLen )
-{
-	ASSUME( cp_sourcePath );
-    #ifdef _WIN32_WCE
-		uiw len = _StrLen( cp_sourcePath );
-		if( len + 1 > maxLen )
-		{
-			return 0;
-		}
-		_StrCpy( cp_sourcePath, cp_sourcePath );
-        return len;
-    #else
-        return ::GetFullPathNameA( cp_sourcePath, maxLen, absPath, 0 );
-    #endif
-}
-#endif
 
 FilePath Files::CurrentWorkingPathGet()
 {
@@ -734,12 +608,9 @@ struct CFileEnumerator : public Files::CFileEnumInfo
 		_pnn.AddLevel();
 		_pathLen = _pnn.Length();
 
-        WIN32_FIND_DATAW findData;
-
 		FilePath pathAndMask = _pnn + mask;
-
+		WIN32_FIND_DATAW findData;
         _handle = ::FindFirstFileW( pathAndMask.PlatformPath(), &findData );
-
         if( _handle == INVALID_HANDLE_VALUE )
         {
             *this = CFileEnumerator();
@@ -768,7 +639,6 @@ struct CFileEnumerator : public Files::CFileEnumInfo
         {
 			_pnn.AddLevel();
             _fileSize = ui64_max;
-			_is_folder = true;
         }
         else
         {
@@ -776,7 +646,6 @@ struct CFileEnumerator : public Files::CFileEnumInfo
             large_size.LowPart = findData.nFileSizeLow;
             large_size.HighPart = findData.nFileSizeHigh;
             _fileSize = large_size.QuadPart;
-			_is_folder = false;
         }
 
         return true;
@@ -787,20 +656,17 @@ struct CFileEnumerator : public Files::CFileEnumInfo
         ASSUME( _handle != INVALID_HANDLE_VALUE );
 
         WIN32_FIND_DATAW findData;
-
         if( !::FindNextFileW( _handle, &findData ) )
         {
             *this = CFileEnumerator();
             return false;
         }
 
-		_pnn = FilePath( FilePath::pathType( _pnn.PlatformPath(), _pathLen ) );
-		_pnn += findData.cFileName;
+		_pnn = FilePath( FilePath::pathType( _pnn.PlatformPath(), _pathLen, findData.cFileName, ::wcslen( findData.cFileName ) ) );
         if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
         {
 			_pnn.AddLevel();
             _fileSize = ui64_max;
-			_is_folder = true;
         }
         else
         {
@@ -808,7 +674,6 @@ struct CFileEnumerator : public Files::CFileEnumInfo
             large_size.LowPart = findData.nFileSizeLow;
             large_size.HighPart = findData.nFileSizeHigh;
             _fileSize = large_size.QuadPart;
-			_is_folder = false;
         }
 
         return true;
@@ -861,7 +726,10 @@ void Files::EnumFilesRecursively( const FilePath &path, const FilePath &mask, bl
 
 void Files::Private::CloseEnumHandle( fileEnumHandle handle )
 {
-    ::FindClose( handle );
+	if( handle != INVALID_HANDLE_VALUE )
+	{
+		::FindClose( handle );
+	}
 }
 
 #endif

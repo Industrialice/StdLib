@@ -5,6 +5,8 @@
 #include "FileIO.hpp"
 #include "Files.hpp"
 
+CError StdLib_FileError();  //  from FilesWindows.cpp
+
 namespace StdLib
 {
     namespace FileIO
@@ -37,16 +39,16 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
     HANDLE h_file;
 	LARGE_INTEGER curPos;
 
-	if( StdLib_GetFinalPathNameByHandleW == 0 )
-	{
-		file->pnn = new FilePath( pnn );
-		file->pnn->MakeAbsolute();
-	}
-
 	if( !pnn.IsValid() )
 	{
 		o_error = fileError( Error::InvalidArgument(), "Path is invalid" );
 		goto toExit;
+	}
+
+	if( StdLib_GetFinalPathNameByHandleW == 0 )
+	{
+		file->pnn = new FilePath( pnn );
+		file->pnn->MakeAbsolute();
 	}
 
     if( (procMode & (ProcMode::Read | ProcMode::Write)) == 0 )
@@ -134,29 +136,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
     h_file = ::CreateFileW( pnn.PlatformPath(), dwDesiredAccess, FILE_SHARE_READ, 0, dwCreationDisposition, dwFlagsAndAttributes, 0 );
     if( h_file == INVALID_HANDLE_VALUE )
     {
-		switch( ::GetLastError() )
-		{
-		case ERROR_FILE_NOT_FOUND:
-		case ERROR_PATH_NOT_FOUND:
-			o_error = Error::DoesNotExist();
-			break;
-		case ERROR_ACCESS_DENIED:
-		case ERROR_WRITE_PROTECT:
-		case ERROR_SHARING_VIOLATION:
-		case ERROR_LOCK_VIOLATION:
-			o_error = Error::NoAccess();
-			break;
-		case ERROR_NOT_ENOUGH_MEMORY:
-		case ERROR_OUTOFMEMORY:
-			o_error = Error::OutOfMemory();
-			break;
-		case ERROR_FILE_EXISTS:
-		case ERROR_ALREADY_EXISTS:
-			o_error = Error::AlreadyExists();
-			break;
-		default:
-			o_error = Error::CannotOpenFile();
-		}
+		o_error = StdLib_FileError();
         goto toExit;
     }
 
@@ -279,7 +259,7 @@ NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, OffsetMode::Of
 				o_move.QuadPart = file->offsetToStart;
 				if( !::SetFilePointerEx( file->handle, o_move, &o_move, FILE_BEGIN ) )
 				{
-					o_error = Error::Unknown();
+					o_error = StdLib_FileError();
 					goto toExit;
 				}
 			}

@@ -12,15 +12,13 @@ namespace Files
     class CFileEnumInfo;
     typedef void (*EnumFilesCallback)( CFileEnumInfo *info, void *argument );
 
+	//  use move functions to rename
 	EXTERNALD bln MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );  //  if moving across volumes, source removing is not guaranteed
 	EXTERNALD bln MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );  //  if moving across volumes, source removing is not guaranteed
 	EXTERNALD bln MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );  //  if moving across volumes, source removing is not guaranteed
 	EXTERNALD bln CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );
 	EXTERNALD bln CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );
 	EXTERNALD bln CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );
-	EXTERNALD bln RenameFile( const FilePath &sourcePnn, const char *newName, bln is_replace = false, CError *error = 0 );
-	EXTERNALD bln RenameFolder( const FilePath &sourcePnn, const char *newName, bln is_replace = false, CError *error = 0 );
-	EXTERNALD bln RenameObject( const FilePath &sourcePnn, const char *newName, bln is_replace = false, CError *error = 0 );
     EXTERNALD bln RemoveFile( const FilePath &pnn, CError *po_error = 0 );
     EXTERNALD bln RemoveFolder( const FilePath &path, CError *po_error = 0 );
 	EXTERNALD bln RemoveObject( const FilePath &path, CError *po_error = 0 );
@@ -53,7 +51,6 @@ namespace Files
 		FilePath _pnn;
         uiw _pathLen;
         ui64 _fileSize;
-		bln _is_folder;
 
     public:
         ~CFileEnumInfo()
@@ -64,7 +61,6 @@ namespace Files
         CFileEnumInfo() : _handle( fileEnumHandle_undefined )
         {
             _pathLen = 0;
-			_is_folder = false;
         }
 
         const pathChar *PlatformPNN() const
@@ -79,7 +75,7 @@ namespace Files
 
         bln IsFolder() const
         {
-			return _is_folder;
+			return _fileSize == ui64_max;
         }
 
         ui64 FileSize() const  //  ui64_max if not defined

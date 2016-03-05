@@ -331,7 +331,7 @@ f64 Funcs::MakeF64ByND( i32 numerator, i32 denominator )
 template < typename X > X CheckSum( const byte *source, uiw len )
 {
 	ASSUME( source );
-	ui32 sum = 0;
+	X sum = 0;
 	for( ui32 index = 0, rotate = 0; index < len; ++index, ++rotate )
 	{
 		if( rotate > sizeof(X) * 8 )
@@ -2307,16 +2307,19 @@ template < bln is_validateStep, bln is_extendable > Nullable < uiw > PrintToStrA
         if( is_validateStep && argIndex >= argsCount ) { DBGBREAK; return nullv; } \
         if( expectedType.is_fp ) \
         { \
+			ASSUME( sizeof(target) >= 8 ); \
             if( is_validateStep && (!argTypes[ argIndex ].is_fp || argTypes[ argIndex ].is_pointer) ) { DBGBREAK; return nullv; } \
             *(f64 *)&target = va_arg( args, f64 ); \
         } \
         else if( expectedType.size == 4 ) \
         { \
+			ASSUME( sizeof(target) >= 4 ); \
             if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size) || argTypes[ argIndex ].size > 4) ) { DBGBREAK; return nullv; } \
             *(ui32 *)&target = va_arg( args, ui32 ); \
         } \
         else if( expectedType.size == 8 ) \
         { \
+			ASSUME( sizeof(target) >= 8 ); \
             if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size) || argTypes[ argIndex ].size > 8) ) { DBGBREAK; return nullv; } \
             *(ui64 *)&target = va_arg( args, ui64 ); \
         } \
