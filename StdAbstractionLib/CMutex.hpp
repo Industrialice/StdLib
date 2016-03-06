@@ -12,7 +12,7 @@ namespace StdLib
 
 	public:
 		~CMutex();
-		CMutex( ui32 spinCount = 0 );
+		explicit CMutex( ui32 spinCount = 0 );
 		void Lock();
 		void Unlock();
 		bln TryLock();  //  will return true if lock succeeded

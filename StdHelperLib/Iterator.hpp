@@ -211,7 +211,7 @@ public:
         DBGCODE( _str = 0; )
     }
 
-    _IterRandomConst( const type *source )
+	explicit _IterRandomConst( const type *source )
     {
         _str = source;
     }
@@ -229,7 +229,7 @@ public:
         DBGCODE( _str = 0; )
     }
 
-    _IterRandom( type *source )
+    explicit _IterRandom( type *source )
     {
         _str = source;
     }

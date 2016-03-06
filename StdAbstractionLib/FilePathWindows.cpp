@@ -136,7 +136,7 @@ bln FilePath::operator != ( const pathType &path ) const
 
 FilePath &FilePath::AddLevel()
 {
-	if( _path.Back() != L'\\' && _path.Back() != L'/' )
+	if( _path.IsEmpty() || (_path.Back() != L'\\' && _path.Back() != L'/') )
 	{
 		_path += L'\\';
 	}
@@ -145,7 +145,13 @@ FilePath &FilePath::AddLevel()
 
 FilePath &FilePath::PopLevel()
 {
-	NOT_IMPLEMENTED;
+	if( !_path.IsEmpty() )
+	{
+		do
+		{
+			_path.PopBack();
+		} while( !_path.IsEmpty() && (_path.Back() == L'\\' || _path.Back() == L'/') );
+	}
 	return *this;
 }
 
@@ -192,7 +198,7 @@ void FilePath::MakeAbsolute()
 	DWORD result = ::GetFullPathNameW( _path.CStr(), MAX_PATH_LENGTH, tempBuf, 0 );
 	if( result )
 	{
-		ASSUME( tempBuf[ result ] == _path.Back() );  //  I don't thing GetFullPathName can remove/change the last (back)slash?
+		ASSUME( tempBuf[ result ] == _path.Back() );  //  I don't think GetFullPathName can remove/change the last (back)slash?
 		_path = tempBuf;
 	}
 #endif

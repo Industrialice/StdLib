@@ -168,18 +168,10 @@
       <PreprocessorDefinitions>;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PreHeader.hpp</PrecompiledHeaderFile>
-      <CompileAs>
-      </CompileAs>
-      <DisableSpecificWarnings>
-      </DisableSpecificWarnings>
-      <TreatSpecificWarningsAsErrors>
-      </TreatSpecificWarningsAsErrors>
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
       <OpenMPSupport>
       </OpenMPSupport>
-      <CallingConvention>
-      </CallingConvention>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -191,18 +183,10 @@
       <PreprocessorDefinitions>STDLIB_DYNAMIC;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PreHeader.hpp</PrecompiledHeaderFile>
-      <CompileAs>
-      </CompileAs>
-      <DisableSpecificWarnings>
-      </DisableSpecificWarnings>
-      <TreatSpecificWarningsAsErrors>
-      </TreatSpecificWarningsAsErrors>
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
       <OpenMPSupport>
       </OpenMPSupport>
-      <CallingConvention>
-      </CallingConvention>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

@@ -676,11 +676,6 @@ public:
         return CStr()[ _count - 1 ];
     }
 
-    void PushBack( charType c )
-    {
-        AddString < false >( &c, 1 );
-    }
-
     NOINLINE void PopBack()
     {
         ASSUME( _count );

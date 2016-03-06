@@ -87,13 +87,9 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WINDOWS;DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <CompileAs>CompileAsCpp</CompileAs>
-      <DisableSpecificWarnings>4554;</DisableSpecificWarnings>
       <OpenMPSupport>false</OpenMPSupport>
-      <TreatSpecificWarningsAsErrors>4715;4172;4099;</TreatSpecificWarningsAsErrors>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <BrowseInformation>false</BrowseInformation>
-      <CallingConvention>Cdecl</CallingConvention>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

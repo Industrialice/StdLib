@@ -9,13 +9,13 @@ namespace StdLib {
 
 namespace LiceMath
 {
-	EXTERNALS f128color ColorI32WebToF128( colori32web color );
+	f128color ColorI32WebToF128( colori32web color );
     EXTERNALS void ColorI32WebToF128Placed( colori32web color, f128color *po_out );
-	EXTERNALS colori32web ColorF128ToI32Web( const f128color *cpo_color );
+	colori32web ColorF128ToI32Web( const f128color *cpo_color );
 
-	EXTERNALS f96color ColorI32WebToF96( colori32web color );
+	f96color ColorI32WebToF96( colori32web color );
     EXTERNALS void ColorI32WebToF96Placed( colori32web color, f96color *po_out );
-	EXTERNALS colori32web ColorF96ToI32Web( const f96color *cpo_color );
+	colori32web ColorF96ToI32Web( const f96color *cpo_color );
 
     EXTERNALS void M4x4RotateX( m4x4 *po_m, f32 x );
     EXTERNALS void M4x4RotateXDoNotIdentity( m4x4 *po_m, f32 x );

@@ -47,7 +47,7 @@ namespace StdLib
 		bln operator != ( const FilePath &path ) const;
 		bln operator != ( const pathType &path ) const;
 		FilePath &AddLevel();  //  ignored if the path ends on path delimiter
-		FilePath &PopLevel();  //  does nothing if empty
+		FilePath &PopLevel();  /*  does nothing if empty, C:\Pictures\ becomes C:\, C:\Pictures becomes C:\  */
 		bln IsEmpty() const;
 		uiw Length() const;
 		void Normalize();  /*  in Windows, replaces / with \  */

@@ -167,25 +167,14 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <CompileAs>
-      </CompileAs>
-      <DisableSpecificWarnings>
-      </DisableSpecificWarnings>
       <PreprocessorDefinitions>;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TreatSpecificWarningsAsErrors>
-      </TreatSpecificWarningsAsErrors>
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
       <OpenMPSupport>
       </OpenMPSupport>
-      <CallingConvention>
-      </CallingConvention>
+      <CallingConvention>Cdecl</CallingConvention>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PreHeader.hpp</PrecompiledHeaderFile>
-      <ShowIncludes />
-      <UseFullPaths />
-      <OmitDefaultLibName />
-      <ErrorReporting />
       <DisableLanguageExtensions />
       <TreatWChar_tAsBuiltInType />
       <ForceConformanceInForLoopScope />
@@ -199,29 +188,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Dynamic|Win32'">
     <ClCompile>
-      <CompileAs>
-      </CompileAs>
-      <DisableSpecificWarnings>
-      </DisableSpecificWarnings>
       <PreprocessorDefinitions>STDLIB_DYNAMIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TreatSpecificWarningsAsErrors>
-      </TreatSpecificWarningsAsErrors>
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
       <OpenMPSupport>
       </OpenMPSupport>
-      <CallingConvention>
-      </CallingConvention>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PreHeader.hpp</PrecompiledHeaderFile>
-      <ShowIncludes>
-      </ShowIncludes>
-      <UseFullPaths>
-      </UseFullPaths>
-      <OmitDefaultLibName>
-      </OmitDefaultLibName>
-      <ErrorReporting>
-      </ErrorReporting>
       <DisableLanguageExtensions>
       </DisableLanguageExtensions>
       <TreatWChar_tAsBuiltInType>

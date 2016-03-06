@@ -10,9 +10,9 @@ namespace StdLib {
 //  2. packs [others] will have even more overhead
 //  TODO: this is still a proto, probably bugged
 
-enum packiarr_OutOfRangeReaction { packiarr_OutOfRangeIgnore, packiarr_OutOfRangeClamp, packiarr_OutOfRangeWrap };
+enum packiarr_OutOfRangeReaction { packiarr_OutOfRangeIgnore, packiarr_OutOfRangeDebugException, packiarr_OutOfRangeClamp, packiarr_OutOfRangeWrap };
 
-template < const uiw pack, bln is_signed, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeIgnore, const bln is_runtimeBoundsCheck = false, const bln is_debugOverflowCheck = false > class __packiarr_abstract__
+template < const uiw pack, bln is_signed, const packiarr_OutOfRangeReaction oorr > class __packiarr_abstract__
 {
 protected:
     typedef typename IntWithSizeAndSign
@@ -54,12 +54,12 @@ public:
     {
         if( oorr == packiarr_OutOfRangeIgnore )
         {
-            if( is_debugOverflowCheck )
-            {
-                ASSUME( value >= sc_minVal );
-                ASSUME( value <= sc_maxVal );
-            }
         }
+		else if( oorr == packiarr_OutOfRangeDebugException )
+		{
+			ASSUME( value >= sc_minVal );
+			ASSUME( value <= sc_maxVal );
+		}
         else if( oorr == packiarr_OutOfRangeClamp )
         {
             value = Funcs::Clamp( value, sc_minVal, sc_maxVal );
@@ -166,22 +166,12 @@ public:
         return oorr;
     }
 
-    bln IsRuntimeBoundsCheck() const
-    {
-        return is_runtimeBoundsCheck;
-    }
-
-    bln IsDebugOverflowCheck() const
-    {
-        return is_debugOverflowCheck;
-    }
-
     uiw CellsGet() const;
 };
 
-template < const uiw cells, const uiw pack, bln is_signed, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeIgnore, const bln is_runtimeBoundsCheck = false, const bln is_debugOverflowCheck = false > class packiarr_static : public __packiarr_abstract__ < pack, is_signed, oorr, is_runtimeBoundsCheck, is_debugOverflowCheck >
+template < const uiw cells, const uiw pack, bln is_signed, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeDebugException > class packiarr_static : public __packiarr_abstract__ < pack, is_signed, oorr >
 {
-    typedef __packiarr_abstract__ < pack, is_signed, oorr, is_runtimeBoundsCheck, is_debugOverflowCheck > parentType;
+    typedef __packiarr_abstract__ < pack, is_signed, oorr > parentType;
     typedef typename parentType::native_t native_t;
     typedef typename parentType::unative_t unative_t;
     using parentType::nativeBits;
@@ -232,9 +222,9 @@ public:
     }
 };
 
-template < const uiw pack, bln is_signed, typename reservator = Reservator::Half <>, typename allocator = Allocator::Simple, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeIgnore, const bln is_runtimeBoundsCheck = false, const bln is_debugOverflowCheck = false > class packiarr_dynamic : public __packiarr_abstract__ < pack, is_signed, oorr, is_runtimeBoundsCheck, is_debugOverflowCheck >
+template < const uiw pack, bln is_signed, typename reservator = Reservator::Half <>, typename allocator = Allocator::Simple, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeDebugException > class packiarr_dynamic : public __packiarr_abstract__ < pack, is_signed, oorr >
 {
-    typedef __packiarr_abstract__ < pack, is_signed, oorr, is_runtimeBoundsCheck, is_debugOverflowCheck > parentType;
+    typedef __packiarr_abstract__ < pack, is_signed, oorr > parentType;
     typedef typename parentType::native_t native_t;
     typedef typename parentType::unative_t unative_t;
     using parentType::nativeBits;
