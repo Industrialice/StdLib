@@ -423,14 +423,20 @@ public:
 };
 
 //  force all methods compilation to check for correctness
-template class CVec < int >;
-template class CVec < CVec < int > >;
-template class CVec < int, void >;
-template class CVec < CVec < int, void >, void >;
-template class CVec < int, void, 128 >;
-template class CVec < CVec < int, void, 128 >, void, 128 >;
-template class CRefVec < int >;
-template class CCRefVec < int >;
+namespace StdLib
+{
+	template class CVec < int >;
+	template class CVec < CVec < int > >;
+	template class CVec < int, void >;
+	template class CVec < CVec < int, void >, void >;
+	template class CVec < int, void, 128 >;
+	template class CVec < CVec < int, void, 128 >, void, 128 >;
+	template class CRefVec < int >;
+	template class CCRefVec < int >;
+	template class CVecArr < int >;
+	template class TCStr < char, 128 >;
+	template class TCStr < wchar_t, 128 >;
+}
 
 struct TestMe
 {
@@ -501,6 +507,16 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
+	FilePath curPath = Files::CurrentWorkingPathGet();
+
+	::wprintf( L"current path %ls\n", curPath.PlatformPath() );
+
+	Files::CurrentWorkingPathSet( L"C:\\" );
+
+	curPath = Files::CurrentWorkingPathGet();
+
+	::wprintf( L"current path %ls\n", curPath.PlatformPath() );
+
 	/*int test[ 15 ] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 	CVecArr < int > arr;
 	arr.Set( test, 10, _countof(test) );
@@ -516,7 +532,7 @@ int __cdecl main()
 	}*/
 
 	//FindBrokenNames();
-	FileEnumBenchmark();
+	//FileEnumBenchmark();
 
 	/*FileMapping::mappingError error;
 	FileIO::CFile testFile( "test.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read );

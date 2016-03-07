@@ -68,7 +68,7 @@ namespace Files
             return _pnn.PlatformPath();
         }
 
-		const FilePath PNN() const
+		const FilePath &PNN() const
 		{
 			return _pnn;
 		}

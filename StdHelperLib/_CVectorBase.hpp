@@ -728,6 +728,7 @@ public:
 	count_type _Reserved() const
 	{
 		DBGBREAK;  //  inapplicable, should not be called
+		return 0;
 	}
 
 	count_type _Size() const

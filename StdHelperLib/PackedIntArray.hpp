@@ -194,7 +194,7 @@ public:
 
     void Set( const uiw index, native_t value )
     {
-        if( is_runtimeBoundsCheck && index >= cells )
+        if( index >= cells )
         {
             DBGBREAK;
             return;
@@ -206,7 +206,7 @@ public:
 
     native_t Get( const uiw index ) const
     {
-        if( is_runtimeBoundsCheck && index >= cells )
+        if( index >= cells )
         {
             DBGBREAK;
             return native_t();
@@ -253,7 +253,7 @@ public:
 
     void Set( const uiw index, native_t value )
     {
-        if( is_runtimeBoundsCheck && index >= _cells )
+        if( index >= _cells )
         {
             DBGBREAK;
             return;
@@ -265,7 +265,7 @@ public:
 
     native_t Get( const uiw index ) const
     {
-        if( is_runtimeBoundsCheck && index >= _cells )
+        if( index >= _cells )
         {
             DBGBREAK;
             return native_t();

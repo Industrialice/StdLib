@@ -24,9 +24,9 @@ namespace StdLib
     }
 }
 
-NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error )
+NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error )
 {
-    ASSUME( cp_pnn && file );
+    ASSUME( file );
 
     file->handle = -1;
     file->offsetToStart = 0;
@@ -36,6 +36,12 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn,
     mode_t process_mask;
     int flags = 0;
     int seekResult;
+
+    if( !pnn.IsValid() )
+    {
+        o_error = fileError( Error::InvalidArgument(), "Path is invalid" );
+        goto toExit;
+    }
 
     if( (procMode & (ProcMode::Read | ProcMode::Write)) == 0 )
     {
@@ -82,7 +88,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn,
 		{
             if( (procMode & ProcMode::Write) == 0 )  //  we need to truncate file, but we can't do it if we can't write to it, so we just remove it
             {
-                if( !Files::RemoveFile( cp_pnn, &o_error ) )
+                if( !Files::RemoveFile( pnn, &o_error ) )
                 {
                     goto toExit;
                 }
@@ -138,7 +144,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn,
 	}
 
     process_mask = ::umask( 0 );
-    fileHandle = ::open( cp_pnn, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH );
+    fileHandle = ::open( pnn.PlatformPath(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH );
     ::umask( process_mask );
     if( fileHandle == -1 )
     {
@@ -189,8 +195,6 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const char *cp_pnn,
     file->handle = fileHandle;
     file->bufferPos = 0;
     file->readBufferCurrentSize = 0;
-
-    o_error = Error::Ok();
 
 toExit:
     DSA( po_error, o_error );
@@ -314,27 +318,18 @@ bln FileIO::Private::FileIO_SizeSet( CFileBasis *file, ui64 newSize )
     return false;
 }
 
-NOINLINE ui32 FileIO::Private::FileIO_PNNGet( const CFileBasis *file, char *p_buf )
+NOINLINE FilePath FileIO::Private::FileIO_PNNGet( const CFileBasis *file )
 {
     ASSUME( FileIO_IsValid( file ) );
-    char a_proc[ 512 ] = "/proc/self/fd/";
+    char a_proc[ MAX_PATH_LENGTH ] = "/proc/self/fd/";
     Funcs::IntToStrDec( file->handle, a_proc + sizeof("/proc/self/fd/") - 1 );
-    char a_buf[ 4096 ];
+    char a_buf[ MAX_PATH_LENGTH ];
     ssize_t len = ::readlink( a_proc, a_buf, sizeof(a_buf) - 1 );
     if( len == -1 )
     {
-        if( p_buf )
-        {
-            *p_buf = '\0';
-        }
-        return 0;
+        return FilePath();
     }
-    if( p_buf )
-    {
-        _MemCpy( p_buf, a_buf, len );
-        p_buf[ len ] = '\0';
-    }
-    return len;
+    return FilePath( a_buf );
 }
 
 NOINLINE bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len )

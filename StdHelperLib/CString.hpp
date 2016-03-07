@@ -589,40 +589,54 @@ public:
         }
     }
 
-    NOINLINE TCStr( const ownType &source )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > NOINLINE TCStr( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source )
     {
-        ASSUME( this != &source );
-        _count = source._count;
-        if( source.IsDynamic() )
+        ASSUME( (void *)this != (void *)&source );
+        _count = source.Size();
+		const charType *sourceStr = source.CStr();
+        if( _count >= static_size )
         {
-            SetDynamic( source._count );
-            _MemCpyStr( _dynamic_str, source._dynamic_str, source._count + 1 );
+            SetDynamic( _count );
+            _MemCpyStr( _dynamic_str, sourceStr, _count + 1 );
         }
         else
         {
             SetStatic();
-            _MemCpyStr( _static_str, source._static_str, source._count + 1 );
+            _MemCpyStr( _static_str, sourceStr, _count + 1 );
         }
     }
 
-    NOINLINE TCStr( const ownType &source, uiw pos, uiw len = uiw_max )
+private:
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > NOINLINE void _MakeCopy( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source, uiw pos, uiw len )
+	{
+		uiw realLen = Funcs::Min < uiw >( source.Size() - pos, len );
+		_count = realLen;
+		charType *thisStr;
+		if( realLen >= static_size )
+		{
+			SetDynamic( realLen );
+			thisStr = _dynamic_str;
+		}
+		else
+		{
+			SetStatic();
+			thisStr = _static_str;
+		}
+		_MemCpyStr( thisStr, source.CStr() + pos, realLen );
+		thisStr[ realLen ] = (charType)0;
+	}
+
+public:
+	TCStr( const TCStr &source, uiw pos, uiw len = uiw_max )
+	{
+		ASSUME( this != &source && pos <= source.Size() );
+		_MakeCopy( source, pos, len );
+	}
+
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source, uiw pos, uiw len = uiw_max )
     {
-        ASSUME( this != &source && pos <= source._count );
-        uiw realLen = Funcs::Min < uiw >( source._count - pos, len );
-        _count = realLen;
-        charType *thisStr;
-        if( realLen >= static_size )
-        {
-            SetDynamic( realLen );
-            thisStr = _dynamic_str;
-        }
-        else
-        {
-            SetStatic();
-            thisStr = _static_str;
-        }
-        _MemCpyStr( thisStr, source.CStr() + pos, realLen );
-        thisStr[ realLen ] = (charType)0;
+        ASSUME( (void *)this != (void *)&source && pos <= source.Size() );
+		_MakeCopy( source, pos, len );
     }
 
     NOINLINE TCStr( uiw n, charType c )
@@ -807,15 +821,15 @@ public:
         }
     }
 
-    ownType &Insert( const ownType &str, uiw pos )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > ownType &Insert( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &str, uiw pos )
     {
         InsertString < true >( pos, str.CStr(), str.Size() );
         return *this;
     }
 
-    ownType &Insert( const ownType &str, uiw pos, uiw subpos, uiw sublen )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > ownType &Insert( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &str, uiw pos, uiw subpos, uiw sublen )
     {
-        ASSUME( subpos <= str._count );
+        ASSUME( subpos <= str.Size() );
         InsertString < true >( pos, str.CStr() + subpos, Funcs::Min < uiw >( str.Size() - subpos, sublen ) );
         return *this;
     }
@@ -956,42 +970,42 @@ public:
         return Iter( thisStr + pos );
     }
 
-    ownType &Replace( const ownType &str, uiw replacePos, uiw replaceLen = 0 )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > ownType &Replace( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &str, uiw replacePos, uiw replaceLen = 0 )
     {
         ASSUME( replacePos <= _count && this != &str );
         if( this == &str )
         {
             ownType temp( str );
-            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), temp.CStr(), temp._count );
+            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), temp.CStr(), temp.Size() );
         }
         else
         {
-            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), str.CStr(), str._count );
+            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), str.CStr(), str.Size() );
         }
         return *this;
     }
 
-    ownType &Replace( const ownType &str, IterConst replaceBegin, IterConst replaceEnd )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > ownType &Replace( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &str, IterConst replaceBegin, IterConst replaceEnd )
     {
         ASSUME( replaceEnd >= replaceBegin );
-        const ownType &temp = this == &str ? ownType( str ) : str;
+        const ownType &temp = (void *)this == (void *)&str ? ownType( str ) : str;
         uiw pos = replaceBegin.Ptr() - CStr();
         uiw len = replaceEnd - replaceBegin;
-        EraseAndInsert( pos, len, temp.CStr(), temp._count );
+        EraseAndInsert( pos, len, temp.CStr(), temp.Size() );
         return *this;
     }
 
-    ownType &Replace( const ownType &str, uiw replacePos, uiw replaceLen, uiw subpos = 0, uiw sublen = uiw_max )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > ownType &Replace( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &str, uiw replacePos, uiw replaceLen, uiw subpos = 0, uiw sublen = uiw_max )
     {
-        ASSUME( replacePos <= _count && subpos <= str._count );
+        ASSUME( replacePos <= _count && subpos <= str.Size() );
         if( this == &str )
         {
             ownType temp( str, subpos, sublen );
-            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), temp.CStr(), temp._count );
+            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), temp.CStr(), temp.Size() );
         }
         else
         {
-            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), str.CStr() + subpos, Funcs::Min < uiw >( str._count - subpos, sublen ) );
+            EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), str.CStr() + subpos, Funcs::Min < uiw >( str.Size() - subpos, sublen ) );
         }
         return *this;
     }
@@ -1086,16 +1100,16 @@ public:
         return *this;
     }
 
-    ownType &Append( const ownType &str )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > ownType &Append( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &str )
     {
-        AddString < true >( str.CStr(), str._count );
+        AddString < true >( str.CStr(), str.Size() );
         return *this;
     }
 
-    ownType &Append( const ownType &str, uiw subpos, uiw sublen )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > ownType &Append( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &str, uiw subpos, uiw sublen )
     {
         ASSUME( subpos <= str._count );
-        AddString < true >( str.CStr() + subpos, Funcs::Min < uiw >( str._count - subpos, sublen ) );
+        AddString < true >( str.CStr() + subpos, Funcs::Min < uiw >( str.Size() - subpos, sublen ) );
         return *this;
     }
 
@@ -1155,42 +1169,42 @@ public:
         return *this;
     }
 
-    NOINLINE ownType &Assign( const ownType &source )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > NOINLINE ownType &Assign( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source )
     {
-        if( this != &source )
+        if( (void *)this != (void *)&source )
         {
-            bln isNeedDynamic = source._count > static_last;
+			const charType *sourceStr = source.CStr();
+            bln isNeedDynamic = source.Size() > static_last;
             if( IsStatic() )
             {
                 if( isNeedDynamic )
                 {
-                    ASSUME( source.IsDynamic() );
-                    SetDynamic( source._count );
-                    _MemCpyStr( _dynamic_str, source._dynamic_str, source._count + 1 );
+                    SetDynamic( source.Size() );
+                    _MemCpyStr( _dynamic_str, sourceStr, source.Size() + 1 );
                 }
                 else
                 {
-                    _MemCpyStr( _static_str, source.CStr(), source._count + 1 );
+                    _MemCpyStr( _static_str, sourceStr, source.Size() + 1 );
                 }
             }
             else
             {
-                _ProcReservationUp( source._count );
-                _MemCpyStr( _dynamic_str, source.CStr(), source._count + 1 );
+                _ProcReservationUp( source.Size() );  //  TODO: reservation to unknown
+                _MemCpyStr( _dynamic_str, sourceStr, source.Size() + 1 );
             }
-            _count = source._count;
+            _count = source.Size();
         }
         return *this;
     }
 
-    NOINLINE ownType &Assign( const ownType &str, uiw subpos, uiw sublen )
+	//  if you call Assign on self, it can invalidate source string. TODO: make this an error?
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > NOINLINE ownType &Assign( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &str, uiw subpos, uiw sublen )
     {
-        ASSUME( subpos <= str._count );
-        uiw realLen = Funcs::Min < uiw >( str._count - subpos, sublen );
-        if( this == &str )
+        ASSUME( subpos <= str.Size() );
+        uiw realLen = Funcs::Min < uiw >( str.Size() - subpos, sublen );
+        if( (void *)this == (void *)&str )
         {
             charType *curStr = Str();
-            ASSUME( curStr == str.CStr() );
             _MemMoveStr( curStr, curStr + subpos, realLen );
             curStr[ realLen ] = (charType)0;
             _count = realLen;
@@ -1334,7 +1348,12 @@ public:
         _count = 0;
     }
 
-    TCStr &operator = ( const ownType &source )
+	TCStr &operator = ( const TCStr &source )
+	{
+		return Assign( source );
+	}
+
+    template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr &operator = ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source )
     {
         return Assign( source );
     }
@@ -1358,9 +1377,9 @@ public:
         return *this;
     }
 
-    TCStr operator + ( const ownType &source ) const
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr operator + ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
     {
-        return TCStr( this->CStr(), this->_count, source.CStr(), source._count );
+        return TCStr( this->CStr(), this->_count, source.CStr(), source.Size() );
     }
 
     TCStr operator + ( const charType *str ) const
@@ -1377,23 +1396,23 @@ public:
         return TCStr( this->CStr(), this->_count, &symbol, 1 );
     }
 
-    friend TCStr operator + ( const charType *str, const ownType &second )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > friend TCStr operator + ( const charType *str, const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &second )
     {
         if( str == 0 )
         {
             str = _EmptyStr < charType >::Get();
         }
-        return TCStr( str, GetStringLength( str ), second.CStr(), second._count );
+        return TCStr( str, GetStringLength( str ), second.CStr(), second.Size() );
     }
 
-    friend TCStr operator + ( charType symbol, const ownType &second )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > friend TCStr operator + ( charType symbol, const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &second )
     {
-        return TCStr( &symbol, 1, second.CStr(), second._count );
+        return TCStr( &symbol, 1, second.CStr(), second.Size() );
     }
 
-    TCStr &operator += ( const ownType &source )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr &operator += ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source )
     {
-        AddString < true >( source.CStr(), source._count );
+        AddString < true >( source.CStr(), source.Size() );
         return *this;
     }
 
@@ -1413,7 +1432,7 @@ public:
         return *this;
     }
 
-    bln operator == ( const ownType &source ) const
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bln operator == ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
     {
         if( _count == source._count )
         {
@@ -1431,7 +1450,7 @@ public:
         return IsStringEquals( CStr(), str );
     }
 
-    bln operator != ( const ownType &source ) const
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bln operator != ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
     {
         return !this->operator==( source );
     }
@@ -1441,7 +1460,7 @@ public:
         return !this->operator==( str );
     }
 
-    bln operator < ( const ownType &source ) const
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bln operator < ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
     {
         return StringCompare( CStr(), source.CStr() ) < 0;
     }
@@ -1455,7 +1474,7 @@ public:
         return StringCompare( CStr(), str ) < 0;
     }
 
-    bln operator >( const ownType &source ) const
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bln operator > ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
     {
         return StringCompare( CStr(), source.CStr() ) > 0;
     }
