@@ -507,15 +507,11 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-	FilePath curPath = Files::CurrentWorkingPathGet();
+	CStr str0( "fuck" );
+	CStr str1;
+	str1 = std::move( str0 );
 
-	::wprintf( L"current path %ls\n", curPath.PlatformPath() );
-
-	Files::CurrentWorkingPathSet( L"C:\\" );
-
-	curPath = Files::CurrentWorkingPathGet();
-
-	::wprintf( L"current path %ls\n", curPath.PlatformPath() );
+	::printf( "str0 %s ... str1 %s\n", str0.CStr(), str1.CStr() );
 
 	/*int test[ 15 ] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 	CVecArr < int > arr;

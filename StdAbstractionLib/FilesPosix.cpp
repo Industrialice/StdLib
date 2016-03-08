@@ -11,6 +11,199 @@
 #include <errno.h>
 #include <dirent.h>
 
+bln Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bln Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+NOINLINE bln Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bln Files::CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bln Files::CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bln Files::CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+NOINLINE bln Files::RemoveFile( const FilePath &pnn, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+NOINLINE bln Files::RemoveFolder( const FilePath &path, CError *error )  //  potentially recursive
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bln Files::RemoveObject( const FilePath &path, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bln Files::VolumeDriveName( const FilePath &path, char *RSTR output, uiw maxLen )
+{
+	NOT_IMPLEMENTED;
+	return false;
+}
+
+NOINLINE bln Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+NOINLINE bln Files::IsExists( const FilePath &pnn, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bln Files::IsFile( const FilePath &pnn, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bln Files::IsFolder( const FilePath &pnn, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bln Files::IsEmpty( const FilePath &pnn, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+NOINLINE bln Files::IsFileReadOnlyGet( const FilePath &pnn, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+NOINLINE bln Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+NOINLINE bln Files::CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+NOINLINE bln Files::CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bln Files::IsRelativePathSupported()
+{
+	return true;
+}
+
+FilePath Files::CurrentWorkingPathGet()
+{
+	char buf[ PATH_MAX ];
+	char *result = ::getcwd( buf, sizeof(buf) - 1 );
+	if( result == NULL )
+	{
+		FilePath();
+	}
+	return FilePath( result );
+}
+
+bln Files::CurrentWorkingPathSet( const FilePath &path )
+{
+	if( !path.IsValid() )
+	{
+		return false;
+	}
+	return chdir( path.PlatformPath() ) == 0;
+}
+
+struct CFileEnumerator : public Files::CFileEnumInfo
+{
+	NOINLINE bln EnumFirstFile( const FilePath &path, const FilePath &mask )
+	{
+		NOT_IMPLEMENTED;
+		return false;
+	}
+
+	NOINLINE bln EnumNextFile()
+	{
+		NOT_IMPLEMENTED;
+		return false;
+	}
+};
+
+bln Files::EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask )
+{
+	return ((CFileEnumerator *)info)->EnumFirstFile( path, mask );
+}
+
+bln Files::EnumNextFile( CFileEnumInfo *info )
+{
+	return ((CFileEnumerator *)info)->EnumNextFile();
+}
+
+void Files::EnumFilesRecursively( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
+{
+	NOT_IMPLEMENTED;
+}
+
+void Files::Private::CloseEnumHandle( fileEnumHandle handle )
+{
+	NOT_IMPLEMENTED;
+}
+
+#if 0
 NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *po_error )
 {
     ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
@@ -311,5 +504,6 @@ void Files::EnumFilesRecursively( const char *path, const char *mask, bln is_rep
 {
 	DBGBREAK;  //  TODO:
 }
+#endif
 
 #endif

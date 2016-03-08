@@ -606,10 +606,30 @@ public:
         }
     }
 
-private:
-	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > NOINLINE void _MakeCopy( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source, uiw pos, uiw len )
+	NOINLINE TCStr( uiw n, charType c )
 	{
-		uiw realLen = Funcs::Min < uiw >( source.Size() - pos, len );
+		charType *thisStr;
+		if( n >= static_size )
+		{
+			SetDynamic( n );
+			thisStr = _dynamic_str;
+		}
+		else
+		{
+			SetStatic();
+			thisStr = _static_str;
+		}
+		for( _count = 0; _count < n; ++_count )
+		{
+			thisStr[ _count ] = c;
+		}
+		thisStr[ _count ] = (charType)0;
+	}
+
+private:
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > NOINLINE void _MakeCopy( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source, uiw sourceStartIndex, uiw sourceLen )
+	{
+		uiw realLen = Funcs::Min < uiw >( source.Size() - sourceStartIndex, sourceLen );
 		_count = realLen;
 		charType *thisStr;
 		if( realLen >= static_size )
@@ -622,42 +642,34 @@ private:
 			SetStatic();
 			thisStr = _static_str;
 		}
-		_MemCpyStr( thisStr, source.CStr() + pos, realLen );
+		_MemCpyStr( thisStr, source.CStr() + sourceStartIndex, realLen );
 		thisStr[ realLen ] = (charType)0;
 	}
 
 public:
-	TCStr( const TCStr &source, uiw pos, uiw len = uiw_max )
+	TCStr( const TCStr &source, uiw sourceStartIndex = 0, uiw sourceLen = uiw_max )
 	{
-		ASSUME( this != &source && pos <= source.Size() );
-		_MakeCopy( source, pos, len );
+		ASSUME( this != &source && sourceStartIndex <= source.Size() );
+		_MakeCopy( source, sourceStartIndex, sourceLen );
 	}
 
-	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source, uiw pos, uiw len = uiw_max )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source, uiw sourceStartIndex, uiw sourceLen = uiw_max )
     {
-        ASSUME( (void *)this != (void *)&source && pos <= source.Size() );
-		_MakeCopy( source, pos, len );
+        ASSUME( (void *)this != (void *)&source && sourceStartIndex <= source.Size() );
+		_MakeCopy( source, sourceStartIndex, sourceLen );
     }
 
-    NOINLINE TCStr( uiw n, charType c )
-    {
-        charType *thisStr;
-        if( n >= static_size )
-        {
-            SetDynamic( n );
-            thisStr = _dynamic_str;
-        }
-        else
-        {
-            SetStatic();
-            thisStr = _static_str;
-        }
-        for( _count = 0; _count < n; ++_count )
-        {
-            thisStr[ _count ] = c;
-        }
-        thisStr[ _count ] = (charType)0;
-    }
+#ifdef MOVE_SUPPORTED
+	TCStr( TCStr &&source )
+	{
+		ASSUME( this != &source );
+		_MemCpy( _static_str, source._static_str, static_size );
+		_count = source._count;
+		source._count = 0;
+		source._static_str[ 0 ] = (charType)0;
+		source.SetStatic();
+	}
+#endif
 
 	charType *Str()
 	{
@@ -1169,6 +1181,19 @@ public:
         return *this;
     }
 
+#ifdef MOVE_SUPPORTED
+	ownType &Assign( TCStr &&source )
+	{
+		ASSUME( this != &source );
+		_MemCpy( _static_str, source._static_str, static_size );
+		_count = source._count;
+		source._count = 0;
+		source._static_str[ 0 ] = (charType)0;
+		source.SetStatic();
+		return *this;
+	}
+#endif
+
 	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > NOINLINE ownType &Assign( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source )
     {
         if( (void *)this != (void *)&source )
@@ -1352,6 +1377,13 @@ public:
 	{
 		return Assign( source );
 	}
+
+#ifdef MOVE_SUPPORTED
+	ownType &operator = ( TCStr &&source )
+	{
+		return Assign( std::move( source ) );
+	}
+#endif
 
     template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr &operator = ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source )
     {
