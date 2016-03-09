@@ -500,6 +500,7 @@ template < typename... Args > CStr Concat( const Args &... strings )
 
 void FindBrokenNames();
 void FileEnumBenchmark();
+void CopyFilesToRotate();
 
 #include <locale>
 
@@ -507,11 +508,7 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-	CStr str0( "fuck" );
-	CStr str1;
-	str1 = std::move( str0 );
-
-	::printf( "str0 %s ... str1 %s\n", str0.CStr(), str1.CStr() );
+	CopyFilesToRotate();
 
 	/*int test[ 15 ] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 	CVecArr < int > arr;

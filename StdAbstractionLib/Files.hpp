@@ -37,6 +37,7 @@ namespace Files
 	EXTERNALD bln CurrentWorkingPathSet( const FilePath &path );
 	EXTERNALD bln EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask );
 	EXTERNALD bln EnumNextFile( CFileEnumInfo *info );
+	EXTERNALD void EnumFiles( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument );
 	EXTERNALD void EnumFilesRecursively( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument );
 
     namespace Private

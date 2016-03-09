@@ -4,17 +4,19 @@
 //  Default errors:
 /*
 Ok
-Unknown
+UnknownError
 InvalidArgument
 OutOfMemory
 AlreadyExists
 DoesNotExist
 NoAccess
-Unsupported
+UnsupportedFormat
+UnsupportedFeature
 Unimplemented
 Obsolete
 Interrupted
 CannotOpenFile
+UnknownFormat
 */
 
 namespace StdLib {
@@ -117,17 +119,19 @@ public:
 namespace Error
 {
 	inline CError Ok() { return CError( 0, "DEFAULT", "OK" ); }
-	inline CError Unknown() { return CError( 1, "DEFAULT", "UNKNOWN" ); }
+	inline CError UnknownError() { return CError( 1, "DEFAULT", "UNKNOWN_ERROR" ); }
 	inline CError InvalidArgument() { return CError( 2, "DEFAULT", "INVALID_ARGUMENT" ); }
 	inline CError OutOfMemory() { return CError( 3, "DEFAULT", "OUT_OF_MEMORY" ); }
 	inline CError AlreadyExists() { return CError( 4, "DEFAULT", "ALREADY_EXISTS" ); }
-	inline CError DoesNotExist() { return CError( 5, "DEFAULT", "DOES_NOT_EXISTS" ); }
+	inline CError DoesNotExist() { return CError( 5, "DEFAULT", "DOES_NOT_EXIST" ); }
 	inline CError NoAccess() { return CError( 6, "DEFAULT", "NO_ACCESS" ); }
-	inline CError Unsupported() { return CError( 7, "DEFAULT", "UNSUPPORTED" ); }
-	inline CError Unimplemented() { return CError( 8, "DEFAULT", "UNIMPLEMENTED" ); }
-	inline CError Obsolete() { return CError( 9, "DEFAULT", "OBSOLETE" ); }
-	inline CError Interrupted() { return CError( 10, "DEFAULT", "INTERRUPTED" ); }
-	inline CError CannotOpenFile() { return CError( 11, "DEFAULT", "CANNOT_OPEN_FILE" ); }
+	inline CError UnsupportedFormat() { return CError( 7, "DEFAULT", "UNSUPPORTED_FORMAT" ); }
+	inline CError UnsupportedFeature() { return CError( 8, "DEFAULT", "UNSUPPORTED_FEATURE" ); }
+	inline CError Unimplemented() { return CError( 9, "DEFAULT", "UNIMPLEMENTED" ); }
+	inline CError Obsolete() { return CError( 10, "DEFAULT", "OBSOLETE" ); }
+	inline CError Interrupted() { return CError( 11, "DEFAULT", "INTERRUPTED" ); }
+	inline CError CannotOpenFile() { return CError( 12, "DEFAULT", "CANNOT_OPEN_FILE" ); }
+	inline CError UnknownFormat() { return CError( 13, "DEFAULT", "UNKNOWN_FORMAT" ); }
 
 	const ui32 _MaxDefaultError = 128;
 }

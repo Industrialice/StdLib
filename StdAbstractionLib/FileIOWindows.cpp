@@ -144,7 +144,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
     {
         if( !::SetFilePointerEx( h_file, LARGE_INTEGER(), &curPos, FILE_END ) )
         {
-            o_error = fileError( Error::Unknown(), "Failed to set file pointer to the end of the file( append )" );
+            o_error = fileError( Error::UnknownError(), "Failed to set file pointer to the end of the file( append )" );
             BOOL result = ::CloseHandle( h_file );
             ASSUME( result );
             goto toExit;
@@ -215,12 +215,12 @@ NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, OffsetMode::Of
 
     if( !CancelCachedRead( file ) )
     {
-        o_error = Error::Unknown();
+        o_error = Error::UnknownError();
         goto toExit;
     }
     if( !FileIO_Flush( file ) )
     {
-        o_error = Error::Unknown();
+        o_error = Error::UnknownError();
         goto toExit;
     }
 
@@ -246,7 +246,7 @@ NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, OffsetMode::Of
 
     if( !::SetFilePointerEx( file->handle, o_move, &o_move, moveMethod ) )
     {
-        o_error = Error::Unknown();
+        o_error = Error::UnknownError();
         goto toExit;
     }
 
@@ -281,7 +281,7 @@ ui64 FileIO::Private::FileIO_SizeGet( CFileBasis *file, CError *error )
     LARGE_INTEGER o_size;
     if( !::GetFileSizeEx( file->handle, &o_size ) )
     {
-		DSA( error, Error::Unknown() );
+		DSA( error, Error::UnknownError() );
         return 0;
     }
 	ASSUME( o_size.QuadPart >= file->offsetToStart );

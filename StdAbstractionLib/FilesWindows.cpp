@@ -90,7 +90,7 @@ NOINLINE bln Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &tar
 	wapiResult = ::MoveFileExW( source.PlatformPath(), target.PlatformPath(), flags );
 	if( wapiResult != TRUE )
 	{
-		retError = Error::Unknown();
+		retError = Error::UnknownError();
 		goto toRet;
 	}
 
@@ -192,7 +192,7 @@ NOINLINE bln Files::RemoveFile( const FilePath &pnn, CError *po_error )
 			retError = Error::NoAccess();
 			break;
 		default:
-			retError = Error::Unknown();
+			retError = Error::UnknownError();
 		}
     }
 
@@ -257,7 +257,7 @@ NOINLINE bln Files::RemoveFolder( const FilePath &path, CError *po_error )  //  
     funcResult = ::RemoveDirectoryW( path.PlatformPath() ) != 0;
     if( !funcResult )
     {
-        o_error = Error::Unknown();
+        o_error = Error::UnknownError();
     }
 
 toExit:
@@ -331,13 +331,13 @@ NOINLINE bln Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &
 
 	if( ::GetFileInformationByHandle( h0, &inf0 ) != TRUE )
 	{
-		retError = Error::Unknown();
+		retError = Error::UnknownError();
 		goto toExit;
 	}
 
 	if( ::GetFileInformationByHandle( h1, &inf1 ) != TRUE )
 	{
-		retError = Error::Unknown();
+		retError = Error::UnknownError();
 		goto toExit;
 	}
 
@@ -688,40 +688,6 @@ bln Files::EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FileP
 bln Files::EnumNextFile( CFileEnumInfo *info )
 {
     return ((CFileEnumerator *)info)->EnumNextFile();
-}
-
-void Files::EnumFilesRecursively( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
-{
-    UniquePtr < CFileEnumInfo > info( new CFileEnumInfo );
-    if( !EnumFirstFile( info, path, L"*.*" ) )
-    {
-        return;
-    }
-
-    do
-    {
-        if( info->IsFolder() )
-        {
-			if( is_reportFolders )
-			{
-				callback( info, argument );
-			}
-            EnumFilesRecursively( info->PNN(), mask, is_reportFolders, callback, argument );
-        }
-    } while( EnumNextFile( info ) );
-
-    if( !EnumFirstFile( info, path, mask ) )
-    {
-        return;
-    }
-
-    do
-    {
-        if( info->IsFolder() == false )
-        {
-            callback( info, argument );
-        }
-    } while( EnumNextFile( info ) );
 }
 
 void Files::Private::CloseEnumHandle( fileEnumHandle handle )

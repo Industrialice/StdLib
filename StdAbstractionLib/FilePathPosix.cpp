@@ -59,4 +59,28 @@ void FilePath::MakeAbsolute()
 	NOT_IMPLEMENTED;
 }
 
+bln FilePath::IsAbsolute() const
+{
+	NOT_IMPLEMENTED;
+	return false;
+}
+
+bln FilePath::HasExtension() const
+{
+	NOT_IMPLEMENTED;
+	return false;
+}
+
+FilePath FilePath::FileName() const
+{
+	NOT_IMPLEMENTED;
+	return FilePath();
+}
+
+FilePath FilePath::Extension() const
+{
+	NOT_IMPLEMENTED;
+	return FilePath();
+}
+
 #endif

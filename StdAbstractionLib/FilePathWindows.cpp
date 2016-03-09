@@ -68,10 +68,73 @@ void FilePath::MakeAbsolute()
 	DWORD result = ::GetFullPathNameW( _path.CStr(), MAX_PATH_LENGTH, tempBuf, 0 );
 	if( result )
 	{
-		ASSUME( tempBuf[ result ] == _path.Back() );  //  I don't think GetFullPathName can remove/change the last (back)slash?
+		ASSUME( tempBuf[ result - 1 ] == _path.Back() );  //  I don't think GetFullPathName can remove/change the last (back)slash?
 		_path = tempBuf;
 	}
 #endif
+}
+
+bln FilePath::IsAbsolute() const
+{
+#ifndef _WIN32_WCE
+	NOT_IMPLEMENTED;
+	return false;
+#else
+	return true;
+#endif
+}
+
+bln FilePath::HasExtension() const
+{
+	NOT_IMPLEMENTED;
+	return false;
+}
+
+FilePath FilePath::FileName() const
+{
+	if( _path.IsEmpty() || _path.Back() == L'\\' || _path.Back() == L'/' )
+	{
+		return FilePath();
+	}
+
+	ASSUME( IsValid() );
+
+	pathType::IterRevConst it;
+	for( it = _path.beginRev(); it != _path.endRev(); ++it )
+	{
+		if( *it == L'\\' || *it == L'/' )
+		{
+			return pathType( (it - 1).Ptr(), _path.beginRev() - it );
+		}
+	}
+
+	return FilePath();
+}
+
+FilePath FilePath::Extension() const
+{
+	if( _path.IsEmpty() || _path.Back() == L'\\' || _path.Back() == L'/' )
+	{
+		return FilePath();
+	}
+
+	ASSUME( IsValid() );
+
+	pathType::IterRevConst it;
+	for( it = _path.beginRev(); it != _path.endRev(); ++it )
+	{
+		if( *it == L'\\' || *it == L'/' )
+		{
+			return FilePath();
+		}
+
+		if( *it == L'.' )
+		{
+			return pathType( (it - 1).Ptr(), _path.beginRev() - it );
+		}
+	}
+
+	return FilePath();
 }
 
 #endif

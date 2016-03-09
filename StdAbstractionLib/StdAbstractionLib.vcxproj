@@ -382,6 +382,7 @@
     <ClCompile Include="FileMappingWindows.cpp" />
     <ClCompile Include="FilePathPosix.cpp" />
     <ClCompile Include="FilePathWindows.cpp" />
+    <ClCompile Include="FilesAny.cpp" />
     <ClCompile Include="FilesPosix.cpp" />
     <ClCompile Include="FilesWindows.cpp" />
     <ClCompile Include="MiscPosix.cpp" />

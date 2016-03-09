@@ -69,16 +69,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\StdLib;..\StdHelperLib;..\StdAbstractionLib;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Debug_x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\StdLib;..\StdHelperLib;..\StdAbstractionLib;$(DXSDK_DIR)\Include\;$(IncludePath)</IncludePath>
+    <LibraryPath>..\Debug_x86;$(DXSDK_DIR)\Lib\x86\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>..\StdLib;..\StdHelperLib;..\StdAbstractionLib;$(IncludePath)</IncludePath>
     <LibraryPath>..\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\StdLib;..\StdHelperLib;..\StdAbstractionLib;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>..\Release;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <IncludePath>..\StdLib;..\StdHelperLib;..\StdAbstractionLib;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include\</IncludePath>
+    <LibraryPath>..\Release;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86\</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>..\StdLib;..\StdHelperLib;..\StdAbstractionLib;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath)</IncludePath>
@@ -185,6 +185,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="FileEnumBenchmark.cpp" />
+    <ClCompile Include="FilesToRotate.cpp" />
     <ClCompile Include="FindBrokenNames.cpp" />
     <ClCompile Include="GLFuncsCreate.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

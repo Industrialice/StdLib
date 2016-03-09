@@ -126,7 +126,7 @@ NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::VM_ProtectGet( const void 
     SIZE_T infSize = ::VirtualQuery( p_mem, &o_mbi, sizeof(o_mbi) );
     if( !infSize )
     {
-		error = Error::Unknown();
+		error = Error::UnknownError();
         goto toExit;
     }
     if( o_mbi.RegionSize < size )

@@ -193,11 +193,6 @@ bln Files::EnumNextFile( CFileEnumInfo *info )
 	return ((CFileEnumerator *)info)->EnumNextFile();
 }
 
-void Files::EnumFilesRecursively( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
-{
-	NOT_IMPLEMENTED;
-}
-
 void Files::Private::CloseEnumHandle( fileEnumHandle handle )
 {
 	NOT_IMPLEMENTED;

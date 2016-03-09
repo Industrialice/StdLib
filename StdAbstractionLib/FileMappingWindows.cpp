@@ -38,7 +38,7 @@ FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( Fi
 	mapping = ::CreateFileMappingW( ((FileIO::Private::CFileBasis *)file)->handle, 0, protect, sizeToMap.HighPart, sizeToMap.LowPart, NULL );
 	if( mapping == NULL )
 	{
-		o_error = mappingError( Error::Unknown(), "CreateFileMappingW failed" );
+		o_error = mappingError( Error::UnknownError(), "CreateFileMappingW failed" );
 		goto toExit;
 	}
 
@@ -68,7 +68,7 @@ FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( Fi
 	{
 		BOOL result = ::CloseHandle( mapping );
 		ASSUME( result );
-		o_error = mappingError( Error::Unknown(), "MapViewOfFile failed" );
+		o_error = mappingError( Error::UnknownError(), "MapViewOfFile failed" );
 		goto toExit;
 	}
 
