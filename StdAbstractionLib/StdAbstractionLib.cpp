@@ -14,7 +14,7 @@ struct MutexInitializer : public CMutex
 
 EXTERNALS void StdAbstractionLib_Initialize()
 {
-	static bool is_initialized;
+	static bln is_initialized;
 	if( is_initialized )
 	{
 		return;

@@ -1031,7 +1031,7 @@ void LiceMath::M4x3SubtractInplace( m4x3 *RSTR m0, const m4x3 *m1 )
 
 void LiceMath::M4x3Determinant( const m4x3 *m )
 {
-    DBGBREAK;  //  TODO:
+    SOFTBREAK;  //  TODO:
 }
 
 void LiceMath::M3x4MultScalar( m3x4 *RSTR m0, const m3x4 *m1, f32 scalar )
@@ -1553,7 +1553,7 @@ f32 LiceMath::Vec4Dot( const vec4 *v0, const vec4 *v1 )
 
 void LiceMath::Vec4Cross( vec4 *RSTR v0, const vec4 *v1, const vec4 *v2, const vec4 *cpo_v3 )
 {
-    DBGBREAK;  //  TODO:
+    SOFTBREAK;  //  TODO:
 /*
     v0->x = v1->y * (v2->z * cpo_v3->w - cpo_v3->z * v2->w) - v1->z * (v2->y * cpo_v3->w - cpo_v3->y * v2->w) + v1->w * (v2->y * cpo_v3->z - cpo_v3->y * v2->z);
     v0->y = v1->z * (v2->x * cpo_v3->w - cpo_v3->x * v2->w) - v1->x * (v2->z * cpo_v3->w - cpo_v3->z * v2->w) - v1->w * (v2->x * cpo_v3->z - cpo_v3->x * v2->z);
@@ -1563,7 +1563,7 @@ void LiceMath::Vec4Cross( vec4 *RSTR v0, const vec4 *v1, const vec4 *v2, const v
 
 void LiceMath::Vec4CrossInplace( vec4 *RSTR v0, const vec4 *v1, const vec4 *v2 )
 {
-    DBGBREAK;  //  TODO:
+    SOFTBREAK;  //  TODO:
     /*f32 x = v0->y * v1->z - v0->z * v1->y;
     f32 y = v0->z * v1->x - v0->x * v1->z;
     v0->z = v0->x * v1->y - v0->y * v1->x;

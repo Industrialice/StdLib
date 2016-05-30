@@ -352,6 +352,7 @@
     <ClInclude Include="deprecatedCString.hpp" />
     <ClInclude Include="deprecatedCVector.hpp" />
     <ClInclude Include="LiceMathTypes.hpp" />
+    <ClInclude Include="MemoryStreamContainer.hpp" />
     <ClInclude Include="PackedIntArray.hpp" />
     <ClInclude Include="PreHeader.hpp" />
     <ClInclude Include="Reservators.hpp" />

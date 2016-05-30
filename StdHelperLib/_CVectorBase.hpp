@@ -186,7 +186,7 @@ public:
 
     void _UnkSize( count_type newCount )
     {
-        if( newCount < _reserved )
+        if( newCount < _count )
         {
             _DecSize( newCount );
         }
@@ -468,7 +468,7 @@ public:
         }
         else
         {
-            DBGBREAK;
+            HARDBREAK;
         }
         _count = source->_count;
         source->_count = 0;
@@ -727,7 +727,7 @@ public:
 
 	count_type _Reserved() const
 	{
-		DBGBREAK;  //  inapplicable, should not be called
+		HARDBREAK;  //  inapplicable, should not be called
 		return 0;
 	}
 

@@ -1,6 +1,8 @@
 #include <StdAbstractionLib.hpp>
 #include <Files.hpp>
 
+#if 0
+
 #include <D3DX11.h>
 #pragma comment( lib, "d3dx11.lib" )
 
@@ -63,3 +65,5 @@ void CopyFilesToRotate()
 	FilePath imagesPath( L"D:\\Pictures" );
 	Files::EnumFiles( imagesPath, L"*.*", false, EnumFilesCallback, 0 );
 }
+
+#endif

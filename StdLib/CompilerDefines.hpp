@@ -43,7 +43,7 @@
     #endif
 
     #ifdef DEBUG
-        #define UNREACHABLE DBGBREAK
+        #define UNREACHABLE HARDBREAK
         #define ASSUME( what ) CHECK( what )
     #else
         #define UNREACHABLE __assume( 0 )
@@ -199,14 +199,14 @@
 
 		#if GCC_VERSION >= 40500
 			#ifdef DEBUG
-				#define UNREACHABLE DBGBREAK
+				#define UNREACHABLE HARDBREAK
 				#define ASSUME( what ) CHECK( what )
 			#else
 				#define UNREACHABLE __builtin_unreachable()
 				#define ASSUME( what ) do { if( !(what) ) { __builtin_unreachable(); } } while( 0 )
 			#endif
 		#else
-			#define UNREACHABLE DBGBREAK
+			#define UNREACHABLE HARDBREAK
 			#define ASSUME( what ) CHECK( what )
 		#endif
 
@@ -260,7 +260,7 @@
 		#endif
 
 		#ifdef DEBUG
-			#define UNREACHABLE DBGBREAK
+			#define UNREACHABLE HARDBREAK
 			#define ASSUME( what ) CHECK( what )
 		#else
 			#define UNREACHABLE __builtin_unreachable()

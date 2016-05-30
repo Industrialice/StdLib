@@ -196,7 +196,7 @@ public:
     {
         if( index >= cells )
         {
-            DBGBREAK;
+            HARDBREAK;
             return;
         }
         ASSUME( index < cells );
@@ -208,7 +208,7 @@ public:
     {
         if( index >= cells )
         {
-            DBGBREAK;
+            HARDBREAK;
             return native_t();
         }
         ASSUME( index < cells );
@@ -255,7 +255,7 @@ public:
     {
         if( index >= _cells )
         {
-            DBGBREAK;
+            HARDBREAK;
             return;
         }
         ASSUME( index < _cells );
@@ -267,7 +267,7 @@ public:
     {
         if( index >= _cells )
         {
-            DBGBREAK;
+            HARDBREAK;
             return native_t();
         }
         ASSUME( index < _cells );

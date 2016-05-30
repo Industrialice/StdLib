@@ -29,7 +29,7 @@ static void PrintWordAndCount( const char *word, uiw index, uiw count )
 
 void Words()
 {
-    FileIO::CFile file( L"d:\\other\\words.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read, FileIO::CacheMode::LinearRead );
+    FileIO::CFile file( L"d:\\other\\words.txt", FileIO::OpenMode::OpenExisting, FileProcMode::Read, FileCacheMode::LinearRead );
     if( !file.IsOpened() )
     {
         ::printf( "failed to open words.txt\n" );

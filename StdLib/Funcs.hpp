@@ -5,6 +5,11 @@
     #include <typeinfo>
 #endif
 
+#include "MemoryStreamInterface.hpp"
+#include "FileInterface.hpp"
+
+#define DEBUG_VALIDATE_PRINT_FUNCS
+
 namespace StdLib {
 
 /*  0b or 0B is binary base  */
@@ -275,10 +280,13 @@ namespace Funcs
 
 	//  maxLen means size of the p_str, including null-terminator. must be at least 1( to hold the null-terminator ). 0 will be returned if maxLen was less than one, debug will halt the program
     EXTERNALD uiw PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args );
+	
+    //  won't append string null-terminator
+    uiw PrintToMemoryStreamArgList( MemoryStreamInterface *stream, const char *cp_fmt, va_list args );
 
-    //  internal
-    EXTERNALD uiw _PrintToContainer( void *cont, char *(*RequestMoreSize)(void *, uiw), const char *cp_fmt, va_list args );
-    struct _ArgType
+	uiw PrintToFileArgList( FileInterface *file, const char *cp_fmt, va_list args );
+
+    struct _ArgType  //  for debug only
     {
 		uiw size;
 		bln is_pointer;
@@ -290,10 +298,43 @@ namespace Funcs
 		{}
     };
 
-#if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
-    EXTERNALD bln _PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... );
+	#undef PrintToStr
+	#undef PrintToMemoryStream
+	#undef PrintToFile
 
-    EXTERNALD uiw _PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
+	inline uiw PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... )
+	{
+        va_list variadic;
+        va_start( variadic, cp_fmt );
+        uiw printed = PrintToStrArgList( p_str, maxLen, cp_fmt, variadic );
+		va_end( variadic );
+
+		return printed;
+	}
+    
+    //  won't append string null-terminator
+	inline uiw PrintToMemoryStream( MemoryStreamInterface *stream, const char *cp_fmt, ... )
+	{
+        va_list variadic;
+        va_start( variadic, cp_fmt );
+        uiw printed = PrintToMemoryStreamArgList( stream, cp_fmt, variadic );
+        va_end( variadic );
+
+        return stream->Resize( printed );  //  removing excessive size( if any )
+	}
+    
+	inline uiw PrintToFile( FileInterface *file, const char *cp_fmt, ... )
+	{
+        va_list variadic;
+        va_start( variadic, cp_fmt );
+        uiw printed = PrintToFileArgList( file, cp_fmt, variadic );
+        va_end( variadic );
+
+        return printed;
+	}
+	
+#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+    EXTERNALD bln _PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... );
 
     template < typename X > _ArgType _AnalyzeArg( const X &arg )
     {
@@ -323,7 +364,7 @@ namespace Funcs
 			}
 			return argType;
         }
-        DBGBREAK;
+        SOFTBREAK;
         return _ArgType();
     }
 
@@ -333,77 +374,45 @@ namespace Funcs
         return _PrintCheckArgs( argTypes + 1, COUNTOF( argTypes ) - 1, cp_fmt, args... );
     }
 
-    template < typename... Args > uiw PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, const Args &... args )
+    template < typename... Args > uiw PrintToStrDebug( char *p_str, uiw maxLen, const char *cp_fmt, const Args &... args )
     {
-        if( !_AreArgsValid( cp_fmt, args... ) )
-        {
-            DBGBREAK;
-            return 0;
-        }
-        return _PrintToStr( p_str, maxLen, cp_fmt, args... );
+		ASSUME( maxLen );
+
+		if( !_AreArgsValid( cp_fmt, args... ) )
+		{
+			SOFTBREAK;
+			return 0;
+		}
+
+		return PrintToStr( p_str, maxLen, cp_fmt, args... );
     }
-#else
-    EXTERNALD uiw PrintToStr( char *p_str, uiw maxLen, const char *cp_fmt, ... );
+
+    template < typename... Args > uiw PrintToMemoryStreamDebug( MemoryStreamInterface *stream, const char *cp_fmt, const Args &... args )
+    {
+		if( !_AreArgsValid( cp_fmt, args... ) )
+		{
+			SOFTBREAK;
+			return 0;
+		}
+
+		return PrintToMemoryStream( stream, cp_fmt, args... );
+    }
+
+    template < typename... Args > uiw PrintToFileDebug( FileInterface *file, const char *cp_fmt, const Args &... args )
+    {
+		if( !_AreArgsValid( cp_fmt, args... ) )
+		{
+			SOFTBREAK;
+			return 0;
+		}
+
+		return PrintToFile( file, cp_fmt, args... );
+    }
+
+	#define PrintToStr PrintToStrDebug
+	#define PrintToMemoryStream PrintToMemoryStreamDebug
+	#define PrintToFile PrintToFileDebug
 #endif
-
-//  container storage must be linear, allowed to be non-zero size, will be cleared if not empty
-#if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
-    template < typename container > uiw _PrintToContainer( container *cont, const char *cp_fmt, ... );
-
-    template < typename container, typename... Args > uiw PrintToContainer( container *cont, const char *cp_fmt, const Args &... args )
-    {
-        if( !_AreArgsValid( cp_fmt, args... ) )
-        {
-            DBGBREAK;
-            return 0;
-        }
-        return _PrintToContainer( cont, cp_fmt, args... );
-    }
-    
-    //  won't append string null-terminator
-    template < typename container > uiw _PrintToContainer( container *cont, const char *cp_fmt, ... )
-#else
-    //  won't append string null-terminator
-    template < typename container > uiw PrintToContainer( container *cont, const char *cp_fmt, ... )
-#endif
-    {
-        struct NoName
-        {
-            static char *RequestMoreSize( void *ob, uiw size )  //  can overcommit
-            {
-                container *cont = (container *)ob;
-                cont->Resize( cont->Size() + size );
-                return cont->Data();
-            }
-        };
-
-        va_list variadic;
-        va_start( variadic, cp_fmt );
-        uiw printed = _PrintToContainer( cont, NoName::RequestMoreSize, cp_fmt, variadic );
-        va_end( variadic );
-
-        cont->Resize( printed );  //  removing excessive size( if any )
-        return printed;
-    }
-
-    //  won't append string null-terminator
-    template < typename container > uiw PrintToContainerArgList( container *cont, const char *cp_fmt, va_list args )
-    {
-        struct NoName
-        {
-            static char *RequestMoreSize( void *ob, uiw size )  //  can overcommit
-            {
-                container *cont = (container *)ob;
-                cont->Resize( cont->Size() + size );
-                return cont->Data();
-            }
-        };
-
-        uiw printed = _PrintToContainer( cont, NoName::RequestMoreSize, cp_fmt, args );
-
-        cont->Resize( printed );  //  removing excessive size( if any )
-        return printed;
-    }
 
     template < ChrTestFunc func > bln IsStrMatchT( const char *cp_str, uiw count = uiw_max )
     {

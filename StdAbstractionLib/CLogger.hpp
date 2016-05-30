@@ -24,14 +24,14 @@ public:
 
     typedef void (*DirectionFunc)( Tag::messageTag_t tag, const char *cp_text, uiw len );
     
-#if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
     void _Message( Tag::messageTag_t tag, const char *cp_fmt, ... );
 
     template < typename... Args > void Message( Tag::messageTag_t tag, const char *cp_fmt, const Args &... args )
     {
         if( !Funcs::_AreArgsValid( cp_fmt, args... ) )
         {
-            DBGBREAK;
+            SOFTBREAK;
             return;
         }
         _Message( tag, cp_fmt, args... );

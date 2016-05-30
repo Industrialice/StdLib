@@ -68,7 +68,7 @@ void CThread::Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), vo
         else if( priority == PriorityTimeCritical ) normalizedPriority = THREAD_PRIORITY_TIME_CRITICAL;
         else
         {
-            DBGBREAK;
+            SOFTBREAK;
             normalizedPriority = THREAD_PRIORITY_NORMAL;
         }
 

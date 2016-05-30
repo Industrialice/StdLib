@@ -618,11 +618,11 @@ public:
         }
     }
 
-    void Resize( count_type size )  //  Proto
+    void Resize( count_type size, bln is_initialize = true )  //  Proto
     {
         if( size > this->_Size() )
         {
-            AppendNum( size - this->_Size() );
+            AppendNum( size - this->_Size(), is_initialize );
         }
         else
         {

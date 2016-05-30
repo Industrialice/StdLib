@@ -21,7 +21,7 @@ void Files::EnumFiles( const FilePath &path, const FilePath &mask, bln is_report
 void Files::EnumFilesRecursively( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
 {
 	UniquePtr < CFileEnumInfo > info( new CFileEnumInfo );
-	if( !EnumFirstFile( info, path, L"*.*" ) )
+	if( !EnumFirstFile( info, path, PLATFORM_PATH( "*.*" ) ) )
 	{
 		return;
 	}

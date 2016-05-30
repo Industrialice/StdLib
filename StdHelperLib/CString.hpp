@@ -755,7 +755,7 @@ public:
         }
     }
 
-    void Resize( uiw n )
+    void Resize( uiw n, bln = true /* ignored */ )
     {
         Resize( n, (charType)0 );
     }

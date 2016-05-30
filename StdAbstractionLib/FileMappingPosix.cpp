@@ -22,7 +22,7 @@ FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( Fi
 		o_error = mappingError( Error::InvalidArgument(), "File isn't opened" );
 		goto toExit;
 	}
-	if( (file->ProcModeGet() & FileIO::ProcMode::Read) == 0 )
+	if( (file->ProcModeGet() & FileProcMode::Read) == 0 )
 	{
 		o_error = mappingError( Error::InvalidArgument(), "File isn't readable( it must be )" );
 		goto toExit;
@@ -34,15 +34,20 @@ FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( Fi
 	}
 
 	prot = PROT_READ;
-	if( file->ProcModeGet() & FileIO::ProcMode::Write )
+	if( file->ProcModeGet() & FileProcMode::Write )
 	{
 		prot |= PROT_WRITE;
+		retStruct.is_writable = true;
+	}
+	else
+	{
+		retStruct.is_writable = false;
 	}
 
 	memory = ::mmap( 0, size, prot, flags, ((FileIO::Private::CFileBasis *)file)->handle, offset );
 	if( memory == 0 )
 	{
-		o_error = mappingError( Error::Unknown(), "mmap failed" );
+		o_error = mappingError( Error::UnknownError(), "mmap failed" );
 		goto toExit;
 	}
 

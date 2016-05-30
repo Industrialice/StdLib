@@ -2,6 +2,7 @@
 #define __FILE_IO_HPP__
 
 #include "FilePath.hpp"
+#include <FileInterface.hpp>
 
 namespace StdLib {
 
@@ -14,31 +15,6 @@ namespace FileIO
                 CreateAlways,
 				CreateNew,  //  creates a new file only if such file doesn't exist
                 OpenExisting )
-    }
-
-    namespace ProcMode
-    {
-        CONSTS_OPED( ProcMode_t,
-                Read = BIT( 1 ),
-                Write = BIT( 2 ),
-                Append = BIT( 3 ) )  //  requires Write, will set the pointer to the end of the file when opening, makes existing part of the file virtually invisible( isn't reported with Size calls, isn't accessible through offset sets )
-    }
-
-	namespace CacheMode
-	{
-		CONSTS_OPED( CacheMode_t,
-			Default = 0,
-			LinearRead = BIT( 1 ),  //  requires ProcMode::Read, can't be used with RandomRead
-			RandomRead = BIT( 2 ),  //  requires ProcMode::Read, can't be used with LinearRead
-			DisableSystemWriteCache = BIT( 3 ) )  //  requires ProcMode::Write
-	}
-
-    namespace OffsetMode
-    {
-        CONSTS( OffsetMode_t,
-                FromBegin,
-                FromCurrent,
-                FromEnd )
     }
 
     struct SStats
@@ -62,7 +38,7 @@ namespace FileIO
 
     namespace Private
     {
-        struct CFileBasis : CharMovable
+        struct CFileBasis
         {
             fileHandle handle;
 
@@ -78,8 +54,8 @@ namespace FileIO
             bln is_reading;
 
 			OpenMode::OpenMode_t openMode;
-			ProcMode::ProcMode_t procMode;
-			CacheMode::CacheMode_t cacheMode;
+			FileProcMode::mode_t procMode;
+			FileCacheMode::mode_t cacheMode;
 
 			#ifdef WINDOWS
 				UniquePtr < FilePath > pnn;  //  used only on WindowsXP where you can't get PNN from the file handle
@@ -89,29 +65,30 @@ namespace FileIO
         /*  Core Functions  */
         EXTERNALD void FileIO_Initialize( CFileBasis *file );
         EXTERNALD void FileIO_Destroy( CFileBasis *file );
-        EXTERNALD bln FileIO_Open( CFileBasis *file, const FilePath &pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode, fileError *po_error );
+        EXTERNALD bln FileIO_Open( CFileBasis *file, const FilePath &pnn, OpenMode::OpenMode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error );
         EXTERNALD void FileIO_Close( CFileBasis *file );
 		EXTERNALD bln FileIO_IsValid( const CFileBasis *file );
-        EXTERNALD bln FileIO_Write( CFileBasis *file, const void *cp_source, ui32 len );
+        EXTERNALD bln FileIO_Write( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written );
         EXTERNALD bln FileIO_Read( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
-        EXTERNALD bln FileIO_BufferSet( CFileBasis *file, ui32 size, void *buffer = 0 );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
-		EXTERNALD ui32 FileIO_BufferSizeGet( CFileBasis *file );
+        EXTERNALD bln FileIO_BufferSet( CFileBasis *file, ui32 size, void *buffer );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
+		EXTERNALD ui32 FileIO_BufferSizeGet( const CFileBasis *file );
+		EXTERNALD const void *FileIO_BufferGet( const CFileBasis *file );
         EXTERNALD void FileIO_StatsGet( const CFileBasis *file, SStats *po_stats );
         EXTERNALD void FileIO_StatsReset( CFileBasis *file );
         EXTERNALD bln FileIO_Flush( CFileBasis *file );  //  false if writing to file failed to complete
-        EXTERNALD i64 FileIO_OffsetGet( CFileBasis *file );  //  -1 on fail, current offset on success
-        EXTERNALD i64 FileIO_OffsetSet( CFileBasis *file, OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error );  //  -1 on fail, current offset on success, will Flush buffers
-		EXTERNALD ui64 FileIO_SizeGet( CFileBasis *file, CError *error = 0 );  //  returns 0 on error
-        EXTERNALD bln FileIO_SizeSet( CFileBasis *file, ui64 newSize );
+        EXTERNALD i64 FileIO_OffsetGet( CFileBasis *file, FileOffsetMode::mode_t mode, CError *error );
+        EXTERNALD i64 FileIO_OffsetSet( CFileBasis *file, FileOffsetMode::mode_t mode, i64 offset, CError *error );
+		EXTERNALD ui64 FileIO_SizeGet( const CFileBasis *file, CError *error );  //  returns 0 on error
+        EXTERNALD bln FileIO_SizeSet( CFileBasis *file, ui64 newSize, CError *error );
 		EXTERNALD OpenMode::OpenMode_t FileIO_OpenModeGet( const CFileBasis *file );
-		EXTERNALD ProcMode::ProcMode_t FileIO_ProcModeGet( const CFileBasis *file );
-		EXTERNALD CacheMode::CacheMode_t FileIO_CacheModeGet( const CFileBasis *file );
+		EXTERNALD FileProcMode::mode_t FileIO_ProcModeGet( const CFileBasis *file );
+		EXTERNALD FileCacheMode::mode_t FileIO_CacheModeGet( const CFileBasis *file );
         EXTERNALD FilePath FileIO_PNNGet( const CFileBasis *file );
 
 		EXTERNALD void FileIO_InitializeFileIOSystem();
     }
 
-    class CFile : private Private::CFileBasis
+    class CFile : private Private::CFileBasis, public FileInterface
     {
 		CFile( const CFile &source );
 		CFile & operator = ( const CFile &source );
@@ -127,7 +104,7 @@ namespace FileIO
             Private::FileIO_Initialize( this );
         }
 
-        CFile( const FilePath &pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, fileError *po_error = 0 )
+        CFile( const FilePath &pnn, OpenMode::OpenMode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *po_error = 0 )
         {
             Private::FileIO_Initialize( this );
             Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, po_error );
@@ -147,40 +124,10 @@ namespace FileIO
         }
 #endif
 
-        void Open( const FilePath &pnn, OpenMode::OpenMode_t openMode, ProcMode::ProcMode_t procMode, CacheMode::CacheMode_t cacheMode = CacheMode::Default, fileError *po_error = 0 )
+        void Open( const FilePath &pnn, OpenMode::OpenMode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *po_error = 0 )
         {
             Close();
             Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, po_error );
-        }
-
-        void Close()
-        {
-            Private::FileIO_Close( this );
-        }
-
-        bln IsOpened() const
-        {
-            return Private::FileIO_IsValid( this );
-        }
-
-        bln Write( const void *cp_source, ui32 len )
-        {
-            return Private::FileIO_Write( this, cp_source, len );
-        }
-
-        bln Read( void *p_target, ui32 len, ui32 *p_readed )
-        {
-            return Private::FileIO_Read( this, p_target, len, p_readed );
-        }
-
-        bln BufferSet( ui32 size, void *buffer = 0 )  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
-        {
-            return Private::FileIO_BufferSet( this, size, buffer );
-        }
-
-        ui32 BufferSizeGet()
-        {
-            return Private::FileIO_BufferSizeGet( this );
         }
 
         void StatsGet( SStats *po_stats ) const
@@ -193,50 +140,95 @@ namespace FileIO
             Private::FileIO_StatsReset( this );
         }
 
-        bln Flush()  //  false if writing to file failed to complete
-        {
-            return Private::FileIO_Flush( this );
-        }
-
-        i64 OffsetGet()  //  -1 on fail, current offset on success
-        {
-            return Private::FileIO_OffsetGet( this );
-        }
-
-        i64 OffsetSet( OffsetMode::OffsetMode_t mode, i64 offset, CError *po_error )  //  -1 on fail, current offset on success
-        {
-            return Private::FileIO_OffsetSet( this, mode, offset, po_error );
-        }
-
-        ui64 SizeGet()
-        {
-            return Private::FileIO_SizeGet( this );
-        }
-
-        bln SizeSet( ui64 newSize )
-        {
-            return Private::FileIO_SizeSet( this, newSize );
-        }
-
         OpenMode::OpenMode_t OpenModeGet() const
         {
             return Private::FileIO_OpenModeGet( this );
         }
 
-        ProcMode::ProcMode_t ProcModeGet() const
-        {
-            return Private::FileIO_ProcModeGet( this );
-        }
-
-		CacheMode::CacheMode_t CacheModeGet() const
-		{
-			return Private::FileIO_CacheModeGet( this );
-		}
-
 		FilePath PNNGet() const
         {
             return Private::FileIO_PNNGet( this );
         }
+
+        virtual void Close() override final
+        {
+            Private::FileIO_Close( this );
+        }
+
+        virtual bln IsOpened() const override final
+        {
+            return Private::FileIO_IsValid( this );
+        }
+
+        virtual bln Write( const void *cp_source, ui32 len, ui32 *written = 0 ) override final
+        {
+            return Private::FileIO_Write( this, cp_source, len, written );
+        }
+
+        virtual bln Read( void *p_target, ui32 len, ui32 *p_readed = 0 ) override final
+        {
+            return Private::FileIO_Read( this, p_target, len, p_readed );
+        }
+
+		virtual bln IsBufferingSupported() const override final
+		{
+			return true;
+		}
+
+        virtual bln BufferSet( ui32 size, void *buffer = 0 ) override final
+        {
+            return Private::FileIO_BufferSet( this, size, buffer );
+        }
+
+        virtual ui32 BufferSizeGet() const override final
+        {
+            return Private::FileIO_BufferSizeGet( this );
+        }
+
+		virtual const void *BufferGet() const override final
+		{
+			return Private::FileIO_BufferGet( this );
+		}
+
+        virtual bln Flush() override final  //  false if writing to the file has failed to complete
+        {
+            return Private::FileIO_Flush( this );
+        }
+
+		virtual bln IsSeekSupported() const override final
+		{
+			return true;
+		}
+
+        virtual i64 OffsetGet( FileOffsetMode::mode_t mode = FileOffsetMode::FromBegin, CError *error = 0 ) override final
+        {
+            return Private::FileIO_OffsetGet( this, mode, error );
+        }
+
+        virtual i64 OffsetSet( FileOffsetMode::mode_t mode, i64 offset, CError *error = 0 ) override final
+        {
+            return Private::FileIO_OffsetSet( this, mode, offset, error );
+        }
+
+        virtual ui64 SizeGet( CError *error = 0) const override final
+        {
+            return Private::FileIO_SizeGet( this, error );
+        }
+
+        virtual bln SizeSet( ui64 newSize, CError *error = 0 ) override final
+        {
+            return Private::FileIO_SizeSet( this, newSize, error );
+        }
+
+        virtual FileProcMode::mode_t ProcModeGet() const override final
+        {
+            return Private::FileIO_ProcModeGet( this );
+        }
+
+		virtual FileCacheMode::mode_t CacheModeGet() const override final
+		{
+			return Private::FileIO_CacheModeGet( this );
+		}
 
 		void TransferTo( CFile *target )  //  use this method if std::move isn't supported
 		{

@@ -16,6 +16,7 @@ namespace FileMapping
 		{
 			void *memory;
 			uiw size;
+			bln is_writable;
 			#ifdef WINDOWS
 				HANDLE handle;
 			#endif
@@ -25,10 +26,11 @@ namespace FileMapping
 		EXTERNALD void FileMapping_Destroy( MappingStruct *mapping );
 	}
 
-	//  Note that file must be opened as readable, writable is optional
-	//  If you pass is_writeCopy, you can write even if file isn't writable( actual file will not be affected by your changes )
+	//  Note that the file must be opened as readable, writable is optional
+	//  If you pass is_writeCopy, you can write even if the file isn't writable( the actual file will not be affected by your changes )
 	//  Pass uiw_max as size to map the whole file
 	//  You can close the file right after mapping was created
+	//  If a mapping object is const, you can't change the mapped memory
 	class Mapping
 	{
 		Private::MappingStruct mappingStruct;
@@ -63,8 +65,15 @@ namespace FileMapping
 			return mappingStruct.memory != 0;
 		}
 
+		bln IsWritable() const
+		{
+			ASSUME( IsCreated() );
+			return mappingStruct.is_writable;
+		}
+
 		void *Memory()
 		{
+			ASSUME( mappingStruct.is_writable );
 			return mappingStruct.memory;
 		}
 
@@ -73,10 +82,37 @@ namespace FileMapping
 			return mappingStruct.memory;
 		}
 
+		const void *CMemory() const
+		{
+			return mappingStruct.memory;
+		}
+
 		uiw Size() const
 		{
 			ASSUME( IsCreated() );
 			return mappingStruct.size;
+		}
+
+		MemoryStreamFixedExt CreateMemoryStream( uiw offset = 0 )
+		{
+			ASSUME( IsCreated() );
+			if( IsWritable() )
+			{
+				return MemoryStreamFixedExt( Memory(), Size(), offset );
+			}
+			return MemoryStreamFixedExt( CMemory(), Size(), offset );
+		}
+
+		MemoryStreamFixedExt CreateMemoryStream( uiw offset = 0 ) const
+		{
+			ASSUME( IsCreated() );
+			return MemoryStreamFixedExt( CMemory(), Size(), offset );
+		}
+
+		MemoryStreamFixedExt CCreateMemoryStream( uiw offset = 0 ) const
+		{
+			ASSUME( IsCreated() );
+			return MemoryStreamFixedExt( CMemory(), Size(), offset );
 		}
 
 	#ifdef MOVE_SUPPORTED
@@ -88,6 +124,7 @@ namespace FileMapping
 		Mapping &operator = ( Mapping &&source )
 		{
 			ASSUME( this != &source );
+			Private::FileMapping_Destroy( &this->mappingStruct );
 			this->mappingStruct = source.mappingStruct;
 			source.mappingStruct.memory = 0;
 			return *this;

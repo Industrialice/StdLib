@@ -55,7 +55,7 @@ bln VirtualMem::VM_Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !prot )
     {
-        DBGBREAK;
+        SOFTBREAK;
         return false;
     }
     return ::mprotect( p_mem, size, prot ) == 0;
@@ -67,7 +67,7 @@ void *VirtualMem::VM_Alloc( uiw size, PageMode::PageMode_t mode )
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !prot )
     {
-        DBGBREAK;
+        SOFTBREAK;
         return 0;
     }
     return ::mmap( 0, size, prot, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -86,7 +86,7 @@ ui32 VirtualMem::VM_PageSize()
 
 VirtualMem::PageMode::PageMode_t VirtualMem::VM_ProtectGet( const void *p_mem, uiw size, CError *po_error )
 {
-    DSA( po_error, Error::Unsupported() );
+    DSA( po_error, Error::UnsupportedFeature() );
     return PageMode::Error;
 }
 
@@ -96,7 +96,7 @@ bln VirtualMem::VM_ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode 
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !prot )
     {
-        DBGBREAK;
+        SOFTBREAK;
         return false;
     }
     return ::mprotect( p_mem, size, prot ) == 0;

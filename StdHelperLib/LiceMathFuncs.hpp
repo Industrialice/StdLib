@@ -80,7 +80,7 @@ namespace LiceMath
     EXTERNALS void M4x3RotateAxisDoNotIdentity( m4x3 *po_m, const vec3 *cpo_v, f32 angle );  //  input vector must be normalized
     EXTERNALS void M4x3Identity( m4x3 *po_m );
 	EXTERNALS bln M4x3IsIdentity( const m4x3 *cpo_m );  //  without epsilon
-	EXTERNALS EXTERNALS void M4x3Transpose( m3x4 *po_m0, const m4x3 *cpo_m1 );
+	EXTERNALS void M4x3Transpose( m3x4 *po_m0, const m4x3 *cpo_m1 );
 	EXTERNALS m3x4 *M4x3TransposeInplaceAs3x4( m4x3 *po_m0 );  //  m4x3 will become m3x4
     EXTERNALS void M4x3MultM4x3AsM4x4LastIden( m4x3 *RSTR po_m0, const m4x3 *cpo_m1, const m4x3 *cpo_m2 );
     EXTERNALS void M4x3MultM4x3AsM4x4LastIdenInplace( m4x3 *RSTR po_m0, const m4x3 *cpo_m1 );

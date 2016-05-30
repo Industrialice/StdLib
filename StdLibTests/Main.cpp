@@ -504,11 +504,96 @@ void CopyFilesToRotate();
 
 #include <locale>
 
+#include <LiceMathFuncs.hpp>
+
+#include <MemoryStreamContainer.hpp>
+
+#include <FileMemoryStream.hpp>
+
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-	CopyFilesToRotate();
+	FileIO::CFile testFile( L"print_to_file_test.txt", FileIO::OpenMode::CreateAlways, FileProcMode::Write | FileProcMode::Read );
+	if( !testFile.IsOpened() )
+	{
+		::printf( "failed to open file print_to_file_test.txt\n" );
+	}
+	else
+	{
+		const char *str = "let's get started\n";
+		testFile.Write( str, _StrLen( str ) );
+
+		i64 offset = testFile.OffsetGet();
+		FileMapping::mappingError error;
+
+		if( !testFile.SizeSet( 999 ) )
+		{
+			::printf( "set file size failed\n" );
+		}
+
+		i64 offsetToEnd = testFile.OffsetGet( FileOffsetMode::FromEnd );
+		::printf( "offset to end %i\n", (int)offsetToEnd );
+
+		FileMapping::Mapping mapping( &testFile, 0, uiw_max, false, &error );
+		if( !mapping.IsCreated() )
+		{
+			::printf( "failed to create mapping, error %s _ %s\n", error.Description(), error.Addition() );
+		}
+		else
+		{
+			uiw printed = Funcs::PrintToMemoryStream( &mapping.CreateMemoryStream( offset ), "hey %u half-life %h no way %[0x000]b\n", 9999123, 43252345, 5 );
+			mapping = FileMapping::Mapping();
+			if( !testFile.SizeSet( printed, &error ) )
+			{
+				::printf( "set file size 2 failed %s _ %s\n", error.Description(), error.Addition() );
+			}
+		}
+	}
+
+	char smallBuf[ 160 ];
+	uiw printed = Funcs::PrintToStr( smallBuf, sizeof(smallBuf), "hey %u half-life %h no way %[0x000]b\n", 9999123, 43252345, 5 );
+	::printf( "printed %u\n", printed );
+	::printf( "%s", smallBuf );
+
+	char buf[ 256 ];
+	Funcs::PrintToStr( buf, 256, "%s%s\n", "testing", " my shit" );
+	::printf( buf );
+
+	CStr str;
+	MemoryStreamContainer < CStr > stream( &str );
+
+	Funcs::PrintToMemoryStream( &stream, "%s", "shit!_" );
+
+	FileMemoryStream file( &stream, FileProcMode::WriteAppend );
+	if( !file.IsOpened() )
+	{
+		::printf( "failed to open file\n" );
+	}
+	else
+	{
+		i64 offset = file.OffsetGet();
+
+		::printf( "current offset %i\n", (int)offset );
+
+		const char *cstr = "holy fucking shit, ok";
+
+		file.Write( cstr, _StrLen( cstr ) );
+
+		offset = file.OffsetGet();
+
+		::printf( "current offset %i\n", (int)offset );
+
+		file.OffsetSet( FileOffsetMode::FromBegin, 10 );
+
+		file.Write( cstr, _StrLen( cstr ) );
+
+		offset = file.OffsetGet();
+
+		::printf( "current offset %i\n", (int)offset );
+
+		::printf( "%s\n", str.CStr() );
+	}
 
 	/*int test[ 15 ] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 	CVecArr < int > arr;

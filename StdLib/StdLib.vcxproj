@@ -345,7 +345,10 @@
     <ClInclude Include="CF16.hpp" />
     <ClInclude Include="CompilerDefines.hpp" />
     <ClInclude Include="Error.hpp" />
+    <ClInclude Include="FileInterface.hpp" />
     <ClInclude Include="Funcs.hpp" />
+    <ClInclude Include="FileMemoryStream.hpp" />
+    <ClInclude Include="MemoryStreamInterface.hpp" />
     <ClInclude Include="PlatformDefines.hpp" />
     <ClInclude Include="PlatformTypes.hpp" />
     <ClInclude Include="PreHeader.hpp" />
@@ -354,6 +357,7 @@
   <ItemGroup>
     <ClCompile Include="CF16.cpp" />
     <ClCompile Include="Funcs.cpp" />
+    <ClCompile Include="FileMemoryStream.cpp" />
     <ClCompile Include="PreHeader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_Dynamic|Win32'">Create</PrecompiledHeader>

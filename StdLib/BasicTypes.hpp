@@ -551,7 +551,6 @@ template < typename X > struct TypeDesc
 template < typename X > struct TypeDesc < const X > : TypeDesc < X >
 {
     static const bln is_const = true;
-    typedef const X type;
 };
 template < typename X > struct TypeDesc < X & >
 {
@@ -569,7 +568,6 @@ template < typename X > struct TypeDesc < X & >
 template < typename X > struct TypeDesc < const X & > : TypeDesc < X & >
 {
     static const bln is_const = true;
-    typedef const X type;
 };
 template < typename X > struct TypeDesc < X * >
 {
@@ -587,9 +585,6 @@ template < typename X > struct TypeDesc < X * >
 template < typename X > struct TypeDesc < const X * > : TypeDesc < X * >
 {
     static const bln is_const = true;
-    typedef const X type;
-    typedef const X & ref;
-    typedef const X * pointer;
 };
 template < typename X > struct TypeDesc < X [] >
 {
@@ -607,7 +602,6 @@ template < typename X > struct TypeDesc < X [] >
 template < typename X > struct TypeDesc < const X [] > : TypeDesc < X [] >
 {
     static const bln is_const = true;
-    typedef const X type;
 };
 template < typename X, uiw size > struct TypeDesc < X [ size ] >
 {
@@ -625,7 +619,6 @@ template < typename X, uiw size > struct TypeDesc < X [ size ] >
 template < typename X, uiw size > struct TypeDesc < const X [ size ] > : TypeDesc < X [ size ] >
 {
     static const bln is_const = true;
-    typedef const X type;
 };
 
 #ifdef LONGLONG_SUPPORTED

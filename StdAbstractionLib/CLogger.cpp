@@ -5,6 +5,7 @@
 #include "CMutex.hpp"
 #include <Allocators.hpp>
 #include <stdarg.h>
+#include <MemoryStreamContainer.hpp>
 
 namespace
 {
@@ -30,7 +31,7 @@ namespace
 CLogger::CLogger()
 {}
 
-#if defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
 NOINLINE void CLogger::_Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
 #else
 NOINLINE void CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
@@ -48,7 +49,9 @@ NOINLINE void CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
     va_list args;
     va_start( args, cp_fmt );
 
-    uiw printedLen = Funcs::PrintToContainerArgList( &dis->_buffer, cp_fmt, args );
+	MemoryStreamContainer < CStr > stream( &dis->_buffer );
+
+    uiw printedLen = Funcs::PrintToMemoryStreamArgList( &stream, cp_fmt, args );
 
     va_end( args );
 

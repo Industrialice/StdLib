@@ -210,3 +210,11 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+*.tlog
+/Debug_x86
+/StdLib.VC.VC.opendb
+/StdLib.VC.db
+*.ipdb
+*.iobj
+/Release_x86
+/StdLibTests/print_to_file_test.txt

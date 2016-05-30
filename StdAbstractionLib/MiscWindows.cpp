@@ -88,7 +88,7 @@ bln VirtualMem::VM_Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
     DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !protect )
     {
-        DBGBREAK;
+        SOFTBREAK;
         return false;
     }
     return ::VirtualAlloc( p_mem, size, MEM_COMMIT, protect ) != 0;
@@ -100,7 +100,7 @@ void *VirtualMem::VM_Alloc( uiw size, PageMode::PageMode_t mode )
     DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !protect )
     {
-        DBGBREAK;
+        SOFTBREAK;
         return false;
     }
     return ::VirtualAlloc( 0, size, MEM_RESERVE | MEM_COMMIT, protect );
@@ -158,7 +158,7 @@ bln VirtualMem::VM_ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode 
     DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
     if( !protect )
     {
-        DBGBREAK;
+        SOFTBREAK;
         return false;
     }
     return ::VirtualProtect( p_mem, size, protect, &oldProtect ) != 0;

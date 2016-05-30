@@ -25,7 +25,7 @@ CEvent::CEvent( bln isInitiallySignaling /* = false */, bln isResetAfterWait /* 
 
 void CEvent::WaitFor( ui32 timeout )
 {
-	DBGBREAK;  //  WTF?  //  TODO:
+	SOFTBREAK;  //  WTF?  //  TODO:
     int result = pthread_mutex_lock( &_handle.lock );
     ASSUME( result == 0 );
 

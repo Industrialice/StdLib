@@ -109,7 +109,7 @@ public: \
     #endif
 #endif
 
-#define NOT_IMPLEMENTED DBGBREAK
+#define NOT_IMPLEMENTED SOFTBREAK
 
 #if defined(STATIC_ASSERTION_SUPPORTED) && !defined(DISALLOW_NATIVE_STATIC_ASSERTION)
     #define STATIC_CHECK( what, str ) static_assert( what, str )

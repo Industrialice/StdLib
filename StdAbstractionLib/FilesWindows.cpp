@@ -30,7 +30,7 @@ NOINLINE CError StdLib_FileError()
 	case ERROR_ALREADY_EXISTS:
 		return Error::AlreadyExists();
 	default:
-		return Error::CannotOpenFile();
+		return Error::UnknownError();
 	}
 }
 
