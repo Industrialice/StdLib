@@ -4,10 +4,7 @@
 #include <wchar.h>
 
 #include <StdCoreLib.hpp>
-#include "Reservators.hpp"
-#include "Allocators.hpp"
-#include "Iterator.hpp"
-#include "Algorithm.hpp"
+#include "CVector.hpp"
 
 #define _MemCpyStr( a, b, c ) memcpy( a, b, (c) * sizeof(charType) )
 #define _MemMoveStr( a, b, c ) memmove( a, b, (c) * sizeof(charType) )
@@ -534,6 +531,24 @@ public:
         _MemCpyStr( thisStr, str, _count );
         thisStr[ _count ] = (charType)0;
     }
+	
+/*
+#ifdef VAR_TEMPLATES_SUPPORTED
+    template < typename Args... > TCStr( const CCRefVec < charType > &source0, Args &&... sources )
+	{
+		if( str0 == 0 )
+		{
+			str0 = _EmptyStr < charType >::Get();
+		}
+		if( str1 == 0 )
+		{
+			str1 = _EmtpyStr < charType >::Get();
+		}
+
+		uiw len0 = _StrLen( str0 );
+		uiw len1 = _StrLen( str1 );
+	}
+#endif*/
 
     NOINLINE TCStr( const charType *str0, uiw len0, const charType *str1, uiw len1 )
     {
@@ -556,6 +571,7 @@ public:
         _MemCpyStr( thisStr + len0, str1, len1 );
         thisStr[ _count ] = (charType)0;
     }
+
 
     template < typename InputIterator > NOINLINE TCStr( InputIterator begin, InputIterator end )
     {

@@ -1,8 +1,6 @@
 #include "PreHeader.hpp"
 #include "FileMemoryStream.hpp"
 
-using namespace StdLib;
-
 #include <typeinfo>
 #include <stdio.h>
 
@@ -2050,7 +2048,13 @@ class ParserParam
 	bln _is_present;
 
 public:
-	ui32 GetParam() const
+	i32 GetParamI() const
+	{
+		ASSUME( _is_present );
+		return *(i32 *)&_param;
+	}
+
+	ui32 GetParamU() const
 	{
 		ASSUME( _is_present );
 		return _param;
@@ -2154,13 +2158,10 @@ bln ArgParserHelper( char type, void *p_source, ParserParam param, uiw *written,
         }        
         else
         {
+			len = _StrLen( sourceStr );
 			if( param.IsPresent() )
 			{
-				len = Funcs::Min < uiw >( _StrLen( sourceStr ), param.GetParam() );
-			}
-			else
-			{
-				len = _StrLen( sourceStr );
+				len = Funcs::Min < uiw >( len, param.GetParamU() );
 			}
         }
 		if( !file->Write( sourceStr, len ) )
@@ -2174,7 +2175,7 @@ bln ArgParserHelper( char type, void *p_source, ParserParam param, uiw *written,
         f32 f32val = (f32)*(f64 *)p_source;
         if( param.IsPresent() )
         {
-            len = Funcs::F32ToStrWithPrecise( f32val, param.GetParam(), a_buf );
+            len = Funcs::F32ToStrWithPrecise( f32val, param.GetParamU(), a_buf );
         }
         else
         {
@@ -2197,7 +2198,7 @@ bln ArgParserHelper( char type, void *p_source, ParserParam param, uiw *written,
     case 'b':  //  bln [param]
 	{
         len = *(ui32 *)p_source ? _StrLen( "true" ) : _StrLen( "false" );
-		bln is_capitalize = param.IsPresent() == false || param.GetParam() == 0 ? false : true;
+		bln is_capitalize = param.IsPresent() == false || param.GetParamU() == 0 ? false : true;
 		if( !file->Write( *(ui32 *)p_source ? (is_capitalize ? "TRUE" : "true") : (is_capitalize ? "FALSE" : "false"), len ) )
 		{
 			return false;
@@ -2212,22 +2213,22 @@ bln ArgParserHelper( char type, void *p_source, ParserParam param, uiw *written,
         len = 1;
         goto retLen;
     case 'h':  //  integer 32 as hex str [param]
-        len = Funcs::IntToStrHex( param.IsPresent() && param.GetParam(), false, false, a_buf, *(ui32 *)p_source );
+        len = Funcs::IntToStrHex( param.IsPresent() && param.GetParamU(), false, false, a_buf, *(ui32 *)p_source );
         goto retBuf;
     case 'j':  //  integer 64 as hex str [param]
-        len = Funcs::IntToStrHex( param.IsPresent() && param.GetParam(), false, false, a_buf, *(ui64 *)p_source );
+        len = Funcs::IntToStrHex( param.IsPresent() && param.GetParamU(), false, false, a_buf, *(ui64 *)p_source );
         goto retBuf;
     case 'p':  //  pointer, integer word as hex str [param]
-        len = Funcs::IntToStrHex( param.IsPresent() && param.GetParam(), false, false, a_buf, *(uiw *)p_source );
+        len = Funcs::IntToStrHex( param.IsPresent() && param.GetParamU(), false, false, a_buf, *(uiw *)p_source );
         goto retBuf;
     case 'n':  //  integer 32 as bin str [param]
-        len = Funcs::IntToStrBin( *(ui32 *)p_source, a_buf, false, param.IsPresent() && param.GetParam() );
+        len = Funcs::IntToStrBin( *(ui32 *)p_source, a_buf, false, param.IsPresent() && param.GetParamU() );
         goto retBuf;
     case 'm':  //  integer 64 as bin str [param]
-        len = Funcs::IntToStrBin( *(ui64 *)p_source, a_buf, false, param.IsPresent() && param.GetParam() );
+        len = Funcs::IntToStrBin( *(ui64 *)p_source, a_buf, false, param.IsPresent() && param.GetParamU() );
         goto retBuf;
     case 'a':  //  pointer, integer word as bin str [param]
-        len = Funcs::IntToStrBin( *(uiw *)p_source, a_buf, false, param.IsPresent() && param.GetParam() );
+        len = Funcs::IntToStrBin( *(uiw *)p_source, a_buf, false, param.IsPresent() && param.GetParamU() );
         goto retBuf;
     case 'w':  //  unsigned word
         len = Funcs::IntToStrDec( *(uiw *)p_source, a_buf );
@@ -2238,7 +2239,7 @@ bln ArgParserHelper( char type, void *p_source, ParserParam param, uiw *written,
     case 'd':  //  f64 [param]
         if( param.IsPresent() )
         {
-            len = Funcs::F64ToStrWithPrecise( *(f64 *)p_source, param.GetParam(), a_buf );
+            len = Funcs::F64ToStrWithPrecise( *(f64 *)p_source, param.GetParamU(), a_buf );
         }
         else
         {

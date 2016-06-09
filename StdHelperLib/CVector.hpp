@@ -1236,6 +1236,8 @@ public:
 };
 
 //  there's no const version because there's no reason to have it. if you want const, use CCVecRef. I might as well create an aliased type, but I might not
+//  unlike CVecRef, you can actually modify array's content, but use it on your own risk! there's no protection from destructing
+//  uninitialized data, or from rewriting initialized data without destructing it first
 template < typename X, TypeSemantic_t typeSemantic = Sem_Strict > class CVecArr : public Private::_CBaseVec < X, void, void, typeSemantic, 0 >
 {
 	typedef Private::_CBaseVec < X, void, void, typeSemantic, 0 > baseType;

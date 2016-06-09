@@ -24,8 +24,8 @@ static void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
 
 void FileEnumBenchmark()
 {
-	CTC tc( true );
+	TimeMoment tc( TimeMoment::CreateCurrent() );
 	EnumStats stats = {};
 	Files::EnumFilesRecursively( L"C:\\Program Files", L"*.*", true, EnumFilesCallback, &stats );
-	::printf( "enumerated %u files and %u folders for %f seconds\n", stats.enumeratedFiles, stats.enumeratedFolders, tc.Get32() );
+	::printf( "enumerated %u files and %u folders for %f seconds\n", stats.enumeratedFiles, stats.enumeratedFolders, TimeMoment::CreateCurrent().SinceSec32( tc ) );
 }

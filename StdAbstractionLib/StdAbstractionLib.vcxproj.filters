@@ -53,6 +53,9 @@
     <ClInclude Include="FilePath.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VKeys.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileIOPosix.cpp">
@@ -119,6 +122,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FilesAny.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VKeysWindows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

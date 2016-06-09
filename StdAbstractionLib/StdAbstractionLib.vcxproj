@@ -368,6 +368,7 @@
     <ClInclude Include="PreHeader.hpp" />
     <ClInclude Include="CThread.hpp" />
     <ClInclude Include="StdAbstractionLib.hpp" />
+    <ClInclude Include="VKeys.hpp" />
     <ClInclude Include="WinCEFuncs.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -401,6 +402,7 @@
     <ClCompile Include="CThreadPosix.cpp" />
     <ClCompile Include="CThreadWindows.cpp" />
     <ClCompile Include="StdAbstractionLib.cpp" />
+    <ClCompile Include="VKeysWindows.cpp" />
     <ClCompile Include="WinCEFuncs.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

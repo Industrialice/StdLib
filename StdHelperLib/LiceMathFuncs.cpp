@@ -2184,6 +2184,12 @@ void LiceMath::Projection( m4x4 *m, f32 fovDegree, f32 nearPlane, f32 farPlane, 
     f32 h = 1.f / ::tanf( fovV * 0.5f );
     f32 l = -q * nearPlane;
 
+	/*f32 angle = DEGREETORADIAN( fovDegree );
+	f32 w = 1.f / (aspect * ::tanf( angle * 0.5f ));
+	f32 h = 1.f / ::tanf( angle * 0.5f );
+	f32 q = farPlane / (farPlane - nearPlane);
+	f32 l = (-nearPlane * farPlane) / (farPlane - nearPlane);*/
+
     m->e00 = w; m->e01 = 0; m->e02 = 0; m->e03 = 0;
     m->e10 = 0; m->e11 = h; m->e12 = 0; m->e13 = 0;
     m->e20 = 0; m->e21 = 0; m->e22 = q; m->e23 = 1;

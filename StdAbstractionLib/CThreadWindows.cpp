@@ -14,7 +14,7 @@ struct ThreadArg
     void *argument;
 };
 
-static unsigned int __stdcall ThreadFunc( void *argument )
+static unsigned int WINAPI ThreadFunc( void *argument )
 {
     ThreadArg threadArg = *(ThreadArg *)argument;
     free( argument );
@@ -36,13 +36,13 @@ CThread::CThread()
     _thread = 0;
 }
 
-CThread::CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority)
+CThread::CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, i8 priority )
 {
     _thread = 0;
     CThread::Create( stackSize, ExecutionFunc, argument, priority );
 }
 
-void CThread::Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority )
+void CThread::Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, i8 priority )
 {
     ASSUME( _thread == 0 );
 
@@ -57,25 +57,55 @@ void CThread::Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), vo
     #endif
     ASSUME( _thread != (HANDLE)-1 );
 
-    if( priority != PriorityNormal )
+	_currentPriority = 0;
+	this->PrioritySet( priority );
+}
+	
+i8 CThread::PriorityGet() const
+{
+	return _currentPriority;
+}
+
+bln CThread::PrioritySet( i8 priority )
+{
+    if( priority != _currentPriority )
     {
         int normalizedPriority;
-        if( priority == PriorityIdle ) normalizedPriority = THREAD_PRIORITY_IDLE;
-        else if( priority == PriorityLowest ) normalizedPriority = THREAD_PRIORITY_LOWEST;
-        else if( priority == PriorityBelowNormal ) normalizedPriority = THREAD_PRIORITY_BELOW_NORMAL;
-        else if( priority == PriorityAboveNormal ) normalizedPriority = THREAD_PRIORITY_ABOVE_NORMAL;
-        else if( priority == PriorityHighest ) normalizedPriority = THREAD_PRIORITY_HIGHEST;
-        else if( priority == PriorityTimeCritical ) normalizedPriority = THREAD_PRIORITY_TIME_CRITICAL;
-        else
-        {
-            SOFTBREAK;
-            normalizedPriority = THREAD_PRIORITY_NORMAL;
-        }
 
-        BOOL result = ::SetThreadPriority( _thread, normalizedPriority );
-        ASSUME( result );
+		if( priority < -85 ) normalizedPriority = THREAD_PRIORITY_IDLE;
+		else if( priority < -55 ) normalizedPriority = THREAD_PRIORITY_LOWEST;
+		else if( priority < -25 ) normalizedPriority = THREAD_PRIORITY_BELOW_NORMAL;
+		else if( priority < 25 ) normalizedPriority = THREAD_PRIORITY_NORMAL;
+		else if( priority < 55 ) normalizedPriority = THREAD_PRIORITY_ABOVE_NORMAL;
+		else if( priority < 85 ) normalizedPriority = THREAD_PRIORITY_HIGHEST;
+		else normalizedPriority = THREAD_PRIORITY_TIME_CRITICAL;
+
+		if( ::SetThreadPriority( _thread, normalizedPriority ) == TRUE )
+		{
+			_currentPriority = priority;
+			return true;
+		}
+		SOFTBREAK;
+        return false;
     }
+	return true;
 }
+
+#ifdef MOVE_SUPPORTED
+	CThread::CThread( CThread &&source ) : _thread( source._thread ), _currentPriority( source._currentPriority )
+	{
+		source._thread = 0;
+	}
+	
+	CThread &CThread::operator = ( CThread &&source )
+	{
+		ASSUME( this != &source );
+		this->_thread = source._thread;
+		this->_currentPriority = source._currentPriority;
+		source._thread = 0;
+		return *this;
+	}
+#endif
 
 void CThread::SleepCurrent( ui32 msecs )  //  static
 {

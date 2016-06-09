@@ -1,7 +1,5 @@
 #include "PreHeader.hpp"
 
-using namespace StdLib;
-
 static ui16 GetOverflowed( Private::OverflowAction_t action, bln is_negative )
 {
 	if( action == Private::Flow_Clamp )

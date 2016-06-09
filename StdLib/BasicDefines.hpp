@@ -2,7 +2,6 @@
 #define __BASIC_DEFINES_HPP__
 
 #define EXTC extern "C"
-#define COUNTOF( a ) (sizeof(a) / sizeof(*(a)))
 #define BIT( bit ) (1 << (bit))
 #define TOSTR( code ) #code
 #define CONCAT( first, second ) first##second

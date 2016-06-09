@@ -514,6 +514,17 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
+	TimeMoment cur = TimeMoment::CreateCurrent();
+
+	TimeMoment next = TimeMoment::CreateShiftedSec( cur, 3.5f );
+
+	TimeMoment before = TimeMoment::CreateShiftedSec( cur, -3.5f );
+
+	::printf( "sec since before %f\n", cur.SinceSec32( before ) );
+	::printf( "sec till next %f\n", cur.BeforeSec32( next ) );
+	::printf( "sec between next and before %f\n", next.SinceSec32( before ) );
+
+#if 0
 	FileIO::CFile testFile( L"print_to_file_test.txt", FileIO::OpenMode::CreateAlways, FileProcMode::Write | FileProcMode::Read );
 	if( !testFile.IsOpened() )
 	{
@@ -594,6 +605,7 @@ int __cdecl main()
 
 		::printf( "%s\n", str.CStr() );
 	}
+#endif
 
 	/*int test[ 15 ] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 	CVecArr < int > arr;

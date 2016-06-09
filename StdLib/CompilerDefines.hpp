@@ -22,6 +22,7 @@
         #include <xkeycheck.h>
     #endif
 
+	#define COUNTOF( a ) _countof( a )
     #define REMOVE_COMMA
     #define ALIGNED_PRE( al ) __declspec(align(al))
     #define ALIGNED_POST( al )
@@ -287,6 +288,17 @@
 
     #error unknown compiler
 
+#endif
+
+#if !defined(COUNTOF)
+	#ifdef CONSTEXPR_SUPPORTED
+		template < typename arrType, std::size_t size > constexpr std::size_t COUNTOF( const arrType (&)[ size ] )
+		{
+			return size;
+		}
+	#else
+		#define COUNTOF( a ) sizeof( a ) / sizeof( *(a) )
+	#endif
 #endif
 
 #if !defined(OVERRIDE_SUPPORTED)

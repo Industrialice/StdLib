@@ -5,29 +5,27 @@ namespace StdLib {
 
 class CThread
 {
-    DBGCODE( bln _is_created; )
+private:
+    DBGCODE( bln _is_created; )  //  used in POSIX
     threadHandle _thread;
+	i8 _currentPriority;  //  -128 is the lowest, 0 normal, 127 time-critical
 
     CThread( const CThread & );
     CThread & operator = ( const CThread & );
 
 public:
-    enum Priority_t
-    {
-        PriorityIdle,
-        PriorityLowest,
-        PriorityBelowNormal,
-        PriorityNormal,
-        PriorityAboveNormal,
-        PriorityHighest,
-        PriorityTimeCritical
-    };
-
     ~CThread();
     CThread();
-    CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority = PriorityNormal );
-    void Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, Priority_t priority = PriorityNormal );
+    CThread( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, i8 priority = 0 );
+    void Create( uiw stackSize, void (*ExecutionFunc)( void *argument ), void *argument, i8 priority = 0 );
+	i8 PriorityGet() const;
+	bln PrioritySet( i8 priority );
     static void SleepCurrent( ui32 msecs );
+
+#ifdef MOVE_SUPPORTED
+	CThread( CThread &&source );
+	CThread &operator = ( CThread &&source );
+#endif
 };
 
 }  //  namespace StdLib

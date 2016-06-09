@@ -19,7 +19,8 @@ public:
                 error = 2,
                 debug = 3,
                 user = 4,
-                important = 5 )
+                important = 5,
+				critical = 6 )
     };
 
     typedef void (*DirectionFunc)( Tag::messageTag_t tag, const char *cp_text, uiw len );
