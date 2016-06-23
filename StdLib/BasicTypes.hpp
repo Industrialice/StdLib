@@ -525,7 +525,8 @@ template < bln condition, typename X = void > struct EnableIf
 template < typename X > struct EnableIf < false, X >
 {};
 
-/*  volatile doesn't supported  */
+//  volatile doesn't supported
+//  TODO: ** pointers, references to pointers, references to arrays and other composite types
 
 template < typename X > struct TypeDesc
 {
@@ -536,7 +537,7 @@ template < typename X > struct TypeDesc
     static const bln is_pointer = false;
     static const bln is_reference = false;
     #ifdef TYPETRAITS_SUPPORTED
-        static const bln is_pod = std::is_pod < X >::value || (IsDerivedFrom < X, CharPOD >::value && !IsDerivedFrom < X, CharMovable >::value);
+        static const bln is_pod = std::is_pod < X >::value || (IsDerivedFrom < X, CharPOD >::value && !IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value);
 
         static const bln is_movableAsPOD = is_pod || (IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value) ||
                                            (std::is_trivially_constructible < X, const X & >::value && std::is_trivially_assignable < X, const X & >::value &&
@@ -583,6 +584,14 @@ template < typename X > struct TypeDesc < X * >
     typedef X type;
 };
 template < typename X > struct TypeDesc < const X * > : TypeDesc < X * >
+{
+    static const bln is_const = true;
+};
+template < typename X > struct TypeDesc < X * const > : TypeDesc < X * >
+{
+    static const bln is_const = true;
+};
+template < typename X > struct TypeDesc < const X * const > : TypeDesc < X * >
 {
     static const bln is_const = true;
 };

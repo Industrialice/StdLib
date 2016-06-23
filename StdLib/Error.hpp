@@ -17,6 +17,7 @@ Obsolete
 Interrupted
 CannotOpenFile
 UnknownFormat
+Forbidden
 */
 
 namespace StdLib {
@@ -132,6 +133,7 @@ namespace Error
 	inline CError Interrupted() { return CError( 11, "DEFAULT", "INTERRUPTED" ); }
 	inline CError CannotOpenFile() { return CError( 12, "DEFAULT", "CANNOT_OPEN_FILE" ); }
 	inline CError UnknownFormat() { return CError( 13, "DEFAULT", "UNKNOWN_FORMAT" ); }
+	inline CError Forbidden() { return CError( 14, "DEFAULT", "FORBIDDEN" ); }
 
 	const ui32 _MaxDefaultError = 128;
 }

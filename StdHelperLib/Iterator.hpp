@@ -2,6 +2,7 @@
 #define __ITERATOR_HPP__
 
 #include <StdCoreLib.hpp>
+#include <iterator>
 
 namespace StdLib
 { namespace Iterator
@@ -43,13 +44,13 @@ struct _TypeIterator {};
 
 template < typename type, iw step, typename retType, bln is_const > class _IterRandomBasis;
 
-template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, false > : _TypeIterator
+template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, false > : _TypeIterator, public std::iterator < std::random_access_iterator_tag, type >
 {
 protected:
     type *_str;
 };
 
-template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, true > : _TypeIterator
+template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, true > : _TypeIterator, public std::iterator < std::random_access_iterator_tag, type >
 {
 protected:
     const type *_str;

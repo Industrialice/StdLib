@@ -5,17 +5,17 @@
 #include <FileIO.hpp>
 #include <stdio.h>
 #include <Misc.hpp>
-#include <CThread.hpp>
-#include <CEvent.hpp>
-#include <CAtomicFlag.hpp>
-#include <CMutex.hpp>
 #include <CString.hpp>
+#include <thread>
+#include <mutex>
+#include <CEvent.hpp>
+#include <atomic>
 
 using namespace StdLib;
 
 class DeleteShitImpl
 {
-    CMutex PrintfMutex;
+    std::mutex PrintfMutex;
     CEvent ThreadFreeEvent;
     struct SThreadInfo
     {
@@ -23,13 +23,13 @@ class DeleteShitImpl
         ui32 deletedCount;
         CEvent startEvent;
         CEvent endEvent;
-        CAtomicFlag is_finished;
-        CAtomicFlag is_continue;
-        CStr extensionToProcess;
-        CStr path;
+        std::atomic_flag is_finished;
+        std::atomic_flag is_continue;
+        CWStr extensionToProcess;
+        CWStr path;
         CEvent *threadFreeEventPointer;
-        CMutex *printfMutexPointer;
-        CThread thread;  //  keep it last, it must be initialized last
+        std::mutex *printfMutexPointer;
+        std::thread thread;  //  keep it last, it must be initialized last
 
         SThreadInfo() : totalSize( 0 ), deletedCount( 0 ), startEvent( false, true ), endEvent( true, false ), is_finished( true ),
             is_continue( false ), thread( 128 * 1024, ThreadFunc, this ), threadFreeEventPointer( 0 ), printfMutexPointer( 0 )
@@ -44,9 +44,9 @@ public:
 
     void Perform()
     {
-        CTC tc = CTC( true );
+        TimeMoment tm = TimeMoment::CreateCurrent();
 
-        FileIO::CFile extensions = FileIO::CFile( "exts.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read, FileIO::CacheMode::LinearRead, 0 );
+        FileIO::CFile extensions = FileIO::CFile( L"exts.txt", FileIO::OpenMode::OpenExisting, FileProcMode::Read, FileCacheMode::LinearRead, 0 );
         if( !extensions.IsOpened() )
         {
             ::printf( "can't open file exts.txt\n" );
@@ -78,9 +78,10 @@ public:
             ++next;
         }
 
-        char moduleName[ MAX_PATH_LENGTH ], path[ MAX_PATH_LENGTH ];
-        ::GetModuleFileNameA( ::GetModuleHandleA( 0 ), moduleName, MAX_PATH_LENGTH );
-        Files::ExtractPathFromString( moduleName, path );
+        wchar_t moduleName[ MAX_PATH_LENGTH ];
+        ::GetModuleFileNameW( ::GetModuleHandleW( 0 ), moduleName, MAX_PATH_LENGTH );
+		FilePath pModulePath( moduleName );
+		pModulePath.PopLevel();
 
         ThreadsCount = CPU::CPUCoresNum();
         ::printf( "creating %u threads\n", ThreadsCount );
@@ -110,8 +111,7 @@ public:
 private:
     static void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
     {
-		//  TODO:
-        /*SThreadInfo *ti = (SThreadInfo *)argument;
+		SThreadInfo *ti = (SThreadInfo *)argument;
         bln result = Files::RemoveFile( info->PNN(), 0 );
         ti->printfMutexPointer->Lock();
         ::printf( "deleting file %s, result %s\n", info->PNN(), result ? "success" : "fail" );
@@ -123,13 +123,12 @@ private:
                 ti->totalSize += info->FileSize();
             }
             ++ti->deletedCount;
-        }*/
+        }
     }
 
     static void ThreadFunc( void *arg )
     {
-		//  TODO:
-        /*SThreadInfo *ti = (SThreadInfo *)arg;
+		SThreadInfo *ti = (SThreadInfo *)arg;
 
         do
         {
@@ -146,26 +145,26 @@ private:
                 ti->threadFreeEventPointer->Raise();
             }
             ti->endEvent.Raise();
-        } while( ti->is_continue.IsSet() );*/
+        } while( ti->is_continue.IsSet() );
     }
 
-    void AddFileJob( const CCRefVec < char > &path, const CStr &ext )
+    void AddFileJob( const CWStr &path, const CWStr &ext )
     {
         ThreadFreeEvent.WaitFor();
         for( uiw index = 0; ; ++index )
         {
             ASSUME( index < ThreadsCount );
 
-            if( ThreadInfos[ index ].is_finished.IsSet() )
+            if( ThreadInfos[ index ].is_finished )
             {
                 ThreadInfos[ index ].endEvent.WaitFor();  //  make sure that the thread has completely finished its job and waiting for a new one
                 if( ThreadInfos[ index ].path.Size() || ThreadInfos[ index ].extensionToProcess.Size() )
                 {
-                    PrintfMutex.Lock();
+                    PrintfMutex.lock();
                     const char *tpath = ThreadInfos[ index ].path.Size() ? ThreadInfos[ index ].path.Data() : "";
                     const char *text = ThreadInfos[ index ].extensionToProcess.Size() ? ThreadInfos[ index ].extensionToProcess.Data() : "";
                     ::printf( "#thread %u# job %s%s has been completed\n", index, tpath, text );
-                    PrintfMutex.Unlock();
+                    PrintfMutex.unlock();
                 }
                 ThreadInfos[ index ].path.Assign( path.begin(), path.end() );
                 ThreadInfos[ index ].extensionToProcess = ext;

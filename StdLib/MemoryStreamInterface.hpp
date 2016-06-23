@@ -16,7 +16,7 @@ namespace StdLib
 		virtual bln IsWritable() const = 0;
 	};
 
-	template < uiw size > class MemoryStreamFixed : public MemoryStreamInterface
+	template < uiw size > class MemoryStreamFixed final : public MemoryStreamInterface
 	{
 		ui8 _buffer[ size ];
 		uiw _currentSize;
@@ -25,12 +25,12 @@ namespace StdLib
 		MemoryStreamFixed() : _currentSize( 0 )
 		{}
 
-		virtual uiw Size() const override final
+		virtual uiw Size() const override
 		{
 			return _currentSize;
 		}
 
-		virtual uiw Resize( uiw newSize ) override final
+		virtual uiw Resize( uiw newSize ) override
 		{
 			if( newSize > size )
 			{
@@ -40,33 +40,33 @@ namespace StdLib
 			return _currentSize;
 		}
 
-		virtual ui8 *Memory() override final
+		virtual ui8 *Memory() override
 		{
 			return _buffer;
 		}
 
-		virtual const ui8 *Memory() const override final
+		virtual const ui8 *Memory() const override
 		{
 			return _buffer;
 		}
 
-		virtual const ui8 *CMemory() const override final
+		virtual const ui8 *CMemory() const override
 		{
 			return _buffer;
 		}
 
-		virtual bln IsReadable() const override final
+		virtual bln IsReadable() const override
 		{
 			return true;
 		}
 
-		virtual bln IsWritable() const override final
+		virtual bln IsWritable() const override
 		{
 			return true;
 		}
 	};
 
-	class MemoryStreamFixedExt : public MemoryStreamInterface
+	class MemoryStreamFixedExt final : public MemoryStreamInterface
 	{
 		ui8 *_writeBuffer;
 		const ui8 *_readBuffer;
@@ -98,12 +98,12 @@ namespace StdLib
 			this->_currentSize = currentSize;
 		}
 
-		virtual uiw Size() const override final
+		virtual uiw Size() const override
 		{
 			return _currentSize;
 		}
 
-		virtual uiw Resize( uiw newSize ) override final
+		virtual uiw Resize( uiw newSize ) override
 		{
 			if( newSize > _maxSize )
 			{
@@ -113,33 +113,33 @@ namespace StdLib
 			return _currentSize;
 		}
 
-		virtual ui8 *Memory() override final
+		virtual ui8 *Memory() override
 		{
 			return _writeBuffer;
 		}
 
-		virtual const ui8 *Memory() const override final
+		virtual const ui8 *Memory() const override
 		{
 			return _readBuffer;
 		}
 
-		virtual const ui8 *CMemory() const override final
+		virtual const ui8 *CMemory() const override
 		{
 			return _readBuffer;
 		}
 
-		virtual bln IsReadable() const override final
+		virtual bln IsReadable() const override
 		{
 			return _readBuffer != 0;
 		}
 
-		virtual bln IsWritable() const override final
+		virtual bln IsWritable() const override
 		{
 			return _writeBuffer != 0;
 		}
 	};
 
-	class MemoryStreamHeap : public MemoryStreamInterface
+	class MemoryStreamHeap final : public MemoryStreamInterface
 	{
 		ui8 *_buffer;
 		uiw _currentSize;
@@ -153,12 +153,12 @@ namespace StdLib
 		MemoryStreamHeap() : _buffer( 0 ), _currentSize( 0 )
 		{}
 
-		virtual uiw Size() const override final
+		virtual uiw Size() const override
 		{
 			return _currentSize;
 		}
 
-		virtual uiw Resize( uiw newSize ) override final
+		virtual uiw Resize( uiw newSize ) override
 		{
 			if( newSize != _currentSize )
 			{
@@ -169,27 +169,27 @@ namespace StdLib
 			return _currentSize;
 		}
 
-		virtual ui8 *Memory() override final
+		virtual ui8 *Memory() override
 		{
 			return _buffer;
 		}
 
-		virtual const ui8 *Memory() const override final
+		virtual const ui8 *Memory() const override
 		{
 			return _buffer;
 		}
 
-		virtual const ui8 *CMemory() const override final
+		virtual const ui8 *CMemory() const override
 		{
 			return _buffer;
 		}
 
-		virtual bln IsReadable() const override final
+		virtual bln IsReadable() const override
 		{
 			return true;
 		}
 
-		virtual bln IsWritable() const override final
+		virtual bln IsWritable() const override
 		{
 			return true;
 		}

@@ -88,7 +88,7 @@ namespace FileIO
 		EXTERNALD void FileIO_InitializeFileIOSystem();
     }
 
-    class CFile : private Private::CFileBasis, public FileInterface
+    class CFile final : private Private::CFileBasis, public FileInterface
     {
 		CFile( const CFile &source );
 		CFile & operator = ( const CFile &source );
@@ -150,82 +150,82 @@ namespace FileIO
             return Private::FileIO_PNNGet( this );
         }
 
-        virtual void Close() override final
+        virtual void Close() override
         {
             Private::FileIO_Close( this );
         }
 
-        virtual bln IsOpened() const override final
+        virtual bln IsOpened() const override
         {
             return Private::FileIO_IsValid( this );
         }
 
-        virtual bln Write( const void *cp_source, ui32 len, ui32 *written = 0 ) override final
+        virtual bln Write( const void *cp_source, ui32 len, ui32 *written = 0 ) override
         {
             return Private::FileIO_Write( this, cp_source, len, written );
         }
 
-        virtual bln Read( void *p_target, ui32 len, ui32 *p_readed = 0 ) override final
+        virtual bln Read( void *p_target, ui32 len, ui32 *p_readed = 0 ) override
         {
             return Private::FileIO_Read( this, p_target, len, p_readed );
         }
 
-		virtual bln IsBufferingSupported() const override final
+		virtual bln IsBufferingSupported() const override
 		{
 			return true;
 		}
 
-        virtual bln BufferSet( ui32 size, void *buffer = 0 ) override final
+        virtual bln BufferSet( ui32 size, void *buffer = 0 ) override
         {
             return Private::FileIO_BufferSet( this, size, buffer );
         }
 
-        virtual ui32 BufferSizeGet() const override final
+        virtual ui32 BufferSizeGet() const override
         {
             return Private::FileIO_BufferSizeGet( this );
         }
 
-		virtual const void *BufferGet() const override final
+		virtual const void *BufferGet() const override
 		{
 			return Private::FileIO_BufferGet( this );
 		}
 
-        virtual bln Flush() override final  //  false if writing to the file has failed to complete
+        virtual bln Flush() override  //  false if writing to the file has failed to complete
         {
             return Private::FileIO_Flush( this );
         }
 
-		virtual bln IsSeekSupported() const override final
+		virtual bln IsSeekSupported() const override
 		{
 			return true;
 		}
 
-        virtual i64 OffsetGet( FileOffsetMode::mode_t mode = FileOffsetMode::FromBegin, CError *error = 0 ) override final
+        virtual i64 OffsetGet( FileOffsetMode::mode_t mode = FileOffsetMode::FromBegin, CError *error = 0 ) override
         {
             return Private::FileIO_OffsetGet( this, mode, error );
         }
 
-        virtual i64 OffsetSet( FileOffsetMode::mode_t mode, i64 offset, CError *error = 0 ) override final
+        virtual i64 OffsetSet( FileOffsetMode::mode_t mode, i64 offset, CError *error = 0 ) override
         {
             return Private::FileIO_OffsetSet( this, mode, offset, error );
         }
 
-        virtual ui64 SizeGet( CError *error = 0) const override final
+        virtual ui64 SizeGet( CError *error = 0) const override
         {
             return Private::FileIO_SizeGet( this, error );
         }
 
-        virtual bln SizeSet( ui64 newSize, CError *error = 0 ) override final
+        virtual bln SizeSet( ui64 newSize, CError *error = 0 ) override
         {
             return Private::FileIO_SizeSet( this, newSize, error );
         }
 
-        virtual FileProcMode::mode_t ProcModeGet() const override final
+        virtual FileProcMode::mode_t ProcModeGet() const override
         {
             return Private::FileIO_ProcModeGet( this );
         }
 
-		virtual FileCacheMode::mode_t CacheModeGet() const override final
+		virtual FileCacheMode::mode_t CacheModeGet() const override
 		{
 			return Private::FileIO_CacheModeGet( this );
 		}

@@ -6,7 +6,7 @@
 namespace StdLib
 {
 	//  must be a linear container
-	template < typename Container > class MemoryStreamContainer : public MemoryStreamInterface
+	template < typename Container > class MemoryStreamContainer final : public MemoryStreamInterface
 	{
 		Container *_writableContainer;
 		const Container *_readableContainer;
@@ -32,7 +32,7 @@ namespace StdLib
 			this->_writableContainer = 0;
 		}
 
-		virtual uiw Size() const override final
+		virtual uiw Size() const override
 		{
 			if (_readableContainer == 0 )
 			{
@@ -41,7 +41,7 @@ namespace StdLib
 			return _readableContainer->Size();
 		}
 
-		virtual uiw Resize( uiw newSize ) override final
+		virtual uiw Resize( uiw newSize ) override
 		{
 			if (_writableContainer == 0 )
 			{
@@ -51,7 +51,7 @@ namespace StdLib
 			return _writableContainer->Size();
 		}
 
-		virtual ui8 *Memory() override final
+		virtual ui8 *Memory() override
 		{
 			if (_writableContainer == 0 )
 			{
@@ -60,7 +60,7 @@ namespace StdLib
 			return (ui8 *)_writableContainer->Data();
 		}
 
-		virtual const ui8 *Memory() const override final
+		virtual const ui8 *Memory() const override
 		{
 			if (_readableContainer == 0 )
 			{
@@ -69,17 +69,17 @@ namespace StdLib
 			return (const ui8 *)_readableContainer->Data();
 		}
 
-		virtual const ui8 *CMemory() const override final
+		virtual const ui8 *CMemory() const override
 		{
 			return MemoryStreamContainer::Memory();
 		}
 
-		virtual bln IsReadable() const override final
+		virtual bln IsReadable() const override
 		{
 			return _readableContainer != 0;
 		}
 
-		virtual bln IsWritable() const override final
+		virtual bln IsWritable() const override
 		{
 			return _writableContainer != 0;
 		}

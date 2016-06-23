@@ -510,19 +510,45 @@ void CopyFilesToRotate();
 
 #include <FileMemoryStream.hpp>
 
+#include <CAtomicFlag.hpp>
+
+#include <thread>
+#include <atomic>
+#include <mutex>
+#include <chrono>
+
+#include "MTMessageQueue.hpp"
+
+using namespace GameTest;
+
+void ThreadFunc( std::shared_ptr < MTMessageQueue > queue )
+{
+	for( ; ; )
+	{
+		queue->ExecWait();
+	}
+}
+
+void FuncTest0( int a, float b )
+{
+	::printf( "FuncTest0 %i %f\n", a, b );
+}
+
+void FuncTest1( const CVec < int > &vec )
+{
+	for( auto i : vec )
+	{
+		::printf( "%i\n", i );
+	}
+}
+
+void PrintSameFiles( const wchar_t *pnn );
+
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
-
-	TimeMoment cur = TimeMoment::CreateCurrent();
-
-	TimeMoment next = TimeMoment::CreateShiftedSec( cur, 3.5f );
-
-	TimeMoment before = TimeMoment::CreateShiftedSec( cur, -3.5f );
-
-	::printf( "sec since before %f\n", cur.SinceSec32( before ) );
-	::printf( "sec till next %f\n", cur.BeforeSec32( next ) );
-	::printf( "sec between next and before %f\n", next.SinceSec32( before ) );
+	
+	PrintSameFiles( L"D:\\music" );
 
 #if 0
 	FileIO::CFile testFile( L"print_to_file_test.txt", FileIO::OpenMode::CreateAlways, FileProcMode::Write | FileProcMode::Read );
