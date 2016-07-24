@@ -59,8 +59,10 @@ namespace Funcs
     EXTERNALS f32 F32NormalizeRadian( f32 rad );
 	EXTERNALS f32 LerpF32( f32 left, f32 right, f32 value );
 	EXTERNALS f64 LerpF64( f64 left, f64 right, f64 value );
-    EXTERNALS f32 F32FracPart( f32 val );
-    EXTERNALS f64 F64FracPart( f64 val );
+    EXTERNALS f32 F32FracPart( f32 val );  //  will preserve sign
+    EXTERNALS f64 F64FracPart( f64 val );  //  will preserve sign
+    EXTERNALS f32 F32IntegerPart( f32 val );  //  will preserve sign
+    EXTERNALS f64 F64IntegerPart( f64 val );  //  will preserve sign
     EXTERNALS bln IsF32NaN( f32 val );
     EXTERNALS bln IsF64NaN( f64 val );
     EXTERNALS bln IsF32Inf( f32 val );

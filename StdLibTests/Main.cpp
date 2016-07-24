@@ -544,23 +544,37 @@ void FuncTest1( const CVec < int > &vec )
 
 void PrintSameFiles( const wchar_t *pnn );
 
+static f32 RadiansWrapTest( f32 rad )
+{
+	while( rad < 0.0f )
+	{
+		rad += f32_pi * 2;
+	}
+
+	while( rad >= f32_pi * 2 )
+	{
+		rad -= f32_pi * 2;
+	}
+
+	return rad;
+}
+
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 	
-	PrintSameFiles( L"D:\\music" );
+	//PrintSameFiles( L"D:\\Pictures" );
 
-	f32 v0 = -0.0093432;
-	f32 v1 = -9.3432;
+	::printf( "%f = %f\n", -1.4543f, Funcs::F32FracPart( -1.4543f ) );
+	::printf( "%f = %f\n", 1.4543f, Funcs::F32FracPart( 1.4543f ) );
+	::printf( "%f = %f\n", -1.4543f, Funcs::F32IntegerPart( -1.4543f ) );
+	::printf( "%f = %f\n", 1.4543f, Funcs::F32IntegerPart( 1.4543f ) );
 
-	char buf[ 256 ];
-	Funcs::PrintToStr( buf, 256, "%n\n%n\n", *(ui32 *)&v0, *(ui32 *)&v1 );
-
-	printf( "%s\n", buf );
-
-	Funcs::PrintToStr( buf, 256, "%h\n%h\n", *(ui32 *)&v0, *(ui32 *)&v1 );
-
-	printf( "%s\n", buf );
+	for( ui32 index = 0; index < 10; ++index )
+	{
+		f32 randValue = Funcs::RandomRangeF32( -1000, 1000 );
+		::printf( "value = %f, reference = %f, fast = %f\n", randValue, RadiansWrapTest( randValue ), Funcs::F32NormalizeRadian( randValue ) );
+	}
 
 #if 0
 	FileIO::CFile testFile( L"print_to_file_test.txt", FileIO::OpenMode::CreateAlways, FileProcMode::Write | FileProcMode::Read );

@@ -65,7 +65,8 @@ f32 Funcs::RandomFluctuateF32( f32 target, f32 fluctuation )
 
 i32 Funcs::RoundF32( f32 val )  //  TODO: bullshit
 {
-    return (i32)(val < 0 ? val - 0.55555555555f : val + 0.55555555555f);
+	return std::round( val );  //  C++11
+    //return (i32)(val < 0 ? val - 0.55555555555f : val + 0.55555555555f);
 }
 
 i32 Funcs::RoundF32WithPrecise( f32 val, ui32 precise )  //  TODO: bullshit
@@ -103,7 +104,8 @@ f32 Funcs::RoundF32ToNearestStep( f32 val, f32 step )
 
 i32 Funcs::RoundF64( f64 val )  //  TODO: bullshit
 {
-    return (i32)(val < 0 ? val - 0.555555555555555 : val + 0.555555555555555);
+	return std::round( val );  //  C++11
+    //return (i32)(val < 0 ? val - 0.555555555555555 : val + 0.555555555555555);
 }
 
 i32 Funcs::RoundF64WithPrecise( f64 val, ui32 precise )  //  TODO: bullshit
@@ -227,10 +229,27 @@ f64 Funcs::SaturateF64( f64 val )
     return val;
 }
 
-f32 Funcs::F32NormalizeRadian( f32 rad )
+f32 Funcs::F32NormalizeRadian( f32 rad )  //  T
 {
-    rad = ::fabsf( rad );
-    return Funcs::F32FracPart( rad / (f32_pi * 2) ) * (f32_pi * 2);
+	rad = Funcs::F32FracPart( rad / (f32_pi * 2) ) * (f32_pi * 2);
+	if( rad < 0.0f )
+	{
+		rad += f32_pi * 2;
+	}
+	return rad;
+
+	//  reference implementation
+	//while( rad < 0.0f )
+	//{
+	//	rad += f32_pi * 2;
+	//}
+
+	//while( rad >= f32_pi * 2 )
+	//{
+	//	rad -= f32_pi * 2;
+	//}
+
+	//return rad;
 }
 	
 f32 Funcs::LerpF32( f32 left, f32 right, f32 value )
@@ -245,14 +264,32 @@ f64 Funcs::LerpF64( f64 left, f64 right, f64 value )
 	return left + (right - left) * value;
 }
 
-f32 Funcs::F32FracPart( f32 val )
+f32 Funcs::F32FracPart( f32 val )  //  T
 {
-    return val - ::floorf( val );
+	return std::fmod( val, 1.0f );
 }
 
-f64 Funcs::F64FracPart( f64 val )
+f64 Funcs::F64FracPart( f64 val )  //  T
 {
-    return val - ::floor( val );
+	return std::fmod( val, 1.0 );
+}
+    
+f32 Funcs::F32IntegerPart( f32 val )  //  T
+{
+	if( val < 0.0f )
+	{
+		return std::ceilf( val );
+	}
+	return std::floorf( val );
+}
+    
+f64 Funcs::F64IntegerPart( f64 val )  //  T
+{
+	if( val < 0.0 )
+	{
+		return std::ceil( val );
+	}
+	return std::floor( val );
 }
 
 bln Funcs::IsF32NaN( f32 val )
