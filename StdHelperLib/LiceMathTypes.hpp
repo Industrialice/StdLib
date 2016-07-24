@@ -1,6 +1,8 @@
 #ifndef __LICE_MATH_TYPES_HPP__
 #define __LICE_MATH_TYPES_HPP__
 
+//  TODO: rewrite all this
+
 namespace StdLib {
 
 struct M4x4;

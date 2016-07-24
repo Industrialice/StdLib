@@ -1,6 +1,8 @@
 #ifndef __MEMORY_STREAM_INTERFACE_HPP__
 #define __MEMORY_STREAM_INTERFACE_HPP__
 
+#include "PlatformTypes.hpp"
+
 namespace StdLib
 {
 	struct MemoryStreamInterface

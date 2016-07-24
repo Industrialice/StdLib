@@ -220,3 +220,5 @@ ModelManifest.xml
 /StdLibTests/print_to_file_test.txt
 /StdLibTests/MTMessageQueue.hpp
 /StdLibTests/Message.hpp
+/StdLibTests.exe
+/exts.txt

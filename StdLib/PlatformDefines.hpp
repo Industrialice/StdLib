@@ -1,6 +1,8 @@
 #ifndef __PLATFORM_DEFINES_HPP__
 #define __PLATFORM_DEFINES_HPP__
 
+#include "BasicDefines.hpp"
+
 #ifdef WINDOWS
 
     #define NOMINMAX

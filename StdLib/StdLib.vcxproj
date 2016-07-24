@@ -349,10 +349,14 @@
     <ClInclude Include="Funcs.hpp" />
     <ClInclude Include="FileMemoryStream.hpp" />
     <ClInclude Include="MemoryStreamInterface.hpp" />
+    <ClInclude Include="Nullable.hpp" />
     <ClInclude Include="PlatformDefines.hpp" />
     <ClInclude Include="PlatformTypes.hpp" />
     <ClInclude Include="PreHeader.hpp" />
     <ClInclude Include="StdCoreLib.hpp" />
+    <ClInclude Include="StringFuncs.hpp" />
+    <ClInclude Include="TypeDesc.hpp" />
+    <ClInclude Include="UniquePtr.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CF16.cpp" />
@@ -372,6 +376,7 @@
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release_Dynamic|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
+    <ClCompile Include="StringFuncs.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

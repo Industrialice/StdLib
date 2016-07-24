@@ -372,21 +372,42 @@
     <ClInclude Include="WinCEFuncs.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CEventPosix.cpp" />
+    <ClCompile Include="CEventPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="CEventWindows.cpp" />
     <ClCompile Include="CLogger.cpp" />
-    <ClCompile Include="CMutexPosix.cpp" />
+    <ClCompile Include="CMutexPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="FileIOAny.cpp" />
-    <ClCompile Include="FileIOPosix.cpp" />
+    <ClCompile Include="FileIOPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="FileIOWindows.cpp" />
-    <ClCompile Include="FileMappingPosix.cpp" />
+    <ClCompile Include="FileMappingPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="FileMappingWindows.cpp" />
-    <ClCompile Include="FilePathPosix.cpp" />
+    <ClCompile Include="FilePathPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="FilePathWindows.cpp" />
     <ClCompile Include="FilesAny.cpp" />
-    <ClCompile Include="FilesPosix.cpp" />
+    <ClCompile Include="FilesPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="FilesWindows.cpp" />
-    <ClCompile Include="MiscPosix.cpp" />
+    <ClCompile Include="MiscPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="MiscWindows.cpp" />
     <ClCompile Include="CMutexWindows.cpp" />
     <ClCompile Include="PreHeader.cpp">
@@ -399,7 +420,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Dynamic|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="CThreadPosix.cpp" />
+    <ClCompile Include="CThreadPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="CThreadWindows.cpp" />
     <ClCompile Include="StdAbstractionLib.cpp" />
     <ClCompile Include="VKeysWindows.cpp" />

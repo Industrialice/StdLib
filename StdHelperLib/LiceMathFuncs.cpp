@@ -475,7 +475,7 @@ void LiceMath::M4x4SubtractInplace( m4x4 *RSTR m0, const m4x4 *m1 )
 
 void LiceMath::M4x4Determinant( const m4x4 *m )
 {
-
+	NOT_IMPLEMENTED;
 }
 
 void LiceMath::M4x3RotateX( m4x3 *m, f32 x )
@@ -634,7 +634,7 @@ void LiceMath::M4x3RotateXYDoNotIdentity( m4x3 *m, f32 x, f32 y )
     m->e22 = cx * cy;
 }
 
-void LiceMath::M4x3RotateXYTransform( m4x3 *m0, const m4x3 *m1, f32 x, f32 y )  //  TODO: temporary
+void LiceMath::M4x3RotateXYTransform( m4x3 *RSTR m0, const m4x3 *m1, f32 x, f32 y )  //  TODO: temporary
 {
     m4x3 o_m;
     M4x3RotateXY( &o_m, x, y );
@@ -1031,7 +1031,7 @@ void LiceMath::M4x3SubtractInplace( m4x3 *RSTR m0, const m4x3 *m1 )
 
 void LiceMath::M4x3Determinant( const m4x3 *m )
 {
-    SOFTBREAK;  //  TODO:
+	NOT_IMPLEMENTED;
 }
 
 void LiceMath::M3x4MultScalar( m3x4 *RSTR m0, const m3x4 *m1, f32 scalar )

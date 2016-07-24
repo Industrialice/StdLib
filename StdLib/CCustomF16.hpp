@@ -1,6 +1,8 @@
 #ifndef __C_CUSTOM_F16_HPP__
 #define __C_CUSTOM_F16_HPP__
 
+#include "PlatformTypes.hpp"
+
 namespace StdLib {
 
 //  passing NaN and +/-inf is undefined behavior

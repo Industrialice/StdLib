@@ -28,7 +28,7 @@ NOINLINE f32 Private::f16_ToF32( ui16 value )
         return s ? f32_inf_neg : f32_inf_pos;
     }
     ui32 em = ((ui32)(value & ~f16_sign_mask) << 13) + (112 << 23);
-    union
+    union  //  TODO: UB
     {
         f32 f;
         ui32 i;
@@ -53,7 +53,7 @@ NOINLINE f64 Private::f16_ToF64( ui16 value )
         return s ? f64_inf_neg : f64_inf_pos;
     }
     ui64 em = ((ui64)(value & ~f16_sign_mask) << 42) + (1008ULL << 52);
-    union
+    union  //  TODO: UB
     {
         f64 f;
         ui64 i;
@@ -74,7 +74,7 @@ NOINLINE i32 Private::f16_ToI32( ui16 value )  //  TODO: facepalm
     }
     ui32 s = (value & f16_sign_mask) << 16;
     ui32 em = ((ui32)(value & ~f16_sign_mask) << 13) + (112 << 23);
-    union
+    union  //  TODO: UB
     {
         f32 f;
         ui32 i;

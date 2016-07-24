@@ -27,7 +27,7 @@
 
 #include "CompilerDefines.hpp"
 	
-#define EXTERNALS extern "C"
+#define EXTERNALS /*extern "C"*/
 
 #ifdef STDLIB_DYNAMIC
 	#ifdef STDLIB_EXPORT
@@ -55,11 +55,11 @@
     //#error both LITTLE_ENDIAN and BIG_ENDIAN are specified
 #endif
 
-#include "BasicDefines.hpp"
-#include "PlatformDefines.hpp"
-#include "BasicTypes.hpp"
-#include "PlatformTypes.hpp"
+#include "TypeDesc.hpp"
+#include "Nullable.hpp"
+#include "UniquePtr.hpp"
 #include "Funcs.hpp"
+#include "StringFuncs.hpp"
 #include "CF16.hpp"
 #include "CCustomF16.hpp"
 #include "Error.hpp"

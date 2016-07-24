@@ -1,6 +1,8 @@
 #ifndef __C_F16_HPP__
 #define __C_F16_HPP__
 
+#include "PlatformTypes.hpp"
+
 namespace StdLib {
 
 //  TODO: it's does not following IEEE 754-2008 and i probably should fix this

@@ -63,41 +63,6 @@
 
 #endif
 
-#define CREATE_HDL( name ) class name \
-{ \
-    void *_void; \
-public: \
-    name() \
-    { \
-        _void = 0; \
-    } \
-    \
-    name( void *p_val ) \
-    { \
-        _void = p_val; \
-    } \
-    \
-    void *GetVal() const \
-    { \
-        return _void; \
-    } \
-    \
-    bln operator == ( const name &test ) const \
-    { \
-        return this->_void == test._void; \
-    } \
-    \
-    bln operator != ( const name &test ) const \
-    { \
-        return this->_void != test._void; \
-    } \
-    \
-    bln IsValid() const \
-    { \
-        return this->_void != 0; \
-    } \
-};
-
 #ifdef DEFINE_VARARGS_SUPPORTED
     #ifdef DEBUG
         #define DBGCODE( ... ) __VA_ARGS__
@@ -129,5 +94,7 @@ public: \
 #define TERSWITCH1( case0check, code0, defaultcode ) ((case0check) ? (code0) : (defaultcode))
 #define TERSWITCH2( case0check, code0, case1check, code1, defaultcode ) ((case0check) ? (code0) : ((case1check) ? (code1) : (defaultcode)))
 #define TERSWITCH3( case0check, code0, case1check, code1, case2check, code2, defaultcode ) ((case0check) ? (code0) : ((case1check) ? (code1) : ((case2check) ? (code2) : (defaultcode))))
+
+#define DSA( pointer, assigning ) if( pointer ) *(pointer) = (assigning)
 
 #endif

@@ -238,8 +238,8 @@ public:
         static const bln is_checkOverlap = true;
     #endif
 
-    void _SizeUp( count_type sizeToLeave, count_type newCount )  //  will not destroy anything
-    {
+	NOINLINE void _SizeUpWithReserveIncreasion( count_type sizeToLeave, count_type newCount )  //  will not destroy anything
+	{
         ASSUME( newCount >= this->_Size() && sizeToLeave <= this->_Size() );
 
         if( _cis_MoveAsPOD == false )
@@ -257,6 +257,15 @@ public:
         {
             this->_IncSize( newCount );
         }
+	}
+
+    void _SizeUp( count_type sizeToLeave, count_type newCount )  //  will not destroy anything
+    {
+        ASSUME( newCount >= this->_Size() && sizeToLeave <= this->_Size() );
+		if( !this->_IncSizeIfHasEnoughReserve( newCount ) )
+		{
+			this->_SizeUpWithReserveIncreasion( sizeToLeave, newCount );
+		}
     }
 
     void _SizeDown( count_type sizeToLeave, count_type newCount )  //  will not destroy anything
@@ -456,6 +465,14 @@ public:
         }
     }
 
+	NOINLINE void _AppendWithReserveIncreasion( const X &source )
+	{
+		count_type curCount = this->_Size();
+		uiw index = &source - this->_GetArr();
+		_SizeUp( curCount, curCount + 1 );
+		new (this->_GetArr() + curCount) X( index < curCount ? this->_GetArr()[ index ] : source );
+	}
+
 public:
 
     ~_CBaseVec()
@@ -590,7 +607,7 @@ public:
 
     void Reserve( count_type size )
     {
-        _SizeUp( this->_Size(), size );
+        this->_Reserve( size );
     }
 
     count_type Reserved() const
@@ -781,20 +798,16 @@ public:
         return Iter( this->_GetArr() + index );
     }
 
-	VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
 	void Append( const X &source )
 	{
 		count_type curCount = this->_Size();
-		if( !this->_IsStatic() && is_checkOverlap )
+		if( this->_IncSizeIfHasEnoughReserve( curCount + 1 ) )
 		{
-			uiw index = &source - this->_GetArr();
-			_SizeUp( curCount, curCount + 1 );
-			new (this->_GetArr() + curCount) X( index < curCount ? this->_GetArr()[ index ] : source );
+			new (this->_GetArr() + curCount) X( source );
 		}
 		else
 		{
-			_SizeUp( curCount, curCount + 1 );
-			new (this->_GetArr() + curCount) X( source );
+			this->_AppendWithReserveIncreasion( source );
 		}
 	}
 
@@ -802,8 +815,7 @@ public:
 	void Append( X &&source )
 	{
 		count_type curCount = this->_Size();
-		uiw index = &source - this->_GetArr();
-		ASSUME( index >= curCount );  //  overlapping isn't allowed
+		ASSUME( (&source - this->_GetArr()) >= curCount );  //  overlapping isn't allowed
 		_SizeUp( curCount, curCount + 1 );
 		new (this->_GetArr() + curCount) X( std::move( source ) );
 	}

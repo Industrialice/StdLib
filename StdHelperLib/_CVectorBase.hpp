@@ -46,6 +46,13 @@ public:
         return (const X *)&_arr;
     }
 
+	bln _IncSizeIfHasEnoughReserve( count_type newCount )
+	{
+        ASSUME( newCount <= static_size && newCount >= _count );
+        _count = newCount;
+		return true;
+	}
+
     void _IncSize( count_type newCount )
     {
         ASSUME( newCount <= static_size && newCount >= _count );
@@ -84,6 +91,9 @@ public:
         _count = newCount;
         return TypeDesc < count_type >::max;
     }
+
+	void _Reserve( count_type newReserve )
+	{}
 
     void _FlushReserved()
     {}
@@ -164,6 +174,17 @@ public:
         return _arr;
     }
 
+	bln _IncSizeIfHasEnoughReserve( count_type newCount )
+	{
+        ASSUME( newCount >= _count );
+		if( newCount <= _reserved )
+		{
+			_count = newCount;
+			return true;
+		}
+		return false;
+	}
+
     void _IncSize( count_type newCount )
     {
         ASSUME( newCount >= _count );
@@ -237,6 +258,30 @@ public:
         }
         return _TryDecSizeLocally( newCount );
     }
+
+	void _Reserve( count_type newReserve )
+	{
+		if( newReserve < _count )
+		{
+			newReserve = _count;
+		}
+
+		bln is_changed = false;
+
+		if( newReserve > _reserved )
+		{
+			is_changed = reservator::Up( newReserve, &_reserved );
+		}
+		else if( newReserve < _reserved )
+		{
+			is_changed = reservator::Down( newReserve, &_reserved );
+		}
+
+		if( is_changed )
+		{
+			_arr = allocator::Realloc( _arr, _reserved );
+		}
+	}
 
     void _FlushReserved()
     {
@@ -326,6 +371,12 @@ public:
         return _arr;
     }
 
+	bln _IncSizeIfHasEnoughReserve( count_type newCount )
+	{
+        ASSUME( newCount >= _count );
+		return false;
+	}
+
     void _IncSize( count_type newCount )
     {
         ASSUME( newCount >= _count );
@@ -395,6 +446,9 @@ public:
         _count = newCount;
         return TypeDesc < count_type >::max;
     }
+
+	void _Reserve( count_type newReserve )
+	{}
 
     void _FlushReserved()
     {}
@@ -484,8 +538,16 @@ public:
         return _count > static_size ? _dynamicArr : (X *)&_preallocatedArr;
     }
 
+	bln _IncSizeIfHasEnoughReserve( count_type newCount )
+	{
+		ASSUME( newCount >= _count );
+		return false;
+	}
+
     void _IncSize( count_type newCount )
     {
+		ASSUME( newCount >= _count );
+
         if( newCount != _count )
         {
             if( newCount > static_size )  //  reallocation required
@@ -506,6 +568,8 @@ public:
 
     void _DecSize( count_type newCount )
     {
+		ASSUME( newCount <= _count );
+
         if( newCount != _count )
         {
             if( newCount > static_size )  //  reallocation required
@@ -593,6 +657,9 @@ public:
         return _TryDecSizeLocally( newCount );
     }
 
+	void _Reserve( count_type newReserve )
+	{}
+
     void _FlushReserved()
     {}
 
@@ -678,6 +745,13 @@ public:
 		DBGCODE( _reserve = reserve; )
 	}
 
+	bln _IncSizeIfHasEnoughReserve( count_type newCount )
+	{
+		DBGCODE( ASSUME( newCount <= _reserve ); )
+		_count = newCount;
+		return true;
+	}
+
 	void _IncSize( count_type newCount )
 	{
 		DBGCODE( ASSUME( newCount <= _reserve ); )
@@ -716,6 +790,9 @@ public:
 		_count = newCount;
 		return TypeDesc < count_type >::max;
 	}
+
+	void _Reserve( count_type newReserve )
+	{}
 
 	void _FlushReserved()
 	{}

@@ -550,6 +550,18 @@ int __cdecl main()
 	
 	PrintSameFiles( L"D:\\music" );
 
+	f32 v0 = -0.0093432;
+	f32 v1 = -9.3432;
+
+	char buf[ 256 ];
+	Funcs::PrintToStr( buf, 256, "%n\n%n\n", *(ui32 *)&v0, *(ui32 *)&v1 );
+
+	printf( "%s\n", buf );
+
+	Funcs::PrintToStr( buf, 256, "%h\n%h\n", *(ui32 *)&v0, *(ui32 *)&v1 );
+
+	printf( "%s\n", buf );
+
 #if 0
 	FileIO::CFile testFile( L"print_to_file_test.txt", FileIO::OpenMode::CreateAlways, FileProcMode::Write | FileProcMode::Read );
 	if( !testFile.IsOpened() )
@@ -573,7 +585,7 @@ int __cdecl main()
 		::printf( "offset to end %i\n", (int)offsetToEnd );
 
 		FileMapping::Mapping mapping( &testFile, 0, uiw_max, false, &error );
-		if( !mapping.IsCreated() )
+		if( !mapping.IsOpened() )
 		{
 			::printf( "failed to create mapping, error %s _ %s\n", error.Description(), error.Addition() );
 		}
@@ -653,7 +665,7 @@ int __cdecl main()
 	/*FileMapping::mappingError error;
 	FileIO::CFile testFile( "test.txt", FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read );
 	FileMapping::Mapping mapping( &testFile, 0, uiw_max, false, &error );
-	if( !mapping.IsCreated() )
+	if( !mapping.IsOpened() )
 	{
 		::printf( "failed to create mapping, error %s:%s", error.Description(), error.Addition() );
 		getchar();

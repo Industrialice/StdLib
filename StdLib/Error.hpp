@@ -1,6 +1,8 @@
 #ifndef __ERROR_HPP__
 #define __ERROR_HPP__
 
+#include "PlatformTypes.hpp"
+
 //  Default errors:
 /*
 Ok

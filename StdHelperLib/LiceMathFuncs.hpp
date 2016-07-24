@@ -1,6 +1,8 @@
 #ifndef __LICE_MATH_FUNCS_HPP__
 #define __LICE_MATH_FUNCS_HPP__
 
+//  TODO: rewrite all this
+
 #include "LiceMathTypes.hpp"
 
 namespace StdLib {

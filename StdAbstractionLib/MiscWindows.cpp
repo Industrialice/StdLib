@@ -340,7 +340,31 @@ bln TimeMoment::operator < ( const TimeMoment &other ) const
 	return _tc.QuadPart < other._tc.QuadPart;
 }
 
+bln TimeMoment::operator <= ( const TimeMoment &other ) const
+{
+	CHECK( !this->IsEmpty() && !other.IsEmpty() );
+	return _tc.QuadPart <= other._tc.QuadPart;
+}
+
 bln TimeMoment::operator > ( const TimeMoment &other ) const
+{
+	CHECK( !this->IsEmpty() && !other.IsEmpty() );
+	return _tc.QuadPart > other._tc.QuadPart;
+}
+
+bln TimeMoment::operator >= ( const TimeMoment &other ) const
+{
+	CHECK( !this->IsEmpty() && !other.IsEmpty() );
+	return _tc.QuadPart > other._tc.QuadPart;
+}
+
+bln TimeMoment::operator == ( const TimeMoment &other ) const
+{
+	CHECK( !this->IsEmpty() && !other.IsEmpty() );
+	return _tc.QuadPart == other._tc.QuadPart;
+}
+
+bln TimeMoment::operator != ( const TimeMoment &other ) const
 {
 	CHECK( !this->IsEmpty() && !other.IsEmpty() );
 	return _tc.QuadPart > other._tc.QuadPart;

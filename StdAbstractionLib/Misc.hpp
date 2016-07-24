@@ -71,7 +71,11 @@ public:
     f64 BeforeUSec64( const TimeMoment &second ) const;
 
 	bln operator < ( const TimeMoment &other ) const;
+	bln operator <= ( const TimeMoment &other ) const;
 	bln operator > ( const TimeMoment &other ) const;
+	bln operator >= ( const TimeMoment &other ) const;
+	bln operator == ( const TimeMoment &other ) const;
+	bln operator != ( const TimeMoment &other ) const;
 
 	bln IsEmpty() const;  //  return true if the TimeMoment hasn't been initialized with anything. you can't use an empty TimeMoment for comparisons
 

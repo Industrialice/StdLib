@@ -60,14 +60,14 @@ namespace FileMapping
 			mappingStruct = Private::FileMapping_Create( file, offset, size, is_writeCopy, error );
 		}
 
-		bln IsCreated() const
+		bln IsOpened() const
 		{
 			return mappingStruct.memory != 0;
 		}
 
 		bln IsWritable() const
 		{
-			ASSUME( IsCreated() );
+			ASSUME( IsOpened() );
 			return mappingStruct.is_writable;
 		}
 
@@ -89,13 +89,13 @@ namespace FileMapping
 
 		uiw Size() const
 		{
-			ASSUME( IsCreated() );
+			ASSUME( IsOpened() );
 			return mappingStruct.size;
 		}
 
 		MemoryStreamFixedExt CreateMemoryStream( uiw offset = 0 )
 		{
-			ASSUME( IsCreated() );
+			ASSUME( IsOpened() );
 			if( IsWritable() )
 			{
 				return MemoryStreamFixedExt( Memory(), Size(), offset );
@@ -105,13 +105,13 @@ namespace FileMapping
 
 		MemoryStreamFixedExt CreateMemoryStream( uiw offset = 0 ) const
 		{
-			ASSUME( IsCreated() );
+			ASSUME( IsOpened() );
 			return MemoryStreamFixedExt( CMemory(), Size(), offset );
 		}
 
 		MemoryStreamFixedExt CCreateMemoryStream( uiw offset = 0 ) const
 		{
-			ASSUME( IsCreated() );
+			ASSUME( IsOpened() );
 			return MemoryStreamFixedExt( CMemory(), Size(), offset );
 		}
 
