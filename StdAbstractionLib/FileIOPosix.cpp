@@ -24,7 +24,7 @@ namespace StdLib
     }
 }
 
-NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, OpenMode::OpenMode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error )
+NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error )
 {
     ASSUME( file );
 
@@ -61,19 +61,19 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
         goto toExit;
     }
 
-    if( openMode == OpenMode::CreateIfDoesNotExist )
+    if( openMode == FileOpenMode::CreateIfDoesNotExist )
     {
         flags |= O_CREAT;
     }
-    else if( openMode == OpenMode::CreateAlways || openMode == OpenMode::CreateNew )
+    else if( openMode == FileOpenMode::CreateAlways || openMode == FileOpenMode::CreateNew )
     {
 		if( (procMode & FileProcMode::WriteAppend) == FileProcMode::WriteAppend )
 		{
-			o_error = fileError( Error::InvalidArgument(), "FileProcMode::Append can't be used with OpenMode::CreateAlways or OpenMode::CreateNew" );
+			o_error = fileError( Error::InvalidArgument(), "FileProcMode::Append can't be used with FileOpenMode::CreateAlways or FileOpenMode::CreateNew" );
 			goto toExit;
 		}
 
-		if( openMode == OpenMode::CreateAlways )
+		if( openMode == FileOpenMode::CreateAlways )
 		{
             if( (procMode & FileProcMode::Write) == 0 )  //  we need to truncate file, but we can't do it if we can't write to it, so we just remove it
             {
@@ -93,9 +93,9 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
             flags |= O_CREAT | O_EXCL;
         }
     }
-    else  //  if( openMode == OpenMode::OpenExisting )
+    else  //  if( openMode == FileOpenMode::OpenExisting )
     {
-        ASSUME( openMode == OpenMode::OpenExisting );
+        ASSUME( openMode == FileOpenMode::OpenExisting );
     }
 
     if( cacheMode & (FileCacheMode::LinearRead | FileCacheMode::RandomRead) )

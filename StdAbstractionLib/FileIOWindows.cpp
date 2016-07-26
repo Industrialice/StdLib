@@ -25,7 +25,7 @@ namespace
 	DWORD( WINAPI *StdLib_GetFinalPathNameByHandleW )(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 }
 
-NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, OpenMode::OpenMode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error )
+NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error )
 {
     ASSUME( file );
 
@@ -67,11 +67,11 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
         dwDesiredAccess |= GENERIC_READ;
     }
 
-    if( openMode == OpenMode::CreateIfDoesNotExist )
+    if( openMode == FileOpenMode::CreateIfDoesNotExist )
     {
         dwCreationDisposition = OPEN_ALWAYS;
     }
-    else if( openMode == OpenMode::CreateAlways || openMode == OpenMode::CreateNew )
+    else if( openMode == FileOpenMode::CreateAlways || openMode == FileOpenMode::CreateNew )
     {
 		if( (procMode & FileProcMode::WriteAppend) == FileProcMode::WriteAppend )
 		{
@@ -79,7 +79,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
 			goto toExit;
 		}
 
-		if( openMode == OpenMode::CreateAlways )
+		if( openMode == FileOpenMode::CreateAlways )
 		{
 			dwCreationDisposition = CREATE_ALWAYS;
 		}
@@ -90,7 +90,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
     }
     else  //  if( openMode == OpenMode::OpenExisting )
     {
-        ASSUME( openMode == OpenMode::OpenExisting );
+        ASSUME( openMode == FileOpenMode::OpenExisting );
         dwCreationDisposition = OPEN_EXISTING;
     }
 
@@ -234,7 +234,7 @@ i64 FileIO::Private::FileIO_OffsetGet( CFileBasis *file, FileOffsetMode::mode_t 
 			return -1;
 		}
 
-		return fileSize - offsetFromBegin;
+		return offsetFromBegin - fileSize;
 	}
 }
 

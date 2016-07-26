@@ -4,7 +4,7 @@
 
 #include "WinCEFuncs.hpp"
 #include "Misc.hpp"
-#include "Funcs.hpp"
+#include <RoundingFuncs.hpp>
 
 namespace
 {

@@ -207,7 +207,7 @@ void FileIO::Private::FileIO_StatsReset( CFileBasis *file )
 	Funcs::ClearPod( &file->stats );
 }
 
-FileIO::OpenMode::OpenMode_t FileIO::Private::FileIO_OpenModeGet( const CFileBasis *file )
+FileOpenMode::mode_t FileIO::Private::FileIO_OpenModeGet( const CFileBasis *file )
 {
 	ASSUME( FileIO_IsValid( file ) );
 	return file->openMode;

@@ -80,6 +80,7 @@ const i8 i8_max = 127;  //  0x7F
 const i8 i8_min = -128;  //  0x80
 
 #ifdef _MSC_VER
+	//  warning C4056: overflow in floating-point constant arithmetic
     #pragma warning( disable: 4056 )
 #endif
 
@@ -90,7 +91,9 @@ const f32 f32_nan = f32_inf * 0.f;  //  one of the possible NaN values
 const ui32 f32_exp_mask = 0x7F800000;
 const ui32 f32_significand_mask = 0x007FFFFF;
 const ui32 f32_sign_mask = 0x80000000;
+const f32 f32_piHalf = 1.570796326794895f;
 const f32 f32_pi = 3.14159265358979f;
+const f32 f32_pi2 = 6.28318530717958f;
 const ui32 f32_smallest_norm_int = 0x800000;
 const f32 f32_smallest_norm = *(f32 *)&f32_smallest_norm_int;
 const ui32 f32_smallest_denorm_int = 0x1;
@@ -103,7 +106,9 @@ const f64 f64_nan = f64_inf * 0.f;  //  one of the possible NaN values
 const ui64 f64_exp_mask = ASUINT64( 0x7FF0000000000000 );
 const ui64 f64_significand_mask = ASUINT64( 0x000FFFFFFFFFFFFF );
 const ui64 f64_sign_mask = ASUINT64( 0x8000000000000000 );
+const f32 f64_piHalf = 1.5707963267948966192315;
 const f64 f64_pi = 3.141592653589793238463;
+const f64 f64_pi2 = 6.283185307179586476926;
 
 #ifdef _MSC_VER
     #pragma warning( default: 4056 )

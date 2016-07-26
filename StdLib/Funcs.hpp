@@ -18,34 +18,6 @@ namespace StdLib {
 
 namespace Funcs
 {
-    EXTERNALS i32 RandomI32();  //  [ 0x80000000 ; 0x7FffFFff ]
-    EXTERNALS ui32 RandomUI32();  //  [ 0 ; 0xFFffFFff ]
-    EXTERNALS f32 RandomF32();  //  [ 0.f ; 1.f ]
-    EXTERNALS i32 RandomRangeI32( i32 from, i32 to );
-    EXTERNALS ui32 RandomRangeUI32( ui32 from, ui32 to );
-    EXTERNALS f32 RandomRangeF32( f32 from, f32 to );
-    EXTERNALS ui32 RandomUI32Limit( ui32 limit );  //  [ 0; limit )
-	EXTERNALS i32 RandomFluctuateI32( i32 target, i32 fluctuation );  //  will cut overflow values
-	EXTERNALS ui32 RandomFluctuateUI32( ui32 target, ui32 fluctuation );  //  will cut overflow values
-	EXTERNALS f32 RandomFluctuateF32( f32 target, f32 fluctuation );
-
-    EXTERNALS i32 RoundF32( f32 val );
-    EXTERNALS i32 RoundF32WithPrecise( f32 val, ui32 precise );
-    EXTERNALS f32 RoundF32DownToStep( f32 val, f32 step );
-    EXTERNALS f32 RoundF32UpToStep( f32 val, f32 step );
-    EXTERNALS f32 RoundF32ToNearestStep( f32 val, f32 step );
-    EXTERNALS i32 RoundF64( f64 val );
-    EXTERNALS i32 RoundF64WithPrecise( f64 val, ui32 precise );
-    EXTERNALS f64 RoundF64DownToStep( f64 val, f64 step );
-    EXTERNALS f64 RoundF64UpToStep( f64 val, f64 step );
-    EXTERNALS f64 RoundF64ToNearestStep( f64 val, f64 step );
-    EXTERNALS uiw RoundUIDownToStep( uiw val, uiw step );
-    EXTERNALS uiw RoundUIUpToStep( uiw val, uiw step );
-    EXTERNALS uiw RoundUIToNearestStep( uiw val, uiw step );
-    EXTERNALS iw RoundIDownToStep( iw val, iw step );  //  TODO: complete
-    EXTERNALS iw RoundIUpToStep( iw val, iw step );  //  TODO: complete
-    EXTERNALS iw RoundIToNearestStep( iw val, iw step );  //  TODO: complete
-
     #define _PowF32( fp, power ) ::powf( fp, (i32)power )
     #define _PowF64( fp, power ) ::pow( fp, (i32)power )
     EXTERNALS bln IsF32Equal( f32 first, f32 second, f32 epsilon );

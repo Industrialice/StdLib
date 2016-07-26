@@ -8,15 +8,6 @@ namespace StdLib {
 
 namespace FileIO
 {
-    namespace OpenMode
-    {
-        CONSTS( OpenMode_t,
-                CreateIfDoesNotExist,
-                CreateAlways,
-				CreateNew,  //  creates a new file only if such file doesn't exist
-                OpenExisting )
-    }
-
     struct SStats
     {
 		typedef ui64 counter_t;
@@ -53,7 +44,7 @@ namespace FileIO
 			ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
             bln is_reading;
 
-			OpenMode::OpenMode_t openMode;
+			FileOpenMode::mode_t openMode;
 			FileProcMode::mode_t procMode;
 			FileCacheMode::mode_t cacheMode;
 
@@ -65,7 +56,7 @@ namespace FileIO
         /*  Core Functions  */
         EXTERNALD void FileIO_Initialize( CFileBasis *file );
         EXTERNALD void FileIO_Destroy( CFileBasis *file );
-        EXTERNALD bln FileIO_Open( CFileBasis *file, const FilePath &pnn, OpenMode::OpenMode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error );
+        EXTERNALD bln FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error );
         EXTERNALD void FileIO_Close( CFileBasis *file );
 		EXTERNALD bln FileIO_IsValid( const CFileBasis *file );
         EXTERNALD bln FileIO_Write( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written );
@@ -80,7 +71,7 @@ namespace FileIO
         EXTERNALD i64 FileIO_OffsetSet( CFileBasis *file, FileOffsetMode::mode_t mode, i64 offset, CError *error );
 		EXTERNALD ui64 FileIO_SizeGet( const CFileBasis *file, CError *error );  //  returns 0 on error
         EXTERNALD bln FileIO_SizeSet( CFileBasis *file, ui64 newSize, CError *error );
-		EXTERNALD OpenMode::OpenMode_t FileIO_OpenModeGet( const CFileBasis *file );
+		EXTERNALD FileOpenMode::mode_t FileIO_OpenModeGet( const CFileBasis *file );
 		EXTERNALD FileProcMode::mode_t FileIO_ProcModeGet( const CFileBasis *file );
 		EXTERNALD FileCacheMode::mode_t FileIO_CacheModeGet( const CFileBasis *file );
         EXTERNALD FilePath FileIO_PNNGet( const CFileBasis *file );
@@ -104,7 +95,7 @@ namespace FileIO
             Private::FileIO_Initialize( this );
         }
 
-        CFile( const FilePath &pnn, OpenMode::OpenMode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *po_error = 0 )
+        CFile( const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *po_error = 0 )
         {
             Private::FileIO_Initialize( this );
             Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, po_error );
@@ -124,7 +115,7 @@ namespace FileIO
         }
 #endif
 
-        void Open( const FilePath &pnn, OpenMode::OpenMode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *po_error = 0 )
+        void Open( const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *po_error = 0 )
         {
             Close();
             Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, po_error );
@@ -140,7 +131,7 @@ namespace FileIO
             Private::FileIO_StatsReset( this );
         }
 
-        OpenMode::OpenMode_t OpenModeGet() const
+        FileOpenMode::mode_t OpenModeGet() const
         {
             return Private::FileIO_OpenModeGet( this );
         }

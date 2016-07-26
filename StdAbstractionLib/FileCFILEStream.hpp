@@ -1,27 +1,32 @@
-#ifndef __FILE_MEMORY_STREAM_HPP__
-#define __FILE_MEMORY_STREAM_HPP__
+#ifndef __FILE_C_FILE_STREAM_HPP__
+#define __FILE_C_FILE_STREAM_HPP__
 
+#include "FilePath.hpp"
 #include "MemoryStreamInterface.hpp"
 #include "FileInterface.hpp"
 
 namespace StdLib
 {
-	class FileMemoryStream final : public FileInterface
+	class FileCFILEStream final : public FileInterface
 	{
-		MemoryStreamInterface *_stream;
-		uiw _offset;  //  _startOffset + current offset
-		uiw _startOffset;  //  can be non-zero in append mode
+		void *_file;
+		FileOpenMode::mode_t _openMode;
 		FileProcMode::mode_t _procMode;
+		FileCacheMode::mode_t _cacheMode;
+		i64 _offsetToStart;  //  used only when you're using ProcMode::Append, the file will be opened as usual, then the offset will be added so you can't work with the existing part of the file
+		ui32 _bufferSize;
+		void *_customBufferPtr;
 
-		FileMemoryStream( const FileMemoryStream & );
-		FileMemoryStream &operator = ( const FileMemoryStream & );
+		FileCFILEStream( const FileCFILEStream & );
+		FileCFILEStream &operator = ( const FileCFILEStream & );
 
 	public:
 		typedef CTError < const char * > fileError;
 
-		FileMemoryStream();
-		FileMemoryStream( MemoryStreamInterface *stream, FileProcMode::mode_t procMode, fileError *error = 0 );
-		bln Open( MemoryStreamInterface *stream, FileProcMode::mode_t procMode, fileError *error = 0 );
+		~FileCFILEStream();
+		FileCFILEStream();
+		FileCFILEStream( const FilePath &path, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *error = 0 );
+		bln Open( const FilePath &path, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *error = 0 );
 
 		virtual void Close() override;
 		virtual bln IsOpened() const override;
@@ -45,9 +50,11 @@ namespace StdLib
 		virtual FileProcMode::mode_t ProcModeGet() const override;
 		virtual FileCacheMode::mode_t CacheModeGet() const override;
 
+		FileOpenMode::mode_t OpenModeGet() const;
+
 	#ifdef MOVE_SUPPORTED
-		FileMemoryStream( FileMemoryStream &&source );
-		FileMemoryStream &operator = ( FileMemoryStream &&source );
+		FileCFILEStream( FileCFILEStream &&source );
+		FileCFILEStream &operator = ( FileCFILEStream &&source );
 	#endif
 	};
 }

@@ -1,7 +1,7 @@
 #include "PreHeader.hpp"
 #include "FileMemoryStream.hpp"
 
-FileMemoryStream::FileMemoryStream() : _stream( 0 ), _offset( 0 ), _startOffset( 0 )
+FileMemoryStream::FileMemoryStream() : _stream( 0 )
 {}
 
 FileMemoryStream::FileMemoryStream( MemoryStreamInterface *stream, FileProcMode::mode_t procMode, fileError *error )
@@ -150,7 +150,7 @@ i64 FileMemoryStream::OffsetGet( FileOffsetMode::mode_t offsetMode, CError *erro
 	else  //  if( offsetMode == FileOffsetMode::FromEnd )
 	{
 		ASSUME( offsetMode == FileOffsetMode::FromEnd );
-		return _stream->Size() - _offset;
+		return _offset - _stream->Size();
 	}
 }
 
@@ -270,3 +270,25 @@ FileCacheMode::mode_t FileMemoryStream::CacheModeGet() const
 	ASSUME( _stream );
 	return FileCacheMode::Default;
 }
+
+#ifdef MOVE_SUPPORTED
+	FileMemoryStream::FileMemoryStream( FileMemoryStream &&source )
+	{
+		this->_stream = source._stream;
+		source._stream = 0;
+		this->_offset = source._offset;
+		this->_procMode = source._procMode;
+		this->_startOffset = source._startOffset;
+	}
+	
+	FileMemoryStream &FileMemoryStream::operator = ( FileMemoryStream &&source )
+	{
+		ASSUME( this != &source );
+		this->_stream = source._stream;
+		source._stream = 0;
+		this->_offset = source._offset;
+		this->_procMode = source._procMode;
+		this->_startOffset = source._startOffset;
+		return *this;
+	}
+#endif

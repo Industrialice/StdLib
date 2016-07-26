@@ -353,6 +353,8 @@
     <ClInclude Include="PlatformDefines.hpp" />
     <ClInclude Include="PlatformTypes.hpp" />
     <ClInclude Include="PreHeader.hpp" />
+    <ClInclude Include="RandomizingFuncs.hpp" />
+    <ClInclude Include="RoundingFuncs.hpp" />
     <ClInclude Include="StdCoreLib.hpp" />
     <ClInclude Include="StringFuncs.hpp" />
     <ClInclude Include="TypeDesc.hpp" />
@@ -372,6 +374,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Dynamic|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="RandomizingFuncs.cpp" />
+    <ClCompile Include="RoundingFuncs.cpp" />
     <ClCompile Include="StdCoreLib.cpp">
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release_Dynamic|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>

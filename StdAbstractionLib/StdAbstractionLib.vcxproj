@@ -359,6 +359,7 @@
     <ClInclude Include="CAtomicFlag.hpp" />
     <ClInclude Include="CEvent.hpp" />
     <ClInclude Include="CLogger.hpp" />
+    <ClInclude Include="FileCFILEStream.hpp" />
     <ClInclude Include="FileIO.hpp" />
     <ClInclude Include="FileMapping.hpp" />
     <ClInclude Include="FilePath.hpp" />
@@ -382,6 +383,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="FileCFILEStream.cpp" />
     <ClCompile Include="FileIOAny.cpp" />
     <ClCompile Include="FileIOPosix.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

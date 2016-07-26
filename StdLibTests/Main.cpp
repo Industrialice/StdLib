@@ -14,6 +14,7 @@
 
 #include <PackedIntArray.hpp>
 #include "DeleteShit.hpp"
+#include <FileCFILEStream.hpp>
 
 using namespace StdLib;
 
@@ -546,7 +547,7 @@ void PrintSameFiles( const wchar_t *pnn );
 
 static f32 RadiansWrapTest( f32 rad )
 {
-	while( rad < 0.0f )
+	/*while( rad < 0.0f )
 	{
 		rad += f32_pi * 2;
 	}
@@ -556,7 +557,16 @@ static f32 RadiansWrapTest( f32 rad )
 		rad -= f32_pi * 2;
 	}
 
-	return rad;
+	return rad;*/
+
+	 /*return rad - f32_pi2 * floorf(
+                  rad * (1.f / f32_pi2));*/
+
+	 rad = std::remainder(rad, f32_pi2);
+ 
+	 if (std::signbit( rad))
+	  rad += f32_pi2;
+	 return rad;
 }
 
 int __cdecl main()
@@ -565,16 +575,27 @@ int __cdecl main()
 	
 	//PrintSameFiles( L"D:\\Pictures" );
 
-	::printf( "%f = %f\n", -1.4543f, Funcs::F32FracPart( -1.4543f ) );
-	::printf( "%f = %f\n", 1.4543f, Funcs::F32FracPart( 1.4543f ) );
-	::printf( "%f = %f\n", -1.4543f, Funcs::F32IntegerPart( -1.4543f ) );
-	::printf( "%f = %f\n", 1.4543f, Funcs::F32IntegerPart( 1.4543f ) );
+	FileCFILEStream::fileError err;
+	FileCFILEStream file( L"test.txt", FileOpenMode::CreateAlways, FileProcMode::Write, FileCacheMode::Default, &err );
+	if( !file.IsOpened() )
+	{
+		printf( "failed to open file test.txt, error %s %s\n", err.Description(), err.Addition() );
+	}
+	else
+	{
+		if( !file.Write( "hey hey hey", strlen( "hey hey hey" ) ) )
+		{
+			printf( "writing failed\n" );
+		}
+	}
 
-	for( ui32 index = 0; index < 10; ++index )
+	/*for( ui32 index = 0; index < 100; ++index )
 	{
 		f32 randValue = Funcs::RandomRangeF32( -1000, 1000 );
-		::printf( "value = %f, reference = %f, fast = %f\n", randValue, RadiansWrapTest( randValue ), Funcs::F32NormalizeRadian( randValue ) );
-	}
+		f32 ref = RadiansWrapTest( randValue );
+		f32 fast = Funcs::F32NormalizeRadian( randValue );
+		::printf( "value = %f, reference = %f, fast = %f, diff %f\n", randValue, ref, fast, std::fabs( ref - fast ) );
+	}*/
 
 #if 0
 	FileIO::CFile testFile( L"print_to_file_test.txt", FileIO::OpenMode::CreateAlways, FileProcMode::Write | FileProcMode::Read );
