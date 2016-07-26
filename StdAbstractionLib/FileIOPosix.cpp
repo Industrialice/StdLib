@@ -177,7 +177,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
         file->offsetToStart = seekResult;
     }
 
-	Funcs::ClearPod( &file->stats );
+	FILEIO_STAT( Funcs::ClearPod( &file->stats ); )
     file->openMode = openMode;
     file->procMode = procMode;
 	file->cacheMode = cacheMode;
@@ -326,7 +326,7 @@ NOINLINE FilePath FileIO::Private::FileIO_PNNGet( const CFileBasis *file )
 NOINLINE bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written )
 {
     ASSUME( FileIO_IsValid( file ) && (cp_source || len == 0) );
-    ++file->stats.writesToFileCount;
+    FILEIO_STAT( ++file->stats.writesToFileCount; )
     if( !len )
     {
 		DSA( written, 0 );
@@ -339,20 +339,20 @@ NOINLINE bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_sour
         return false;
     }
 	DSA( written, sswritten );
-    file->stats.bytesToFileWritten += sswritten;
+    FILEIO_STAT( file->stats.bytesToFileWritten += sswritten; )
     return true;
 }
 
 NOINLINE bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
 {
     ASSUME( FileIO_IsValid( file ) && (p_target || len == 0) );
-    ++file->stats.readsFromFileCount;
+    FILEIO_STAT( ++file->stats.readsFromFileCount; )
     ssize_t readed = ::read( file->handle, p_target, len );
     if( readed == -1 )
     {
         return false;
     }
-    file->stats.bytesFromFileReaded += readed;
+    FILEIO_STAT( file->stats.bytesFromFileReaded += readed; )
     if( p_readed )
     {
         *p_readed += readed;

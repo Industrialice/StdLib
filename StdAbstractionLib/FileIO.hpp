@@ -1,6 +1,14 @@
 #ifndef __FILE_IO_HPP__
 #define __FILE_IO_HPP__
 
+#define ENABLE_FILEIO_STATS
+
+#ifdef ENABLE_FILEIO_STATS
+	#define FILEIO_STAT( ... ) __VA_ARGS__
+#else
+	#define FILEIO_STAT( ... )
+#endif
+
 #include "FilePath.hpp"
 #include <FileInterface.hpp>
 
@@ -8,6 +16,7 @@ namespace StdLib {
 
 namespace FileIO
 {
+#ifdef ENABLE_FILEIO_STATS
     struct SStats
     {
 		typedef ui64 counter_t;
@@ -24,6 +33,7 @@ namespace FileIO
 		counter_t bufferedReads;
 		counter_t unbufferedReads;
     };
+#endif
 
 	typedef CTError < const char * > fileError;
 
@@ -33,7 +43,7 @@ namespace FileIO
         {
             fileHandle handle;
 
-            FileIO::SStats stats;
+            FILEIO_STAT( FileIO::SStats stats; )
 
 			ui64 offsetToStart;  //  used only when you're using ProcMode::Append, the file will be opened as usual, then the offset will be added so you can't work with the existing part of the file
 
@@ -64,8 +74,8 @@ namespace FileIO
         EXTERNALD bln FileIO_BufferSet( CFileBasis *file, ui32 size, void *buffer );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
 		EXTERNALD ui32 FileIO_BufferSizeGet( const CFileBasis *file );
 		EXTERNALD const void *FileIO_BufferGet( const CFileBasis *file );
-        EXTERNALD void FileIO_StatsGet( const CFileBasis *file, SStats *po_stats );
-        EXTERNALD void FileIO_StatsReset( CFileBasis *file );
+        FILEIO_STAT( EXTERNALD void FileIO_StatsGet( const CFileBasis *file, SStats *po_stats ); )
+        FILEIO_STAT( EXTERNALD void FileIO_StatsReset( CFileBasis *file ); )
         EXTERNALD bln FileIO_Flush( CFileBasis *file );  //  false if writing to file failed to complete
         EXTERNALD i64 FileIO_OffsetGet( CFileBasis *file, FileOffsetMode::mode_t mode, CError *error );
         EXTERNALD i64 FileIO_OffsetSet( CFileBasis *file, FileOffsetMode::mode_t mode, i64 offset, CError *error );
@@ -121,6 +131,7 @@ namespace FileIO
             Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, po_error );
         }
 
+	#ifdef ENABLE_FILEIO_STATS
         void StatsGet( SStats *po_stats ) const
         {
             Private::FileIO_StatsGet( this, po_stats );
@@ -130,6 +141,7 @@ namespace FileIO
         {
             Private::FileIO_StatsReset( this );
         }
+	#endif
 
         FileOpenMode::mode_t OpenModeGet() const
         {
@@ -230,7 +242,7 @@ namespace FileIO
 			target->openMode = this->openMode;
 			target->procMode = this->procMode;
 			target->cacheMode = this->cacheMode;
-			target->stats = this->stats;
+			FILEIO_STAT( target->stats = this->stats; )
 			target->bufferRef = this->bufferRef;
 			target->internalBuffer = this->internalBuffer.TakeAway();
 			target->is_reading = this->is_reading;
@@ -253,7 +265,7 @@ namespace FileIO
             this->openMode = source.openMode;
             this->procMode = source.procMode;
 			this->cacheMode = source.cacheMode;
-            this->stats = source.stats;
+            FILEIO_STAT( this->stats = source.stats; )
 			if( source.internalBuffer == source.bufferRef )
 			{
 				this->internalBuffer = std::move( source.internalBuffer );

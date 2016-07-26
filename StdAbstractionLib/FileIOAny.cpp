@@ -17,16 +17,16 @@ namespace StdLib
 static void FORCEINLINE WriteToBuffer( FileIO::Private::CFileBasis *file, const void *what, ui32 howMuch )
 {
     _MemCpy( file->bufferRef + file->bufferPos, what, howMuch );
-    file->stats.bytesToBufferWritten += howMuch;
-    ++file->stats.writesToBufferCount;
+    FILEIO_STAT( file->stats.bytesToBufferWritten += howMuch; )
+    FILEIO_STAT( ++file->stats.writesToBufferCount; )
     file->bufferPos += howMuch;
 }
 
 static void FORCEINLINE ReadFromBuffer( FileIO::Private::CFileBasis *file, void *target, ui32 howMuch )
 {
     _MemCpy( target, file->bufferRef + file->bufferPos, howMuch );
-    file->stats.bytesFromBufferReaded += howMuch;
-    ++file->stats.readsFromBufferCount;
+    FILEIO_STAT( file->stats.bytesFromBufferReaded += howMuch; )
+    FILEIO_STAT( ++file->stats.readsFromBufferCount; )
     file->bufferPos += howMuch;
 }
 
@@ -52,7 +52,7 @@ NOINLINE bln FileIO::Private::FileIO_Write( CFileBasis *file, const void *cp_sou
 	DSA( written, 0 );
     if( file->bufferSize )
     {
-        ++file->stats.bufferedWrites;
+        FILEIO_STAT( ++file->stats.bufferedWrites; )
         if( !CancelCachedRead( file ) )
         {
             return false;
@@ -79,7 +79,7 @@ NOINLINE bln FileIO::Private::FileIO_Write( CFileBasis *file, const void *cp_sou
 		DSA( written, len );
         return true;
     }
-    ++file->stats.unbufferedWrites;
+    FILEIO_STAT( ++file->stats.unbufferedWrites; )
     return WriteToFile( file, cp_source, len, written );
 }
 
@@ -89,7 +89,7 @@ NOINLINE bln FileIO::Private::FileIO_Read( CFileBasis *file, void *p_target, ui3
     DSA( p_readed, 0 );
     if( file->bufferSize )
     {
-        ++file->stats.bufferedReads;
+        FILEIO_STAT( ++file->stats.bufferedReads; )
         if( !FileIO_Flush( file ) )
         {
             return false;
@@ -125,7 +125,7 @@ NOINLINE bln FileIO::Private::FileIO_Read( CFileBasis *file, void *p_target, ui3
         }
         return true;
     }
-    ++file->stats.unbufferedReads;
+    FILEIO_STAT( ++file->stats.unbufferedReads; )
     return ReadFromFile( file, p_target, len, p_readed );
 }
 
@@ -195,17 +195,19 @@ NOINLINE bln FileIO::Private::FileIO_Flush( CFileBasis *file )
     return true;
 }
 
-void FileIO::Private::FileIO_StatsGet( const CFileBasis *file, SStats *po_stats )
-{
-    ASSUME( FileIO_IsValid( file ) && po_stats );
-    _MemCpy( po_stats, &file->stats, sizeof(SStats) );
-}
+#ifdef ENABLE_FILEIO_STATS
+	void FileIO::Private::FileIO_StatsGet( const CFileBasis *file, SStats *po_stats )
+	{
+		ASSUME( FileIO_IsValid( file ) && po_stats );
+		_MemCpy( po_stats, &file->stats, sizeof(SStats) );
+	}
 
-void FileIO::Private::FileIO_StatsReset( CFileBasis *file )
-{
-    ASSUME( FileIO_IsValid( file ) );
-	Funcs::ClearPod( &file->stats );
-}
+	void FileIO::Private::FileIO_StatsReset( CFileBasis *file )
+	{
+		ASSUME( FileIO_IsValid( file ) );
+		Funcs::ClearPod( &file->stats );
+	}
+#endif
 
 FileOpenMode::mode_t FileIO::Private::FileIO_OpenModeGet( const CFileBasis *file )
 {
