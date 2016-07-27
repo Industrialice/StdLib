@@ -518,7 +518,7 @@ void CopyFilesToRotate();
 #include <mutex>
 #include <chrono>
 
-#include "MTMessageQueue.hpp"
+/*#include "MTMessageQueue.hpp"
 
 using namespace GameTest;
 
@@ -528,7 +528,7 @@ void ThreadFunc( std::shared_ptr < MTMessageQueue > queue )
 	{
 		queue->ExecWait();
 	}
-}
+}*/
 
 void FuncTest0( int a, float b )
 {

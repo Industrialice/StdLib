@@ -70,6 +70,20 @@ public:
         return *this;
     }
 
+	bln operator == ( const X &source ) const
+	{
+		if( this->_is_null )
+		{
+			return false;
+		}
+		return this->ToRef() == source;
+	}
+
+	bln operator != ( const X &source ) const
+	{
+		return !this->operator != ( source );
+	}
+
     bln operator == ( const Nullable &source ) const
     {
 		if( _is_null == source._is_null )
