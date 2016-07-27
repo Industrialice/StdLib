@@ -25,7 +25,7 @@ namespace
 	DWORD( WINAPI *StdLib_GetFinalPathNameByHandleW )(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 }
 
-NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, OpenMode::OpenMode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error )
+NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error )
 {
     ASSUME( file );
 
@@ -67,11 +67,11 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
         dwDesiredAccess |= GENERIC_READ;
     }
 
-    if( openMode == OpenMode::CreateIfDoesNotExist )
+    if( openMode == FileOpenMode::CreateIfDoesNotExist )
     {
         dwCreationDisposition = OPEN_ALWAYS;
     }
-    else if( openMode == OpenMode::CreateAlways || openMode == OpenMode::CreateNew )
+    else if( openMode == FileOpenMode::CreateAlways || openMode == FileOpenMode::CreateNew )
     {
 		if( (procMode & FileProcMode::WriteAppend) == FileProcMode::WriteAppend )
 		{
@@ -79,7 +79,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
 			goto toExit;
 		}
 
-		if( openMode == OpenMode::CreateAlways )
+		if( openMode == FileOpenMode::CreateAlways )
 		{
 			dwCreationDisposition = CREATE_ALWAYS;
 		}
@@ -90,7 +90,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
     }
     else  //  if( openMode == OpenMode::OpenExisting )
     {
-        ASSUME( openMode == OpenMode::OpenExisting );
+        ASSUME( openMode == FileOpenMode::OpenExisting );
         dwCreationDisposition = OPEN_EXISTING;
     }
 
@@ -152,7 +152,7 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
 	file->cacheMode = cacheMode;
     file->handle = h_file;
     file->bufferPos = 0;
-	Funcs::ClearPod( &file->stats );
+	FILEIO_STAT( Funcs::ClearPod( &file->stats ); )
 	file->readBufferCurrentSize = 0;
 	file->is_reading = false;
 
@@ -234,7 +234,7 @@ i64 FileIO::Private::FileIO_OffsetGet( CFileBasis *file, FileOffsetMode::mode_t 
 			return -1;
 		}
 
-		return fileSize - offsetFromBegin;
+		return offsetFromBegin - fileSize;
 	}
 }
 
@@ -403,7 +403,7 @@ NOINLINE FilePath FileIO::Private::FileIO_PNNGet( const CFileBasis *file )
 bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written )
 {
     ASSUME( FileIO_IsValid( file ) && (cp_source || len == 0) );
-    ++file->stats.writesToFileCount;
+    FILEIO_STAT( ++file->stats.writesToFileCount; )
     if( !len )
     {
 		DSA( written, 0 );
@@ -415,7 +415,7 @@ bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 
 		DSA( written, 0 );
         return false;
     }
-    file->stats.bytesToFileWritten += len;
+    FILEIO_STAT( file->stats.bytesToFileWritten += len; )
 	DSA( written, len );
     return true;
 }
@@ -424,7 +424,7 @@ bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, u
 {
     ASSUME( FileIO_IsValid( file ) && (p_target || len == 0) );
     DWORD readed = 0;
-    ++file->stats.readsFromFileCount;
+    FILEIO_STAT( ++file->stats.readsFromFileCount; )
     if( len != 0 )
     {
         if( !::ReadFile( file->handle, p_target, len, &readed, 0 ) )
@@ -432,7 +432,7 @@ bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, u
             return false;
         }
     }
-    file->stats.bytesFromFileReaded += readed;
+    FILEIO_STAT( file->stats.bytesFromFileReaded += readed; )
     if( p_readed )
     {
         *p_readed += readed;

@@ -14,6 +14,7 @@
 
 #include <PackedIntArray.hpp>
 #include "DeleteShit.hpp"
+#include <FileCFILEStream.hpp>
 
 using namespace StdLib;
 
@@ -544,23 +545,57 @@ void FuncTest1( const CVec < int > &vec )
 
 void PrintSameFiles( const wchar_t *pnn );
 
+static f32 RadiansWrapTest( f32 rad )
+{
+	/*while( rad < 0.0f )
+	{
+		rad += f32_pi * 2;
+	}
+
+	while( rad >= f32_pi * 2 )
+	{
+		rad -= f32_pi * 2;
+	}
+
+	return rad;*/
+
+	 /*return rad - f32_pi2 * floorf(
+                  rad * (1.f / f32_pi2));*/
+
+	 rad = std::remainder(rad, f32_pi2);
+ 
+	 if (std::signbit( rad))
+	  rad += f32_pi2;
+	 return rad;
+}
+
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 	
-	PrintSameFiles( L"D:\\music" );
+	//PrintSameFiles( L"D:\\Pictures" );
 
-	f32 v0 = -0.0093432;
-	f32 v1 = -9.3432;
+	FileCFILEStream::fileError err;
+	FileCFILEStream file( L"test.txt", FileOpenMode::CreateAlways, FileProcMode::Write, FileCacheMode::Default, &err );
+	if( !file.IsOpened() )
+	{
+		printf( "failed to open file test.txt, error %s %s\n", err.Description(), err.Addition() );
+	}
+	else
+	{
+		if( !file.Write( "hey hey hey", strlen( "hey hey hey" ) ) )
+		{
+			printf( "writing failed\n" );
+		}
+	}
 
-	char buf[ 256 ];
-	Funcs::PrintToStr( buf, 256, "%n\n%n\n", *(ui32 *)&v0, *(ui32 *)&v1 );
-
-	printf( "%s\n", buf );
-
-	Funcs::PrintToStr( buf, 256, "%h\n%h\n", *(ui32 *)&v0, *(ui32 *)&v1 );
-
-	printf( "%s\n", buf );
+	/*for( ui32 index = 0; index < 100; ++index )
+	{
+		f32 randValue = Funcs::RandomRangeF32( -1000, 1000 );
+		f32 ref = RadiansWrapTest( randValue );
+		f32 fast = Funcs::F32NormalizeRadian( randValue );
+		::printf( "value = %f, reference = %f, fast = %f, diff %f\n", randValue, ref, fast, std::fabs( ref - fast ) );
+	}*/
 
 #if 0
 	FileIO::CFile testFile( L"print_to_file_test.txt", FileIO::OpenMode::CreateAlways, FileProcMode::Write | FileProcMode::Read );

@@ -63,6 +63,12 @@
     <ClInclude Include="TypeDesc.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="RoundingFuncs.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomizingFuncs.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CF16.cpp">
@@ -81,6 +87,12 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="StringFuncs.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="RoundingFuncs.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="RandomizingFuncs.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

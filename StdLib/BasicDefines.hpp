@@ -1,7 +1,6 @@
 #ifndef __BASIC_DEFINES_HPP__
 #define __BASIC_DEFINES_HPP__
 
-#define EXTC extern "C"
 #define BIT( bit ) (1 << (bit))
 #define TOSTR( code ) #code
 #define CONCAT( first, second ) first##second
@@ -13,9 +12,9 @@
 #endif
 
 #ifdef COUNTER_SUPPORTED
-    #define MAKE_UNIC( name ) CONCAT( name, __COUNTER__ )
+    #define MAKE_UNIQUE( name ) CONCAT( name, __COUNTER__ )
 #else
-    #define MAKE_UNIC( name ) CONCAT( name, __LINE__ )  /*  not really unique  */
+    #define MAKE_UNIQUE( name ) CONCAT( name, __LINE__ )  /*  not really unique  */
 #endif
 
 #ifdef MOVE_SUPPORTED
@@ -23,12 +22,6 @@
 #else
 	#define TRY_MOVE( arg ) (arg)
 #endif
-
-#define AUTO_EXEC( code ) struct CONCAT( $__AUTO_EXEC_STRUCT__, __LINE__ ) { CONCAT( $__AUTO_EXEC_STRUCT__, __LINE__ )() \
-        { \
-            code; \
-        } \
-    } MAKE_UNIC( $__auto_exec_struct_object__ )
 
 #define CONSTS_OPS( name ) \
     static name operator |( name left, name right ) \

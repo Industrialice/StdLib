@@ -19,14 +19,15 @@
 
 #define EXTERN_TEMPLATES_ALLOWED
 
-#include <stddef.h>
+#include <cstddef>
 #include <new>
-#include <math.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstdarg>
 
 #include "CompilerDefines.hpp"
 	
+//  TODO: temporary commented out because it confuses MSVS's intellisense
 #define EXTERNALS /*extern "C"*/
 
 #ifdef STDLIB_DYNAMIC

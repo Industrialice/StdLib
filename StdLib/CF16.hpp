@@ -5,7 +5,7 @@
 
 namespace StdLib {
 
-//  TODO: it's does not following IEEE 754-2008 and i probably should fix this
+//  TODO: it does not follow IEEE 754-2008 and I probably should fix that
 //  +/-inf and NaN conversion to integer is undefined behavior
 
 namespace Private

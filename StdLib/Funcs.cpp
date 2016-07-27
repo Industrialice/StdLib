@@ -1,180 +1,5 @@
 #include "PreHeader.hpp"
 
-static ui32 WideRandom()
-{
-	return rand() | (rand() << 15) | (rand() << 30);
-}
-
-i32 Funcs::RandomI32()
-{
-    return (i32)WideRandom();
-}
-
-ui32 Funcs::RandomUI32()
-{
-    return WideRandom();
-}
-
-f32 Funcs::RandomF32()
-{
-    return rand() / (f32)RAND_MAX;
-}
-
-i32 Funcs::RandomRangeI32( i32 from, i32 to )
-{
-    return (WideRandom() & 0x7FffFFff) % ((to - from) + 1) + from;
-}
-
-ui32 Funcs::RandomRangeUI32( ui32 from, ui32 to )
-{
-    return WideRandom() % ((to - from) + 1) + from;
-}
-
-f32 Funcs::RandomRangeF32( f32 from, f32 to )
-{
-    return from + (rand() / (f32)RAND_MAX) * (to - from);
-}
-
-ui32 Funcs::RandomUI32Limit( ui32 limit )
-{
-    return WideRandom() % limit;
-}
-	
-i32 Funcs::RandomFluctuateI32( i32 target, i32 fluctuation )
-{
-	i32 distToMin = target - i32_min;
-	i32 distToMax = i32_max - target;
-	i32 from = target - (distToMin > fluctuation ? fluctuation : distToMin);
-	i32 to = target + (distToMax > fluctuation ? fluctuation : distToMax);
-	return RandomRangeI32( from, to );
-}
-
-ui32 Funcs::RandomFluctuateUI32( ui32 target, ui32 fluctuation )
-{
-	ui32 distToMin = target;
-	ui32 distToMax = ui32_max - target;
-	ui32 from = target - (distToMin > fluctuation ? fluctuation : distToMin);
-	ui32 to = target + (distToMax > fluctuation ? fluctuation : distToMax);
-	return RandomRangeUI32( from, to );
-}
-
-f32 Funcs::RandomFluctuateF32( f32 target, f32 fluctuation )
-{
-	return RandomRangeF32( target - fluctuation, target + fluctuation );
-}
-
-i32 Funcs::RoundF32( f32 val )  //  TODO: bullshit
-{
-    return (i32)(val < 0 ? val - 0.55555555555f : val + 0.55555555555f);
-}
-
-i32 Funcs::RoundF32WithPrecise( f32 val, ui32 precise )  //  TODO: bullshit
-{
-    f32 rounder = 0.f;
-    f32 adder = 0.50001f;
-    for( ; precise; --precise )
-    {
-        rounder += adder;
-        adder *= 0.1f;
-    }
-    return (i32)(val < 0 ? val - rounder : val + rounder);
-}
-
-f32 Funcs::RoundF32DownToStep( f32 val, f32 step )
-{
-    val /= step;
-    val = ::floorf( val );
-    return step * val;
-}
-
-f32 Funcs::RoundF32UpToStep( f32 val, f32 step )
-{
-    val /= step;
-    val = ::floorf( val );
-    return step * (val + 1.f);
-}
-
-f32 Funcs::RoundF32ToNearestStep( f32 val, f32 step )
-{
-    val /= step;
-    val = ::floorf( val + 0.5f );
-    return step * val;
-}
-
-i32 Funcs::RoundF64( f64 val )  //  TODO: bullshit
-{
-    return (i32)(val < 0 ? val - 0.555555555555555 : val + 0.555555555555555);
-}
-
-i32 Funcs::RoundF64WithPrecise( f64 val, ui32 precise )  //  TODO: bullshit
-{
-    f64 rounder = 0.0;
-    f64 adder = 0.5000001;
-    for( ; precise; --precise )
-    {
-        rounder += adder;
-        adder *= 0.1;
-    }
-    return (i32)(val < 0 ? val - rounder : val + rounder);
-}
-
-f64 Funcs::RoundF64DownToStep( f64 val, f64 step )
-{
-    val /= step;
-    val = ::floor( val );
-    return step * val;
-}
-
-f64 Funcs::RoundF64UpToStep( f64 val, f64 step )
-{
-    val /= step;
-    val = ::floor( val );
-    return step * (val + 1.f);
-}
-
-f64 Funcs::RoundF64ToNearestStep( f64 val, f64 step )
-{
-    val /= step;
-    val = ::floor( val + 0.5f );
-    return step * val;
-}
-
-uiw Funcs::RoundUIDownToStep( uiw val, uiw step )
-{
-    return val - val % step;
-}
-
-uiw Funcs::RoundUIUpToStep( uiw val, uiw step )
-{
-    return val + (step - val % step);
-}
-
-uiw Funcs::RoundUIToNearestStep( uiw val, uiw step )
-{
-    uiw left = val % step;
-    uiw low = val - left;
-    uiw up = val + (step - left);
-    return left >= step / 2 ? up : low;
-}
-
-iw Funcs::RoundIDownToStep( iw val, iw step )
-{
-	NOT_IMPLEMENTED;
-    return 0;
-}
-
-iw Funcs::RoundIUpToStep( iw val, iw step )
-{
-	NOT_IMPLEMENTED;
-    return 0;
-}
-
-iw Funcs::RoundIToNearestStep( iw val, iw step )
-{
-	NOT_IMPLEMENTED;
-    return 0;
-}
-
 bln Funcs::IsF32Equal( f32 first, f32 second, f32 epsilon )
 {
     return ::fabsf( first - second ) < epsilon;
@@ -227,10 +52,42 @@ f64 Funcs::SaturateF64( f64 val )
     return val;
 }
 
-f32 Funcs::F32NormalizeRadian( f32 rad )
+f32 Funcs::F32NormalizeRadian( f32 rad )  //  T
 {
-    rad = ::fabsf( rad );
-    return Funcs::F32FracPart( rad / (f32_pi * 2) ) * (f32_pi * 2);
+	if( rad >= 0.0f && rad < f32_pi2 )
+	{
+		return rad;
+	}
+
+	if( rad < 0.0f && rad >= -f32_pi2 )
+	{
+		return rad + f32_pi2;
+	}
+
+	if( rad >= f32_pi2 && rad < (f32_pi2 * 2) )
+	{
+		return rad - f32_pi2;
+	}
+
+	rad = Funcs::F32FracPart( rad / f32_pi2 ) * f32_pi2;
+	if( rad < 0.0f )
+	{
+		rad += f32_pi2;
+	}
+	return rad;
+
+	//  reference implementation
+	//while( rad < 0.0f )
+	//{
+	//	rad += f32_pi * 2;
+	//}
+
+	//while( rad >= f32_pi * 2 )
+	//{
+	//	rad -= f32_pi * 2;
+	//}
+
+	//return rad;
 }
 	
 f32 Funcs::LerpF32( f32 left, f32 right, f32 value )
@@ -245,14 +102,32 @@ f64 Funcs::LerpF64( f64 left, f64 right, f64 value )
 	return left + (right - left) * value;
 }
 
-f32 Funcs::F32FracPart( f32 val )
+f32 Funcs::F32FracPart( f32 val )  //  T
 {
-    return val - ::floorf( val );
+	return std::fmod( val, 1.0f );
 }
 
-f64 Funcs::F64FracPart( f64 val )
+f64 Funcs::F64FracPart( f64 val )  //  T
 {
-    return val - ::floor( val );
+	return std::fmod( val, 1.0 );
+}
+    
+f32 Funcs::F32IntegerPart( f32 val )  //  T
+{
+	if( val < 0.0f )
+	{
+		return std::ceilf( val );
+	}
+	return std::floorf( val );
+}
+    
+f64 Funcs::F64IntegerPart( f64 val )  //  T
+{
+	if( val < 0.0 )
+	{
+		return std::ceil( val );
+	}
+	return std::floor( val );
 }
 
 bln Funcs::IsF32NaN( f32 val )
@@ -327,7 +202,7 @@ bln Funcs::IsF64InfNeg( f64 val )
 
 f32 Funcs::MakeF32ByBits( ui32 sign1, ui32 exp8, ui32 significand23 )
 {
-    union
+    union  //  TODO: UB
     {
         ui32 i;
         f32 f;
@@ -340,7 +215,7 @@ f32 Funcs::MakeF32ByBits( ui32 sign1, ui32 exp8, ui32 significand23 )
 
 f64 Funcs::MakeF64ByBits( uiw sign1, uiw exp11, ui64 significand52 )
 {
-    union
+    union  //  TODO: UB
     {
         ui64 i;
         f64 f;
@@ -385,36 +260,40 @@ ui64 Funcs::FNV64Hash( const byte *source, uiw maxLen )
 
 uiw Funcs::FNVWordHash( const byte *source, uiw maxLen )
 {
-#if WORD_SIZE == 32
-	return FNV32Hash( source, maxLen );
-#else
-	return FNV64Hash( source, maxLen );
-#endif
+	return WSC( FNV32Hash, FNV64Hash )( source, maxLen );
 }
 
 uiw Funcs::MemCpy( void *RSTR p_dest, const void *cp_source, uiw size )
 {
+	ASSUME( p_dest && cp_source || size == 0 );
     ::memcpy( p_dest, cp_source, size );
+    return size;
+}
+
+uiw Funcs::MemMove( void *RSTR p_dest, const void *cp_source, uiw size )
+{
+	ASSUME( p_dest && cp_source || size == 0 );
+    ::memmove( p_dest, cp_source, size );
     return size;
 }
 
 uiw Funcs::MemZero( void *p_mem, uiw size )
 {
-    ASSUME( p_mem );
+    ASSUME( p_mem || size == 0 );
     ::memset( p_mem, 0, size );
     return size;
 }
 
 uiw Funcs::MemSet( void *p_mem, byte val, uiw size )
 {
-    ASSUME( p_mem );
+    ASSUME( p_mem || size == 0 );
     ::memset( p_mem, val, size );
     return size;
 }
 
 bln Funcs::MemTest( void *p_mem, byte val, uiw size )
 {
-    ASSUME( p_mem );
+    ASSUME( p_mem || size == 0 );
     byte *p_memByte = (byte *)p_mem;
     while( size )
     {
@@ -430,7 +309,7 @@ bln Funcs::MemTest( void *p_mem, byte val, uiw size )
 
 bln Funcs::MemEquals( const void *cp_mem0, const void *cp_mem1, uiw size )
 {
-    ASSUME( cp_mem0 && cp_mem1 );
+    ASSUME( cp_mem0 && cp_mem1 || size == 0 );
     return !::memcmp( cp_mem0, cp_mem1, size );
 }
 

@@ -13,6 +13,22 @@ namespace StdLib
 				WriteAppend = BIT( 3 ) | BIT( 2 ) )  //  makes existing part of the file virtually invisible( isn't reported with Size calls, isn't accessible through offset sets )
 	}
 
+	//  mode                   already exists        doesn't exist
+	//  ***                    ***                   ***
+	//  CreateIfDoesNotExist   opens                 creates new & opens
+	//  CreateAlways           truncates & opens     creates new & opens
+	//  CreateNew              fails                 creates new & opens
+	//  OpenExisting           opens                 fails
+
+    namespace FileOpenMode
+    {
+        CONSTS( mode_t,
+                CreateIfDoesNotExist,
+                CreateAlways,
+				CreateNew,
+                OpenExisting )
+    }
+
 	namespace FileCacheMode
 	{
 		CONSTS_OPED( mode_t,
@@ -21,6 +37,12 @@ namespace StdLib
 			RandomRead = BIT( 2 ),  //  requires ProcMode::Read, can't be used with LinearRead
 			DisableSystemWriteCache = BIT( 3 ) )  //  requires ProcMode::Write
 	}
+
+	//  file content: _1_2_3#4_7_8_9
+	//  current file pointer: 4( highlighted with # )
+	//  OffsetGet( FileOffsetMode::FromBegin ) == 4
+	//  OffsetGet( FileOffsetMode::FromCurrent ) == 0 ( always zero )
+	//  OffsetGet( FileOffsetMode::FromEnd ) == -5 ( 4 - 9 )
 
 	namespace FileOffsetMode
 	{
@@ -42,7 +64,7 @@ namespace StdLib
 
 		virtual bln Flush() = 0;
 		virtual bln IsBufferingSupported() const = 0;
-		virtual bln BufferSet( ui32 size, void *buffer ) = 0;  //  will reject this call if buffering isn't supported,   pass null as a buffer to use an auto allocated buffer, pass 0 as a size to disable buffering
+		virtual bln BufferSet( ui32 size, void *buffer ) = 0;  //  will reject this call if buffering isn't supported, pass null as a buffer to use an auto allocated buffer, pass 0 as a size to disable buffering
 		virtual ui32 BufferSizeGet() const = 0;
 		virtual const void *BufferGet() const = 0;  //  will return 0 if there's no buffer
 
