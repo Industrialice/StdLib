@@ -64,7 +64,7 @@ namespace StdLib
 
 		virtual bln Flush() = 0;
 		virtual bln IsBufferingSupported() const = 0;
-		virtual bln BufferSet( ui32 size, void *buffer ) = 0;  //  will reject this call if buffering isn't supported,   pass null as a buffer to use an auto allocated buffer, pass 0 as a size to disable buffering
+		virtual bln BufferSet( ui32 size, void *buffer ) = 0;  //  will reject this call if buffering isn't supported, pass null as a buffer to use an auto allocated buffer, pass 0 as a size to disable buffering
 		virtual ui32 BufferSizeGet() const = 0;
 		virtual const void *BufferGet() const = 0;  //  will return 0 if there's no buffer
 

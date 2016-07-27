@@ -72,13 +72,31 @@ public:
 
     bln operator == ( const Nullable &source ) const
     {
-        return !_is_null && !source._is_null && ToRef() == source.ToRef();
+		if( _is_null == source._is_null )
+		{
+			if( !_is_null )
+			{
+				return ToRef() == source.ToRef();
+			}
+			return true;
+		}
+        return false;
     }
+
+    bln operator != ( const Nullable &source ) const
+	{
+		return !this->operator == ( source );
+	}
 
     bln operator == ( Nullv ) const
     {
         return _is_null;
     }
+
+    bln operator != ( Nullv ) const
+	{
+		return !_is_null;
+	}
 
 #ifdef NULLPTR_SUPPORTED
     Nullable &operator = ( std::nullptr_t )
@@ -90,6 +108,89 @@ public:
     {
         return _is_null;
     }
+
+    bln operator != ( std::nullptr_t ) const
+	{
+		return !_is_null;
+	}
+#endif
+
+	Nullable( const Nullable &source )
+	{
+		if( source._is_null == false )
+		{
+			new (&_object) X( source.ToRef() );
+		}
+		this->_is_null = source._is_null;
+	}
+
+	Nullable &operator = ( const Nullable &source )
+	{
+		if( this != &source )
+		{
+			if( this->_is_null == source._is_null )
+			{
+				if( this->_is_null == false )
+				{
+					this->ToRef() = source->ToRef();
+				}
+			}
+			else
+			{
+				if( this->_is_null == false )
+				{
+					this->ToRef().~X();
+				}
+				else
+				{
+					new (&this->_object) X( source.ToRef() );
+				}
+
+				this->_is_null = source._is_null;
+			}
+		}
+		return *this;
+	}
+
+#ifdef MOVE_SUPPORTED
+	Nullable( Nullable &&source )
+	{
+		if( source._is_null == false )
+		{
+			ToRef() = std::move( *(X *)&source._object );
+		}
+		this->_is_null = source._is_null;
+	}
+
+	Nullable &operator = ( Nullable &&source )
+	{
+		ASSUME( this != &source );
+
+		if( this->_is_null == source._is_null )
+		{
+			if( this->_is_null == false )
+			{
+				*(X *)&this->_object = std::move( *(X *)&source._object );
+			}
+		}
+		else
+		{
+			if( this->_is_null == false )
+			{
+				this->ToRef().~X();
+			}
+			else
+			{
+				new (&this->_object) X( std::move( *(X *)&source._object ) );
+			}
+
+			this->_is_null = source._is_null;
+		}
+
+		source->_is_null = true;
+
+		return *this;
+	}
 #endif
 
     bln IsNull() const

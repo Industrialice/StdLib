@@ -260,17 +260,20 @@ ui64 Funcs::FNV64Hash( const byte *source, uiw maxLen )
 
 uiw Funcs::FNVWordHash( const byte *source, uiw maxLen )
 {
-#if WORD_SIZE == 32
-	return FNV32Hash( source, maxLen );
-#else
-	return FNV64Hash( source, maxLen );
-#endif
+	return WSC( FNV32Hash, FNV64Hash )( source, maxLen );
 }
 
 uiw Funcs::MemCpy( void *RSTR p_dest, const void *cp_source, uiw size )
 {
 	ASSUME( p_dest && cp_source || size == 0 );
     ::memcpy( p_dest, cp_source, size );
+    return size;
+}
+
+uiw Funcs::MemMove( void *RSTR p_dest, const void *cp_source, uiw size )
+{
+	ASSUME( p_dest && cp_source || size == 0 );
+    ::memmove( p_dest, cp_source, size );
     return size;
 }
 

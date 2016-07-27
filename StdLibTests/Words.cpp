@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <conio.h>
 #include <CThread.hpp>
+#include <RandomizingFuncs.hpp>
 
 using namespace StdLib;
 
@@ -29,7 +30,7 @@ static void PrintWordAndCount( const char *word, uiw index, uiw count )
 
 void Words()
 {
-    FileIO::CFile file( L"d:\\other\\words.txt", FileIO::OpenMode::OpenExisting, FileProcMode::Read, FileCacheMode::LinearRead );
+    FileIO::CFile file( L"d:\\other\\words.txt", FileOpenMode::OpenExisting, FileProcMode::Read, FileCacheMode::LinearRead );
     if( !file.IsOpened() )
     {
         ::printf( "failed to open words.txt\n" );

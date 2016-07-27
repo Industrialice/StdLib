@@ -54,6 +54,7 @@ namespace Funcs
 
     EXTERNALS uiw MemCpy( void *RSTR p_target, const void *cp_source, uiw size );
     #define _MemCpy( dest, source, size ) (::memcpy( dest, source, size ), size)
+	EXTERNALS uiw MemMove( void *RSTR p_target, const void *cp_source, uiw size );
     #define _MemMove( dest, source, size ) (::memmove( dest, source, size ), size)
     EXTERNALS uiw MemZero( void *p_mem, uiw size );
     #define _MemZero( mem, size ) (::memset( mem, 0, size ), size)
@@ -63,110 +64,6 @@ namespace Funcs
     EXTERNALS bln MemEquals( const void *cp_mem0, const void *cp_mem1, uiw size );  //  true if size is 0
     #define _MemEquals( mem0, mem1, size ) (!::memcmp( mem0, mem1, size ))
     EXTERNALS void *MemFindSeq( const void *cp_mem, const void *cp_seq, uiw memSize, uiw seqSize );  //  assume the output is const if the input was const
-
-#if 0
-    /*  there is no type extension, CHECK YOUR TYPES CAREFULLY TO NOT GET CONFUSED  */
-    template < typename X, typename Y > X AddWrapAround( X val, Y addition, X wrapValue )
-    {
-        ASSUME( TypeDesc < X >::is_integer );
-        if( TypeDesc < X >::is_signed )
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        else
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        UNREACHABLE;
-    }
-
-    /*  there is no type extension, CHECK YOUR TYPES CAREFULLY TO NOT GET CONFUSED  */
-    template < typename X, typename Y > X AddClamp( X val, Y addition )
-    {
-        ASSUME( TypeDesc < X >::is_integer );
-        if( TypeDesc < X >::is_signed )
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        else
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        UNREACHABLE;
-    }
-
-    /*  there is no type extension, CHECK YOUR TYPES CAREFULLY TO NOT GET CONFUSED  */
-    template < typename X, typename Y > X SubWrapAround( X val, Y subtraction )
-    {
-        ASSUME( TypeDesc < X >::is_integer );
-        if( TypeDesc < X >::is_signed )
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        else
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        UNREACHABLE;
-    }
-
-    /*  there is no type extension, CHECK YOUR TYPES CAREFULLY TO NOT GET CONFUSED  */
-    template < typename X, typename Y > X SubClamp( X val, Y subtraction )
-    {
-        ASSUME( TypeDesc < X >::is_integer );
-        if( TypeDesc < X >::is_signed )
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        else
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        UNREACHABLE;
-    }
-
-    /*  there is no type extension, CHECK YOUR TYPES CAREFULLY TO NOT GET CONFUSED  */
-    template < typename X, typename Y > X MulWrapAround( X val, Y multiplication )
-    {
-        ASSUME( TypeDesc < X >::is_integer );
-        if( TypeDesc < X >::is_signed )
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        else
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        UNREACHABLE;
-    }
-
-    /*  there is no type extension, CHECK YOUR TYPES CAREFULLY TO NOT GET CONFUSED  */
-    template < typename X, typename Y > X MulClamp( X val, Y multiplication )
-    {
-        ASSUME( TypeDesc < X >::is_integer );
-        if( TypeDesc < X >::is_signed )
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        else
-        {
-            NOT_IMPLEMENTED;
-            return 0;
-        }
-        UNREACHABLE;
-    }
-#endif
 
     template < typename X > bln IsPowerOf2( const X &val )
     {
@@ -211,11 +108,17 @@ namespace Funcs
         return powered;
     }
 
-    template < typename X > void Swap( X *p_first, X *p_second )  //  TODO: there must be a more adequate variant
+    template < typename X > void Swap( X *p_first, X *p_second )
     {
+	#ifdef MOVE_SUPPORTED
+		X temp = std::move( *p_first );
+		*p_first = std::move( *p_second );
+		*p_second = std::move( temp );
+	#else
         X temp = *p_first;
         *p_first = *p_second;
         *p_second = temp;
+	#endif
     }
 
     template < typename X > const X &Max( const X &first, const X &second )
@@ -243,7 +146,7 @@ namespace Funcs
 
     template < typename X, typename Y > void BytewiseCopy( X *p_dest, const Y &source )
     {
-        _MemCpy( p_dest, &source, sizeof(X) );
+        _MemCpy( p_dest, &source, sizeof(Y) );
     }
 
     template < typename X > X ChangeEndianness( X val )
@@ -295,18 +198,6 @@ namespace Funcs
             return ChangeEndianness( val );
         #endif
         return val;
-    }
-
-    template < typename X > X CondReset( X val, bln is_reset )  //  set the value to 0 if is_reset is true
-    {
-        typename IntWithSize < sizeof(X) * 8 >::uint_t test = *(typename IntWithSize < sizeof(X) * 8 >::uint_t *)&val & (*(ui8 *)&is_reset - 1);
-        return *(X *)&test;
-    }
-
-    template < typename X > X CondLeave( X val, bln is_reset )  //  leave the value unchanged if is_reset is true
-    {
-        typename IntWithSize < sizeof(X) * 8 >::uint_t test = *(typename IntWithSize < sizeof(X) * 8 >::uint_t *)&val & -*(ui8 *)&is_reset;
-        return *(X *)&test;
     }
 
 	template < typename X > void ClearPod( X *pod )

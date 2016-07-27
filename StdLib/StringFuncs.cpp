@@ -1546,7 +1546,6 @@ bln Funcs::IsBinBase( const char *cp_str )
 template < typename ft > uiw FloatToStr( ft val, char *p_buf, uiw precise, bln is_cutToShortest )  //  TODO: this code is fail
 {
 	ASSUME( p_buf );
-	ASSUME( typeid(ft) == typeid(f32) || typeid(ft) == typeid(f64) );
 /*#ifdef _MSC_VER
 	char *result = ::_gcvt( val, 31, p_buf );
 	ASSUME( result == p_buf );
@@ -1597,8 +1596,8 @@ toRet:
 	p_buf[ len ] = '\0';
 	return len;
 #else*/
-	const char *modifier0 = typeid(ft) == typeid(f32) ? "%g" : "%lg";
-	const char *modifier1 = typeid(ft) == typeid(f32) ? "%.*f" : "%.*lf";
+	const char *modifier0 = sizeof(ft) == sizeof(f32) ? "%g" : "%lg";
+	const char *modifier1 = sizeof(ft) == sizeof(f32) ? "%.*f" : "%.*lf";
 	if( is_cutToShortest )
 	{
 		return ::sprintf( p_buf, modifier0, val );

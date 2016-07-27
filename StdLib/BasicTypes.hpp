@@ -3,18 +3,14 @@
 
 #include "PlatformDefines.hpp"
 
-#if defined(TYPETRAITS_SUPPORTED)
-    #include <type_traits>
-#endif
-
 STATIC_CHECK( sizeof(INT64_NUMBER) == 8, "sizeof(long long) is unexpected" );
-STATIC_CHECK( sizeof(int)        == 4, "sizeof(int) is unexpected" );
+STATIC_CHECK( sizeof(int)          == 4, "sizeof(int) is unexpected" );
 STATIC_CHECK( sizeof(long) == 4 || sizeof(long) == 8, "sizeof(long) is unexpected" );
-STATIC_CHECK( sizeof(short)      == 2, "sizeof(short) is unexpected" );
-STATIC_CHECK( sizeof(char)       == 1, "sizeof(char) is unexpected" );
-STATIC_CHECK( sizeof(bool)       == 1, "sizeof(bool) is unexpected" );
-STATIC_CHECK( sizeof(float)      == 4, "sizeof(float) is unexpected" );
-STATIC_CHECK( sizeof(double)     == 8, "sizeof(double) is unexpected" );
+STATIC_CHECK( sizeof(short)        == 2, "sizeof(short) is unexpected" );
+STATIC_CHECK( sizeof(char)         == 1, "sizeof(char) is unexpected" );
+STATIC_CHECK( sizeof(bool)         == 1, "sizeof(bool) is unexpected" );
+STATIC_CHECK( sizeof(float)        == 4, "sizeof(float) is unexpected" );
+STATIC_CHECK( sizeof(double)       == 8, "sizeof(double) is unexpected" );
 
 STATIC_CHECK( sizeof(void *) * 8 == WORD_SIZE, "incorrect WORD_SIZE" );
 

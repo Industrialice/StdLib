@@ -18,6 +18,7 @@ namespace StdLib
 		virtual bln IsWritable() const = 0;
 	};
 
+	//  uses a fixed buffer
 	template < uiw size > class MemoryStreamFixed final : public MemoryStreamInterface
 	{
 		ui8 _buffer[ size ];
@@ -68,6 +69,7 @@ namespace StdLib
 		}
 	};
 
+	//  uses an external buffer
 	class MemoryStreamFixedExt final : public MemoryStreamInterface
 	{
 		ui8 *_writeBuffer;
@@ -141,6 +143,7 @@ namespace StdLib
 		}
 	};
 
+	//  uses a heap allocated buffer
 	class MemoryStreamHeap final : public MemoryStreamInterface
 	{
 		ui8 *_buffer;
@@ -196,6 +199,8 @@ namespace StdLib
 			return true;
 		}
 	};
+
+	//  TODO: add a fixed buffered mem stream that uses a heap if the fixed buffer is not enough
 }
 
 #endif

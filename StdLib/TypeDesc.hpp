@@ -3,6 +3,10 @@
 
 #include "PlatformTypes.hpp"
 
+#if defined(TYPETRAITS_SUPPORTED)
+    #include <type_traits>
+#endif
+
 namespace StdLib {
 
 //  volatile doesn't supported
