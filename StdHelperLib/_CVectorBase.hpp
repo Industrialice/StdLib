@@ -540,8 +540,9 @@ public:
 
 	bln _IncSizeIfHasEnoughReserve( count_type newCount )
 	{
-		ASSUME( newCount >= _count );
-		return false;
+		ASSUME( newCount >= _count && newCount <= static_size );
+		_count = newCount;
+		return true;
 	}
 
     void _IncSize( count_type newCount )

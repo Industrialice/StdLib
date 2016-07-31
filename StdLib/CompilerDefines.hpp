@@ -5,6 +5,7 @@
 
     #define NOMINMAX
 
+	// for features review, visit https://msdn.microsoft.com/en-us/library/hh567368.aspx
     /*
     MSVC++ 13.0 _MSC_VER == 1900 (Visual Studio 2015)
     MSVC++ 12.0 _MSC_VER == 1800 (Visual Studio 2013)
@@ -85,6 +86,7 @@
     #if _MSC_VER >= 1800  //  Visual Studio 2013
         #define VAR_TEMPLATES_SUPPORTED
         #define INITIALIZER_LISTS_SUPPORTED
+		#define EXPLICIT_CONVERSION_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1900  //  Visual Studio 2015
@@ -183,6 +185,7 @@
 	#define LONGLONG_SUPPORTED
 	#define NATIVE_ALIGNOF
 	#define TYPETRAITS_SUPPORTED
+	#define EXPLICIT_CONVERSION_SUPPORTED
 
 	#ifndef __clang__
 		#define NULLPTR_SUPPORTED

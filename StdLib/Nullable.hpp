@@ -213,11 +213,33 @@ public:
         return _is_null;
     }
 
-    /*explicit*/ operator const X & () const
+#ifdef EXPLICIT_CONVERSION_SUPPORTED
+    explicit operator const X & () const
     {
         ASSUME( _is_null == false );
         return ToRef();
     }
+#endif
+
+	X &InitializeAndGet()
+	{
+		if( _is_null )
+		{
+			new (&_object) X();
+			_is_null = false;
+		}
+		return ToRef();
+	}
+
+	const X &InitializeAndCGet()
+	{
+		if( _is_null )
+		{
+			new (&_object) X();
+			_is_null = false;
+		}
+		return ToRef();
+	}
 
 	X &Get()
     {
@@ -231,6 +253,50 @@ public:
 	    return ToRef();
     }
 
+	const X &CGet() const
+    {
+        ASSUME( _is_null == false );
+	    return ToRef();
+    }
+
+	X *InitializeAndAddr()
+	{
+		if( _is_null )
+		{
+			new (&_object) X();
+			_is_null = false;
+		}
+		return &ToRef();
+	}
+
+	const X *InitializeAndCAddr() const
+	{
+		if( _is_null )
+		{
+			new (&_object) X();
+			_is_null = false;
+		}
+		return &ToRef();
+	}
+
+	X *Addr()
+	{
+        ASSUME( _is_null == false );
+		return &ToRef();
+	}
+
+	const X *Addr() const
+	{
+        ASSUME( _is_null == false );
+		return &ToRef();
+	}
+
+	const X *CAddr() const
+	{
+        ASSUME( _is_null == false );
+		return &ToRef();
+	}
+
 	X *operator -> ()
 	{
         ASSUME( _is_null == false );
@@ -242,10 +308,33 @@ public:
         ASSUME( _is_null == false );
 		return &ToRef();
 	}
+
+	X ValueOrDefault() const
+	{
+		if( _is_null )
+		{
+			return X();
+		}
+		return ToRef();
+	}
+
+	X ValueOrDefault( const X &def ) const
+	{
+		if( _is_null )
+		{
+			return def;
+		}
+		return ToRef();
+	}
 };
 
 //  To prevent using Nullable as a holder for reference types
 template < typename X > class Nullable < X & >
+{
+    Nullable();
+};
+
+template < typename X > class Nullable < const X & >
 {
     Nullable();
 };

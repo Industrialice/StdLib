@@ -2001,7 +2001,7 @@ uiw Funcs::PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_li
 
     Nullable < uiw > written = PrintToStrArgListImpl < false >( 0, 0, cp_fmt, args, &file );
 
-	uiw actuallWritten = written.IsNull() ? 0 : written.Get();
+	uiw actuallWritten = written.ValueOrDefault( 0 );
 	if( actuallWritten > maxLen )
 	{
 		SOFTBREAK;  //  target string is too small
@@ -2029,7 +2029,7 @@ uiw Funcs::PrintToFileArgList( FileInterface *file, const char *cp_fmt, va_list 
 {
 	ASSUME( file && file->IsOpened() && (file->ProcModeGet() & FileProcMode::Write) && cp_fmt );
 
-	return PrintToStrArgListImpl < false >( 0, 0, cp_fmt, args, file );
+	return PrintToStrArgListImpl < false >( 0, 0, cp_fmt, args, file ).ValueOrDefault( 0 );
 }
 
 #if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
