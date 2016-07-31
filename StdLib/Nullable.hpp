@@ -81,7 +81,7 @@ public:
 
 	bln operator != ( const X &source ) const
 	{
-		return !this->operator != ( source );
+		return !this->operator == ( source );
 	}
 
     bln operator == ( const Nullable &source ) const
@@ -169,11 +169,12 @@ public:
 #ifdef MOVE_SUPPORTED
 	Nullable( Nullable &&source )
 	{
+		this->_is_null = source._is_null;
 		if( source._is_null == false )
 		{
 			ToRef() = std::move( *(X *)&source._object );
+			source._is_null = true;
 		}
-		this->_is_null = source._is_null;
 	}
 
 	Nullable &operator = ( Nullable &&source )
@@ -184,7 +185,7 @@ public:
 		{
 			if( this->_is_null == false )
 			{
-				*(X *)&this->_object = std::move( *(X *)&source._object );
+				ToRef() = std::move( *(X *)&source._object );
 			}
 		}
 		else
@@ -212,7 +213,7 @@ public:
         return _is_null;
     }
 
-    operator const X & () const
+    /*explicit*/ operator const X & () const
     {
         ASSUME( _is_null == false );
         return ToRef();
@@ -220,21 +221,25 @@ public:
 
 	X &Get()
     {
+        ASSUME( _is_null == false );
 	    return ToRef();
     }
 
 	const X &Get() const
     {
+        ASSUME( _is_null == false );
 	    return ToRef();
     }
 
 	X *operator -> ()
 	{
+        ASSUME( _is_null == false );
 		return &ToRef();
 	}
 
 	const X *operator -> () const
 	{
+        ASSUME( _is_null == false );
 		return &ToRef();
 	}
 };
