@@ -64,6 +64,7 @@
 #include "CF16.hpp"
 #include "CCustomF16.hpp"
 #include "Error.hpp"
+#include "RandomizingFuncs.hpp"
 
 EXTERNALS void StdCoreLib_Initialize();
 

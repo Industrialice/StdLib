@@ -376,4 +376,16 @@
     #define NOINLINE
 #endif
 
+#ifdef MOVE_SUPPORTED
+	#define APPLY_IF_MOVE_SUPPORTED( ... ) __VA_ARGS__
+#else
+	#define APPLY_IF_MOVE_SUPPORTED( ... )
+#endif
+
+#ifdef DEFAULT_FUNC_PARAMS_SUPPORTED
+	#define APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( ... ) __VA_ARGS__
+#else
+	#define APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( ... )
+#endif
+
 #endif

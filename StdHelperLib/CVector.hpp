@@ -8,12 +8,6 @@
 #include "Iterator.hpp"
 #include "Algorithm.hpp"
 
-#ifdef DEFAULT_FUNC_PARAMS_SUPPORTED
-    #define VEC_DEF_PARAM( ... ) __VA_ARGS__
-#else
-    #define VEC_DEF_PARAM( ... )
-#endif
-
 namespace StdLib
 {
 namespace Private
@@ -509,7 +503,7 @@ public:
     {
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Assign VEC_DEF_PARAM(< false >)( begin.Ptr(), this->_Size() );
+            Assign APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( begin.Ptr(), this->_Size() );
         }
         else  //  can't be overlapped because CVec iterator is random
         {
@@ -677,7 +671,7 @@ public:
 		return target;
     }
 
-    VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
+    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
     void Insert( count_type pos, const X &source, count_type count = 1 )
     {
         uiw offset = &source - this->_GetArr();
@@ -708,7 +702,7 @@ public:
     }
 #endif
 
-    VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
+    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
     void Insert( count_type pos, const X *source, count_type count )
     {
         if( is_checkOverlap )
@@ -727,10 +721,10 @@ public:
 
     template < uiw count > void Insert( count_type pos, const X (&source)[ count ] )
     {
-        Insert VEC_DEF_PARAM(< false >)( pos, source, count );
+        Insert APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( pos, source, count );
     }
 
-    VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
+    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
     void Insert( count_type pos, const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
         ASSUME( pos < this->_Size() && source.Size() > start );
@@ -739,10 +733,10 @@ public:
             count = source.Size() - start;
         }
 
-        Insert VEC_DEF_PARAM(< is_checkOverlap >)( pos, source.Data() + start, count );
+        Insert APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< is_checkOverlap >)( pos, source.Data() + start, count );
     }
 
-    template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
+    template < typename IterType APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Insert( IterConst where, IterType begin, IterType end )
     {
         uiw dist = Algorithm::Distance( begin, end );
@@ -750,7 +744,7 @@ public:
         ASSUME( pos < this->_Size() );
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Insert VEC_DEF_PARAM(< is_checkOverlap >)( pos, begin.Ptr(), dist );
+            Insert APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< is_checkOverlap >)( pos, begin.Ptr(), dist );
         }
         else  //  can't be overlapped because CVec iterator is random
         {
@@ -765,12 +759,12 @@ public:
 #ifdef INITIALIZER_LISTS_SUPPORTED
     void Insert( count_type pos, std::initializer_list < X > what )
     {
-        Insert VEC_DEF_PARAM(< false >)( pos, what.begin(), what.size() );
+        Insert APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( pos, what.begin(), what.size() );
     }
 
     void Insert( IterConst where, std::initializer_list < X > what )
     {
-        Insert VEC_DEF_PARAM(< false >)( where, what.begin(), what.size() );
+        Insert APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( where, what.begin(), what.size() );
     }
 #endif
 
@@ -838,7 +832,7 @@ public:
 		return target;
 	}
 
-    VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
+    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
     void Append( const X *source, count_type count )
     {
         count_type curCount = this->_Size();
@@ -861,10 +855,10 @@ public:
 
     template < uiw count > void Append( const X (&source)[ count ] )
     {
-        this->Append VEC_DEF_PARAM(< false >)( source, count );
+        this->Append APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( source, count );
     }
 
-    VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
+    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
     void Append( const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
         ASSUME( start < source._Size() || count == 0 );
@@ -874,13 +868,13 @@ public:
         _Copy < false, true >( this->_GetArr() + curCount, (X *)source.Data() + start, count );
     }
 
-    template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
+    template < typename IterType APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Append( IterType begin, IterType end )
     {
         uiw dist = Algorithm::Distance( begin, end );
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Append VEC_DEF_PARAM(< is_checkOverlap >)( begin.Ptr(), dist );
+            Append APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< is_checkOverlap >)( begin.Ptr(), dist );
         }
         else  //  can't be overlapped because CVec iterator is random
         {
@@ -940,7 +934,7 @@ private:
     }
 
 public:
-    VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
+    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
     void Assign( const X &source, count_type count = 1 )
     {
         count_type curCount = this->_Size();
@@ -975,7 +969,7 @@ public:
     }
 #endif
 
-    VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
+    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
     void Assign( const X *source, count_type count )
     {
         uiw index = source - this->_GetArr();
@@ -993,10 +987,10 @@ public:
 
     template < uiw count > void Assign( const X (&source)[ count ] )
     {
-        this->Assign VEC_DEF_PARAM(< false >)( source, count );
+        this->Assign APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( source, count );
     }
 
-    VEC_DEF_PARAM( template < bln is_checkOverlap = true > )
+    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
     void Assign( const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
         ASSUME( start <= source.Size() || count == 0 );
@@ -1013,13 +1007,13 @@ public:
         }
     }
 
-    template < typename IterType VEC_DEF_PARAM( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
+    template < typename IterType APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Assign( IterType begin, IterType end )
     {
         uiw dist = Algorithm::Distance( begin, end );
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Assign VEC_DEF_PARAM(< is_checkOverlap >)( begin.Ptr(), dist );
+            Assign APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< is_checkOverlap >)( begin.Ptr(), dist );
         }
         else  //  can't be overlapped because CVec iterator is random
         {
@@ -1036,7 +1030,7 @@ public:
 #ifdef INITIALIZER_LISTS_SUPPORTED
     void Assign( std::initializer_list < X > ilist )
     {
-        Assign VEC_DEF_PARAM(< false >)( ilist.begin(), ilist.size() );
+        Assign APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( ilist.begin(), ilist.size() );
     }
 #endif
 

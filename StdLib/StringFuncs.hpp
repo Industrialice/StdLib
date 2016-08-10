@@ -24,9 +24,9 @@
 namespace StdLib {
 namespace Funcs
 {
-    EXTERNALS uiw NormalizeMem32( ui32 val, char *p_buf );  //  returns buffer size after normalize
-    EXTERNALS uiw NormalizeMem64( ui64 val, char *p_buf );  //  returns buffer size after normalize
-    EXTERNALS uiw NormalizeMemWord( uiw val, char *p_buf );  //  returns buffer size after normalize
+    EXTERNALS uiw NormalizeMem32( ui32 val, char *p_buf );  //  returns buffer size after normalization
+    EXTERNALS uiw NormalizeMem64( ui64 val, char *p_buf );  //  returns buffer size after normalization
+    EXTERNALS uiw NormalizeMemWord( uiw val, char *p_buf );  //  returns buffer size after normalization
 
     typedef bln (*ChrTestFunc)( char );
 
@@ -151,7 +151,8 @@ namespace Funcs
     EXTERNALS uiw F32ToStrWithPrecise( f32 val, ui32 precise, char *p_buf );
     EXTERNALS uiw F64ToStr( f64 val, char *p_buf );
     EXTERNALS uiw F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf );
-
+	
+	//  TODO: add flags that allow to check for success
 	//  TODO: wchar_t handling
 	/*
 	a - pointer, integer word as bin str [param - when non-zero, use upper case]
@@ -244,6 +245,7 @@ namespace Funcs
     {
         STATIC_CHECK( TypeDesc < X >::is_pod, "you can't pass non-pod args to variadic functions" );
         STATIC_CHECK( TypeDesc < X >::is_array || (sizeof(X) > 0 && sizeof(X) <= 8), "you can't use weird-sized types with variadic functions" );
+		typedef typename TypeDesc < X >::type underlyingTypeX;
 		_ArgType argType = { sizeof(X), false, false, false };
         if( TypeDesc < X >::is_fp )
         {
@@ -254,13 +256,13 @@ namespace Funcs
 		{
 			argType.size = sizeof(uiw); //  when array, size can be off
 			argType.is_pointer = true;
-			if( typeid(typename TypeDesc < X >::type) == typeid(char) )
+			if( AreTypesTheSame < underlyingTypeX, char >() )
 			{
 				argType.is_string = true;
 			}
 			return argType;
 		}
-        if( TypeDesc < X >::is_integer || typeid(X) == typeid(bln) || typeid(X) == typeid(char) )
+        if( TypeDesc < X >::is_integer || AreTypesTheSame < underlyingTypeX, bln >() || AreTypesTheSame < underlyingTypeX, char >() )
         {
 			if( sizeof(X) < sizeof(int) )
 			{

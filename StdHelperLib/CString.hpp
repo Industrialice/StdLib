@@ -679,10 +679,10 @@ public:
 	TCStr( TCStr &&source )
 	{
 		ASSUME( this != &source );
-		_MemCpy( _static_str, source._static_str, static_size );
+		_MemCpy( _static_str, source._static_str, sizeof(source._static_str) );
 		_count = source._count;
-		source._count = 0;
-		source._static_str[ 0 ] = (charType)0;
+		//source._count = 0;
+		//source._static_str[ 0 ] = (charType)0;
 		source.SetStatic();
 	}
 #endif
@@ -1201,10 +1201,10 @@ public:
 	ownType &Assign( TCStr &&source )
 	{
 		ASSUME( this != &source );
-		_MemCpy( _static_str, source._static_str, static_size );
+		_MemCpy( _static_str, source._static_str, sizeof(source._static_str) );
 		_count = source._count;
-		source._count = 0;
-		source._static_str[ 0 ] = (charType)0;
+		//source._count = 0;
+		//source._static_str[ 0 ] = (charType)0;
 		source.SetStatic();
 		return *this;
 	}
@@ -1425,12 +1425,20 @@ public:
         return *this;
     }
 
-	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr operator + ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr operator + ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const APPLY_IF_MOVE_SUPPORTED( & )
     {
         return TCStr( this->CStr(), this->_count, source.CStr(), source.Size() );
     }
+	
+#ifdef MOVE_SUPPORTED	
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr operator + ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) &&
+    {
+        this->AddString < false >( source.CStr(), source.Size() );
+		return std::move( *this );
+    }
+#endif
 
-    TCStr operator + ( const charType *str ) const
+    TCStr operator + ( const charType *str ) const //APPLY_IF_MOVE_SUPPORTED( & )
     {
         if( str == 0 )
         {
@@ -1439,10 +1447,31 @@ public:
         return TCStr( this->CStr(), this->_count, str, GetStringLength( str ) );
     }
 
-    TCStr operator + ( charType symbol ) const
+/*#ifdef MOVE_SUPPORTED
+    TCStr operator + ( const charType *str ) &&
+    {
+        if( str == 0 )
+        {
+            str = _EmptyStr < charType >::Get();
+        }
+		this->AddString < true >( str, GetStringLength( str ) );
+		return std::move( *this );
+    }
+#endif*/
+
+    TCStr operator + ( charType symbol ) const //APPLY_IF_MOVE_SUPPORTED( & )
     {
         return TCStr( this->CStr(), this->_count, &symbol, 1 );
     }
+
+/*#ifdef MOVE_SUPPORTED
+    TCStr operator + ( charType symbol ) &&
+    {
+        charType *str = AddSpace( 1 ) + _count;
+		*str = symbol;
+		return std::move( *this );
+    }
+#endif*/
 
 	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > friend TCStr operator + ( const charType *str, const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &second )
     {
@@ -1452,6 +1481,14 @@ public:
         }
         return TCStr( str, GetStringLength( str ), second.CStr(), second.Size() );
     }
+
+#ifdef MOVE_SUPPORTED
+	TCStr operator + ( TCStr &&source )
+    {
+		this->Append( std::move( source ) );
+		return *this;
+    }
+#endif
 
 	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > friend TCStr operator + ( charType symbol, const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &second )
     {

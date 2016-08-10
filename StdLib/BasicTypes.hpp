@@ -123,6 +123,40 @@ template < typename Candidate, typename Of > class IsDerivedFrom
 
 public:
     enum { value = sizeof(Func(Converter < Candidate, Of >(), int())) == sizeof(int) };
+	operator bln() const
+	{
+		return value;
+	}
+	bln operator () () const
+	{
+		return value;
+	}
+};
+
+template < typename A, typename B > struct AreTypesTheSame
+{
+	enum { value = false };
+	operator bln() const
+	{
+		return false;
+	}
+	bln operator () () const
+	{
+		return false;
+	}
+};
+
+template < typename T > struct AreTypesTheSame < T, T >
+{
+	enum { value = true };
+	operator bln() const
+	{
+		return true;
+	}
+	bln operator () () const
+	{
+		return true;
+	}
 };
 
 template < const uiw al > struct TypeWithSizeAndAlignment;

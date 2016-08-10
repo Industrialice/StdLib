@@ -146,7 +146,7 @@ public:
 			{
 				if( this->_is_null == false )
 				{
-					this->ToRef() = source->ToRef();
+					this->ToRef() = source.ToRef();
 				}
 			}
 			else

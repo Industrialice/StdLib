@@ -496,7 +496,7 @@ template < typename... Args > __forceinline CStr LogEntry( const Args &... args 
 
 template < typename... Args > CStr Concat( const Args &... strings )
 {
-    static_assert( typeid(strings) == typeid(CStr) )...;
+    static_assert( AreTypesTheSame< typename TypeDesc < Args >::type, CStr >() )...;
 }
 
 void FindBrokenNames();
@@ -573,9 +573,14 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 	
+	CStr str = "123";
+	str = str + str;
+
+	::printf( "%s\n", str.CStr() );
+
 	//PrintSameFiles( L"D:\\Pictures" );
 
-	FileCFILEStream::fileError err;
+	/*FileCFILEStream::fileError err;
 	FileCFILEStream file( L"test.txt", FileOpenMode::CreateAlways, FileProcMode::Write, FileCacheMode::Default, &err );
 	if( !file.IsOpened() )
 	{
@@ -587,7 +592,7 @@ int __cdecl main()
 		{
 			printf( "writing failed\n" );
 		}
-	}
+	}*/
 
 	/*for( ui32 index = 0; index < 100; ++index )
 	{

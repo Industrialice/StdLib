@@ -11,6 +11,7 @@ namespace StdLib {
 
 //  volatile doesn't supported
 //  TODO: ** pointers, references to pointers, references to arrays and other composite types
+//  TODO: rvalues for C++11
 
 template < typename X > struct TypeDesc
 {
