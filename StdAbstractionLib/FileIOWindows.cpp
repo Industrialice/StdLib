@@ -211,7 +211,7 @@ i64 FileIO::Private::FileIO_OffsetGet( CFileBasis *file, FileOffsetMode::mode_t 
 		DSA( error, StdLib_FileError() );
 		return -1;
 	}
-	ASSUME( o_pos.QuadPart >= file->offsetToStart );
+	ASSUME( o_pos.QuadPart >= (i64)file->offsetToStart );
 	LONGLONG offsetFromBegin = o_pos.QuadPart - file->offsetToStart;
 
 	if( mode == FileOffsetMode::FromBegin )
@@ -297,7 +297,7 @@ NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, FileOffsetMode
 	{
 		if( mode != FileOffsetMode::FromBegin )
 		{
-			if( o_move.QuadPart < file->offsetToStart )
+			if( o_move.QuadPart < (i64)file->offsetToStart )
 			{
 				o_move.QuadPart = file->offsetToStart;
 				if( !::SetFilePointerEx( file->handle, o_move, &o_move, FILE_BEGIN ) )
@@ -307,7 +307,7 @@ NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, FileOffsetMode
 				}
 			}
 		}
-		ASSUME( o_move.QuadPart >= file->offsetToStart );
+		ASSUME( o_move.QuadPart >= (i64)file->offsetToStart );
 		o_move.QuadPart -= file->offsetToStart;
 	}
 
@@ -327,7 +327,7 @@ ui64 FileIO::Private::FileIO_SizeGet( const CFileBasis *file, CError *error )
 		DSA( error, Error::UnknownError() );
         return 0;
     }
-	ASSUME( o_size.QuadPart >= file->offsetToStart );
+	ASSUME( o_size.QuadPart >= (i64)file->offsetToStart );
 	o_size.QuadPart -= file->offsetToStart;
 	DSA( error, Error::Ok() );
     return o_size.QuadPart;
@@ -360,7 +360,7 @@ NOINLINE bln FileIO::Private::FileIO_SizeSet( CFileBasis *file, ui64 newSize, CE
 		DSA( error, StdLib_FileError() );
         return false;
     }
-    ASSUME( currentOffset.QuadPart >= file->offsetToStart );
+    ASSUME( currentOffset.QuadPart >= (i64)file->offsetToStart );
 
     if( currentOffset.QuadPart != newSize )
     {

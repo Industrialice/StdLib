@@ -782,7 +782,6 @@ public:
 	void Append( X &&source )
 	{
 		count_type curCount = this->_Size();
-		ASSUME( (&source - this->_GetArr()) >= curCount );  //  overlapping isn't allowed
 		_SizeUp( curCount, curCount + 1 );
 		new (this->_GetArr() + curCount) X( std::move( source ) );
 	}

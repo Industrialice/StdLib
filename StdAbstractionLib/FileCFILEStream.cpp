@@ -28,7 +28,7 @@ bln FileCFILEStream::Open( const FilePath &path, FileOpenMode::mode_t openMode, 
 	Nullable < bln > is_fileExists = Files::IsExists( path );
 	if( is_fileExists.IsNull() )
 	{
-		DSA( error, Error::UnknownError(), "failed to check file's existense" );
+		DSA( error, fileError( Error::UnknownError(), "failed to check file's existense" ) );
 		return false;
 	}
 

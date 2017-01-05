@@ -92,7 +92,7 @@ const f64 f64_nan = f64_inf * 0.f;  //  one of the possible NaN values
 const ui64 f64_exp_mask = 0x7FF0000000000000ULL;
 const ui64 f64_significand_mask = 0x000FFFFFFFFFFFFFULL;
 const ui64 f64_sign_mask = 0x8000000000000000ULL;
-const f32 f64_piHalf = 1.5707963267948966192315;
+const f64 f64_piHalf = 1.5707963267948966192315;
 const f64 f64_pi = 3.141592653589793238463;
 const f64 f64_pi2 = 6.283185307179586476926;
 

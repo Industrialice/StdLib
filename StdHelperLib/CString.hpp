@@ -554,7 +554,7 @@ public:
 		DebugValidate( this );
     }
 
-	template < uiw Size > TCStr( const charType (&const str)[ Size ] ) : TCStr( str, Size - 1 )
+	template < uiw Size > TCStr( const charType (&str)[ Size ] ) : TCStr( str, Size - 1 )
 	{}
 
     NOINLINE TCStr( const charType *str, uiw len )
