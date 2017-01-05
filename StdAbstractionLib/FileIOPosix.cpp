@@ -32,10 +32,11 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
     file->offsetToStart = 0;
 
     fileError o_error;
-    int fileHandle;
+    int fileHandle = -1;
     mode_t process_mask;
     int flags = 0;
     int seekResult;
+	int adviceResult;
 
     if( !pnn.IsValid() )
     {
@@ -98,40 +99,6 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
         ASSUME( openMode == FileOpenMode::OpenExisting );
     }
 
-    if( cacheMode & (FileCacheMode::LinearRead | FileCacheMode::RandomRead) )
-    {
-		if( (cacheMode & (FileCacheMode::LinearRead | FileCacheMode::RandomRead)) == (FileCacheMode::LinearRead | FileCacheMode::RandomRead) )
-		{
-			o_error = fileError( Error::InvalidArgument(), "Both FileCacheMode::LinearRead and FileCacheMode::RandomRead are specified" );
-			goto toExit;
-		}
-
-		if( (procMode & FileProcMode::Read) == 0 )
-		{
-			o_error = fileError( Error::InvalidArgument(), "FileCacheMode::LinearRead or FileCacheMode::RandomRead must be used only when FileProcMode::Read is specified" );
-			goto toExit;
-		}
-
-		if( cacheMode & FileCacheMode::LinearRead )
-		{
-			//  TODO:
-		}
-		else
-		{
-			//  TODO:
-		}
-    }
-	if( cacheMode & FileCacheMode::DisableSystemWriteCache )
-	{
-		if( (procMode & FileProcMode::Write) == 0 )
-		{
-			o_error = fileError( Error::InvalidArgument(), "FileCacheMode::DisableSystemWriteCache must be used only when FileProcMode::Write is specified" );
-			goto toExit;
-		}
-
-		//  TODO:
-	}
-
     process_mask = ::umask( 0 );
     fileHandle = ::open( pnn.PlatformPath(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH );
     ::umask( process_mask );
@@ -166,6 +133,44 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
         goto toExit;
     }
 
+    if( cacheMode & (FileCacheMode::LinearRead | FileCacheMode::RandomRead) )
+    {
+		if( (cacheMode & (FileCacheMode::LinearRead | FileCacheMode::RandomRead)) == (FileCacheMode::LinearRead | FileCacheMode::RandomRead) )
+		{
+			o_error = fileError( Error::InvalidArgument(), "Both FileCacheMode::LinearRead and FileCacheMode::RandomRead are specified" );
+			goto toExit;
+		}
+
+		if( (procMode & FileProcMode::Read) == 0 )
+		{
+			o_error = fileError( Error::InvalidArgument(), "FileCacheMode::LinearRead or FileCacheMode::RandomRead must be used only when FileProcMode::Read is specified" );
+			goto toExit;
+		}
+
+		#if _XOPEN_SOURCE >= 600 || _POSIX_C_SOURCE >= 200112L
+			if( cacheMode & FileCacheMode::LinearRead )
+			{
+				adviceResult = ::posix_fadvise( fileHandle, 0, 0, POSIX_FADV_SEQUENTIAL );
+				ASSUME( adviceResult == 0 );
+			}
+			else
+			{
+				adviceResult = ::posix_fadvise( fileHandle, 0, 0, POSIX_FADV_RANDOM );
+				ASSUME( adviceResult == 0 );
+			}
+		#endif
+    }
+	if( cacheMode & FileCacheMode::DisableSystemWriteCache )
+	{
+		if( (procMode & FileProcMode::Write) == 0 )
+		{
+			o_error = fileError( Error::InvalidArgument(), "FileCacheMode::DisableSystemWriteCache must be used only when FileProcMode::Write is specified" );
+			goto toExit;
+		}
+
+		//  TODO:
+	}
+
     if( (procMode & FileProcMode::WriteAppend) == FileProcMode::WriteAppend )
     {
         seekResult = ::lseek64( fileHandle, 0, SEEK_END );
@@ -184,10 +189,19 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
     file->handle = fileHandle;
     file->bufferPos = 0;
     file->readBufferCurrentSize = 0;
+	file->is_reading = false;
+	file->is_shouldCloseFileHandle = true;
 
 toExit:
+	::close( fileHandle );
     DSA( po_error, o_error );
     return file->handle != -1;
+}
+        
+NOINLINE bln FileIO::Private::FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle, fileError *error )
+{
+	DSA( error, Error::Unimplemented() );
+	return false;
 }
 
 NOINLINE void FileIO::Private::FileIO_Close( CFileBasis *file )
@@ -198,8 +212,11 @@ NOINLINE void FileIO::Private::FileIO_Close( CFileBasis *file )
         return;
     }
     FileIO_Flush( file );
-    int result = ::close( file->handle );
-    ASSUME( result == 0 );
+	if( file->is_shouldCloseFileHandle )
+	{
+		int result = ::close( file->handle );
+		ASSUME( result == 0 );
+	}
     file->handle = -1;
 }
 

@@ -87,17 +87,13 @@
         #define VAR_TEMPLATES_SUPPORTED
         #define INITIALIZER_LISTS_SUPPORTED
 		#define EXPLICIT_CONVERSION_SUPPORTED
+		#define CONSTRUCTORS_DELEGATION_SUPPORTED
     #endif
 
     #if _MSC_VER >= 1900  //  Visual Studio 2015
         #define NOEXCEPT noexcept
         #define CONSTEXPR_SUPPORTED
     #endif
-
-    #define INT64_NUMBER __int64
-    #define UINT64_NUMBER unsigned __int64
-    #define ASINT64( number ) number##I64
-    #define ASUINT64( number ) number##UI64
 
     #if defined(_M_IX86) || defined(_M_AMD64)
         #ifndef LITTLE_ENDIAN
@@ -186,6 +182,7 @@
 	#define NATIVE_ALIGNOF
 	#define TYPETRAITS_SUPPORTED
 	#define EXPLICIT_CONVERSION_SUPPORTED
+	#define CONSTRUCTORS_DELEGATION_SUPPORTED
 
 	#ifndef __clang__
 		#define NULLPTR_SUPPORTED
@@ -271,11 +268,6 @@
 			#define ASSUME( what ) do { if( !(what) ) { __builtin_unreachable(); } } while( 0 )
 		#endif
 	#endif
-
-    #define INT64_NUMBER long long
-    #define UINT64_NUMBER unsigned long long
-    #define ASINT64( number ) number##LL
-    #define ASUINT64( number ) number##ULL
 
     #define ZERO_LENGTH_ARRAYS_SUPPORTED
 
@@ -367,25 +359,8 @@
     #define NOEXCEPT
 #endif
 
-/*  TODO: wtf  */
-#if defined(TYPETRAITS_SUPPORTED) && defined(_WIN32_WCE)
-    #undef TYPETRAITS_SUPPORTED
-#endif
-
 #ifndef NOINLINE
     #define NOINLINE
-#endif
-
-#ifdef MOVE_SUPPORTED
-	#define APPLY_IF_MOVE_SUPPORTED( ... ) __VA_ARGS__
-#else
-	#define APPLY_IF_MOVE_SUPPORTED( ... )
-#endif
-
-#ifdef DEFAULT_FUNC_PARAMS_SUPPORTED
-	#define APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( ... ) __VA_ARGS__
-#else
-	#define APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( ... )
 #endif
 
 #endif

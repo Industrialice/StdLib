@@ -9,12 +9,10 @@ template < typename X, typename reservator, typename allocator, uiw static_size 
 
 template < typename X, uiw static_size > class _CBasisVec < X, void, void, static_size > : CharMovable  /*  static base  */
 {
-    _CBasisVec( const _CBasisVec &source );
-    _CBasisVec &operator = ( const _CBasisVec &source );
-#ifdef MOVE_SUPPORTED
-    _CBasisVec( _CBasisVec &&source );
-    void operator = ( _CBasisVec &&source );
-#endif
+    _CBasisVec( const _CBasisVec &source ) = delete;
+    _CBasisVec &operator = ( const _CBasisVec &source ) = delete;
+    _CBasisVec( _CBasisVec &&source ) = delete;
+    void operator = ( _CBasisVec &&source ) = delete;
 
 public:
     typedef uiw count_type;
@@ -125,12 +123,10 @@ private:
 
 template < typename X, typename reservator, typename allocator > class _CBasisVec < X, reservator, allocator, 0 > : CharMovable  /*  dynamic base reservable  */
 {
-    _CBasisVec( const _CBasisVec &source );
-    _CBasisVec &operator = ( const _CBasisVec &source );
-#ifdef MOVE_SUPPORTED
-    _CBasisVec( _CBasisVec &&source );
-    _CBasisVec &operator = ( _CBasisVec &&source );
-#endif
+    _CBasisVec( const _CBasisVec &source ) = delete;
+    _CBasisVec &operator = ( const _CBasisVec &source ) = delete;
+    _CBasisVec( _CBasisVec &&source ) = delete;
+    _CBasisVec &operator = ( _CBasisVec &&source ) = delete;
 
 public:
     typedef typename reservator::count_type count_type;
@@ -328,12 +324,10 @@ private:
 
 template < typename X, typename allocator > class _CBasisVec < X, void, allocator, 0 > : CharMovable  /*  dynamic base non-reservable  */
 {
-    _CBasisVec( const _CBasisVec &source );
-    _CBasisVec &operator = ( const _CBasisVec &source );
-#ifdef MOVE_SUPPORTED
-    _CBasisVec( _CBasisVec &&source );
-    _CBasisVec &operator = ( _CBasisVec &&source );
-#endif
+    _CBasisVec( const _CBasisVec &source ) = delete;
+    _CBasisVec &operator = ( const _CBasisVec &source ) = delete;
+    _CBasisVec( _CBasisVec &&source ) = delete;
+    _CBasisVec &operator = ( _CBasisVec &&source ) = delete;
 
 public:
     typedef uiw count_type;
@@ -480,12 +474,10 @@ private:
 
 template < typename X, typename allocator, uiw static_size > class _CBasisVec < X, void, allocator, static_size > : CharMovable  /*  dynamic base non-reservable with fixed preallocation  */
 {
-    _CBasisVec( const _CBasisVec &source );
-    _CBasisVec &operator = ( const _CBasisVec &source );
-#ifdef MOVE_SUPPORTED
-    _CBasisVec( _CBasisVec &&source );
-    _CBasisVec &operator = ( _CBasisVec &&source );
-#endif
+    _CBasisVec( const _CBasisVec &source ) = delete;
+    _CBasisVec &operator = ( const _CBasisVec &source ) = delete;
+    _CBasisVec( _CBasisVec &&source ) = delete;
+    _CBasisVec &operator = ( _CBasisVec &&source ) = delete;
 
 public:
     typedef uiw count_type;

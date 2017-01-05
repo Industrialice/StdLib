@@ -123,7 +123,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
 
     union
     {
-        charType _static_str[ static_size ];  //  if last byte is zero - static storage is used, nonzero - dynamic
+        charType _static_str[ static_size ];  //  if the last byte is zero - static storage is being used, nonzero - dynamic
         struct
         {
             charType *_dynamic_str;
@@ -132,19 +132,38 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
     };
     uiw _count;  //  without zero symbol
 
+#ifdef DEBUG
+	bln _is_static;
+
+	inline void DebugValidate( const TCStr *str )
+	{
+		ASSUME( str->_is_static == (str->_static_str[ static_last ] == (charType)0) );
+	}
+#else
+	inline void DebugValidate( const TCStr *str ) {}
+#endif
+
+	bln FitsStatic( uiw size )
+	{
+		return size < static_size;
+	}
+
     void SetStatic()
     {
         _static_str[ static_last ] = (charType)0;
+		DBGCODE( _is_static = true; )
     }
 
     void SetDynamic()
     {
         _static_str[ static_last ] = (charType)0x1;
+		DBGCODE( _is_static = false; )
     }
 
     void SetDynamic( uiw reserve )
     {
         _static_str[ static_last ] = (charType)0x1;
+		DBGCODE( _is_static = false; )
         _reserved = reserve;
         _dynamic_str = allocator::template Alloc < charType >( _reserved + 1 );
     }
@@ -172,6 +191,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
     template < bln isCanBeAliased > NOINLINE void AddString( const charType *str, uiw len )
     {
         ASSUME( str != 0 || len == 0 );
+		DebugValidate( this );
 
         charType *targetStr;
         charType temp[ static_last ];
@@ -189,14 +209,14 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         }
         else
         {
-            if( _count + len >= static_size )
+            if( FitsStatic( _count + len ) == false )
             {
                 uiw reserved = _count + len;
                 charType *newStr = allocator::template Alloc < charType >( reserved + 1 );
                 _MemCpyStr( newStr, _static_str, _count );
                 if( isCanBeAliased && IsStrInRange( str, _static_str, _static_str + _count ) )
                 {
-                    ASSUME( len <= static_last );
+                    ASSUME( FitsStatic( len ) );
                     _MemCpyStr( temp, str, len );
                     str = temp;
                 }
@@ -214,11 +234,16 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         _MemCpyStr( targetStr + _count, str, len );
         _count += len;
         targetStr[ _count ] = (charType)0;
+
+		DebugValidate( this );
     }
 
-    /*  space will be left uninitialized  */
+    //  space will be left uninitialized
+	//  returns pointer to the beginning of the current string
     NOINLINE charType *AddSpace( uiw len )
     {
+		DebugValidate( this );
+
         charType *thisStr;
 
         if( IsDynamic() )
@@ -228,7 +253,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         }
         else
         {
-            if( _count + len >= static_size )
+            if( FitsStatic( _count + len ) == false )
             {
                 uiw reserved = _count + len;
                 charType *newStr = allocator::template Alloc < charType >( reserved + 1 );
@@ -246,12 +271,15 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
 
         _count += len;
         thisStr[ _count ] = (charType)0;
+		
+		DebugValidate( this );
         return thisStr;
     }
 
     template < bln isCanBeAliased > NOINLINE void InsertString( uiw index, const charType *str, uiw len )
     {
         ASSUME( str != 0 || len == 0 );
+		DebugValidate( this );
 
         charType temp[ static_last ];
         charType *dynPtr;
@@ -281,7 +309,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         }
         else
         {
-            if( _count + len >= static_size )
+            if( FitsStatic( _count + len ) == false )
             {
                 uiw reserved = _count + len;
                 charType *newStr = allocator::template Alloc < charType >( reserved + 1 );
@@ -296,7 +324,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
             {
                 if( isCanBeAliased && IsStrInRange( str, _static_str, _static_str + _count ) )
                 {
-                    ASSUME( len < static_size );
+                    ASSUME( FitsStatic( len ) );
                     _MemCpyStr( temp, str, len );
                     str = temp;
                 }
@@ -306,10 +334,13 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         }
 
         _count += len;
+
+		DebugValidate( this );
     }
 
     NOINLINE charType *InsertSpace( uiw index, uiw len )
     {
+		DebugValidate( this );
         charType *thisStr;
 
         if( IsDynamic() )
@@ -320,7 +351,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         }
         else
         {
-            if( _count + len >= static_size )
+            if( FitsStatic( _count + len ) == false )
             {
                 uiw reserved = _count + len;
                 charType *newStr = allocator::template Alloc < charType >( reserved + 1 );
@@ -339,12 +370,14 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         }
 
         _count += len;
+		DebugValidate( this );
         return thisStr;
     }
 
     NOINLINE charType *EraseSpace( uiw index, uiw count )
     {
         ASSUME( (count == 0 || (index < _count)) && count <= _count && index + count <= _count );
+		DebugValidate( this );
         charType *str = Str();
         _count -= count;
         _MemMoveStr( str + index, str + index + count, _count - index + 1 );
@@ -355,12 +388,14 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
                 return Str();
             }
         }
+		DebugValidate( this );
         return str;
     }
 
     NOINLINE charType *EraseAndInsertSpace( const uiw index, uiw replaceCount, const uiw len )
     {
         ASSUME( (replaceCount == 0 || (index < _count)) && replaceCount <= _count && index + replaceCount <= _count );
+		DebugValidate( this );
         charType *thisStr = Str();
         if( replaceCount != len )
         {
@@ -381,16 +416,19 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
                 }
             }
         }
+		DebugValidate( this );
         return thisStr;
     }
 
     void EraseAndInsert( const uiw index, uiw replaceCount, const charType *const str, const uiw len )
     {
+		DebugValidate( this );
         ASSUME( str != 0 || len == 0 );
         ASSUME( (replaceCount == 0 || (index < _count)) && replaceCount <= _count && index + replaceCount <= _count );
         charType *thisStr = EraseAndInsertSpace( index, replaceCount, len );
         _MemCpyStr( thisStr + index, str, len );
         thisStr[ _count ] = (charType)0;
+		DebugValidate( this );
     }
 
 public:
@@ -461,6 +499,7 @@ public:
 
     ~TCStr()
     {
+		DebugValidate( this );
         if( IsDynamic() )
         {
             allocator::Free( _dynamic_str );
@@ -472,11 +511,12 @@ public:
         _static_str[ 0 ] = (charType)0;
         SetStatic();
         _count = 0;
+		DebugValidate( this );
     }
 
     NOINLINE TCStr( uiw reserve )
     {
-        if( reserve >= static_size )
+        if( FitsStatic( reserve ) == false )
         {
             SetDynamic( reserve );
             *_dynamic_str = (charType)0;
@@ -487,6 +527,7 @@ public:
             SetStatic();
         }
         _count = 0;
+		DebugValidate( this );
     }
 
     NOINLINE TCStr( const charType *str )
@@ -499,7 +540,7 @@ public:
         uiw len = GetStringLength( str );
         _count = len;
         charType *thisStr;
-        if( len >= static_size )
+        if( FitsStatic( len ) == false )
         {
             SetDynamic( _count );
             thisStr = _dynamic_str;
@@ -510,7 +551,11 @@ public:
             thisStr = _static_str;
         }
         _MemCpyStr( thisStr, str, _count + 1 );
+		DebugValidate( this );
     }
+
+	template < uiw Size > TCStr( const charType (&const str)[ Size ] ) : TCStr( str, Size - 1 )
+	{}
 
     NOINLINE TCStr( const charType *str, uiw len )
     {
@@ -518,7 +563,7 @@ public:
 
         _count = len;
         charType *thisStr;
-        if( len >= static_size )
+        if( FitsStatic( len ) == false )
         {
             SetDynamic( _count );
             thisStr = _dynamic_str;
@@ -530,25 +575,8 @@ public:
         }
         _MemCpyStr( thisStr, str, _count );
         thisStr[ _count ] = (charType)0;
+		DebugValidate( this );
     }
-	
-/*
-#ifdef VAR_TEMPLATES_SUPPORTED
-    template < typename Args... > TCStr( const CCRefVec < charType > &source0, Args &&... sources )
-	{
-		if( str0 == 0 )
-		{
-			str0 = _EmptyStr < charType >::Get();
-		}
-		if( str1 == 0 )
-		{
-			str1 = _EmtpyStr < charType >::Get();
-		}
-
-		uiw len0 = _StrLen( str0 );
-		uiw len1 = _StrLen( str1 );
-	}
-#endif*/
 
     NOINLINE TCStr( const charType *str0, uiw len0, const charType *str1, uiw len1 )
     {
@@ -557,7 +585,7 @@ public:
 
         _count = len0 + len1;
         charType *thisStr;
-        if( _count >= static_size )
+        if( FitsStatic( _count ) == false )
         {
             SetDynamic( _count );
             thisStr = _dynamic_str;
@@ -570,6 +598,7 @@ public:
         _MemCpyStr( thisStr, str0, len0 );
         _MemCpyStr( thisStr + len0, str1, len1 );
         thisStr[ _count ] = (charType)0;
+		DebugValidate( this );
     }
 
 
@@ -580,7 +609,7 @@ public:
             uiw len = Iterator::_IterDist < InputIterator, InputIterator::iteratorType >::Dist( begin, end );
             _count = len;
             charType *thisStr;
-            if( len >= static_size )
+            if( FitsStatic( len ) == false )
             {
                 SetDynamic( _count );
                 thisStr = _dynamic_str;
@@ -603,6 +632,7 @@ public:
                 AddString < false >( begin.Ptr(), 1 );
             }
         }
+		DebugValidate( this );
     }
 
 	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > NOINLINE TCStr( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source )
@@ -610,7 +640,7 @@ public:
         ASSUME( (void *)this != (void *)&source );
         _count = source.Size();
 		const charType *sourceStr = source.CStr();
-        if( _count >= static_size )
+        if( FitsStatic( _count ) == false )
         {
             SetDynamic( _count );
             _MemCpyStr( _dynamic_str, sourceStr, _count + 1 );
@@ -620,12 +650,13 @@ public:
             SetStatic();
             _MemCpyStr( _static_str, sourceStr, _count + 1 );
         }
+		DebugValidate( this );
     }
 
 	NOINLINE TCStr( uiw n, charType c )
 	{
 		charType *thisStr;
-		if( n >= static_size )
+		if( FitsStatic( n ) == false )
 		{
 			SetDynamic( n );
 			thisStr = _dynamic_str;
@@ -640,6 +671,7 @@ public:
 			thisStr[ _count ] = c;
 		}
 		thisStr[ _count ] = (charType)0;
+		DebugValidate( this );
 	}
 
 private:
@@ -648,7 +680,7 @@ private:
 		uiw realLen = Funcs::Min < uiw >( source.Size() - sourceStartIndex, sourceLen );
 		_count = realLen;
 		charType *thisStr;
-		if( realLen >= static_size )
+		if( FitsStatic( realLen ) == false )
 		{
 			SetDynamic( realLen );
 			thisStr = _dynamic_str;
@@ -660,6 +692,7 @@ private:
 		}
 		_MemCpyStr( thisStr, source.CStr() + sourceStartIndex, realLen );
 		thisStr[ realLen ] = (charType)0;
+		DebugValidate( this );
 	}
 
 public:
@@ -675,17 +708,18 @@ public:
 		_MakeCopy( source, sourceStartIndex, sourceLen );
     }
 
-#ifdef MOVE_SUPPORTED
 	TCStr( TCStr &&source )
 	{
 		ASSUME( this != &source );
+		DebugValidate( &source );
 		_MemCpy( _static_str, source._static_str, sizeof(source._static_str) );
+		DBGCODE( _is_static = source._is_static; )
 		_count = source._count;
 		//source._count = 0;
 		//source._static_str[ 0 ] = (charType)0;
 		source.SetStatic();
+		DebugValidate( this );
 	}
-#endif
 
 	charType *Str()
 	{
@@ -725,14 +759,15 @@ public:
         charType *str;
         if( IsDynamic() )
         {
-            str = _dynamic_str;
             _ProcReservationDown( _count );
+            str = _dynamic_str;
         }
         else
         {
             str = _static_str;
         }
         str[ _count ] = (charType)0;
+		DebugValidate( this );
     }
 
     //  without null-terminator
@@ -747,7 +782,7 @@ public:
         {
             if( IsStatic() )
             {
-                if( reserve >= static_size )
+                if( FitsStatic( reserve ) == false )
                 {
                     charType *dyn = allocator::template Alloc < charType >( reserve + 1 );
                     _MemCpyStr( dyn, _static_str, _count + 1 );
@@ -769,6 +804,7 @@ public:
                 _reserved = reserve;
             }
         }
+		DebugValidate( this );
     }
 
     void Resize( uiw n, bln = true /* ignored */ )
@@ -784,8 +820,8 @@ public:
             charType *str;
             if( IsDynamic() )
             {
-                str = _dynamic_str;
                 _ProcReservationDown( _count );
+                str = _dynamic_str;
             }
             else
             {
@@ -797,13 +833,13 @@ public:
         {
             uiw diff = n - _count;
             uiw index = _count;
-            AddSpace( diff );
-            charType *str = Str();
+            charType *str = AddSpace( diff );
             for( ; diff; --diff )
             {
                 str[ index++ ] = c;
             }
         }
+		DebugValidate( this );
     }
 
     bln IsEmpty() const
@@ -818,11 +854,17 @@ public:
 
     bln IsStatic() const
     {
+	#ifdef DEBUG
+		ASSUME( _is_static == (_static_str[ static_last ] == (charType)0) );
+	#endif
         return _static_str[ static_last ] == (charType)0;
     }
 
     bln IsDynamic() const
     {
+	#ifdef DEBUG
+		ASSUME( _is_static == (_static_str[ static_last ] == (charType)0) );
+	#endif
         return _static_str[ static_last ] != (charType)0;
     }
 
@@ -836,7 +878,7 @@ public:
     {
         if( IsDynamic() )
         {
-            if( _count < static_size )
+            if( FitsStatic( _count ) )
             {
                 _MemCpyStr( _static_str, _dynamic_str, _count + 1 );
                 SetStatic();
@@ -847,11 +889,13 @@ public:
                 _dynamic_str = allocator::Realloc( _dynamic_str, _reserved + 1 );
             }
         }
+		DebugValidate( this );
     }
 
 	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > ownType &Insert( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &str, uiw pos )
     {
         InsertString < true >( pos, str.CStr(), str.Size() );
+		DebugValidate( this );
         return *this;
     }
 
@@ -859,6 +903,7 @@ public:
     {
         ASSUME( subpos <= str.Size() );
         InsertString < true >( pos, str.CStr() + subpos, Funcs::Min < uiw >( str.Size() - subpos, sublen ) );
+		DebugValidate( this );
         return *this;
     }
 
@@ -869,6 +914,7 @@ public:
             return *this;
         }
         InsertString < true >( pos, s, GetStringLength( s ) );
+		DebugValidate( this );
         return *this;
     }
 
@@ -886,6 +932,7 @@ public:
             }
             InsertString < true >( pos, s, n );
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -896,6 +943,7 @@ public:
         {
             *thisStr++ = c;
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -908,6 +956,7 @@ public:
         {
             *thisStr++ = c;
         }
+		DebugValidate( this );
     }
 
     Iter Insert( charType c, IterConst where )
@@ -915,6 +964,7 @@ public:
         uiw pos = where.Ptr() - Str();
         ASSUME( pos <= _count );
         InsertString < false >( pos, &c, 1 );
+		DebugValidate( this );
         return Iter( Str() + pos );
     }
 
@@ -934,6 +984,7 @@ public:
             }
             InsertString < true >( pos, str, n );
         }
+		DebugValidate( this );
         return Iter( Str() + pos );
     }
 
@@ -967,11 +1018,13 @@ public:
                 }
             }
         }
+		DebugValidate( this );
     }
 
     ownType &Erase( uiw pos, uiw len = uiw_max )
     {
         EraseSpace( pos, Funcs::Min < uiw >( _count - pos, len ) );
+		DebugValidate( this );
         return *this;
     }
 
@@ -982,6 +1035,7 @@ public:
         ASSUME( pos <= _count );
         EraseSpace( pos, 1 );
         ASSUME( thisStr == Str() );
+		DebugValidate( this );
         return Iter( thisStr + pos );
     }
 
@@ -995,6 +1049,7 @@ public:
         ASSUME( len + pos <= _count );
         EraseSpace( pos, len );
         ASSUME( thisStr == Str() );
+		DebugValidate( this );
         return Iter( thisStr + pos );
     }
 
@@ -1010,6 +1065,7 @@ public:
         {
             EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), str.CStr(), str.Size() );
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1020,6 +1076,7 @@ public:
         uiw pos = replaceBegin.Ptr() - CStr();
         uiw len = replaceEnd - replaceBegin;
         EraseAndInsert( pos, len, temp.CStr(), temp.Size() );
+		DebugValidate( this );
         return *this;
     }
 
@@ -1035,6 +1092,7 @@ public:
         {
             EraseAndInsert( replacePos, Funcs::Min < uiw >( replaceLen, _count - replacePos ), str.CStr() + subpos, Funcs::Min < uiw >( str.Size() - subpos, sublen ) );
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1056,6 +1114,7 @@ public:
             uiw diff = begin - end;
             EraseAndInsert( pos, diff, s, len );
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1075,6 +1134,7 @@ public:
             replaceLen = Funcs::Min < uiw >( replaceLen, _count - replacePos );
             EraseAndInsert( replacePos, replaceLen, s, strLen );
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1087,6 +1147,7 @@ public:
         {
             *thisStr++ = c;
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1101,6 +1162,7 @@ public:
         {
             *thisStr++ = c;
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1125,12 +1187,14 @@ public:
             }
             thisStr[ _count ] = (charType)0;
         }
+		DebugValidate( this );
         return *this;
     }
 
 	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > ownType &Append( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &str )
     {
         AddString < true >( str.CStr(), str.Size() );
+		DebugValidate( this );
         return *this;
     }
 
@@ -1138,6 +1202,7 @@ public:
     {
         ASSUME( subpos <= str._count );
         AddString < true >( str.CStr() + subpos, Funcs::Min < uiw >( str.Size() - subpos, sublen ) );
+		DebugValidate( this );
         return *this;
     }
 
@@ -1147,6 +1212,7 @@ public:
         {
             AddString < true >( s, GetStringLength( s ) );
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1154,16 +1220,19 @@ public:
     {
         ASSUME( s != 0 || n == 0 );
         AddString < true >( s, n );
+		DebugValidate( this );
         return *this;
     }
 
     ownType &Append( charType c, uiw n = 1 )
     {
-        charType *str = AddSpace( n ) + _count;
+        uiw pos = _count;
+        charType *str = AddSpace( n ) + pos;
         for( ; n; --n )
         {
             *str++ = c;
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1194,28 +1263,30 @@ public:
                 }
             }
         }
+		DebugValidate( this );
         return *this;
     }
 
-#ifdef MOVE_SUPPORTED
 	ownType &Assign( TCStr &&source )
 	{
 		ASSUME( this != &source );
+		DebugValidate( &source );
 		_MemCpy( _static_str, source._static_str, sizeof(source._static_str) );
 		_count = source._count;
+		DBGCODE( _is_static = source._is_static; )
 		//source._count = 0;
 		//source._static_str[ 0 ] = (charType)0;
 		source.SetStatic();
+		DebugValidate( this );
 		return *this;
 	}
-#endif
 
 	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > NOINLINE ownType &Assign( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source )
     {
         if( (void *)this != (void *)&source )
         {
 			const charType *sourceStr = source.CStr();
-            bln isNeedDynamic = source.Size() > static_last;
+            bln isNeedDynamic = FitsStatic( source.Size() ) == false;
             if( IsStatic() )
             {
                 if( isNeedDynamic )
@@ -1235,6 +1306,7 @@ public:
             }
             _count = source.Size();
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1255,6 +1327,7 @@ public:
         {
             return Assign( str.CStr() + subpos, realLen );
         }
+		DebugValidate( this );
     }
 
     NOINLINE ownType &Assign( const charType *s, uiw n = uiw_max )
@@ -1277,7 +1350,7 @@ public:
             return *this;
         }
 
-        bln isNeedDynamic = n > static_last;
+        bln isNeedDynamic = FitsStatic( n ) == false;
 
         if( isNeedDynamic )
         {
@@ -1300,18 +1373,20 @@ public:
         }
 
         _count = n;
-
+		
+		DebugValidate( this );
         return *this;
     }
 
     ownType &Assign( charType c, uiw n = 1 )
     {
         Clear();
-        charType *str = AddSpace( n ) + _count;
+        charType *str = AddSpace( n );
         for( ; n; --n )
         {
             *str++ = c;
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1332,7 +1407,7 @@ public:
                 if( IsStatic() )
                 {
                     charType *thisStr;
-                    if( len >= static_size )
+                    if( FitsStatic( len ) == false )
                     {
                         SetDynamic( len );
                         thisStr = _dynamic_str;
@@ -1361,6 +1436,7 @@ public:
                 }
             }
         }
+		DebugValidate( this );
         return *this;
     }
 
@@ -1376,6 +1452,7 @@ public:
             _static_str[ 0 ] = (charType)0;
         }
         _count = 0;
+		DebugValidate( this );
     }
 
     void FullClear()
@@ -1387,6 +1464,7 @@ public:
         }
         _static_str[ 0 ] = (charType)0;
         _count = 0;
+		DebugValidate( this );
     }
 
 	TCStr &operator = ( const TCStr &source )
@@ -1394,17 +1472,20 @@ public:
 		return Assign( source );
 	}
 
-#ifdef MOVE_SUPPORTED
 	ownType &operator = ( TCStr &&source )
 	{
 		return Assign( std::move( source ) );
 	}
-#endif
 
     template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr &operator = ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source )
     {
         return Assign( source );
     }
+
+	template < uiw Size > TCStr &operator = ( const charType (&str)[ Size ] )
+	{
+		return this->Assign( str, Size - 1 );
+	}
 
     TCStr &operator = ( const charType *str )
     {
@@ -1422,23 +1503,22 @@ public:
         thisStr[ 0 ] = c;
         thisStr[ 1 ] = (charType)0;
         _count = 1;
+		DebugValidate( this );
         return *this;
     }
 
-	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr operator + ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const APPLY_IF_MOVE_SUPPORTED( & )
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr operator + ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const //&
     {
         return TCStr( this->CStr(), this->_count, source.CStr(), source.Size() );
     }
 	
-#ifdef MOVE_SUPPORTED	
-	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr operator + ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) &&
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > TCStr operator + ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) //&&
     {
         this->AddString < false >( source.CStr(), source.Size() );
 		return std::move( *this );
     }
-#endif
 
-    TCStr operator + ( const charType *str ) const //APPLY_IF_MOVE_SUPPORTED( & )
+    TCStr operator + ( const charType *str ) const //&
     {
         if( str == 0 )
         {
@@ -1447,7 +1527,7 @@ public:
         return TCStr( this->CStr(), this->_count, str, GetStringLength( str ) );
     }
 
-/*#ifdef MOVE_SUPPORTED
+/*
     TCStr operator + ( const charType *str ) &&
     {
         if( str == 0 )
@@ -1457,21 +1537,22 @@ public:
 		this->AddString < true >( str, GetStringLength( str ) );
 		return std::move( *this );
     }
-#endif*/
+*/
 
-    TCStr operator + ( charType symbol ) const //APPLY_IF_MOVE_SUPPORTED( & )
+    TCStr operator + ( charType symbol ) const //&
     {
         return TCStr( this->CStr(), this->_count, &symbol, 1 );
     }
 
-/*#ifdef MOVE_SUPPORTED
+/*
     TCStr operator + ( charType symbol ) &&
     {
-        charType *str = AddSpace( 1 ) + _count;
+        uiw pos = _count;
+        str = AddSpace( dist ) + pos;
 		*str = symbol;
 		return std::move( *this );
     }
-#endif*/
+*/
 
 	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > friend TCStr operator + ( const charType *str, const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &second )
     {
@@ -1482,13 +1563,11 @@ public:
         return TCStr( str, GetStringLength( str ), second.CStr(), second.Size() );
     }
 
-#ifdef MOVE_SUPPORTED
 	TCStr operator + ( TCStr &&source )
     {
 		this->Append( std::move( source ) );
 		return *this;
     }
-#endif
 
 	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > friend TCStr operator + ( charType symbol, const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &second )
     {

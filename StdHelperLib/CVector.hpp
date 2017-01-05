@@ -228,10 +228,6 @@ public:
     static const bln _cis_POD = typeSemantic == Sem_POD || TypeDesc < X >::is_pod;
     static const bln _cis_MoveAsPOD = typeSemantic == Sem_MovableAsPOD || TypeDesc < X >::is_movableAsPOD;
 
-    #ifndef DEFAULT_FUNC_PARAMS_SUPPORTED
-        static const bln is_checkOverlap = true;
-    #endif
-
 	NOINLINE void _SizeUpWithReserveIncreasion( count_type sizeToLeave, count_type newCount )  //  will not destroy anything
 	{
         ASSUME( newCount >= this->_Size() && sizeToLeave <= this->_Size() );
@@ -314,7 +310,6 @@ public:
         }
     }
 
-#ifdef MOVE_SUPPORTED
     template < typename Type, bln is_useMoveContructor > struct _MoveTo;
 
     template < typename Type > struct _MoveTo < Type, true >
@@ -334,19 +329,13 @@ public:
             source->~Type();
         }
     };
-#endif
 
     template < typename Type, bln is_destroySource > struct _CopySelector;
     template < typename Type > struct _CopySelector < Type, true >
     {
         static void Copy( Type *target, Type *source )
         {
-#           ifdef MOVE_SUPPORTED
-                _MoveTo < Type, std::is_move_constructible < Type >::value >::Move( target, source );
-#           else
-                new (target) Type( *source );
-                source->~Type();
-#           endif
+            _MoveTo < Type, std::is_move_constructible < Type >::value >::Move( target, source );
         }
     };
     template < typename Type > struct _CopySelector < Type, false >
@@ -503,7 +492,7 @@ public:
     {
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Assign APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( begin.Ptr(), this->_Size() );
+            Assign < false >( begin.Ptr(), this->_Size() );
         }
         else  //  can't be overlapped because CVec iterator is random
         {
@@ -521,7 +510,6 @@ public:
         _Copy < false >( this->_GetArr(), (X *)source._GetArr(), source._Size() );
     }
 
-#ifdef MOVE_SUPPORTED
     _CBaseVec( ownType &&source ) NOEXCEPT
     {
         ASSUME( this != &source );
@@ -551,14 +539,11 @@ public:
             this->_Transfer( &source );
         }
     }
-#endif
 
-#ifdef INITIALIZER_LISTS_SUPPORTED
     _CBaseVec( std::initializer_list < X > ilist ) : baseType( ilist.size(), ilist.size() )
     {
         _Copy < false >( this->_GetArr(), (X *)ilist.begin(), ilist.size() );
     }
-#endif
 
     ownType &operator = ( const ownType &source )
     {
@@ -571,14 +556,12 @@ public:
         return *this;
     }
 
-#ifdef VAR_TEMPLATES_SUPPORTED
     template < typename... Args > void EmplaceBack( Args &&... args )
     {
         count_type curCount = this->_Size();
         _SizeUp( curCount, curCount + 1 );
         new (this->_GetArr() + curCount ) X( std::forward < Args >( args )... );
     }
-#endif
 
     X *PushBackUninit()
     {
@@ -644,7 +627,6 @@ public:
 		}
     }
 
-#ifdef VAR_TEMPLATES_SUPPORTED
     template < typename... Args > void Emplace( count_type pos, Args &&... args, count_type count = 1 )
     {
         X *target = _InsertRaw( pos, count );
@@ -654,7 +636,6 @@ public:
             ++target;
         }
     }
-#endif
 
     X *InsertNum( count_type pos, count_type num = 1, bln is_initialize = true )
     {
@@ -671,8 +652,7 @@ public:
 		return target;
     }
 
-    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
-    void Insert( count_type pos, const X &source, count_type count = 1 )
+    template < bln is_checkOverlap = true > void Insert( count_type pos, const X &source, count_type count = 1 )
     {
         uiw offset = &source - this->_GetArr();
         bln is_belongs = offset < this->_Size();
@@ -692,7 +672,6 @@ public:
         }
     }
 
-#ifdef MOVE_SUPPORTED
     void Insert( count_type pos, X &&source )
     {
         uiw offset = &source - this->_GetArr();
@@ -700,10 +679,8 @@ public:
         X *target = _InsertRaw( pos, 1 );
         new (target) X( std::move( source ) );
     }
-#endif
 
-    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
-    void Insert( count_type pos, const X *source, count_type count )
+    template < bln is_checkOverlap = true > void Insert( count_type pos, const X *source, count_type count )
     {
         if( is_checkOverlap )
         {
@@ -721,11 +698,10 @@ public:
 
     template < uiw count > void Insert( count_type pos, const X (&source)[ count ] )
     {
-        Insert APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( pos, source, count );
+        Insert < false >( pos, source, count );
     }
 
-    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
-    void Insert( count_type pos, const ownType &source, count_type start = 0, count_type count = count_type_max )
+    template < bln is_checkOverlap = true > void Insert( count_type pos, const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
         ASSUME( pos < this->_Size() && source.Size() > start );
         if( count > source.Size() - start )
@@ -733,10 +709,10 @@ public:
             count = source.Size() - start;
         }
 
-        Insert APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< is_checkOverlap >)( pos, source.Data() + start, count );
+        Insert < is_checkOverlap >( pos, source.Data() + start, count );
     }
 
-    template < typename IterType APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
+    template < typename IterType, bln is_checkOverlap = true, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Insert( IterConst where, IterType begin, IterType end )
     {
         uiw dist = Algorithm::Distance( begin, end );
@@ -744,7 +720,7 @@ public:
         ASSUME( pos < this->_Size() );
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Insert APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< is_checkOverlap >)( pos, begin.Ptr(), dist );
+            Insert < is_checkOverlap >( pos, begin.Ptr(), dist );
         }
         else  //  can't be overlapped because CVec iterator is random
         {
@@ -756,17 +732,15 @@ public:
         }
     }
 
-#ifdef INITIALIZER_LISTS_SUPPORTED
     void Insert( count_type pos, std::initializer_list < X > what )
     {
-        Insert APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( pos, what.begin(), what.size() );
+        Insert < false >( pos, what.begin(), what.size() );
     }
 
     void Insert( IterConst where, std::initializer_list < X > what )
     {
-        Insert APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( where, what.begin(), what.size() );
+        Insert < false >( where, what.begin(), what.size() );
     }
-#endif
 
     void Erase( count_type pos, count_type count = uiw_max )
     {
@@ -805,7 +779,6 @@ public:
 		}
 	}
 
-#ifdef MOVE_SUPPORTED
 	void Append( X &&source )
 	{
 		count_type curCount = this->_Size();
@@ -813,7 +786,6 @@ public:
 		_SizeUp( curCount, curCount + 1 );
 		new (this->_GetArr() + curCount) X( std::move( source ) );
 	}
-#endif
 
 	X *AppendNum( count_type num = 1, bln is_initialize = true )
 	{
@@ -832,8 +804,7 @@ public:
 		return target;
 	}
 
-    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
-    void Append( const X *source, count_type count )
+    template < bln is_checkOverlap = true > void Append( const X *source, count_type count )
     {
         count_type curCount = this->_Size();
         if( this->_IsStatic() || !is_checkOverlap )
@@ -855,11 +826,10 @@ public:
 
     template < uiw count > void Append( const X (&source)[ count ] )
     {
-        this->Append APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( source, count );
+        this->Append < false >( source, count );
     }
 
-    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
-    void Append( const ownType &source, count_type start = 0, count_type count = count_type_max )
+    template < bln is_checkOverlap = true > void Append( const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
         ASSUME( start < source._Size() || count == 0 );
         count = Funcs::Min( count, source.Size() - start );
@@ -868,13 +838,13 @@ public:
         _Copy < false, true >( this->_GetArr() + curCount, (X *)source.Data() + start, count );
     }
 
-    template < typename IterType APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
+    template < typename IterType, bln is_checkOverlap = true, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Append( IterType begin, IterType end )
     {
         uiw dist = Algorithm::Distance( begin, end );
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Append APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< is_checkOverlap >)( begin.Ptr(), dist );
+            Append < is_checkOverlap >( begin.Ptr(), dist );
         }
         else  //  can't be overlapped because CVec iterator is random
         {
@@ -888,12 +858,10 @@ public:
         }
     }
 
-#ifdef INITIALIZER_LISTS_SUPPORTED
     void Append( std::initializer_list < X > ilist )
     {
         Append( ilist.begin(), ilist.size() );
     }
-#endif
 
 private:
     NOINLINE void InsertOverlapped( count_type start, count_type count, count_type index )
@@ -934,8 +902,7 @@ private:
     }
 
 public:
-    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
-    void Assign( const X &source, count_type count = 1 )
+    template < bln is_checkOverlap = true > void Assign( const X &source, count_type count = 1 )
     {
         count_type curCount = this->_Size();
         uiw index = &source - this->_GetArr();
@@ -954,7 +921,6 @@ public:
         }
     }
 
-#ifdef MOVE_SUPPORTED
     void Assign( X &&source )
     {
         count_type curCount = this->_Size();
@@ -967,10 +933,8 @@ public:
             new (&this->_GetArr()[ curCount ]) X( std::move( source ) );
         }
     }
-#endif
 
-    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
-    void Assign( const X *source, count_type count )
+    template < bln is_checkOverlap = true > void Assign( const X *source, count_type count )
     {
         uiw index = source - this->_GetArr();
         if( is_checkOverlap && index < this->_Size() )
@@ -987,11 +951,10 @@ public:
 
     template < uiw count > void Assign( const X (&source)[ count ] )
     {
-        this->Assign APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( source, count );
+        this->Assign < false >( source, count );
     }
 
-    APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( template < bln is_checkOverlap = true > )
-    void Assign( const ownType &source, count_type start = 0, count_type count = count_type_max )
+    template < bln is_checkOverlap = true > void Assign( const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
         ASSUME( start <= source.Size() || count == 0 );
         count = Funcs::Min( source.Size() - start, count );
@@ -1007,13 +970,13 @@ public:
         }
     }
 
-    template < typename IterType APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED( , bln is_checkOverlap = true ), typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
+    template < typename IterType, bln is_checkOverlap = true, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Assign( IterType begin, IterType end )
     {
         uiw dist = Algorithm::Distance( begin, end );
         if( IterType::iteratorType == Iterator::Type::Random )
         {
-            Assign APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< is_checkOverlap >)( begin.Ptr(), dist );
+            Assign < is_checkOverlap >( begin.Ptr(), dist );
         }
         else  //  can't be overlapped because CVec iterator is random
         {
@@ -1027,12 +990,10 @@ public:
         }
     }
 
-#ifdef INITIALIZER_LISTS_SUPPORTED
     void Assign( std::initializer_list < X > ilist )
     {
-        Assign APPLY_IF_DEFAULT_FUNC_PARAMS_SUPPORTED(< false >)( ilist.begin(), ilist.size() );
+        Assign < false >( ilist.begin(), ilist.size() );
     }
-#endif
 
     void Clear()
     {
@@ -1043,8 +1004,6 @@ public:
 
 }  //  namespace Private
 
-template < typename X > class CRefVec;
-template < typename X > class CCRefVec;
 template < typename X, typename reservator = Reservator::Half <>, uiw static_size = 0, TypeSemantic_t typeSemantic = Sem_Strict, typename allocator = Allocator::Simple > class CVec;
 
 template < typename X > class CRefVec : public Private::_CBaseVecStatic < X, void, void, 0 >
@@ -1079,7 +1038,7 @@ public:
     }
 };
 
-template < typename X > class CCRefVec : public Private::_CBaseVecConstStatic < X, void, void, 0 >
+template < typename X > class CRefVec < const X > : public Private::_CBaseVecConstStatic < const X, void, void, 0 >
 {
     typedef Private::_CBaseVecConstStatic < X, void, void, 0 > baseType;
     typedef Private::_CBasisVec < X, void, void, 0 > arrType;
@@ -1087,30 +1046,30 @@ template < typename X > class CCRefVec : public Private::_CBaseVecConstStatic < 
 public:
     typedef typename baseType::count_type count_type;
 
-    CCRefVec()
+    CRefVec()
     {}
 
-    CCRefVec( const X *source, count_type size )
+    CRefVec( const X *source, count_type size )
     {
         this->_SetArr( (X *)source, size );
     }
 
-    CCRefVec( const CCRefVec < X > &source )
+    CRefVec( const CRefVec < const X > &source )
     {
         this->_SetArr( (X *)source.Data(), source.Size() );
     }
 
-    CCRefVec( const CRefVec < X > &source )
+    CRefVec( const CRefVec < X > &source )
     {
         this->_SetArr( (X *)source.Data(), source.Size() );
     }
 
-    template < uiw count > CCRefVec( const X (&source)[ count ] )
+    template < uiw count > CRefVec( const X (&source)[ count ] )
     {
         this->_SetArr( (X *)source, count );
     }
 
-    CCRefVec &operator = ( const CCRefVec < X > &source )
+    CRefVec &operator = ( const CRefVec < const X > &source )
     {
         if( this != &source )
         {
@@ -1119,7 +1078,7 @@ public:
         return *this;
     }
 
-    CCRefVec &operator = ( const CRefVec < X > &source )
+    CRefVec &operator = ( const CRefVec < X > &source )
     {
         this->_SetArr( (X *)source.Data(), source.Size() );
         return *this;
@@ -1155,7 +1114,7 @@ public:
     CVec( const CRefVec < X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
     {}
 
-    CVec( const CCRefVec < X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
+    CVec( const CRefVec < const X > &source ) : baseType( source.Data(), source.Size(), source.Size() )
     {}
     
     CVec &operator = ( const CVec &source )
@@ -1170,7 +1129,7 @@ public:
         return *this;
     }
     
-    CVec &operator = ( const CCRefVec < X > &source )
+    CVec &operator = ( const CRefVec < const X > &source )
     {
         this->Assign( source.Data(), source.Size() );
         return *this;
@@ -1200,12 +1159,9 @@ public:
         return *this;
     }*/
 
-#ifdef MOVE_SUPPORTED
     CVec( CVec &&source ) NOEXCEPT = default;
     CVec &operator = ( CVec &&source ) NOEXCEPT = default;
-#endif
 
-#ifdef INITIALIZER_LISTS_SUPPORTED
     CVec( std::initializer_list < X > ilist ) : baseType( ilist )
     {}
 
@@ -1214,23 +1170,22 @@ public:
         baseType::Assign( ilist );
         return *this;
     }
-#endif
 
     CRefVec < X > ToRef()
     {
         return CRefVec < X >( this->Data(), this->Size() );
     }
 
-    CCRefVec < X > ToRef() const
+    CRefVec < const X > ToRef() const
     {
         typedef Private::_CBaseVecConstStatic < X, reservator, allocator, static_size > constBaseType;
-        return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
+        return CRefVec < const X >( constBaseType::Data(), constBaseType::Size() );
     }
 
-    CCRefVec < X > ToCRef() const
+    CRefVec < const X > ToCRef() const
     {
         typedef Private::_CBaseVecConstStatic < X, reservator, allocator, static_size > constBaseType;
-        return CCRefVec < X >( constBaseType::Data(), constBaseType::Size() );
+        return CRefVec < const X >( constBaseType::Data(), constBaseType::Size() );
     }
 
     operator CRefVec < X >()
@@ -1238,9 +1193,9 @@ public:
         return ToRef();
     }
 
-    operator CCRefVec < X >() const
+    operator CRefVec < const X >() const
     {
-        return ToRef();
+        return ToCRef();
     }
 };
 
@@ -1277,9 +1232,9 @@ public:
 	}
 };
 
-template < typename X > CCRefVec < X > MakeRefVec( const X *source, uiw count )
+template < typename X > CRefVec < const X > MakeRefVec( const X *source, uiw count )
 {
-    return CCRefVec < X >( source, count );
+    return CRefVec < const X >( source, count );
 }
 
 template < typename X > CRefVec < X > MakeRefVec( X *source, uiw count )
@@ -1287,9 +1242,9 @@ template < typename X > CRefVec < X > MakeRefVec( X *source, uiw count )
     return CRefVec < X >( source, count );
 }
 
-template < typename X, uiw count > CCRefVec < X > MakeRefVec( const X (&source)[ count ] )
+template < typename X, uiw count > CRefVec < const X > MakeRefVec( const X (&source)[ count ] )
 {
-    return CCRefVec < X >( source, count );
+    return CRefVec < const X >( source, count );
 }
 
 template < typename X, uiw count > CRefVec < X > MakeRefVec( X (&source)[ count ] )

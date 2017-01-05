@@ -25,7 +25,7 @@ namespace
 	DWORD( WINAPI *StdLib_GetFinalPathNameByHandleW )(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 }
 
-NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error )
+NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *error )
 {
     ASSUME( file );
 
@@ -155,10 +155,17 @@ NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn
 	FILEIO_STAT( Funcs::ClearPod( &file->stats ); )
 	file->readBufferCurrentSize = 0;
 	file->is_reading = false;
+	file->is_shouldCloseFileHandle = true;
 
 toExit:
-    DSA( po_error, o_error );
+    DSA( error, o_error );
     return file->handle != INVALID_HANDLE_VALUE;
+}
+        
+NOINLINE bln FileIO::Private::FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle, fileError *error )
+{
+	DSA( error, Error::Unimplemented() );
+	return false;
 }
 
 NOINLINE void FileIO::Private::FileIO_Close( CFileBasis *file )
@@ -169,8 +176,11 @@ NOINLINE void FileIO::Private::FileIO_Close( CFileBasis *file )
         return;
     }
 	FileIO_Flush( file );
-    BOOL result = ::CloseHandle( file->handle );
-    ASSUME( result );
+	if( file->is_shouldCloseFileHandle )
+	{
+		BOOL result = ::CloseHandle( file->handle );
+		ASSUME( result );
+	}
     file->handle = INVALID_HANDLE_VALUE;
 }
 
@@ -238,7 +248,7 @@ i64 FileIO::Private::FileIO_OffsetGet( CFileBasis *file, FileOffsetMode::mode_t 
 	}
 }
 
-NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, FileOffsetMode::mode_t mode, i64 offset, CError *po_error )
+NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, FileOffsetMode::mode_t mode, i64 offset, CError *error )
 {
     ASSUME( FileIO_IsValid( file ) );
     CError o_error = Error::Ok();
@@ -304,7 +314,7 @@ NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, FileOffsetMode
     result = o_move.QuadPart;
 
 toExit:
-    DSA( po_error, o_error );
+    DSA( error, o_error );
     return result;
 }
 

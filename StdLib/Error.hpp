@@ -55,12 +55,10 @@ public:
 		return this->code != other.code || strcmp( this->errorClass, other.errorClass );
 	}
 
-#ifdef MOVE_SUPPORTED
-	CError( const CError &source ) = default;
+	/*CError( const CError &source ) = default;
 	CError &operator = ( const CError &source ) = default;
 	CError( CError &&source ) = default;
-	CError &operator = ( CError &&source ) = default;
-#endif
+	CError &operator = ( CError &&source ) = default;*/
 
 	const char *Class() const
 	{
@@ -106,12 +104,10 @@ public:
 		return CError::operator !=( other );
 	}
 
-#ifdef MOVE_SUPPORTED
-	CTError( const CTError &source ) = default;
+	/*CTError( const CTError &source ) = default;
 	CTError &operator = ( const CTError &source ) = default;
 	CTError( CTError &&source ) = default;
-	CTError &operator = ( CTError &&source ) = default;
-#endif
+	CTError &operator = ( CTError &&source ) = default;*/
 
 	const additionT &Addition() const
 	{

@@ -9,6 +9,26 @@ FileMemoryStream::FileMemoryStream( MemoryStreamInterface *stream, FileProcMode:
 	this->Open( stream, procMode, error );
 }
 
+FileMemoryStream::FileMemoryStream( FileMemoryStream &&source )
+{
+	this->_stream = source._stream;
+	source._stream = 0;
+	this->_offset = source._offset;
+	this->_procMode = source._procMode;
+	this->_startOffset = source._startOffset;
+}
+	
+FileMemoryStream &FileMemoryStream::operator = ( FileMemoryStream &&source )
+{
+	ASSUME( this != &source );
+	this->_stream = source._stream;
+	source._stream = 0;
+	this->_offset = source._offset;
+	this->_procMode = source._procMode;
+	this->_startOffset = source._startOffset;
+	return *this;
+}
+
 bln FileMemoryStream::Open( MemoryStreamInterface *stream, FileProcMode::mode_t procMode, fileError *error )
 {
 	ASSUME( stream && procMode );
@@ -270,25 +290,3 @@ FileCacheMode::mode_t FileMemoryStream::CacheModeGet() const
 	ASSUME( _stream );
 	return FileCacheMode::Default;
 }
-
-#ifdef MOVE_SUPPORTED
-	FileMemoryStream::FileMemoryStream( FileMemoryStream &&source )
-	{
-		this->_stream = source._stream;
-		source._stream = 0;
-		this->_offset = source._offset;
-		this->_procMode = source._procMode;
-		this->_startOffset = source._startOffset;
-	}
-	
-	FileMemoryStream &FileMemoryStream::operator = ( FileMemoryStream &&source )
-	{
-		ASSUME( this != &source );
-		this->_stream = source._stream;
-		source._stream = 0;
-		this->_offset = source._offset;
-		this->_procMode = source._procMode;
-		this->_startOffset = source._startOffset;
-		return *this;
-	}
-#endif

@@ -12,7 +12,7 @@ struct FileInfo
 static void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
 {
 	CVec < FileInfo > *arg = (CVec < FileInfo > *)argument;
-	arg->Append( { info->PNN(), (ui32)info->FileSize() } );
+	arg->Append( { info->PNN(), (ui32)info->FileSize().ValueOrDefault() } );
 }
 
 void PrintSameFiles( const wchar_t *pnn )

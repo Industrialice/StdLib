@@ -1,10 +1,9 @@
 #include "PreHeader.hpp"
 #include "RoundingFuncs.hpp"
 
-i32 Funcs::RoundF32( f32 val )  //  TODO: bullshit
+i32 Funcs::RoundF32( f32 val )
 {
-	return std::round( val );  //  C++11
-    //return (i32)(val < 0 ? val - 0.55555555555f : val + 0.55555555555f);
+	return std::round( val );
 }
 
 i32 Funcs::RoundF32WithPrecise( f32 val, ui32 precise )  //  TODO: bullshit

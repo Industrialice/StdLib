@@ -4,7 +4,7 @@
 
 #include "VKeys.hpp"
 
-CCRefVec < ui8 > VKeys::GetPlatformMappingStruct()
+CRefVec < const ui8 > VKeys::GetPlatformMappingStruct()
 {
 	static const ui8 VKeysMappingWindows[ 256 ] =
 	{

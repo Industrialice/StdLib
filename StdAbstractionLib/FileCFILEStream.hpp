@@ -17,9 +17,6 @@ namespace StdLib
 		ui32 _bufferSize;
 		void *_customBufferPtr;
 
-		FileCFILEStream( const FileCFILEStream & );
-		FileCFILEStream &operator = ( const FileCFILEStream & );
-
 	public:
 		typedef CTError < const char * > fileError;
 
@@ -52,10 +49,8 @@ namespace StdLib
 
 		FileOpenMode::mode_t OpenModeGet() const;
 
-	#ifdef MOVE_SUPPORTED
 		FileCFILEStream( FileCFILEStream &&source );
 		FileCFILEStream &operator = ( FileCFILEStream &&source );
-	#endif
 	};
 }
 

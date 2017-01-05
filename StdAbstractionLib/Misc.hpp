@@ -37,19 +37,10 @@ class TimeMoment
     tcs _tc;
 
 public:
-	TimeMoment( const TimeMoment &source ) : _tc( source._tc )
-	{}
-
-	TimeMoment &operator = ( const TimeMoment &source )
-	{
-		this->_tc = source._tc;
-		return *this;
-	}
-
-#ifdef MOVE_SUPPORTED
+	/*TimeMoment( const TimeMoment &source ) = default;
+	TimeMoment &operator = ( const TimeMoment &source ) = default;
 	TimeMoment( TimeMoment && ) = default;
-	TimeMoment &operator = ( TimeMoment && ) = default;
-#endif
+	TimeMoment &operator = ( TimeMoment && ) = default;*/
 
     TimeMoment();
 	TimeMoment( const tcs &time );

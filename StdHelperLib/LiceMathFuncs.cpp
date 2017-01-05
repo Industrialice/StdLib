@@ -249,12 +249,12 @@ void LiceMath::M4x4Transpose( m4x4 *RSTR m0, const m4x4 *m1 )
 
 void LiceMath::M4x4TransposeInplace( m4x4 *m )
 {
-    Funcs::Swap( &m->m[ 0 ][ 1 ], &m->m[ 1 ][ 0 ] );
-    Funcs::Swap( &m->m[ 0 ][ 2 ], &m->m[ 2 ][ 0 ] );
-    Funcs::Swap( &m->m[ 0 ][ 3 ], &m->m[ 3 ][ 0 ] );
-    Funcs::Swap( &m->m[ 1 ][ 2 ], &m->m[ 2 ][ 1 ] );
-    Funcs::Swap( &m->m[ 1 ][ 3 ], &m->m[ 3 ][ 1 ] );
-    Funcs::Swap( &m->m[ 2 ][ 3 ], &m->m[ 3 ][ 2 ] );
+    std::swap( m->m[ 0 ][ 1 ], m->m[ 1 ][ 0 ] );
+    std::swap( m->m[ 0 ][ 2 ], m->m[ 2 ][ 0 ] );
+    std::swap( m->m[ 0 ][ 3 ], m->m[ 3 ][ 0 ] );
+    std::swap( m->m[ 1 ][ 2 ], m->m[ 2 ][ 1 ] );
+    std::swap( m->m[ 1 ][ 3 ], m->m[ 3 ][ 1 ] );
+    std::swap( m->m[ 2 ][ 3 ], m->m[ 3 ][ 2 ] );
 
     /*for( ui32 index = 0; index < 3; ++index )
     {
@@ -1074,9 +1074,9 @@ void LiceMath::M3x3Transpose( m3x3 *RSTR m0, const m3x3 *m1 )
 
 void LiceMath::M3x3TransposeInplace( m3x3 *m )
 {
-    Funcs::Swap( &m->m[ 0 ][ 1 ], &m->m[ 1 ][ 0 ] );
-    Funcs::Swap( &m->m[ 0 ][ 2 ], &m->m[ 2 ][ 0 ] );
-    Funcs::Swap( &m->m[ 1 ][ 2 ], &m->m[ 2 ][ 1 ] );
+    std::swap( m->m[ 0 ][ 1 ], m->m[ 1 ][ 0 ] );
+    std::swap( m->m[ 0 ][ 2 ], m->m[ 2 ][ 0 ] );
+    std::swap( m->m[ 1 ][ 2 ], m->m[ 2 ][ 1 ] );
 }
 
 void LiceMath::M3x3MultM3x3( m3x3 *RSTR m0, const m3x3 *m1, const m3x3 *m2 )
@@ -1455,7 +1455,7 @@ void LiceMath::M2x2Transpose( m2x2 *RSTR m0, const m2x2 *m1 )
 
 void LiceMath::M2x2TransposeInplace( m2x2 *m )
 {
-    Funcs::Swap( &m->e10, &m->e01 );
+    std::swap( m->e10, m->e01 );
 }
 
 void LiceMath::Vec4MultM4x4( vec4 *RSTR v0, const vec4 *v1, const m4x4 *m )

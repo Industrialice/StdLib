@@ -199,38 +199,38 @@ void Files::Private::CloseEnumHandle( fileEnumHandle handle )
 }
 
 #if 0
-NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *po_error )
+NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *error )
 {
     ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
 
     bln funcResult = ::unlink( cp_pnn ) == 0;
-    if( po_error )
+    if( error )
     {
         if( !funcResult )
         {
             if( errno == EACCES )
             {
-                *po_error = Error::NoAccess();
+                *error = Error::NoAccess();
             }
             else if( errno == ENOENT )
             {
-                *po_error = Error::DoesNotExist();
+                *error = Error::DoesNotExist();
             }
             else
             {
-                *po_error = Error::Unknown();
+                *error = Error::Unknown();
             }
         }
         else
         {
-            *po_error = Error::Ok();
+            *error = Error::Ok();
         }
     }
 
     return funcResult;
 }
 
-NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *po_error )
+NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *error )
 {
     ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH_LENGTH );
     DIR *p_dir;
@@ -275,7 +275,7 @@ NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *po_error )
 
             if( S_ISDIR( o_stat.st_mode ) )
             {
-                if( !Files::RemoveFolder( a_buf, po_error ) )
+                if( !Files::RemoveFolder( a_buf, error ) )
                 {
                     ::closedir( p_dir );
                     goto toExit;
@@ -284,7 +284,7 @@ NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *po_error )
             else
             {
                 ASSUME( S_ISREG( o_stat.st_mode ) );
-                if( !Files::RemoveFile( a_buf, po_error ) )
+                if( !Files::RemoveFile( a_buf, error ) )
                 {
                     ::closedir( p_dir );
                     goto toExit;
@@ -302,7 +302,7 @@ NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *po_error )
     }
 
 toExit:
-    DSA( po_error, o_error );
+    DSA( error, o_error );
     return funcResult;
 }
 
@@ -382,7 +382,7 @@ bln Files::CurrentWorkingPathSet( const char *path )
 	return chdir( path ) == 0;
 }
 
-NOINLINE bln Files::CreateNewFolder( const char *cp_where, const char *cp_name, CError *po_error )
+NOINLINE bln Files::CreateNewFolder( const char *cp_where, const char *cp_name, CError *error )
 {
     ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH_LENGTH) );
 
@@ -408,7 +408,7 @@ NOINLINE bln Files::CreateNewFolder( const char *cp_where, const char *cp_name, 
     }
 
 toExit:
-    DSA( po_error, o_error );
+    DSA( error, o_error );
     return funcResult;
 }
 
@@ -483,13 +483,13 @@ NOINLINE uiw Files::ExtractExtensionFromString( const char *cp_str, char *RSTR p
     return Funcs::StrCpyAndCount( p_buf, cp_str + lastDot + 1 );
 }
 
-bln Files::EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask )
+bln Files::EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask )  //  friend of CFileEnumInfo
 {
 	DBGBREAK;  //  TODO:
     return false;
 }
 
-bln Files::EnumNextFile( CFileEnumInfo *info )
+bln Files::EnumNextFile( CFileEnumInfo *info )  //  friend of CFileEnumInfo
 {
 	DBGBREAK;  //  TODO:
     return false;

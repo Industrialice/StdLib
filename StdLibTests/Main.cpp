@@ -18,8 +18,6 @@
 
 using namespace StdLib;
 
-#if 0
-
 struct SDummy
 {
     ~SDummy()
@@ -43,19 +41,24 @@ struct SDummy
     }*/
 };
 
-#include <LiceMath.hpp>
-
 void OutVec3( const char *cp_str, const vec3 *cpo_vec )
 {
     char a_bb[ 1024 ];
-    VC( Funcs::PrintToStr, a_bb, 1023, "%s\n%[3]f %[3]f %[3]f\n", cp_str, cpo_vec->x, cpo_vec->y, cpo_vec->z );
+    Funcs::PrintToStr( a_bb, 1024, "%s\n%[3]f %[3]f %[3]f\n", cp_str, cpo_vec->x, cpo_vec->y, cpo_vec->z );
+    ::printf( "%s\n\n", a_bb );
+}
+
+void OutVec4( const char *cp_str, const vec4 *cpo_vec )
+{
+    char a_bb[ 1024 ];
+    Funcs::PrintToStr( a_bb, 1024, "%s\n%[3]f %[3]f %[3]f %[3]f\n", cp_str, cpo_vec->x, cpo_vec->y, cpo_vec->z, cpo_vec->w );
     ::printf( "%s\n\n", a_bb );
 }
 
 void Out4x3( const char *cp_str, const m4x3 *cpo_m )
 {
     char a_bb[ 1024 ];
-    VC( Funcs::PrintToStr, a_bb, 1023, "%s\n%[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f\n", cp_str, cpo_m->e00, cpo_m->e01, cpo_m->e02,
+    Funcs::PrintToStr( a_bb, 1024, "%s\n%[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f\n", cp_str, cpo_m->e00, cpo_m->e01, cpo_m->e02,
                                                                                                                   cpo_m->e10, cpo_m->e11, cpo_m->e12,
                                                                                                                   cpo_m->e20, cpo_m->e21, cpo_m->e22,
                                                                                                                   cpo_m->e30, cpo_m->e31, cpo_m->e32 );
@@ -65,7 +68,7 @@ void Out4x3( const char *cp_str, const m4x3 *cpo_m )
 void Out3x4( const char *cp_str, const m3x4 *cpo_m )
 {
     char a_bb[ 1024 ];
-    VC( Funcs::PrintToStr, a_bb, 1023, "%s\n%[3]f %[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f %[3]f\n", cp_str, cpo_m->e00, cpo_m->e01, cpo_m->e02,
+    Funcs::PrintToStr( a_bb, 1024, "%s\n%[3]f %[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f %[3]f\n", cp_str, cpo_m->e00, cpo_m->e01, cpo_m->e02,
                                                                                                                   cpo_m->e10, cpo_m->e11, cpo_m->e12,
                                                                                                                   cpo_m->e20, cpo_m->e21, cpo_m->e22 );
     ::printf( "%s\n\n", a_bb );
@@ -74,12 +77,14 @@ void Out3x4( const char *cp_str, const m3x4 *cpo_m )
 void Out4x4( const char *cp_str, const m4x4 *cpo_m )
 {
     char a_bb[ 1024 ];
-    VC( Funcs::PrintToStr, a_bb, 1023, "%s\n%[3]f %[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f %[3]f\n", cp_str, cpo_m->e00, cpo_m->e01, cpo_m->e02, cpo_m->e03,
+    Funcs::PrintToStr( a_bb, 1024, "%s\n%[3]f %[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f %[3]f\n%[3]f %[3]f %[3]f %[3]f\n", cp_str, cpo_m->e00, cpo_m->e01, cpo_m->e02, cpo_m->e03,
                                                                                                                   cpo_m->e10, cpo_m->e11, cpo_m->e12, cpo_m->e13,
                                                                                                                   cpo_m->e20, cpo_m->e21, cpo_m->e22, cpo_m->e23,
                                                                                                                   cpo_m->e30, cpo_m->e31, cpo_m->e32, cpo_m->e33 );
     ::printf( "%s\n\n", a_bb );
 }
+
+#if 0
 
 static void Dir( CLogger::Tag::messageTag_t tag, const char *cp_text, ui32 len )
 {
@@ -433,7 +438,7 @@ namespace StdLib
 	template class CVec < int, void, 128 >;
 	template class CVec < CVec < int, void, 128 >, void, 128 >;
 	template class CRefVec < int >;
-	template class CCRefVec < int >;
+	template class CRefVec < const int >;
 	template class CVecArr < int >;
 	template class TCStr < char, 128 >;
 	template class TCStr < wchar_t, 128 >;
@@ -572,11 +577,46 @@ static f32 RadiansWrapTest( f32 rad )
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
-	
-	CStr str = "123";
-	str = str + str;
 
-	::printf( "%s\n", str.CStr() );
+	CVec < int > testVec { 1, 2, 3 };
+
+	for( auto i : testVec )
+	{
+		printf( "%i\n", i );
+	}
+
+	for( auto &i : testVec.ToRef() )
+	{
+		printf( "%i\n", i );
+	}
+
+	for( auto &i : testVec.ToCRef() )
+	{
+		printf( "%i\n", i );
+	}
+
+	//Fix( TextFixerMode::fanfic );
+	
+	/*m4x4 m1 { 1, 2, 3, 4,
+			  5, 6, 7, 8,
+			  9, 8, 7, 6,
+			  5, 4, 3, 2 };
+
+	vec4 v1 { 1, 2, 3, 4 };
+
+	vec4 v2;
+	LiceMath::Vec4MultM4x4( &v2, &v1, &m1 );
+
+	OutVec4( "first ", &v2 );
+
+	LiceMath::M4x4TransposeInplace( &m1 );
+
+	v2.x = m1.m[0][0] * v1.x + m1.m[0][1] * v1.y + m1.m[0][2] * v1.z + m1.m[0][3] * v1.w;
+	v2.y = m1.m[1][0] * v1.x + m1.m[1][1] * v1.y + m1.m[1][2] * v1.z + m1.m[1][3] * v1.w;
+	v2.z = m1.m[2][0] * v1.x + m1.m[2][1] * v1.y + m1.m[2][2] * v1.z + m1.m[2][3] * v1.w;
+	v2.w = m1.m[3][0] * v1.x + m1.m[3][1] * v1.y + m1.m[3][2] * v1.z + m1.m[3][3] * v1.w;
+
+	OutVec4( "second ", &v2 );*/
 
 	//PrintSameFiles( L"D:\\Pictures" );
 

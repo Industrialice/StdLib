@@ -3,38 +3,28 @@
 
 #include "PlatformDefines.hpp"
 
-STATIC_CHECK( sizeof(INT64_NUMBER) == 8, "sizeof(long long) is unexpected" );
-STATIC_CHECK( sizeof(int)          == 4, "sizeof(int) is unexpected" );
-STATIC_CHECK( sizeof(long) == 4 || sizeof(long) == 8, "sizeof(long) is unexpected" );
-STATIC_CHECK( sizeof(short)        == 2, "sizeof(short) is unexpected" );
-STATIC_CHECK( sizeof(char)         == 1, "sizeof(char) is unexpected" );
-STATIC_CHECK( sizeof(bool)         == 1, "sizeof(bool) is unexpected" );
-STATIC_CHECK( sizeof(float)        == 4, "sizeof(float) is unexpected" );
-STATIC_CHECK( sizeof(double)       == 8, "sizeof(double) is unexpected" );
-
 STATIC_CHECK( sizeof(void *) * 8 == WORD_SIZE, "incorrect WORD_SIZE" );
 
 #if WORD_SIZE == 32
-    typedef unsigned int uiw;
-    typedef signed int iw;
+    typedef uint32_t uiw;
+    typedef int32_t iw;
 #elif WORD_SIZE == 64
-    typedef UINT64_NUMBER uiw;
-    typedef INT64_NUMBER iw;
+    typedef uint64_t uiw;
+    typedef int32_t iw;
 #else
     #error incorrect WORD_SIZE
 #endif
-typedef unsigned int uint;
-typedef UINT64_NUMBER ui64;
-typedef unsigned int ui32;
-typedef unsigned short ui16;
-typedef unsigned char ui8;
-typedef unsigned char byte;
+typedef uint64_t ui64;
+typedef uint32_t ui32;
+typedef uint16_t ui16;
+typedef uint8_t ui8;
+typedef uint8_t byte;
 typedef float f32;
 typedef double f64;
-typedef INT64_NUMBER i64;
-typedef signed int i32;
-typedef signed short i16;
-typedef signed char i8;
+typedef int64_t i64;
+typedef int32_t i32;
+typedef int16_t i16;
+typedef int8_t i8;
 typedef bool bln;
 
 #if WORD_SIZE == 32
@@ -50,7 +40,7 @@ typedef bool bln;
 #else
     #error incorrect WORD_SIZE
 #endif
-const ui64 ui64_max = ASUINT64( 18446744073709551615 );  //  0xFFffFFffFFffFFff
+const ui64 ui64_max = 18446744073709551615ULL;  //  0xFFffFFffFFffFFff
 const ui64 ui64_min = 0;  //  0x0000000000000000
 const ui32 ui32_max = 4294967295;  //  0xFFffFFff
 const ui32 ui32_min = 0;  //  0x00000000
@@ -66,8 +56,8 @@ const f32 f32_max = 3.402823466e+38F;
 const f32 f32_min = 1.175494351e-38F;
 const f64 f64_max = 1.7976931348623158e+308;
 const f64 f64_min = 2.2250738585072014e-308;
-const i64 i64_max = ASINT64( 9223372036854775807 );  //  0x7FffFFffFFffFFff
-const i64 i64_min = ASINT64( -9223372036854775807 ) - 1;  //  0x8000000000000000
+const i64 i64_max = 9223372036854775807LL;  //  0x7FffFFffFFffFFff
+const i64 i64_min = -9223372036854775807LL - 1;  //  0x8000000000000000
 const i32 i32_max = 2147483647;  //  0x7FffFFff
 const i32 i32_min = -2147483647 - 1;  //  0x80000000
 const i16 i16_max = 32767;  //  0x7Fff
@@ -99,9 +89,9 @@ const f64 f64_inf = f64_max * f64_max;
 const f64 f64_inf_pos = f64_max * f64_max;
 const f64 f64_inf_neg = -(f64_max * f64_max);
 const f64 f64_nan = f64_inf * 0.f;  //  one of the possible NaN values
-const ui64 f64_exp_mask = ASUINT64( 0x7FF0000000000000 );
-const ui64 f64_significand_mask = ASUINT64( 0x000FFFFFFFFFFFFF );
-const ui64 f64_sign_mask = ASUINT64( 0x8000000000000000 );
+const ui64 f64_exp_mask = 0x7FF0000000000000ULL;
+const ui64 f64_significand_mask = 0x000FFFFFFFFFFFFFULL;
+const ui64 f64_sign_mask = 0x8000000000000000ULL;
 const f32 f64_piHalf = 1.5707963267948966192315;
 const f64 f64_pi = 3.141592653589793238463;
 const f64 f64_pi2 = 6.283185307179586476926;

@@ -108,19 +108,6 @@ namespace Funcs
         return powered;
     }
 
-    template < typename X > void Swap( X *p_first, X *p_second )
-    {
-	#ifdef MOVE_SUPPORTED
-		X temp = std::move( *p_first );
-		*p_first = std::move( *p_second );
-		*p_second = std::move( temp );
-	#else
-        X temp = *p_first;
-        *p_first = *p_second;
-        *p_second = temp;
-	#endif
-    }
-
     template < typename X > const X &Max( const X &first, const X &second )
     {
         return first > second ? first : second;

@@ -18,12 +18,10 @@ namespace StdLib
 		static const uiw maxPathLength = MAX_PATH_LENGTH;
 		static const uiw maxFileNameLength = MAX_FILENAME_LENGTH;
 
-	#ifdef MOVE_SUPPORTED
-		FilePath( const FilePath & ) = default;
+		/*FilePath( const FilePath & ) = default;
 		FilePath( FilePath && ) = default;
 		FilePath &operator = ( const FilePath & ) = default;
-		FilePath &operator = ( FilePath && ) = default;
-	#endif
+		FilePath &operator = ( FilePath && ) = default;*/
 		FilePath() {}
 		FilePath( const pathChar *path ) : _path( path ) {}
 		FilePath( const pathType &path ) : _path( path ) {}
@@ -35,13 +33,13 @@ namespace StdLib
 		FilePath &operator += ( pathChar ch ) {	_path += ch; return *this; }
 		FilePath &operator += ( const FilePath &path ) { _path += path._path; return *this;	}
 		FilePath &operator += ( const pathType &path ) { _path += path;	return *this; }
-		FilePath operator + ( const pathChar *path ) const { return FilePath( TRY_MOVE( _path + path ) ); }
-		FilePath operator + ( pathChar ch ) const {	return FilePath( TRY_MOVE( _path + ch ) ); }
-		FilePath operator + ( const FilePath &path ) const { return FilePath( TRY_MOVE( _path + path._path ) );	}
-		FilePath operator + ( const pathType &path ) const { return FilePath( TRY_MOVE( _path + path ) ); }
-		friend FilePath operator + ( const pathChar *left, const FilePath &right ) { return FilePath( TRY_MOVE( left + right._path ) ); }
-		friend FilePath operator + ( pathChar left, const FilePath &right ) { return FilePath( TRY_MOVE( left + right._path ) ); }
-		friend FilePath operator + ( pathType left, const FilePath &right ) { return FilePath( TRY_MOVE( left + right._path ) ); }
+		FilePath operator + ( const pathChar *path ) const { return FilePath( std::move( _path + path ) ); }
+		FilePath operator + ( pathChar ch ) const {	return FilePath( std::move( _path + ch ) ); }
+		FilePath operator + ( const FilePath &path ) const { return FilePath( std::move( _path + path._path ) );	}
+		FilePath operator + ( const pathType &path ) const { return FilePath( std::move( _path + path ) ); }
+		friend FilePath operator + ( const pathChar *left, const FilePath &right ) { return FilePath( std::move( left + right._path ) ); }
+		friend FilePath operator + ( pathChar left, const FilePath &right ) { return FilePath( std::move( left + right._path ) ); }
+		friend FilePath operator + ( pathType left, const FilePath &right ) { return FilePath( std::move( left + right._path ) ); }
 		FilePath &operator = ( const pathChar *path ) {	_path = path; return *this;	}
 		FilePath &operator = ( const pathType &path ) {	_path = path; return *this;	}
 		bln operator == ( const pathChar *path ) const { return _path == path; }

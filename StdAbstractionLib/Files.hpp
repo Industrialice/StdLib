@@ -19,19 +19,19 @@ namespace Files
 	EXTERNALD bln CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );
 	EXTERNALD bln CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );
 	EXTERNALD bln CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false, CError *error = 0 );
-    EXTERNALD bln RemoveFile( const FilePath &pnn, CError *po_error = 0 );
-    EXTERNALD bln RemoveFolder( const FilePath &path, CError *po_error = 0 );
-	EXTERNALD bln RemoveObject( const FilePath &path, CError *po_error = 0 );
+    EXTERNALD bln RemoveFile( const FilePath &pnn, CError *error = 0 );
+    EXTERNALD bln RemoveFolder( const FilePath &path, CError *error = 0 );
+	EXTERNALD bln RemoveObject( const FilePath &path, CError *error = 0 );
 	EXTERNALD bln VolumeDriveName( const FilePath &path, char *RSTR output, uiw maxLen );  //  maxLen include null-symbol, if buffer was too small, returns a zero
 	EXTERNALD bln IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1, CError *error = 0 );  //  the function may fail if it cannot open one of the files
-	EXTERNALD bln IsExists( const FilePath &pnn, CError *error = 0 );  //  on fail returns false
-	EXTERNALD bln IsFile( const FilePath &pnn, CError *error = 0 );  //  on fail returns false
-	EXTERNALD bln IsFolder( const FilePath &pnn, CError *error = 0 );  //  on fail returns false
-	EXTERNALD bln IsEmpty( const FilePath &pnn, CError *error = 0 );  //  on fail returns true, pnn can point to a file or folder
-	EXTERNALD bln IsFileReadOnlyGet( const FilePath &pnn, CError *error = 0 );  //  on fail returns false
-	EXTERNALD bln IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *error = 0 );  //  on fail returns false
-	EXTERNALD bln CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject = false, CError *po_error = 0 );
-	EXTERNALD bln CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject = false, CError *po_error = 0 );
+	EXTERNALD Nullable < bln > IsExists( const FilePath &pnn, CError *error = 0 );
+	EXTERNALD Nullable < bln > IsFile( const FilePath &pnn, CError *error = 0 );
+	EXTERNALD Nullable < bln > IsFolder( const FilePath &pnn, CError *error = 0 );
+	EXTERNALD Nullable < bln > IsEmpty( const FilePath &pnn, CError *error = 0 );
+	EXTERNALD Nullable < bln > IsFileReadOnlyGet( const FilePath &pnn, CError *error = 0 );
+	EXTERNALD Nullable < bln > IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *error = 0 );
+	EXTERNALD bln CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject = false, CError *error = 0 );
+	EXTERNALD bln CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject = false, CError *error = 0 );
 	EXTERNALD bln IsRelativePathSupported();
 	EXTERNALD FilePath CurrentWorkingPathGet();  //  empty FilePath on error
 	EXTERNALD bln CurrentWorkingPathSet( const FilePath &path );
@@ -47,7 +47,6 @@ namespace Files
 
     class CFileEnumInfo
     {
-    protected:
         fileEnumHandle _handle;
 		FilePath _pnn;
         uiw _pathLen;
@@ -79,10 +78,21 @@ namespace Files
 			return _fileSize == ui64_max;
         }
 
-        ui64 FileSize() const  //  ui64_max if not defined
+        Nullable < ui64 > FileSize() const
         {
+			if( _fileSize == ui64_max )
+			{
+				return nullv;
+			}
             return _fileSize;
         }
+
+	private:
+		friend bln EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask );
+		friend bln EnumNextFile( CFileEnumInfo *info );
+
+		NOINLINE bln EnumFirstFile( const FilePath &path, const FilePath &mask );
+		NOINLINE bln EnumNextFile();
     };
 }
 

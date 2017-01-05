@@ -24,6 +24,9 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdarg>
+#include <cstdint>
+#include <type_traits>
+#include <utility>
 
 #include "CompilerDefines.hpp"
 	

@@ -17,7 +17,7 @@ static void MakeFixes( const wchar_t *pnn, TextFixerMode::mode_t fixMode )
 	char narrowPnn[ MAX_PATH_LENGTH ];
 	::wcstombs( narrowPnn, pnn, sizeof(narrowPnn) );
 
-    FileIO::CFile file( narrowPnn, FileIO::OpenMode::OpenExisting, FileIO::ProcMode::Read, FileIO::CacheMode::LinearRead );
+    FileIO::CFile file( pnn, FileOpenMode::OpenExisting, FileProcMode::Read, FileCacheMode::LinearRead );
     if( !file.IsOpened() )
     {
         ::printf( "failed to open %s to read\n", narrowPnn );
@@ -54,7 +54,7 @@ static void MakeFixes( const wchar_t *pnn, TextFixerMode::mode_t fixMode )
                     ++GlobalFixes;
                     to.PopBack();
                 }
-                to.PushBack( '\n' );
+                to.Append( '\n' );
                 continue;
             }
             if( next( 1 ) == '\0' )
@@ -105,7 +105,7 @@ static void MakeFixes( const wchar_t *pnn, TextFixerMode::mode_t fixMode )
                 if( offset <= 'z' - 'a' )
                 {
                     ++GlobalFixes;
-                    to.PushBack( 'a' + offset );
+                    to.Append( 'a' + offset );
                     skip = 2;
                     continue;
                 }
@@ -113,74 +113,74 @@ static void MakeFixes( const wchar_t *pnn, TextFixerMode::mode_t fixMode )
             if( next( 0 ) == 0xE2 && next( 1 ) == 0x99 && next( 2 ) == 0xAB )  //  ♫
             {
                 ++GlobalFixes;
-                to.PushBack( '@' );
+                to.Append( '@' );
                 skip = 3;
                 continue;
             }
             if( next( 0 ) == 0xE2 && next( 1 ) == 0x80 && next( 2 ) == 0x98 )  //  ‘
             {
                 ++GlobalFixes;
-                to.PushBack( '\'' );
+                to.Append( '\'' );
                 skip = 3;
                 continue;
             }
             if( next( 0 ) == 0xE2 && next( 1 ) == 0x80 && next( 2 ) == 0x99 )  //  ’
             {
                 ++GlobalFixes;
-                to.PushBack( '\'' );
+                to.Append( '\'' );
                 skip = 3;
                 continue;
             }
             if( next( 0 ) == 0xE2 && next( 1 ) == 0x80 && next( 2 ) == 0x9C )  //  “
             {
                 ++GlobalFixes;
-                to.PushBack( '"' );
+                to.Append( '"' );
                 skip = 3;
                 continue;
             }
             if( next( 0 ) == 0xE2 && next( 1 ) == 0x80 && next( 2 ) == 0x9D )  //  ”
             {
                 ++GlobalFixes;
-                to.PushBack( '"' );
+                to.Append( '"' );
                 skip = 3;
                 continue;
             }
             if( next( 0 ) == 0xE2 && next( 1 ) == 0x80 && next( 2 ) == 0x93 )  //  –
             {
                 ++GlobalFixes;
-                to.PushBack( '-' );
+                to.Append( '-' );
                 skip = 3;
                 continue;
             }
             if( next( 0 ) == 0xE2 && next( 1 ) == 0x80 && next( 2 ) == 0x94 )  //  —
             {
                 ++GlobalFixes;
-                to.PushBack( '-' );
+                to.Append( '-' );
                 skip = 3;
                 continue;
             }
             if( next( 0 ) == 0xE2 && next( 1 ) == 0x87 && next( 2 ) == 0x94 )  //  ⇔
             {
                 ++GlobalFixes;
-                to.PushBack( '<' );
-                to.PushBack( '-' );
-                to.PushBack( '>' );
+                to.Append( '<' );
+                to.Append( '-' );
+                to.Append( '>' );
                 skip = 3;
                 continue;
             }
             if( next( 0 ) == 0xE2 && next( 1 ) == 0x80 && next( 2 ) == 0xA6 )  //  …
             {
                 ++GlobalFixes;
-                to.PushBack( '.' );
-                to.PushBack( '.' );
-                to.PushBack( '.' );
+                to.Append( '.' );
+                to.Append( '.' );
+                to.Append( '.' );
                 skip = 3;
                 continue;
             }
             if( next( 0 ) == 0xC2 && next( 1 ) == 0xA0 )
             {
                 ++GlobalFixes;
-                to.PushBack( ' ' );
+                to.Append( ' ' );
                 skip = 2;
                 continue;
             }
@@ -197,14 +197,14 @@ static void MakeFixes( const wchar_t *pnn, TextFixerMode::mode_t fixMode )
             if( next( 0 ) == '\t' )
             {
                 ++GlobalFixes;
-                to.PushBack( ' ' );
-                to.PushBack( ' ' );
-                to.PushBack( ' ' );
-                to.PushBack( ' ' );
+                to.Append( ' ' );
+                to.Append( ' ' );
+                to.Append( ' ' );
+                to.Append( ' ' );
                 continue;
             }
         }
-        to.PushBack( next( 0 ) );
+        to.Append( next( 0 ) );
     }
 
     if( fixMode == TextFixerMode::fanfic )
@@ -237,7 +237,7 @@ static void MakeFixes( const wchar_t *pnn, TextFixerMode::mode_t fixMode )
         }
 
         //  Page numbers
-        //to.PushBack( '\0' );
+        //to.Append( '\0' );
         //char *start = _StrChr( to.Data(), '\n' );
         //for( ; ; )
         //{
@@ -274,7 +274,7 @@ static void MakeFixes( const wchar_t *pnn, TextFixerMode::mode_t fixMode )
 
     if( localFixes != GlobalFixes )
     {
-        file.Open( narrowPnn, FileIO::OpenMode::CreateAlways, FileIO::ProcMode::Write );
+        file.Open( pnn, FileOpenMode::CreateAlways, FileProcMode::Write );
         if( !file.IsOpened() )
         {
             ::printf( "failed to open %s to write\n", narrowPnn );

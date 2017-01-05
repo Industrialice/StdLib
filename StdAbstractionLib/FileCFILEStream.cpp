@@ -25,7 +25,12 @@ bln FileCFILEStream::Open( const FilePath &path, FileOpenMode::mode_t openMode, 
 {
 	this->Close();
 
-	bln is_fileExists = Files::IsExists( path );
+	Nullable < bln > is_fileExists = Files::IsExists( path );
+	if( is_fileExists.IsNull() )
+	{
+		DSA( error, Error::UnknownError(), "failed to check file's existense" );
+		return false;
+	}
 
 	if( openMode == FileOpenMode::OpenExisting )
 	{
@@ -364,24 +369,22 @@ FileOpenMode::mode_t FileCFILEStream::OpenModeGet() const
 	return _openMode;
 }
 
-#ifdef MOVE_SUPPORTED
-	FileCFILEStream::FileCFILEStream( FileCFILEStream &&source )
-	{
-		this->_file = source._file;
-		source._file = 0;
-		this->_offsetToStart = source._offsetToStart;
-		this->_openMode = source._openMode;
-		this->_procMode = source._procMode;
-	}
+FileCFILEStream::FileCFILEStream( FileCFILEStream &&source )
+{
+	this->_file = source._file;
+	source._file = 0;
+	this->_offsetToStart = source._offsetToStart;
+	this->_openMode = source._openMode;
+	this->_procMode = source._procMode;
+}
 	
-	FileCFILEStream &FileCFILEStream::operator = ( FileCFILEStream &&source )
-	{
-		ASSUME( this != &source );
-		this->_file = source._file;
-		source._file = 0;
-		this->_offsetToStart = source._offsetToStart;
-		this->_openMode = source._openMode;
-		this->_procMode = source._procMode;
-		return *this;
-	}
-#endif
+FileCFILEStream &FileCFILEStream::operator = ( FileCFILEStream &&source )
+{
+	ASSUME( this != &source );
+	this->_file = source._file;
+	source._file = 0;
+	this->_offsetToStart = source._offsetToStart;
+	this->_openMode = source._openMode;
+	this->_procMode = source._procMode;
+	return *this;
+}

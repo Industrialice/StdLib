@@ -31,7 +31,7 @@ namespace
 CLogger::CLogger()
 {}
 
-#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG)
 NOINLINE void CLogger::_Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
 #else
 NOINLINE void CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )

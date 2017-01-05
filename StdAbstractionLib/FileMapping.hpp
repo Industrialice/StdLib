@@ -35,9 +35,6 @@ namespace FileMapping
 	{
 		Private::MappingStruct mappingStruct;
 
-		Mapping( const Mapping & );
-		Mapping &operator = ( const Mapping & );
-
 	public:
 		~Mapping()
 		{
@@ -115,7 +112,6 @@ namespace FileMapping
 			return MemoryStreamFixedExt( CMemory(), Size(), offset );
 		}
 
-	#ifdef MOVE_SUPPORTED
 		Mapping( Mapping &&source ) : mappingStruct( source.mappingStruct )
 		{
 			source.mappingStruct.memory = 0;
@@ -129,7 +125,6 @@ namespace FileMapping
 			source.mappingStruct.memory = 0;
 			return *this;
 		}
-	#endif
 	};
 }
 

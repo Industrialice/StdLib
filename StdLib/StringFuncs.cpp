@@ -2032,7 +2032,7 @@ uiw Funcs::PrintToFileArgList( FileInterface *file, const char *cp_fmt, va_list 
 	return PrintToStrArgListImpl < false >( 0, 0, cp_fmt, args, file ).ValueOrDefault( 0 );
 }
 
-#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG)
 bln Funcs::_PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... )
 {
     ASSUME( argTypes );

@@ -113,6 +113,11 @@ public:
 	}
 
 #ifdef NULLPTR_SUPPORTED
+	Nullable( std::nullptr_t )
+	{
+		_is_null = true;
+	}
+
     Nullable &operator = ( std::nullptr_t )
     {
         return (*this = nullv);
@@ -166,7 +171,6 @@ public:
 		return *this;
 	}
 
-#ifdef MOVE_SUPPORTED
 	Nullable( Nullable &&source )
 	{
 		this->_is_null = source._is_null;
@@ -206,20 +210,17 @@ public:
 
 		return *this;
 	}
-#endif
 
     bln IsNull() const
     {
         return _is_null;
     }
 
-#ifdef EXPLICIT_CONVERSION_SUPPORTED
     explicit operator const X & () const
     {
         ASSUME( _is_null == false );
         return ToRef();
     }
-#endif
 
 	X &InitializeAndGet()
 	{

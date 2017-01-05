@@ -166,7 +166,7 @@ toExit:
 	return result == TRUE;
 }
 
-NOINLINE bln Files::RemoveFile( const FilePath &pnn, CError *po_error )
+NOINLINE bln Files::RemoveFile( const FilePath &pnn, CError *error )
 {
 	CError retError;
 	bln funcResult = false;
@@ -197,11 +197,11 @@ NOINLINE bln Files::RemoveFile( const FilePath &pnn, CError *po_error )
     }
 
 toExit:
-	DSA( po_error, retError );
+	DSA( error, retError );
     return funcResult;
 }
 
-NOINLINE bln Files::RemoveFolder( const FilePath &path, CError *po_error )  //  potentially recursive
+NOINLINE bln Files::RemoveFolder( const FilePath &path, CError *error )  //  potentially recursive
 {
 	uiw len;
 	CWStr buf;
@@ -239,13 +239,13 @@ NOINLINE bln Files::RemoveFolder( const FilePath &path, CError *po_error )  //  
 		buf += o_find.cFileName;
         if( o_find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
         {
-            if( !RemoveFolder( buf.CStr(), po_error ) )
+            if( !RemoveFolder( buf.CStr(), error ) )
             {
                 ::FindClose( h_find );
                 goto toExit;
             }
         }
-        else if( !RemoveFile( buf.CStr(), po_error ) )
+        else if( !RemoveFile( buf.CStr(), error ) )
         {
             ::FindClose( h_find );
             goto toExit;
@@ -261,24 +261,24 @@ NOINLINE bln Files::RemoveFolder( const FilePath &path, CError *po_error )  //  
     }
 
 toExit:
-    DSA( po_error, o_error );
+    DSA( error, o_error );
     return funcResult;
 }
 
-bln Files::RemoveObject( const FilePath &path, CError *po_error )
+bln Files::RemoveObject( const FilePath &path, CError *error )
 {
 	CError retError;
 	bln funcResult = false;
 
 	if( Files::IsFile( path, &retError ) )
 	{
-		return Files::RemoveFile( path, po_error );
+		return Files::RemoveFile( path, error );
 	}
 	else if( Files::IsFolder( path, &retError ) )
 	{
-		return Files::RemoveFolder( path, po_error );
+		return Files::RemoveFolder( path, error );
 	}
-	DSA( po_error, retError );
+	DSA( error, retError );
 	return false;
 }
 
@@ -352,18 +352,18 @@ toExit:
 	return result;
 }
 
-NOINLINE bln Files::IsExists( const FilePath &pnn, CError *error )
+NOINLINE Nullable < bln > Files::IsExists( const FilePath &pnn, CError *error )
 {
 	CError retError;
-	bln is_file = Files::IsFile( pnn, &retError );
+	Nullable < bln > is_file = Files::IsFile( pnn, &retError );
 	DSA( error, retError );
 	return retError == Error::Ok();
 }
 
-bln Files::IsFile( const FilePath &pnn, CError *error )
+Nullable < bln > Files::IsFile( const FilePath &pnn, CError *error )
 {
 	CError retError;
-	bln funcResult = false;
+	Nullable < bln > funcResult;
 	DWORD attribs;
 
 	if( !pnn.IsValid() )
@@ -386,26 +386,26 @@ toExit:
 	return funcResult;
 }
 
-bln Files::IsFolder( const FilePath &pnn, CError *error )
+Nullable < bln > Files::IsFolder( const FilePath &pnn, CError *error )
 {
 	CError retError;
-	bln is_file = Files::IsFile( pnn, &retError );
+	Nullable < bln > is_file = Files::IsFile( pnn, &retError );
 	DSA( error, retError );
 	if( retError == Error::Ok() )
 	{
-		return is_file == false;
+		return is_file.Get() == false;
 	}
-	return false;
+	return nullv;
 }
 
-bln Files::IsEmpty( const FilePath &pnn, CError *error )
+Nullable < bln > Files::IsEmpty( const FilePath &pnn, CError *error )
 {
 	CError retError;
-	bln is_file = Files::IsFile( pnn, error );
+	Nullable < bln > is_file = Files::IsFile( pnn, error );
 	DSA( error, retError );
 	if( retError != Error::Ok() )
 	{
-		return false;
+		return nullv;
 	}
 
 	//  TODO:
@@ -413,30 +413,30 @@ bln Files::IsEmpty( const FilePath &pnn, CError *error )
 	return false;
 }
 
-NOINLINE bln Files::IsFileReadOnlyGet( const FilePath &pnn, CError *error )
+NOINLINE Nullable < bln > Files::IsFileReadOnlyGet( const FilePath &pnn, CError *error )
 {
 	if( !pnn.IsValid() )
 	{
 		DSA( error, Error::InvalidArgument() );
-		return false;
+		return nullv;
 	}
     
 	DWORD attribs = ::GetFileAttributesW( pnn.PlatformPath() );
     if( attribs == INVALID_FILE_ATTRIBUTES )
     {
 		DSA( error, StdLib_FileError() );
-        return false;
+        return nullv;
     }
 	DSA( error, Error::Ok() );
-    return attribs & FILE_ATTRIBUTE_READONLY;
+    return (attribs & FILE_ATTRIBUTE_READONLY) != 0;
 }
 
-NOINLINE bln Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *error )
+NOINLINE Nullable < bln > Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *error )
 {
 	if( !pnn.IsValid() )
 	{
 		DSA( error, Error::InvalidArgument() );
-		return false;
+		return nullv;
 	}
 
     DWORD new_attribs;
@@ -444,7 +444,7 @@ NOINLINE bln Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *e
     if( old_attribs == INVALID_FILE_ATTRIBUTES )
     {
 		DSA( error, StdLib_FileError() );
-        return false;
+        return nullv;
     }
 
     if( is_ro )
@@ -461,7 +461,7 @@ NOINLINE bln Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *e
         if( ::SetFileAttributesW( pnn.PlatformPath(), new_attribs ) != TRUE )
 		{
 			DSA( error, StdLib_FileError() );
-			return false;
+			return nullv;
 		}
     }
 
@@ -469,10 +469,10 @@ NOINLINE bln Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *e
     return true;
 }
 
-NOINLINE bln Files::CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject, CError *po_error )
+NOINLINE bln Files::CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject, CError *error )
 {
 	bln funcResult = false;
-	CError o_error, existError;
+	CError o_error;
 	bln is_fileAlreadyExists;
 	FilePath fullPath;
 
@@ -486,8 +486,8 @@ NOINLINE bln Files::CreateNewFolder( const FilePath &where, const FilePath &name
 	fullPath.AddLevel();
 	fullPath += name;
 
-	is_fileAlreadyExists = Files::IsFile( fullPath, &existError );
-    if( existError == Error::Ok() )
+	is_fileAlreadyExists = Files::IsFile( fullPath ).ValueOrDefault( false );
+    if( is_fileAlreadyExists )
     {
 		if( is_overrideExistingObject )
 		{
@@ -510,14 +510,14 @@ NOINLINE bln Files::CreateNewFolder( const FilePath &where, const FilePath &name
     }
 
 toExit:
-    DSA( po_error, o_error );
+    DSA( error, o_error );
     return funcResult;
 }
 
-NOINLINE bln Files::CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject, CError *po_error )
+NOINLINE bln Files::CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject, CError *error )
 {
 	bln funcResult = false;
-	CError o_error, existError;
+	CError o_error;
 	bln is_fileAlreadyExists;
 	FilePath fullPath;
 	HANDLE file;
@@ -532,8 +532,8 @@ NOINLINE bln Files::CreateNewFile( const FilePath &where, const FilePath &name, 
 	fullPath.AddLevel();
 	fullPath += name;
 
-	is_fileAlreadyExists = Files::IsFile( fullPath, &existError );
-	if( existError == Error::Ok() )
+	is_fileAlreadyExists = Files::IsFile( fullPath ).ValueOrDefault( false );
+	if( is_fileAlreadyExists )
 	{
 		if( is_overrideExistingObject )
 		{
@@ -560,7 +560,7 @@ NOINLINE bln Files::CreateNewFile( const FilePath &where, const FilePath &name, 
 	funcResult = true;
 
 toExit:
-	DSA( po_error, o_error );
+	DSA( error, o_error );
 	return funcResult;
 }
 
@@ -594,100 +594,97 @@ bln Files::CurrentWorkingPathSet( const FilePath &path )
 	return ::SetCurrentDirectoryW( path.PlatformPath() ) != FALSE;
 }
 
-struct CFileEnumerator : public Files::CFileEnumInfo
+bln Files::CFileEnumInfo::EnumFirstFile( const FilePath &path, const FilePath &mask )
 {
-    NOINLINE bln EnumFirstFile( const FilePath &path, const FilePath &mask )
+    if( _handle != INVALID_HANDLE_VALUE )
     {
-        if( _handle != INVALID_HANDLE_VALUE )
-        {
-            ::FindClose( _handle );
-        }
+        ::FindClose( _handle );
+    }
 
-		_pnn = path;
-		_pnn.Normalize();
-		_pnn.AddLevel();
-		_pathLen = _pnn.Length();
+	_pnn = path;
+	_pnn.Normalize();
+	_pnn.AddLevel();
+	_pathLen = _pnn.Length();
 
-		FilePath pathAndMask = _pnn + mask;
-		WIN32_FIND_DATAW findData;
-        _handle = ::FindFirstFileW( pathAndMask.PlatformPath(), &findData );
-        if( _handle == INVALID_HANDLE_VALUE )
+	FilePath pathAndMask = _pnn + mask;
+	WIN32_FIND_DATAW findData;
+    _handle = ::FindFirstFileW( pathAndMask.PlatformPath(), &findData );
+    if( _handle == INVALID_HANDLE_VALUE )
+    {
+        *this = CFileEnumInfo();
+        return false;
+    }
+
+    if( !::wcscmp( findData.cFileName, L"." ) )
+    {
+        if( !::FindNextFileW( _handle, &findData ) )
         {
-            *this = CFileEnumerator();
+            *this = CFileEnumInfo();
             return false;
         }
-
-        if( !::wcscmp( findData.cFileName, L"." ) )
+        if( !::wcscmp( findData.cFileName, L".." ) )
         {
             if( !::FindNextFileW( _handle, &findData ) )
             {
-                *this = CFileEnumerator();
+                *this = CFileEnumInfo();
                 return false;
             }
-            if( !::wcscmp( findData.cFileName, L".." ) )
-            {
-                if( !::FindNextFileW( _handle, &findData ) )
-                {
-                    *this = CFileEnumerator();
-                    return false;
-                }
-            }
         }
-
-		_pnn += findData.cFileName;
-        if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-        {
-			_pnn.AddLevel();
-            _fileSize = ui64_max;
-        }
-        else
-        {
-            LARGE_INTEGER large_size;
-            large_size.LowPart = findData.nFileSizeLow;
-            large_size.HighPart = findData.nFileSizeHigh;
-            _fileSize = large_size.QuadPart;
-        }
-
-        return true;
     }
 
-    NOINLINE bln EnumNextFile()
+	_pnn += findData.cFileName;
+    if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
     {
-        ASSUME( _handle != INVALID_HANDLE_VALUE );
-
-        WIN32_FIND_DATAW findData;
-        if( !::FindNextFileW( _handle, &findData ) )
-        {
-            *this = CFileEnumerator();
-            return false;
-        }
-
-		_pnn = FilePath( FilePath::pathType( _pnn.PlatformPath(), _pathLen, findData.cFileName, ::wcslen( findData.cFileName ) ) );
-        if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-        {
-			_pnn.AddLevel();
-            _fileSize = ui64_max;
-        }
-        else
-        {
-            LARGE_INTEGER large_size;
-            large_size.LowPart = findData.nFileSizeLow;
-            large_size.HighPart = findData.nFileSizeHigh;
-            _fileSize = large_size.QuadPart;
-        }
-
-        return true;
+		_pnn.AddLevel();
+        _fileSize = ui64_max;
     }
-};
+    else
+    {
+        LARGE_INTEGER large_size;
+        large_size.LowPart = findData.nFileSizeLow;
+        large_size.HighPart = findData.nFileSizeHigh;
+        _fileSize = large_size.QuadPart;
+    }
 
-bln Files::EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask )
-{
-    return ((CFileEnumerator *)info)->EnumFirstFile( path, mask );
+    return true;
 }
 
-bln Files::EnumNextFile( CFileEnumInfo *info )
+bln Files::CFileEnumInfo::EnumNextFile()
 {
-    return ((CFileEnumerator *)info)->EnumNextFile();
+    ASSUME( _handle != INVALID_HANDLE_VALUE );
+
+    WIN32_FIND_DATAW findData;
+    if( !::FindNextFileW( _handle, &findData ) )
+    {
+        *this = CFileEnumInfo();
+        return false;
+    }
+
+	_pnn = FilePath( FilePath::pathType( _pnn.PlatformPath(), _pathLen, findData.cFileName, ::wcslen( findData.cFileName ) ) );
+    if( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+    {
+		_pnn.AddLevel();
+        _fileSize = ui64_max;
+    }
+    else
+    {
+        LARGE_INTEGER large_size;
+        large_size.LowPart = findData.nFileSizeLow;
+        large_size.HighPart = findData.nFileSizeHigh;
+        _fileSize = large_size.QuadPart;
+    }
+
+    return true;
+}
+
+bln Files::EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask )  //  friend of CFileEnumInfo
+{
+    return info->EnumFirstFile( path, mask );
+}
+
+bln Files::EnumNextFile( CFileEnumInfo *info )  //  friend of CFileEnumInfo
+{
+    return info->EnumNextFile();
 }
 
 void Files::Private::CloseEnumHandle( fileEnumHandle handle )

@@ -17,12 +17,6 @@
     #define MAKE_UNIQUE( name ) CONCAT( name, __LINE__ )  /*  not really unique  */
 #endif
 
-#ifdef MOVE_SUPPORTED
-	#define TRY_MOVE( arg ) std::move( arg )
-#else
-	#define TRY_MOVE( arg ) (arg)
-#endif
-
 #define CONSTS_OPS( name ) \
     static name operator |( name left, name right ) \
     { \
@@ -47,23 +41,17 @@
         return left; \
     }
 
-#ifdef DEFINE_VARARGS_SUPPORTED
+#define CONSTS( name, ... ) enum name { __VA_ARGS__ };
 
-    #define CONSTS( name, ... ) enum name { __VA_ARGS__ };
+#define CONSTS_OPED( name, ... ) CONSTS( name, __VA_ARGS__ ); \
+    CONSTS_OPS( name )
 
-    #define CONSTS_OPED( name, ... ) CONSTS( name, __VA_ARGS__ ); \
-        CONSTS_OPS( name )
-
-#endif
-
-#ifdef DEFINE_VARARGS_SUPPORTED
-    #ifdef DEBUG
-        #define DBGCODE( ... ) __VA_ARGS__
-        #define RELCODE( ... )
-    #else
-        #define DBGCODE( ... )
-        #define RELCODE( ... ) __VA_ARGS__
-    #endif
+#ifdef DEBUG
+    #define DBGCODE( ... ) __VA_ARGS__
+    #define RELCODE( ... )
+#else
+    #define DBGCODE( ... )
+    #define RELCODE( ... ) __VA_ARGS__
 #endif
 
 #define NOT_IMPLEMENTED SOFTBREAK

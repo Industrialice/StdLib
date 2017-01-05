@@ -3,10 +3,6 @@
 
 #include "PlatformTypes.hpp"
 
-#if defined(TYPETRAITS_SUPPORTED)
-    #include <type_traits>
-#endif
-
 namespace StdLib {
 
 //  volatile doesn't supported
@@ -21,16 +17,12 @@ template < typename X > struct TypeDesc
     static const bln is_fp = false;
     static const bln is_pointer = false;
     static const bln is_reference = false;
-    #ifdef TYPETRAITS_SUPPORTED
-        static const bln is_pod = std::is_pod < X >::value || (IsDerivedFrom < X, CharPOD >::value && !IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value);
+    static const bln is_pod = std::is_pod < X >::value || (IsDerivedFrom < X, CharPOD >::value && !IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value);
 
-        static const bln is_movableAsPOD = is_pod || (IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value) ||
-                                           (std::is_trivially_constructible < X, const X & >::value && std::is_trivially_assignable < X, const X & >::value &&
-                                           std::is_trivially_move_constructible < X >::value && std::is_trivially_move_assignable < X >::value);  //  that line is not necessary because you can't have a non-trivial move construct/assign with trivial copy/assign
-    #else
-        static const bln is_pod = IsDerivedFrom < X, CharPOD >::value && !IsDerivedFrom < X, CharStrict >::value;
-        static const bln is_movableAsPOD = is_pod || (IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value);
-    #endif
+    static const bln is_movableAsPOD = is_pod || (IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value) ||
+                                        (std::is_trivially_constructible < X, const X & >::value && std::is_trivially_assignable < X, const X & >::value &&
+                                        std::is_trivially_move_constructible < X >::value && std::is_trivially_move_assignable < X >::value);  //  TODO: that isn't accurate in such form
+
     static const uiw bits = sizeof(X) * 8;
     typedef X type;
 };

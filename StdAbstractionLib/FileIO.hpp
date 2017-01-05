@@ -54,6 +54,8 @@ namespace FileIO
 			ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
             bln is_reading;
 
+			bln is_shouldCloseFileHandle;
+
 			FileOpenMode::mode_t openMode;
 			FileProcMode::mode_t procMode;
 			FileCacheMode::mode_t cacheMode;
@@ -66,7 +68,8 @@ namespace FileIO
         /*  Core Functions  */
         EXTERNALD void FileIO_Initialize( CFileBasis *file );
         EXTERNALD void FileIO_Destroy( CFileBasis *file );
-        EXTERNALD bln FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error );
+        EXTERNALD bln FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *error );
+        EXTERNALD bln FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle, fileError *error );
         EXTERNALD void FileIO_Close( CFileBasis *file );
 		EXTERNALD bln FileIO_IsValid( const CFileBasis *file );
         EXTERNALD bln FileIO_Write( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written );
@@ -85,6 +88,7 @@ namespace FileIO
 		EXTERNALD FileProcMode::mode_t FileIO_ProcModeGet( const CFileBasis *file );
 		EXTERNALD FileCacheMode::mode_t FileIO_CacheModeGet( const CFileBasis *file );
         EXTERNALD FilePath FileIO_PNNGet( const CFileBasis *file );
+		EXTERNALD fileHandle FileIO_FileHandle( const CFileBasis *file );
 
 		EXTERNALD void FileIO_InitializeFileIOSystem();
     }
@@ -105,13 +109,18 @@ namespace FileIO
             Private::FileIO_Initialize( this );
         }
 
-        CFile( const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *po_error = 0 )
+        CFile( const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *error = 0 )
         {
             Private::FileIO_Initialize( this );
-            Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, po_error );
+            Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, error );
         }
 
-#ifdef MOVE_SUPPORTED
+        CFile( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle, fileError *error = 0 )
+        {
+            Private::FileIO_Initialize( this );
+            Private::FileIO_OpenFromDescriptor( osFileDescriptor, is_shouldCloseFileHandle, error );
+        }
+
         CFile( CFile &&source )
         {
             Transfer( std::move( source ) );
@@ -123,12 +132,17 @@ namespace FileIO
             Transfer( std::move( source ) );
             return *this;
         }
-#endif
 
-        void Open( const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *po_error = 0 )
+        void Open( const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *error = 0 )
         {
             Close();
-            Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, po_error );
+            Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, error );
+        }
+
+        void Open( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle, fileError *error = 0 )
+        {
+            Close();
+            Private::FileIO_OpenFromDescriptor( osFileDescriptor, is_shouldCloseFileHandle, error );
         }
 
 	#ifdef ENABLE_FILEIO_STATS
@@ -152,6 +166,19 @@ namespace FileIO
         {
             return Private::FileIO_PNNGet( this );
         }
+
+		fileHandle FileHandle() const
+		{
+			return Private::FileIO_FileHandle( this );
+		}
+
+		fileHandle CloseAndGetFileHandle()
+		{
+			this->is_shouldCloseFileHandle = false;
+			fileHandle handle = Private::FileIO_FileHandle( this );
+			Private::FileIO_Close( this );
+			return handle;
+		}
 
         virtual void Close() override
         {
@@ -246,6 +273,7 @@ namespace FileIO
 			target->bufferRef = this->bufferRef;
 			target->internalBuffer = this->internalBuffer.TakeAway();
 			target->is_reading = this->is_reading;
+			target->is_shouldCloseFileHandle = this->is_shouldCloseFileHandle;
 			target->bufferSize = this->bufferSize;
 			target->bufferPos = this->bufferPos;
 			target->readBufferCurrentSize = this->readBufferCurrentSize;
@@ -256,7 +284,6 @@ namespace FileIO
 			Private::FileIO_Initialize( this );
 		}
         
-#ifdef MOVE_SUPPORTED
     private:
         void Transfer( CFile &&source )
         {
@@ -277,6 +304,7 @@ namespace FileIO
 				this->bufferRef = source.bufferRef;
 			}
             this->is_reading = source.is_reading;
+			this->is_shouldCloseFileHandle = source.is_shouldCloseFileHandle;
             this->bufferSize = source.bufferSize;
             this->bufferPos = source.bufferPos;
             this->readBufferCurrentSize = source.readBufferCurrentSize;
@@ -286,7 +314,6 @@ namespace FileIO
 
             Private::FileIO_Initialize( &source );
         }
-#endif
     };
 }
 

@@ -226,3 +226,9 @@ FileCacheMode::mode_t FileIO::Private::FileIO_CacheModeGet( const CFileBasis *fi
 	ASSUME( FileIO_IsValid( file ) );
 	return file->cacheMode;
 }
+
+fileHandle FileIO::Private::FileIO_FileHandle( const CFileBasis *file )
+{
+	ASSUME( FileIO_IsValid( file ) );
+	return file->handle;
+}

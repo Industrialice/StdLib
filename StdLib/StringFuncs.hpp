@@ -238,7 +238,7 @@ namespace Funcs
         return printed;
 	}
 	
-#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG)
     EXTERNALD bln _PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... );
 
     template < typename X > _ArgType _AnalyzeArg( const X &arg )

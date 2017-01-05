@@ -94,7 +94,7 @@ public:
 
         for( uiw index = 0; index < exts.Size(); ++index )
         {
-            AddFileJob( CCRefVec < char >( path, MAX_PATH_LENGTH ), exts[ index ] );
+            AddFileJob( CRefVec < const char >( path, MAX_PATH_LENGTH ), exts[ index ] );
         }
 
         WaitingForFinish();

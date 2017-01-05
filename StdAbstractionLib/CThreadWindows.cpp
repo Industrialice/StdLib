@@ -91,21 +91,19 @@ bln CThread::PrioritySet( i8 priority )
 	return true;
 }
 
-#ifdef MOVE_SUPPORTED
-	CThread::CThread( CThread &&source ) : _thread( source._thread ), _currentPriority( source._currentPriority )
-	{
-		source._thread = 0;
-	}
+CThread::CThread( CThread &&source ) : _thread( source._thread ), _currentPriority( source._currentPriority )
+{
+	source._thread = 0;
+}
 	
-	CThread &CThread::operator = ( CThread &&source )
-	{
-		ASSUME( this != &source );
-		this->_thread = source._thread;
-		this->_currentPriority = source._currentPriority;
-		source._thread = 0;
-		return *this;
-	}
-#endif
+CThread &CThread::operator = ( CThread &&source )
+{
+	ASSUME( this != &source );
+	this->_thread = source._thread;
+	this->_currentPriority = source._currentPriority;
+	source._thread = 0;
+	return *this;
+}
 
 void CThread::SleepCurrent( ui32 msecs )  //  static
 {

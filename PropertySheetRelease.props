@@ -32,7 +32,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
-      <TreatSpecificWarningsAsErrors>4715;4172;4099;4263;4264;4266;</TreatSpecificWarningsAsErrors>
+      <TreatSpecificWarningsAsErrors>4715;4172;4099;4263;4264;4266;4553;</TreatSpecificWarningsAsErrors>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>No</GenerateDebugInformation>

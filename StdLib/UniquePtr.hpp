@@ -7,9 +7,6 @@ namespace StdLib {
 
 template < typename X, typename Deleter = NewDeleter < X > > class UniquePtr
 {
-    UniquePtr( const UniquePtr &source );
-    UniquePtr &operator = ( const UniquePtr &source );
-
 protected:
     X *_ptr;
 
@@ -25,7 +22,6 @@ public:
     UniquePtr( X *ptr ) : _ptr( ptr )
     {}
 
-#ifdef MOVE_SUPPORTED
     UniquePtr( UniquePtr &&source )
     {
         _ptr = source._ptr;
@@ -40,7 +36,6 @@ public:
         source._ptr = 0;
         return *this;
     }
-#endif
 
     void Own( UniquePtr *source )
     {

@@ -25,7 +25,7 @@ public:
 
     typedef void (*DirectionFunc)( Tag::messageTag_t tag, const char *cp_text, uiw len );
     
-#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG) && defined(VAR_TEMPLATES_SUPPORTED)
+#if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG)
     void _Message( Tag::messageTag_t tag, const char *cp_fmt, ... );
 
     template < typename... Args > void Message( Tag::messageTag_t tag, const char *cp_fmt, const Args &... args )

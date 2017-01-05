@@ -44,7 +44,7 @@ namespace VKeys
 		_size
 	);
 
-	CCRefVec < ui8 > GetPlatformMappingStruct();
+	CRefVec < const ui8 > GetPlatformMappingStruct();
 } }
 
 #endif __VKEYS_HPP__

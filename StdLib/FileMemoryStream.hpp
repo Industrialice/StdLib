@@ -13,14 +13,13 @@ namespace StdLib
 		uiw _startOffset;  //  can be non-zero in append mode
 		FileProcMode::mode_t _procMode;
 
-		FileMemoryStream( const FileMemoryStream & );
-		FileMemoryStream &operator = ( const FileMemoryStream & );
-
 	public:
 		typedef CTError < const char * > fileError;
 
 		FileMemoryStream();
 		FileMemoryStream( MemoryStreamInterface *stream, FileProcMode::mode_t procMode, fileError *error = 0 );
+		FileMemoryStream( FileMemoryStream &&source );
+		FileMemoryStream &operator = ( FileMemoryStream &&source );
 		bln Open( MemoryStreamInterface *stream, FileProcMode::mode_t procMode, fileError *error = 0 );
 
 		virtual void Close() override;
@@ -44,11 +43,6 @@ namespace StdLib
 
 		virtual FileProcMode::mode_t ProcModeGet() const override;
 		virtual FileCacheMode::mode_t CacheModeGet() const override;
-
-	#ifdef MOVE_SUPPORTED
-		FileMemoryStream( FileMemoryStream &&source );
-		FileMemoryStream &operator = ( FileMemoryStream &&source );
-	#endif
 	};
 }
 
