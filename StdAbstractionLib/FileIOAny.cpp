@@ -16,7 +16,7 @@ namespace StdLib
 
 static void FORCEINLINE WriteToBuffer( FileIO::Private::CFileBasis *file, const void *what, ui32 howMuch )
 {
-    _MemCpy( file->bufferRef + file->bufferPos, what, howMuch );
+    _MemCpy( file->internalBuffer.get() + file->bufferPos, what, howMuch );
     FILEIO_STAT( file->stats.bytesToBufferWritten += howMuch; )
     FILEIO_STAT( ++file->stats.writesToBufferCount; )
     file->bufferPos += howMuch;
@@ -24,7 +24,7 @@ static void FORCEINLINE WriteToBuffer( FileIO::Private::CFileBasis *file, const 
 
 static void FORCEINLINE ReadFromBuffer( FileIO::Private::CFileBasis *file, void *target, ui32 howMuch )
 {
-    _MemCpy( target, file->bufferRef + file->bufferPos, howMuch );
+    _MemCpy( target, file->internalBuffer.get() + file->bufferPos, howMuch );
     FILEIO_STAT( file->stats.bytesFromBufferReaded += howMuch; )
     FILEIO_STAT( ++file->stats.readsFromBufferCount; )
     file->bufferPos += howMuch;
@@ -33,22 +33,25 @@ static void FORCEINLINE ReadFromBuffer( FileIO::Private::CFileBasis *file, void 
 void FileIO::Private::FileIO_Initialize( CFileBasis *file )
 {
     file->handle = fileHandle_undefined;
-	file->bufferRef = 0;
+	file->internalBuffer.reset();
 	file->bufferSize = 0;
+	#ifdef WINDOWS
+		file->pnn = FilePath();
+	#endif
 }
 
 void FileIO::Private::FileIO_Destroy( CFileBasis *file )
 {
     FileIO_Close( file );
-	file->internalBuffer = 0;
+	file->internalBuffer.reset();
 	#ifdef WINDOWS
-		file->pnn = 0;
+		file->pnn = FilePath();
 	#endif
 }
 
 NOINLINE bln FileIO::Private::FileIO_Write( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written )
 {
-    ASSUME( FileIO_IsValid( file ) && (cp_source || len == 0) && (file->procMode & FileProcMode::Write) );
+    ASSUME( FileIO_IsValid( file ) && (cp_source || len == 0) && !!(file->procMode & FileProcMode::Write) );
 	DSA( written, 0 );
     if( file->bufferSize )
     {
@@ -85,7 +88,7 @@ NOINLINE bln FileIO::Private::FileIO_Write( CFileBasis *file, const void *cp_sou
 
 NOINLINE bln FileIO::Private::FileIO_Read( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
 {
-    ASSUME( FileIO_IsValid( file ) && (p_target || len == 0) && (file->procMode & FileProcMode::Read) );
+    ASSUME( FileIO_IsValid( file ) && (p_target || len == 0) && !!(file->procMode & FileProcMode::Read) );
     DSA( p_readed, 0 );
     if( file->bufferSize )
     {
@@ -110,7 +113,7 @@ NOINLINE bln FileIO::Private::FileIO_Read( CFileBasis *file, void *p_target, ui3
             }
 
             file->readBufferCurrentSize = 0;
-            if( !ReadFromFile( file, file->bufferRef, file->bufferSize, &file->readBufferCurrentSize ) )
+            if( !ReadFromFile( file, file->internalBuffer.get(), file->bufferSize, &file->readBufferCurrentSize ) )
             {
                 return false;
             }
@@ -129,11 +132,12 @@ NOINLINE bln FileIO::Private::FileIO_Read( CFileBasis *file, void *p_target, ui3
     return ReadFromFile( file, p_target, len, p_readed );
 }
 
-NOINLINE bln FileIO::Private::FileIO_BufferSet( CFileBasis *file, ui32 size, void *buffer )
+NOINLINE bln FileIO::Private::FileIO_BufferSet( CFileBasis *file, ui32 size, decltype(CFileBasis::internalBuffer) buffer )
 {
     ASSUME( FileIO_IsValid( file ) );
-	ASSUME( size || buffer == 0 );
-	if( buffer == 0 && file->bufferRef == file->internalBuffer && size == file->bufferSize )
+	ASSUME( size || buffer.get() == nullptr );
+
+	if( buffer.get() == file->internalBuffer.get() && buffer.get_deleter() == file->internalBuffer.get_deleter() && size == file->bufferSize )
     {
         return true;
     }
@@ -147,20 +151,18 @@ NOINLINE bln FileIO::Private::FileIO_BufferSet( CFileBasis *file, ui32 size, voi
     }
     if( buffer )
     {
-		file->internalBuffer = 0;
-		file->bufferRef = (byte *)buffer;
+		file->internalBuffer = std::move( buffer );
     }
     else
     {
 		if( size == 0 )
 		{
-			file->internalBuffer = 0;
+			file->internalBuffer.reset();
 		}
 		else
 		{
-			file->internalBuffer = (byte *)::realloc( file->internalBuffer, size );
+			file->internalBuffer = decltype(file->internalBuffer)( (byte *)malloc( size ), []( byte *ptr ) { free( ptr ); } );
 		}
-		file->bufferRef = file->internalBuffer;
     }
     file->bufferPos = 0;
     file->readBufferCurrentSize = 0;
@@ -177,7 +179,7 @@ ui32 FileIO::Private::FileIO_BufferSizeGet( const CFileBasis *file )
 const void *FileIO::Private::FileIO_BufferGet( const CFileBasis *file )
 {
 	ASSUME( FileIO_IsValid( file ) );
-	return file->internalBuffer.Get();
+	return file->internalBuffer.get();
 }
 
 NOINLINE bln FileIO::Private::FileIO_Flush( CFileBasis *file )
@@ -185,7 +187,7 @@ NOINLINE bln FileIO::Private::FileIO_Flush( CFileBasis *file )
     ASSUME( FileIO_IsValid( file ) && file->bufferPos <= file->bufferSize );
     if( !file->is_reading && file->bufferPos )
     {
-        bln result = WriteToFile( file, file->bufferRef, file->bufferPos, 0 );
+        bln result = WriteToFile( file, file->internalBuffer.get(), file->bufferPos, 0 );
         if( result )
         {
             file->bufferPos = 0;
@@ -209,19 +211,19 @@ NOINLINE bln FileIO::Private::FileIO_Flush( CFileBasis *file )
 	}
 #endif
 
-FileOpenMode::mode_t FileIO::Private::FileIO_OpenModeGet( const CFileBasis *file )
+FileOpenMode FileIO::Private::FileIO_OpenModeGet( const CFileBasis *file )
 {
 	ASSUME( FileIO_IsValid( file ) );
 	return file->openMode;
 }
 
-FileProcMode::mode_t FileIO::Private::FileIO_ProcModeGet( const CFileBasis *file )
+FileProcMode FileIO::Private::FileIO_ProcModeGet( const CFileBasis *file )
 {
 	ASSUME( FileIO_IsValid( file ) );
 	return file->procMode;
 }
 
-FileCacheMode::mode_t FileIO::Private::FileIO_CacheModeGet( const CFileBasis *file )
+FileCacheMode FileIO::Private::FileIO_CacheModeGet( const CFileBasis *file )
 {
 	ASSUME( FileIO_IsValid( file ) );
 	return file->cacheMode;

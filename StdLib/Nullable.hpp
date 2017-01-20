@@ -41,11 +41,6 @@ public:
         _is_null = false;
     }
 
-    Nullable( Nullv )
-    {
-        _is_null = true;
-    }
-
     Nullable &operator = ( const X &source )
     {
         if( _is_null )
@@ -56,16 +51,6 @@ public:
         else
         {
             ToRef() = source;
-        }
-        return *this;
-    }
-
-    Nullable &operator = ( Nullv )
-    {
-        if( !_is_null )
-        {
-            ToRef().~X();
-            _is_null = true;
         }
         return *this;
     }
@@ -102,27 +87,6 @@ public:
 		return !this->operator == ( source );
 	}
 
-    bln operator == ( Nullv ) const
-    {
-        return _is_null;
-    }
-
-    bln operator != ( Nullv ) const
-	{
-		return !_is_null;
-	}
-
-#ifdef NULLPTR_SUPPORTED
-	Nullable( std::nullptr_t )
-	{
-		_is_null = true;
-	}
-
-    Nullable &operator = ( std::nullptr_t )
-    {
-        return (*this = nullv);
-    }
-
     bln operator == ( std::nullptr_t ) const
     {
         return _is_null;
@@ -132,7 +96,21 @@ public:
 	{
 		return !_is_null;
 	}
-#endif
+
+	Nullable( std::nullptr_t )
+	{
+		_is_null = true;
+	}
+
+    Nullable &operator = ( std::nullptr_t )
+    {
+        if( !_is_null )
+        {
+            ToRef().~X();
+            _is_null = true;
+        }
+        return *this;
+    }
 
 	Nullable( const Nullable &source )
 	{

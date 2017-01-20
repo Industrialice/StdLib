@@ -11,7 +11,9 @@
 #include "CThread.hpp"
 #include "FileIO.hpp"
 #include "Files.hpp"
-#include "Misc.hpp"
+#include "TimeMoment.hpp"
+#include "VirtualMemory.hpp"
+#include "SystemInfo.hpp"
 #include "WinCEFuncs.hpp"
 
 EXTERNALS void StdAbstractionLib_Initialize();

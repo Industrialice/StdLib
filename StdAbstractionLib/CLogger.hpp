@@ -6,29 +6,28 @@ namespace StdLib {
 class CLogger
 {
 protected:
-    CLogger();
-    CLogger( const CLogger & );
-    CLogger &operator =( const CLogger & );
+    CLogger() = default;
+    CLogger( const CLogger & ) = delete;
+    CLogger &operator =( const CLogger & ) = delete;
 
 public:
-    struct Tag
-    {
-        CONSTS( messageTag_t,
-                info = 0,
-                warning = 1,
-                error = 2,
-                debug = 3,
-                user = 4,
-                important = 5,
-				critical = 6 )
-    };
+    enum class Tag 
+	{
+        info = 0,
+        warning = 1,
+        error = 2,
+        debug = 3,
+        user = 4,
+        important = 5,
+		critical = 6 
+	};
 
-    typedef void (*DirectionFunc)( Tag::messageTag_t tag, const char *cp_text, uiw len );
+    typedef void (*DirectionFunc)( Tag tag, const char *cp_text, uiw len );
     
 #if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG)
-    void _Message( Tag::messageTag_t tag, const char *cp_fmt, ... );
+    void _Message( Tag tag, const char *cp_fmt, ... );
 
-    template < typename... Args > void Message( Tag::messageTag_t tag, const char *cp_fmt, const Args &... args )
+    template < typename... Args > void Message( Tag tag, const char *cp_fmt, const Args &... args )
     {
         if( !Funcs::_AreArgsValid( cp_fmt, args... ) )
         {
@@ -38,7 +37,7 @@ public:
         _Message( tag, cp_fmt, args... );
     }
 #else
-    void Message( Tag::messageTag_t tag, const char *cp_fmt, ... );
+    void Message( Tag tag, const char *cp_fmt, ... );
 #endif
     void DirectionAdd( DirectionFunc dir );
     uiw DirectionsCount() const;

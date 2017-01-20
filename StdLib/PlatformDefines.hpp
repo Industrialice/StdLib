@@ -18,25 +18,15 @@
         #define CHECK( a ) if( !(a) ) __debugbreak()
 		#define SOFTBREAK __debugbreak()
         #define HARDBREAK __debugbreak()
-        #ifdef DEFINE_VARARGS_SUPPORTED
-            #define DBGMSG( ... ) ::fprintf( stderr, __VA_ARGS__ )
-            #define DBGMSGBREAK( ... ) ::fprintf( stderr, __VA_ARGS__ ); __debugbreak()
-        #else
-            #define DBGMSG( arg ) ::fprintf arg
-            #define DBGMSGBREAK( arg ) ::fprintf arg; __debugbreak()
-        #endif
+        #define DBGMSG( ... ) ::fprintf( stderr, __VA_ARGS__ )
+        #define DBGMSGBREAK( ... ) ::fprintf( stderr, __VA_ARGS__ ); __debugbreak()
     #else
         #define WHRCHECK( a )
         #define CHECK( a )
 		#define SOFTBREAK
         #define HARDBREAK UNREACHABLE
-        #ifdef DEFINE_VARARGS_SUPPORTED
-            #define DBGMSG( ... )
-            #define DBGMSGBREAK( ... )
-        #else
-            #define DBGMSG
-            #define DBGMSGBREAK
-        #endif
+        #define DBGMSG( ... )
+        #define DBGMSGBREAK( ... )
     #endif
 
 #elif defined(POSIX)
@@ -58,25 +48,15 @@
             #define CHECK( a ) if( !(a) ) ::raise( SIGINT )
             #define SOFTBREAK ::raise( SIGINT )
             #define HARDBREAK ::raise( SIGINT )
-            #ifdef DEFINE_VARARGS_SUPPORTED
-                #define DBGMSG( ... ) ::fprintf( stderr, __VA_ARGS__ )
-                #define DBGMSGBREAK( ... ) ::fprintf( stderr, __VA_ARGS__ ); ::raise( SIGINT )
-            #else
-                #define DBGMSG( arg ) ::fprintf arg
-                #define DBGMSGBREAK( arg ) ::fprintf arg; ::raise( SIGINT )
-            #endif
+            #define DBGMSG( ... ) ::fprintf( stderr, __VA_ARGS__ )
+            #define DBGMSGBREAK( ... ) ::fprintf( stderr, __VA_ARGS__ ); ::raise( SIGINT )
         #endif
     #else
         #define CHECK( a )
 		#define SOFTBREAK
         #define HARDBREAK UNREACHABLE
-        #ifdef DEFINE_VARARGS_SUPPORTED
-            #define DBGMSG( ... )
-            #define DBGMSGBREAK( ... )
-        #else
-            #define DBGMSG
-            #define DBGMSGBREAK
-        #endif
+        #define DBGMSG( ... )
+        #define DBGMSGBREAK( ... )
     #endif
 
 #else

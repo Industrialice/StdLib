@@ -12,6 +12,7 @@ namespace StdLib {
                                              (value) < (min), min, \
                                              (value) );
 
+//  TODO: template versions instead
 #define MEMALIGN( mem, alignment ) (void *)((((uiw)mem) + (alignment - 1)) & ~(alignment - 1))
 
 #define MEMREMAP( mem, oldBase, newBase ) (void *)((uiw)mem + ((uiw)newBase - (uiw)oldBase))
@@ -129,11 +130,6 @@ namespace Funcs
             return high;
         }
         return val;
-    }
-
-    template < typename X, typename Y > void BytewiseCopy( X *p_dest, const Y &source )
-    {
-        _MemCpy( p_dest, &source, sizeof(Y) );
     }
 
     template < typename X > X ChangeEndianness( X val )

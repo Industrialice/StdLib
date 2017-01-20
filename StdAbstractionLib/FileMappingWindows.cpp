@@ -4,14 +4,11 @@
 
 #include "FileMapping.hpp"
 
-CError StdLib_FileError();  //  from FilesWindows.cpp
+CError<> StdLib_FileError();  //  from FilesWindows.cpp
 
-FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( FileIO::CFile *file, uiw offset, uiw size, bln is_writeCopy, mappingError *error )
+FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( FileIO::CFile &file, uiw offset, uiw size, bln is_writeCopy, mappingError &error )
 {
-	ASSUME( file );
-
 	MappingStruct retStruct = { 0, 0, NULL };
-	mappingError o_error;
 	HANDLE mapping;
 	LARGE_INTEGER sizeToMap;
 	DWORD protect;
@@ -19,41 +16,47 @@ FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( Fi
 	DWORD desiredAccess;
 	LARGE_INTEGER fileOffset;
 
-	if( !file->IsOpened() )
+	if( !file.IsOpened() )
 	{
-		o_error = mappingError( Error::InvalidArgument(), "File isn't opened" );
+		error = mappingError( Error::InvalidArgument(), "File isn't opened" );
 		goto toExit;
 	}
-	if( (file->ProcModeGet() & FileProcMode::Read) == 0 )
+	if( !(file.ProcModeGet() & FileProcMode::Read) )
 	{
-		o_error = mappingError( Error::InvalidArgument(), "File isn't readable( it must be )" );
+		error = mappingError( Error::InvalidArgument(), "File isn't readable( it must be )" );
 		goto toExit;
 	}
 
 	if( size == uiw_max )
 	{
-		size = file->SizeGet();
+		auto fileSize = file.SizeGet();
+		if( !fileSize.Ok() )
+		{
+			error = mappingError( fileSize.UnwrapError(), "Failed to get file's size" );
+			goto toExit;
+		}
+		size = file.SizeGet().Unwrap();
 	}
 
-	protect = (is_writeCopy || ((file->ProcModeGet() & FileProcMode::Write) == 0)) ? PAGE_WRITECOPY : PAGE_READWRITE;  //  PAGE_WRITECOPY is the same as PAGE_READONLY
+	protect = (is_writeCopy || !(file.ProcModeGet() & FileProcMode::Write)) ? PAGE_WRITECOPY : PAGE_READWRITE;  //  PAGE_WRITECOPY is the same as PAGE_READONLY
 	sizeToMap.QuadPart = size;
-	mapping = ::CreateFileMappingW( ((FileIO::Private::CFileBasis *)file)->handle, 0, protect, sizeToMap.HighPart, sizeToMap.LowPart, NULL );
+	mapping = ::CreateFileMappingW( ((FileIO::Private::CFileBasis &)file).handle, 0, protect, sizeToMap.HighPart, sizeToMap.LowPart, NULL );
 	if( mapping == NULL )
 	{
 		switch( ::GetLastError() )
 		{
 		case ERROR_FILE_INVALID:
-			o_error = mappingError( Error::CannotOpenFile(), "CreateFileMappingW returned ERROR_FILE_INVALID" );
+			error = mappingError( Error::CannotOpenFile(), "CreateFileMappingW returned ERROR_FILE_INVALID" );
 			break;
 		default:
-			o_error = mappingError( StdLib_FileError(), "CreateFileMappingW failed" );
+			error = mappingError( StdLib_FileError(), "CreateFileMappingW failed" );
 		}
 		goto toExit;
 	}
 
-	if( (file->ProcModeGet() & FileProcMode::WriteAppend) == FileProcMode::WriteAppend )
+	if( (file.ProcModeGet() & FileProcMode::WriteAppend) == FileProcMode::WriteAppend )
 	{
-		offset += ((FileIO::Private::CFileBasis *)file)->offsetToStart;
+		offset += ((FileIO::Private::CFileBasis &)file).offsetToStart;
 	}
 	fileOffset.QuadPart = offset;
 
@@ -64,7 +67,7 @@ FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( Fi
 	}
 	else
 	{
-		if( file->ProcModeGet() & FileProcMode::Write )
+		if( !!(file.ProcModeGet() & FileProcMode::Write) )
 		{
 			desiredAccess = FILE_MAP_WRITE;
 			retStruct.is_writable = true;
@@ -80,17 +83,16 @@ FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( Fi
 	{
 		BOOL result = ::CloseHandle( mapping );
 		ASSUME( result );
-		o_error = mappingError( Error::UnknownError(), "MapViewOfFile failed" );
+		error = mappingError( Error::UnknownError(), "MapViewOfFile failed" );
 		goto toExit;
 	}
 
-	o_error = Error::Ok();
+	error = Error::Ok();
 	retStruct.memory = memory;
 	retStruct.size = size;
 	retStruct.handle = mapping;
 
 toExit:
-	DSA( error, o_error );
 	return retStruct;
 }
 

@@ -27,19 +27,6 @@ typedef int16_t i16;
 typedef int8_t i8;
 typedef bool bln;
 
-#if WORD_SIZE == 32
-    const uiw uiw_max = 4294967295;  //  0xFFffFFff
-    const uiw uiw_min = 0;  //  0x00000000
-    const iw iw_max = 2147483647;  //  0x7FffFFff
-    const iw iw_min = -2147483647 - 1;  //  0x80000000
-#elif WORD_SIZE == 64
-    const uiw uiw_max = ASUINT64( 18446744073709551615 );  //  0xFFffFFffFFffFFff
-    const uiw uiw_min = 0;  //  0x0000000000000000
-    const iw iw_max = ASINT64( 9223372036854775807 );  //  0x7FffFFffFFffFFff
-    const iw iw_min = ASINT64( -9223372036854775807 ) - 1;  //  0x8000000000000000
-#else
-    #error incorrect WORD_SIZE
-#endif
 const ui64 ui64_max = 18446744073709551615ULL;  //  0xFFffFFffFFffFFff
 const ui64 ui64_min = 0;  //  0x0000000000000000
 const ui32 ui32_max = 4294967295;  //  0xFFffFFff
@@ -64,6 +51,20 @@ const i16 i16_max = 32767;  //  0x7Fff
 const i16 i16_min = -32768;  //  0x8000
 const i8 i8_max = 127;  //  0x7F
 const i8 i8_min = -128;  //  0x80
+
+#if WORD_SIZE == 32
+    const uiw uiw_max = ui32_max;
+    const uiw uiw_min = 0;
+    const iw iw_max = i32_max;
+    const iw iw_min = i32_min;
+#elif WORD_SIZE == 64
+    const uiw uiw_max = ui64_max;
+    const uiw uiw_min = 0;
+    const iw iw_max = i64_max;
+    const iw iw_min = i64_min;
+#else
+    #error incorrect WORD_SIZE
+#endif
 
 #ifdef _MSC_VER
 	//  warning C4056: overflow in floating-point constant arithmetic
@@ -100,7 +101,7 @@ const f64 f64_pi2 = 6.283185307179586476926;
     #pragma warning( default: 4056 )
 #endif
 
-template < typename Candidate, typename Of > class IsDerivedFrom
+/*template < typename Candidate, typename Of > class IsDerivedFrom
 {
     template < typename Candidate2, typename Of2 > struct Converter
     {
@@ -147,7 +148,7 @@ template < typename T > struct AreTypesTheSame < T, T >
 	{
 		return true;
 	}
-};
+};*/
 
 template < const uiw al > struct TypeWithSizeAndAlignment;
 
@@ -241,11 +242,6 @@ public:
     //STATIC_CHECK( ALIGNOF(X) == ALIGNOF(type), "Error in AlignmentHelper" );
 };
 
-static const struct Nullv
-{
-	Nullv() {}
-} nullv;
-
 struct CharStrict
 {};
 
@@ -264,7 +260,7 @@ enum TypeSemantic_t
 
 template < typename X > struct NewDeleter
 {
-    NewDeleter( X *something )
+    void operator()( X *something )
     {
         delete something;
     }
@@ -272,7 +268,7 @@ template < typename X > struct NewDeleter
 
 template < typename X > struct NewDeleter < X [] >
 {
-    NewDeleter( X *something )
+    void operator()( X *something )
     {
         delete[] something;
     }
@@ -280,19 +276,11 @@ template < typename X > struct NewDeleter < X [] >
 
 struct MallocDeleter
 {
-    MallocDeleter( void *something )
+    void operator()( void *something )
     {
         ::free( something );
     }
 };
-
-template < bln condition, typename X = void > struct EnableIf
-{
-    typedef X type;
-};
-
-template < typename X > struct EnableIf < false, X >
-{};
 
 class CNoInit {};
 
@@ -303,105 +291,14 @@ public:
     template < typename X > CAny( X ) {  /*  void  */  }
 };
 	
-#ifdef DEFINE_VARARGS_SUPPORTED
-    #ifdef DEBUG
-        typedef uiw va_return;
-        const va_return va_return_whatever = uiw_max;
-    #define VC( func, arg0, ... ) { CAny anys[] = { arg0 __VA_ARGS__ }; va_return ret = func( arg0 __VA_ARGS__ ); if( ret != va_return_whatever && ret != COUNTOF( anys ) ) DBGBREAK; }
-    #else
-        typedef void va_return;
-        #define va_return_whatever
-        #define VC( func, arg0, ... ) func( arg0 __VA_ARGS__ )
-    #endif
+#ifdef DEBUG
+    typedef uiw va_return;
+    const va_return va_return_whatever = uiw_max;
+#define VC( func, arg0, ... ) { CAny anys[] = { arg0 __VA_ARGS__ }; va_return ret = func( arg0 __VA_ARGS__ ); if( ret != va_return_whatever && ret != COUNTOF( anys ) ) DBGBREAK; }
 #else
     typedef void va_return;
     #define va_return_whatever
-    #define VC( func, arg ) func arg
+    #define VC( func, arg0, ... ) func( arg0 __VA_ARGS__ )
 #endif
-
-template < typename ret > ret DummyFunc()
-{
-    return ret();
-}
-
-template < typename ret, typename a0 > ret DummyFunc( a0 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1 > ret DummyFunc( a0, a1 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2 > ret DummyFunc( a0, a1, a2 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3 > ret DummyFunc( a0, a1, a2, a3 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4 > ret DummyFunc( a0, a1, a2, a3, a4 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5 > ret DummyFunc( a0, a1, a2, a3, a4, a5 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5, typename a6 > ret DummyFunc( a0, a1, a2, a3, a4, a5, a6 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5, typename a6, typename a7 > ret DummyFunc( a0, a1, a2, a3, a4, a5, a6, a7 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5, typename a6, typename a7, typename a8 > ret DummyFunc( a0, a1, a2, a3, a4, a5, a6, a7, a8 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5, typename a6, typename a7, typename a8, typename a9 > ret DummyFunc( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5, typename a6, typename a7, typename a8, typename a9, typename a10 > ret DummyFunc( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5, typename a6, typename a7, typename a8, typename a9, typename a10, typename a11 > ret DummyFunc( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5, typename a6, typename a7, typename a8, typename a9, typename a10, typename a11, typename a12 > ret DummyFunc( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5, typename a6, typename a7, typename a8, typename a9, typename a10, typename a11, typename a12, typename a13 > ret DummyFunc( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5, typename a6, typename a7, typename a8, typename a9, typename a10, typename a11, typename a12, typename a13, typename a14 > ret DummyFunc( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14 )
-{
-    return ret();
-}
-
-template < typename ret, typename a0, typename a1, typename a2, typename a3, typename a4, typename a5, typename a6, typename a7, typename a8, typename a9, typename a10, typename a11, typename a12, typename a13, typename a14, typename a15 > ret DummyFunc( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15 )
-{
-    return ret();
-}
 
 #endif

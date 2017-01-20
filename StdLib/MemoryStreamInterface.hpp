@@ -201,6 +201,7 @@ namespace StdLib
 	};
 
 	//  TODO: add a fixed buffered mem stream that uses a heap if the fixed buffer is not enough
+	//  TODO: also add heap with reserve
 }
 
 #endif

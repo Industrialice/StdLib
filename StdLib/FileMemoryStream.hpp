@@ -11,16 +11,16 @@ namespace StdLib
 		MemoryStreamInterface *_stream;
 		uiw _offset;  //  _startOffset + current offset
 		uiw _startOffset;  //  can be non-zero in append mode
-		FileProcMode::mode_t _procMode;
+		FileProcMode _procMode;
 
 	public:
-		typedef CTError < const char * > fileError;
+		typedef CError < const char * > fileError;
 
 		FileMemoryStream();
-		FileMemoryStream( MemoryStreamInterface *stream, FileProcMode::mode_t procMode, fileError *error = 0 );
+		FileMemoryStream( MemoryStreamInterface &stream, FileProcMode procMode, fileError *error = 0 );
 		FileMemoryStream( FileMemoryStream &&source );
 		FileMemoryStream &operator = ( FileMemoryStream &&source );
-		bln Open( MemoryStreamInterface *stream, FileProcMode::mode_t procMode, fileError *error = 0 );
+		fileError Open( MemoryStreamInterface &stream, FileProcMode procMode );
 
 		virtual void Close() override;
 		virtual bln IsOpened() const override;
@@ -30,19 +30,19 @@ namespace StdLib
 
 		virtual bln Flush() override;
 		virtual bln IsBufferingSupported() const override;
-		virtual bln BufferSet( ui32 size, void *buffer = 0 ) override;
+		virtual bln BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer = std::unique_ptr < byte, void(*)(byte *) >( nullptr, [](byte *){} ) ) override;
 		virtual ui32 BufferSizeGet() const override;
 		virtual const void *BufferGet() const override;
 
 		virtual bln IsSeekSupported() const override;
-		virtual i64 OffsetGet( FileOffsetMode::mode_t offsetMode = FileOffsetMode::FromBegin, CError *error = 0 ) override;
-		virtual i64 OffsetSet( FileOffsetMode::mode_t offsetMode, i64 offset, CError *error = 0 ) override;
+		virtual CResult < i64 > OffsetGet( FileOffsetMode offsetMode = FileOffsetMode::FromBegin ) override;
+		virtual CResult < i64 > OffsetSet( FileOffsetMode offsetMode, i64 offset ) override;
 
-		virtual ui64 SizeGet( CError *error = 0 ) const override;
-		virtual bln SizeSet( ui64 newSize, CError *error = 0 ) override;
+		virtual CResult < ui64 > SizeGet() const override;
+		virtual CError<> SizeSet( ui64 newSize ) override;
 
-		virtual FileProcMode::mode_t ProcModeGet() const override;
-		virtual FileCacheMode::mode_t CacheModeGet() const override;
+		virtual FileProcMode ProcModeGet() const override;
+		virtual FileCacheMode CacheModeGet() const override;
 	};
 }
 

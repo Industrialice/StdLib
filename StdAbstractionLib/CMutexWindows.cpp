@@ -54,7 +54,7 @@ void CMutex::Initialize()
 		FatalAppExitA( 1, "StdLib: failed to acquire kernel32.dll handle, can't initialize mutex" );
 		return;
 	}
-	*(uiw *)&StdLib_InitializeCriticalSectionEx = (uiw)GetProcAddress( k32, "InitializeCriticalSectionEx" );
+	*(FARPROC *)&StdLib_InitializeCriticalSectionEx = GetProcAddress( k32, "InitializeCriticalSectionEx" );
 }
 
 #endif

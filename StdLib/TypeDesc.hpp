@@ -17,9 +17,9 @@ template < typename X > struct TypeDesc
     static const bln is_fp = false;
     static const bln is_pointer = false;
     static const bln is_reference = false;
-    static const bln is_pod = std::is_pod < X >::value || (IsDerivedFrom < X, CharPOD >::value && !IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value);
+    static const bln is_pod = std::is_pod < X >::value || (std::is_base_of < CharPOD, X >::value && !std::is_base_of < CharMovable, X >::value && !std::is_base_of < CharStrict, X >::value);
 
-    static const bln is_movableAsPOD = is_pod || (IsDerivedFrom < X, CharMovable >::value && !IsDerivedFrom < X, CharStrict >::value) ||
+    static const bln is_movableAsPOD = is_pod || (std::is_base_of < CharMovable, X >::value && !std::is_base_of < CharStrict, X >::value) ||
                                         (std::is_trivially_constructible < X, const X & >::value && std::is_trivially_assignable < X, const X & >::value &&
                                         std::is_trivially_move_constructible < X >::value && std::is_trivially_move_assignable < X >::value);  //  TODO: that isn't accurate in such form
 

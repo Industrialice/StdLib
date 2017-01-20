@@ -2,24 +2,12 @@
 
 #ifdef WINDOWS
 
-#include "WinCEFuncs.hpp"
-#include "Misc.hpp"
-#include <RoundingFuncs.hpp>
+#include "TimeMoment.hpp"
+
+using namespace StdLib;
 
 namespace
 {
-    const DWORD ca_PageProtectMapping[] =
-    {
-        0,  //  0 - Unused
-        0,  //  1 - Write
-        PAGE_READONLY,  //  2 - Read
-        PAGE_READWRITE,  //  3 - Write + Read
-        PAGE_EXECUTE,  //  4 - Execute
-        0,  //  5 - Execute + Write
-        PAGE_EXECUTE_READ,  //  6 - Execute + Read
-        PAGE_EXECUTE_READWRITE  //  7 - Execute + Write + Read
-    };
-        
     bln is_Initialized;
 
     class CMisc
@@ -137,104 +125,6 @@ namespace
 		}
     } MiscData;
 }
-
-//  VirtualMem
-
-void *VirtualMem::VM_Reserve( uiw size )
-{
-    return ::VirtualAlloc( 0, size, MEM_RESERVE, PAGE_NOACCESS );
-}
-
-bln VirtualMem::VM_Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
-{
-    ASSUME( p_mem && size && mode );
-    DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
-    if( !protect )
-    {
-        SOFTBREAK;
-        return false;
-    }
-    return ::VirtualAlloc( p_mem, size, MEM_COMMIT, protect ) != 0;
-}
-
-void *VirtualMem::VM_Alloc( uiw size, PageMode::PageMode_t mode )
-{
-    ASSUME( size && mode );
-    DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
-    if( !protect )
-    {
-        SOFTBREAK;
-        return false;
-    }
-    return ::VirtualAlloc( 0, size, MEM_RESERVE | MEM_COMMIT, protect );
-}
-
-bln VirtualMem::VM_Free( void *p_mem )
-{
-    ASSUME( p_mem );
-    return ::VirtualFree( p_mem, 0, MEM_RELEASE ) != 0;
-}
-
-ui32 VirtualMem::VM_PageSize()
-{
-    return MiscData.MemPageSize();
-}
-
-NOINLINE VirtualMem::PageMode::PageMode_t VirtualMem::VM_ProtectGet( const void *p_mem, uiw size, CError *po_error )
-{
-    MEMORY_BASIC_INFORMATION o_mbi;
-    PageMode::PageMode_t mode = PageMode::Error;
-    CError error = Error::Ok();
-    size = Funcs::RoundUIUpToStep( size, VM_PageSize() );
-    SIZE_T infSize = ::VirtualQuery( p_mem, &o_mbi, sizeof(o_mbi) );
-    if( !infSize )
-    {
-		error = Error::UnknownError();
-        goto toExit;
-    }
-    if( o_mbi.RegionSize < size )
-    {
-        error = Error_InconsistentProtection();
-        goto toExit;
-    }
-
-    for( ui32 index = 0; index < COUNTOF( ca_PageProtectMapping ); ++index )
-    {
-        if( ca_PageProtectMapping[ index ] == o_mbi.Protect )
-        {
-            mode = (PageMode::PageMode_t)index;
-            break;
-        }
-    }
-
-    ASSUME( mode != PageMode::Error );
-
-toExit:
-    DSA( po_error, error );
-    return mode;
-}
-
-bln VirtualMem::VM_ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
-{
-    ASSUME( p_mem && size && mode );
-    DWORD oldProtect;
-    DWORD protect = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
-    if( !protect )
-    {
-        SOFTBREAK;
-        return false;
-    }
-    return ::VirtualProtect( p_mem, size, protect, &oldProtect ) != 0;
-}
-
-//  CPU
-
-ui32 CPU::CPUCoresNum()
-{
-    return MiscData.CpuCoresCount();
-}
-
-//  TimeMoment
 
 enum TMPrec
 {
@@ -430,18 +320,12 @@ TimeMoment TimeMoment::CreateShiftedUSec( const TimeMoment &ref, f64 delta )
 	return Shift < f64, USec >( ref, delta );
 }
 
-void Misc::Private::Initialize()
+void TimeMoment::Initialize()
 {
-	struct SMisc : public CMisc
+	struct SMisc : private CMisc
 	{
 		void Initialize()
 		{
-			SYSTEM_INFO sysinfo;
-			::GetSystemInfo( &sysinfo );
-
-			_memPageSize = sysinfo.dwPageSize;
-			_cpuCoresCount = sysinfo.dwNumberOfProcessors;
-
 			LARGE_INTEGER o_freq;
 			BOOL freqRes = ::QueryPerformanceFrequency( &o_freq );
 			ASSUME( freqRes );

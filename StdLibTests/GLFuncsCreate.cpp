@@ -37,7 +37,7 @@ void GLFuncsCreate()
         return;
     }
 
-    file.BufferSet( 0, 2048 );
+    file.BufferSet( 2048 );
 
     file.Write( "#include <gl.h>\n\n", _StrLen( "#include <gl.h>\n\n" ) );
 

@@ -7,7 +7,6 @@
 #include <stdio.h>
 
 #include "TextFixer.hpp"
-#include <Misc.hpp>
 //#include <FileIO.hpp>
 //#include <Files.hpp>
 #include <FileMapping.hpp>
@@ -86,7 +85,7 @@ void Out4x4( const char *cp_str, const m4x4 *cpo_m )
 
 #if 0
 
-static void Dir( CLogger::Tag::messageTag_t tag, const char *cp_text, ui32 len )
+static void Dir( CLogger::Tag tag, const char *cp_text, ui32 len )
 {
     const char *cp_tag;
     switch( tag )
@@ -115,7 +114,7 @@ static void Dir( CLogger::Tag::messageTag_t tag, const char *cp_text, ui32 len )
     ::printf( "[%s] %s", cp_tag, cp_text );
 }
 
-static void Dir2( CLogger::Tag::messageTag_t tag, const char *cp_text, ui32 len )
+static void Dir2( CLogger::Tag tag, const char *cp_text, ui32 len )
 {
     const char *cp_tag;
     switch( tag )
@@ -574,26 +573,18 @@ static f32 RadiansWrapTest( f32 rad )
 	 return rad;
 }
 
+void ReadBenchmark( ui32 iterations );
+
 int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
-	CVec < int > testVec { 1, 2, 3 };
-
-	for( auto i : testVec )
 	{
-		printf( "%i\n", i );
+		std::unique_ptr < int, MallocDeleter > shit( new int );
+		printf( "sizeof %i\n", sizeof(shit) );
 	}
 
-	for( auto &i : testVec.ToRef() )
-	{
-		printf( "%i\n", i );
-	}
-
-	for( auto &i : testVec.ToCRef() )
-	{
-		printf( "%i\n", i );
-	}
+	//ReadBenchmark( 25 );
 
 	//Fix( TextFixerMode::fanfic );
 	

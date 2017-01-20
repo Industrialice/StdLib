@@ -18,33 +18,32 @@
 #endif
 
 #define CONSTS_OPS( name ) \
-    static name operator |( name left, name right ) \
+    inline name operator |( name left, name right ) \
     { \
         return (name)((uiw)left | (uiw)right); \
     } \
-    static name operator &( name left, name right ) \
+    inline name operator &( name left, name right ) \
     { \
         return (name)((uiw)left & (uiw)right); \
     } \
-    static name operator ~( name operand ) \
+    inline name operator ~( name operand ) \
     { \
         return (name)(~(uiw)operand); \
     } \
-    static name operator |=( name &left, name right ) \
+    inline name operator |=( name &left, name right ) \
     { \
         left = (name)((uiw)left | (uiw)right); \
         return left; \
     } \
-    static name operator &=( name &left, name right ) \
+    inline name operator &=( name &left, name right ) \
     { \
         left = (name)((uiw)left & (uiw)right); \
         return left; \
-    }
-
-#define CONSTS( name, ... ) enum name { __VA_ARGS__ };
-
-#define CONSTS_OPED( name, ... ) CONSTS( name, __VA_ARGS__ ); \
-    CONSTS_OPS( name )
+    } \
+	inline bln operator !( name value ) \
+	{ \
+		return value == (name)0; \
+	}
 
 #ifdef DEBUG
     #define DBGCODE( ... ) __VA_ARGS__

@@ -223,3 +223,5 @@ ModelManifest.xml
 /StdLibTests.exe
 /exts.txt
 /StdLibTests/test.txt
+/Debug_x64
+/Release_x64

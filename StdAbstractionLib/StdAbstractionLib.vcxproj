@@ -299,7 +299,7 @@
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -364,11 +364,13 @@
     <ClInclude Include="FileMapping.hpp" />
     <ClInclude Include="FilePath.hpp" />
     <ClInclude Include="Files.hpp" />
-    <ClInclude Include="Misc.hpp" />
     <ClInclude Include="CMutex.hpp" />
     <ClInclude Include="PreHeader.hpp" />
     <ClInclude Include="CThread.hpp" />
     <ClInclude Include="StdAbstractionLib.hpp" />
+    <ClInclude Include="SystemInfo.hpp" />
+    <ClInclude Include="TimeMoment.hpp" />
+    <ClInclude Include="VirtualMemory.hpp" />
     <ClInclude Include="VKeys.hpp" />
     <ClInclude Include="WinCEFuncs.hpp" />
   </ItemGroup>
@@ -406,11 +408,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="FilesWindows.cpp" />
-    <ClCompile Include="MiscPosix.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="MiscWindows.cpp" />
     <ClCompile Include="CMutexWindows.cpp" />
     <ClCompile Include="PreHeader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -428,6 +425,18 @@
     </ClCompile>
     <ClCompile Include="CThreadWindows.cpp" />
     <ClCompile Include="StdAbstractionLib.cpp" />
+    <ClCompile Include="SystemInfoPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="SystemInfoWindows.cpp" />
+    <ClCompile Include="TimeMomentPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="TimeMomentWindows.cpp" />
+    <ClCompile Include="VirtualMemoryPosix.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="VirtualMemoryWindows.cpp" />
     <ClCompile Include="VKeysWindows.cpp" />
     <ClCompile Include="WinCEFuncs.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

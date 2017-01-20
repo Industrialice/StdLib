@@ -13,7 +13,8 @@ protected:
 public:
     ~UniquePtr()
     {
-        Deleter( (X *)_ptr );  //  this dummy C-cast will eliminate a syntax confusion between creating a local variable _ptr and calling a constructor with the argument _ptr
+		Deleter deleterInstance;
+        deleterInstance.operator()( (X *)_ptr );
     }
 
     UniquePtr() : _ptr( 0 )
@@ -31,7 +32,8 @@ public:
     UniquePtr &operator = ( UniquePtr &&source )
     {
         ASSUME( this != &source );
-        Deleter( (X *)_ptr );
+		Deleter deleterInstance;
+        deleterInstance.operator()( (X *)_ptr );
         _ptr = source._ptr;
         source._ptr = 0;
         return *this;
@@ -40,14 +42,16 @@ public:
     void Own( UniquePtr *source )
     {
         ASSUME( (_ptr != source->_ptr) || (_ptr == 0) );
-        Deleter( (X *)_ptr );
+		Deleter deleterInstance;
+        deleterInstance.operator()( (X *)_ptr );
         _ptr = source->_ptr;
         source->_ptr = 0;
     }
 
     void Release()
     {
-        Deleter( (X *)_ptr );
+		Deleter deleterInstance;
+        deleterInstance.operator()( (X *)_ptr );
         _ptr = 0;
     }
 

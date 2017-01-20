@@ -1,12 +1,13 @@
 #include "PreHeader.hpp"
 #include "Files.hpp"
 
-void Files::EnumFiles( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
+uiw Files::EnumFiles( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
 {
+	uiw enumerated = 0;
 	CFileEnumInfo info;
-	if( !EnumFirstFile( &info, path, mask ) )
+	if( !EnumFirstFile( &info, path, mask ).Ok() )
 	{
-		return;
+		return enumerated;
 	}
 
 	do
@@ -14,16 +15,20 @@ void Files::EnumFiles( const FilePath &path, const FilePath &mask, bln is_report
 		if( is_reportFolders || info.IsFolder() == false )
 		{
 			callback( &info, argument );
+			++enumerated;
 		}
-	} while( EnumNextFile( &info ) );
+	} while( EnumNextFile( &info ).Ok() );
+
+	return enumerated;
 }
 
-void Files::EnumFilesRecursively( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
+uiw Files::EnumFilesRecursively( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
 {
-	UniquePtr < CFileEnumInfo > info( new CFileEnumInfo );
-	if( !EnumFirstFile( info, path, PLATFORM_PATH( "*.*" ) ) )
+	uiw enumerated = 0;
+	std::unique_ptr < CFileEnumInfo > info( new CFileEnumInfo );
+	if( !EnumFirstFile( info.get(), path, PLATFORM_PATH( "*.*" ) ).Ok() )
 	{
-		return;
+		return enumerated;
 	}
 
 	do
@@ -32,22 +37,26 @@ void Files::EnumFilesRecursively( const FilePath &path, const FilePath &mask, bl
 		{
 			if( is_reportFolders )
 			{
-				callback( info, argument );
+				callback( info.get(), argument );
+				++enumerated;
 			}
-			EnumFilesRecursively( info->PNN(), mask, is_reportFolders, callback, argument );
+			enumerated += EnumFilesRecursively( info->PNN(), mask, is_reportFolders, callback, argument );
 		}
-	} while( EnumNextFile( info ) );
+	} while( EnumNextFile( info.get() ).Ok() );
 
-	if( !EnumFirstFile( info, path, mask ) )
+	if( !EnumFirstFile( info.get(), path, mask ).Ok() )
 	{
-		return;
+		return enumerated;
 	}
 
 	do
 	{
 		if( info->IsFolder() == false )
 		{
-			callback( info, argument );
+			callback( info.get(), argument );
+			++enumerated;
 		}
-	} while( EnumNextFile( info ) );
+	} while( EnumNextFile( info.get() ).Ok() );
+
+	return enumerated;
 }

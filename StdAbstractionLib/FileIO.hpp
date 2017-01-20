@@ -35,7 +35,7 @@ namespace FileIO
     };
 #endif
 
-	typedef CTError < const char * > fileError;
+	typedef CError < const char * > fileError;
 
     namespace Private
     {
@@ -47,8 +47,7 @@ namespace FileIO
 
 			ui64 offsetToStart;  //  used only when you're using ProcMode::Append, the file will be opened as usual, then the offset will be added so you can't work with the existing part of the file
 
-			UniquePtr < byte, MallocDeleter > internalBuffer;
-			byte *bufferRef;
+			std::unique_ptr < byte, void(*)(byte *) > internalBuffer = std::unique_ptr < byte, void(*)(byte *) >( nullptr, [](byte *){} );
 			ui32 bufferSize;
 			ui32 bufferPos;
 			ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
@@ -56,47 +55,45 @@ namespace FileIO
 
 			bln is_shouldCloseFileHandle;
 
-			FileOpenMode::mode_t openMode;
-			FileProcMode::mode_t procMode;
-			FileCacheMode::mode_t cacheMode;
+			FileOpenMode openMode;
+			FileProcMode procMode;
+			FileCacheMode cacheMode;
 
 			#ifdef WINDOWS
-				UniquePtr < FilePath > pnn;  //  used only on WindowsXP where you can't get PNN from the file handle
+				FilePath pnn;  //  used only on WindowsXP where you can't get PNN from the file handle
 			#endif
         };
 
         /*  Core Functions  */
         EXTERNALD void FileIO_Initialize( CFileBasis *file );
         EXTERNALD void FileIO_Destroy( CFileBasis *file );
-        EXTERNALD bln FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *error );
-        EXTERNALD bln FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle, fileError *error );
+        EXTERNALD fileError FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode openMode, FileProcMode procMode, FileCacheMode cacheMode );
+        EXTERNALD fileError FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle );
         EXTERNALD void FileIO_Close( CFileBasis *file );
 		EXTERNALD bln FileIO_IsValid( const CFileBasis *file );
         EXTERNALD bln FileIO_Write( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written );
         EXTERNALD bln FileIO_Read( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
-        EXTERNALD bln FileIO_BufferSet( CFileBasis *file, ui32 size, void *buffer );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
+        EXTERNALD bln FileIO_BufferSet( CFileBasis *file, ui32 size, decltype(CFileBasis::internalBuffer) buffer );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
 		EXTERNALD ui32 FileIO_BufferSizeGet( const CFileBasis *file );
 		EXTERNALD const void *FileIO_BufferGet( const CFileBasis *file );
         FILEIO_STAT( EXTERNALD void FileIO_StatsGet( const CFileBasis *file, SStats *po_stats ); )
         FILEIO_STAT( EXTERNALD void FileIO_StatsReset( CFileBasis *file ); )
         EXTERNALD bln FileIO_Flush( CFileBasis *file );  //  false if writing to file failed to complete
-        EXTERNALD i64 FileIO_OffsetGet( CFileBasis *file, FileOffsetMode::mode_t mode, CError *error );
-        EXTERNALD i64 FileIO_OffsetSet( CFileBasis *file, FileOffsetMode::mode_t mode, i64 offset, CError *error );
-		EXTERNALD ui64 FileIO_SizeGet( const CFileBasis *file, CError *error );  //  returns 0 on error
-        EXTERNALD bln FileIO_SizeSet( CFileBasis *file, ui64 newSize, CError *error );
-		EXTERNALD FileOpenMode::mode_t FileIO_OpenModeGet( const CFileBasis *file );
-		EXTERNALD FileProcMode::mode_t FileIO_ProcModeGet( const CFileBasis *file );
-		EXTERNALD FileCacheMode::mode_t FileIO_CacheModeGet( const CFileBasis *file );
+        EXTERNALD CResult < i64 > FileIO_OffsetGet( CFileBasis *file, FileOffsetMode mode );
+        EXTERNALD CResult < i64 > FileIO_OffsetSet( CFileBasis *file, FileOffsetMode mode, i64 offset );
+		EXTERNALD CResult < ui64 > FileIO_SizeGet( const CFileBasis *file );  //  returns 0 on error
+        EXTERNALD CError<> FileIO_SizeSet( CFileBasis *file, ui64 newSize );
+		EXTERNALD FileOpenMode FileIO_OpenModeGet( const CFileBasis *file );
+		EXTERNALD FileProcMode FileIO_ProcModeGet( const CFileBasis *file );
+		EXTERNALD FileCacheMode FileIO_CacheModeGet( const CFileBasis *file );
         EXTERNALD FilePath FileIO_PNNGet( const CFileBasis *file );
 		EXTERNALD fileHandle FileIO_FileHandle( const CFileBasis *file );
-
-		EXTERNALD void FileIO_InitializeFileIOSystem();
     }
 
     class CFile final : private Private::CFileBasis, public FileInterface
     {
-		CFile( const CFile &source );
-		CFile & operator = ( const CFile &source );
+		CFile( const CFile &source ) = delete;
+		CFile & operator = ( const CFile &source ) = delete;
 
 	public:
         ~CFile()
@@ -109,16 +106,26 @@ namespace FileIO
             Private::FileIO_Initialize( this );
         }
 
-        CFile( const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *error = 0 )
+        CFile( const FilePath &pnn, FileOpenMode openMode, FileProcMode procMode, FileCacheMode cacheMode = FileCacheMode::Default, fileError *error = 0 )
         {
+			fileError junkError;
+			if( error == nullptr )
+			{
+				error = &junkError;
+			}
             Private::FileIO_Initialize( this );
-            Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, error );
+            *error = Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode );
         }
 
         CFile( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle, fileError *error = 0 )
         {
+			fileError junkError;
+			if( error == nullptr )
+			{
+				error = &junkError;
+			}
             Private::FileIO_Initialize( this );
-            Private::FileIO_OpenFromDescriptor( osFileDescriptor, is_shouldCloseFileHandle, error );
+            *error = Private::FileIO_OpenFromDescriptor( osFileDescriptor, is_shouldCloseFileHandle );
         }
 
         CFile( CFile &&source )
@@ -133,16 +140,16 @@ namespace FileIO
             return *this;
         }
 
-        void Open( const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode = FileCacheMode::Default, fileError *error = 0 )
+        fileError Open( const FilePath &pnn, FileOpenMode openMode, FileProcMode procMode, FileCacheMode cacheMode = FileCacheMode::Default )
         {
             Close();
-            Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode, error );
+            return Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode );
         }
 
-        void Open( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle, fileError *error = 0 )
+        fileError Open( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle )
         {
             Close();
-            Private::FileIO_OpenFromDescriptor( osFileDescriptor, is_shouldCloseFileHandle, error );
+            return Private::FileIO_OpenFromDescriptor( osFileDescriptor, is_shouldCloseFileHandle );
         }
 
 	#ifdef ENABLE_FILEIO_STATS
@@ -157,7 +164,7 @@ namespace FileIO
         }
 	#endif
 
-        FileOpenMode::mode_t OpenModeGet() const
+        FileOpenMode OpenModeGet() const
         {
             return Private::FileIO_OpenModeGet( this );
         }
@@ -205,9 +212,9 @@ namespace FileIO
 			return true;
 		}
 
-        virtual bln BufferSet( ui32 size, void *buffer = 0 ) override
+        virtual bln BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer = std::unique_ptr < byte, void(*)(byte *) >( nullptr, [](byte *){} ) ) override
         {
-            return Private::FileIO_BufferSet( this, size, buffer );
+            return Private::FileIO_BufferSet( this, size, std::move( buffer ) );
         }
 
         virtual ui32 BufferSizeGet() const override
@@ -230,32 +237,32 @@ namespace FileIO
 			return true;
 		}
 
-        virtual i64 OffsetGet( FileOffsetMode::mode_t mode = FileOffsetMode::FromBegin, CError *error = 0 ) override
+        virtual CResult < i64 > OffsetGet( FileOffsetMode mode = FileOffsetMode::FromBegin ) override
         {
-            return Private::FileIO_OffsetGet( this, mode, error );
+            return Private::FileIO_OffsetGet( this, mode );
         }
 
-        virtual i64 OffsetSet( FileOffsetMode::mode_t mode, i64 offset, CError *error = 0 ) override
+        virtual CResult < i64 > OffsetSet( FileOffsetMode mode, i64 offset ) override
         {
-            return Private::FileIO_OffsetSet( this, mode, offset, error );
+            return Private::FileIO_OffsetSet( this, mode, offset );
         }
 
-        virtual ui64 SizeGet( CError *error = 0) const override
+        virtual CResult < ui64 > SizeGet() const override
         {
-            return Private::FileIO_SizeGet( this, error );
+            return Private::FileIO_SizeGet( this );
         }
 
-        virtual bln SizeSet( ui64 newSize, CError *error = 0 ) override
+        virtual CError<> SizeSet( ui64 newSize ) override
         {
-            return Private::FileIO_SizeSet( this, newSize, error );
+            return Private::FileIO_SizeSet( this, newSize );
         }
 
-        virtual FileProcMode::mode_t ProcModeGet() const override
+        virtual FileProcMode ProcModeGet() const override
         {
             return Private::FileIO_ProcModeGet( this );
         }
 
-		virtual FileCacheMode::mode_t CacheModeGet() const override
+		virtual FileCacheMode CacheModeGet() const override
 		{
 			return Private::FileIO_CacheModeGet( this );
 		}
@@ -270,15 +277,14 @@ namespace FileIO
 			target->procMode = this->procMode;
 			target->cacheMode = this->cacheMode;
 			FILEIO_STAT( target->stats = this->stats; )
-			target->bufferRef = this->bufferRef;
-			target->internalBuffer = this->internalBuffer.TakeAway();
+			target->internalBuffer = decltype(target->internalBuffer)( this->internalBuffer.release(), this->internalBuffer.get_deleter() );
 			target->is_reading = this->is_reading;
 			target->is_shouldCloseFileHandle = this->is_shouldCloseFileHandle;
 			target->bufferSize = this->bufferSize;
 			target->bufferPos = this->bufferPos;
 			target->readBufferCurrentSize = this->readBufferCurrentSize;
 			#ifdef WINDOWS
-				target->pnn = this->pnn.TakeAway();
+				target->pnn = this->pnn;
 			#endif
 
 			Private::FileIO_Initialize( this );
@@ -293,16 +299,7 @@ namespace FileIO
             this->procMode = source.procMode;
 			this->cacheMode = source.cacheMode;
             FILEIO_STAT( this->stats = source.stats; )
-			if( source.internalBuffer == source.bufferRef )
-			{
-				this->internalBuffer = std::move( source.internalBuffer );
-				this->bufferRef = this->internalBuffer;
-			}
-			else
-			{
-				this->internalBuffer = 0;
-				this->bufferRef = source.bufferRef;
-			}
+			this->internalBuffer = std::move( source.internalBuffer );
             this->is_reading = source.is_reading;
 			this->is_shouldCloseFileHandle = source.is_shouldCloseFileHandle;
             this->bufferSize = source.bufferSize;

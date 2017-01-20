@@ -24,7 +24,7 @@ namespace StdLib
     }
 }
 
-NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *po_error )
+NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode procMode, FileCacheMode cacheMode, fileError *po_error )
 {
     ASSUME( file );
 
@@ -226,7 +226,7 @@ bln FileIO::Private::FileIO_IsValid( const CFileBasis *file )
     return file->handle != -1;
 }
 
-i64 FileIO::Private::FileIO_OffsetGet( CFileBasis *file, FileOffsetMode::mode_t mode, CError *error )  //  TODO: processing offset mode
+i64 FileIO::Private::FileIO_OffsetGet( CFileBasis *file, FileOffsetMode mode, CError *error )  //  TODO: processing offset mode
 {
     ASSUME( FileIO_IsValid( file ) );
 	DSA( error, Error::Ok() );
@@ -236,7 +236,7 @@ i64 FileIO::Private::FileIO_OffsetGet( CFileBasis *file, FileOffsetMode::mode_t 
     return offset + (off64_t)file->bufferPos - (off64_t)file->bufferPos;
 }
 
-NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, FileOffsetMode::mode_t mode, i64 offset, CError *po_error )
+NOINLINE i64 FileIO::Private::FileIO_OffsetSet( CFileBasis *file, FileOffsetMode mode, i64 offset, CError *po_error )
 {
     ASSUME( FileIO_IsValid( file ) );
     CError o_error = Error::Ok();
@@ -390,7 +390,7 @@ NOINLINE bln FileIO::Private::CancelCachedRead( CFileBasis *file )
     return result != -1;
 }
 
-void FileIO::Private::FileIO_InitializeFileIOSystem()
+void FileIO_InitializeFileIOSystem()
 {}
 
 #endif

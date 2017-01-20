@@ -7,8 +7,8 @@ namespace StdLib
 	{
 		mutexHandle _handle;
 
-		CMutex( const CMutex & );
-		CMutex & operator = ( const CMutex & );
+		CMutex( const CMutex & ) = delete;
+		CMutex & operator = ( const CMutex & ) = delete;
 
 	public:
 		~CMutex();
@@ -25,9 +25,9 @@ namespace StdLib
 	{
 		CMutex *_mutex;
 
-		CScopeLock();
-		CScopeLock( const CScopeLock & );
-		CScopeLock & operator = ( const CScopeLock & );
+		CScopeLock() = delete;
+		CScopeLock( const CScopeLock & ) = delete;
+		CScopeLock & operator = ( const CScopeLock & ) = delete;
 
 	public:
 		~CScopeLock()

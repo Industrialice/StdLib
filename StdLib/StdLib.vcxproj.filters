@@ -54,9 +54,6 @@
     <ClInclude Include="StringFuncs.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="UniquePtr.hpp">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Nullable.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -67,6 +64,12 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="RandomizingFuncs.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="deprecatedUniquePtr.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Result.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,9 +4,14 @@
 FileMemoryStream::FileMemoryStream() : _stream( 0 )
 {}
 
-FileMemoryStream::FileMemoryStream( MemoryStreamInterface *stream, FileProcMode::mode_t procMode, fileError *error )
+FileMemoryStream::FileMemoryStream( MemoryStreamInterface &stream, FileProcMode procMode, fileError *error )
 {
-	this->Open( stream, procMode, error );
+	fileError dummyError;
+	if( error == nullptr )
+	{
+		error = &dummyError;
+	}
+	*error = this->Open( stream, procMode );
 }
 
 FileMemoryStream::FileMemoryStream( FileMemoryStream &&source )
@@ -29,47 +34,40 @@ FileMemoryStream &FileMemoryStream::operator = ( FileMemoryStream &&source )
 	return *this;
 }
 
-bln FileMemoryStream::Open( MemoryStreamInterface *stream, FileProcMode::mode_t procMode, fileError *error )
+auto FileMemoryStream::Open( MemoryStreamInterface &stream, FileProcMode procMode ) -> fileError
 {
-	ASSUME( stream && procMode );
-
 	_stream = 0;
 	_offset = 0;
 	_startOffset = 0;
 
-	if( (procMode & (FileProcMode::Read | FileProcMode::Write)) == 0 )
+	if( !(procMode & (FileProcMode::Read | FileProcMode::Write)) )
 	{
-		DSA( error, fileError( Error::InvalidArgument(), "Neither FileProcMode::Read, nor FileProcMode::Write is set" ) );
-		return false;
+		return fileError( Error::InvalidArgument(), "Neither FileProcMode::Read, nor FileProcMode::Write is set" );
 	}
 
-	if( procMode & FileProcMode::Read )
+	if( !!(procMode & FileProcMode::Read) )
 	{
-		if( stream->IsReadable() == false )
+		if( stream.IsReadable() == false )
 		{
-			DSA( error, fileError( Error::NoAccess(), "requested read proc mode, but the stream is not readable" ) );
-			return false;
+			return fileError( Error::NoAccess(), "requested read proc mode, but the stream is not readable" );
 		}
 	}
-	if( procMode & FileProcMode::Write )
+	if( !!(procMode & FileProcMode::Write) )
 	{
-		if( stream->IsWritable() == false )
+		if( stream.IsWritable() == false )
 		{
-			DSA( error, fileError( Error::NoAccess(), "requested write proc mode, but the stream is not readable" ) );
-			return false;
+			return fileError( Error::NoAccess(), "requested write proc mode, but the stream is not readable" );
 		}
 	}
 	if( (procMode & FileProcMode::WriteAppend) == FileProcMode::WriteAppend )
 	{
-		_offset = _startOffset = stream->Size();
+		_offset = _startOffset = stream.Size();
 	}
 
-	_stream = stream;
+	_stream = &stream;
 	_procMode = procMode;
 
-	DSA( error, Error::Ok() );
-
-	return true;
+	return Error::Ok();
 }
 
 void FileMemoryStream::Close()
@@ -84,7 +82,8 @@ bln FileMemoryStream::IsOpened() const
 
 bln FileMemoryStream::Read( void *target, ui32 len, ui32 *readed )
 {
-	ASSUME( _stream && (_procMode & FileProcMode::Read) );
+	ASSUME( _stream && !!(_procMode & FileProcMode::Read) );
+	ASSUME( len == 0 || target );
 	uiw diff = _offset <= _stream->Size() ? _stream->Size() - _offset : 0;
 	len = Funcs::Min < uiw >( len, diff );
 	if( _offset + len < _offset )  //  overflow
@@ -99,7 +98,8 @@ bln FileMemoryStream::Read( void *target, ui32 len, ui32 *readed )
 
 bln FileMemoryStream::Write( const void *source, ui32 len, ui32 *written )
 {
-	ASSUME( _stream && (_procMode & FileProcMode::Write) );
+	ASSUME( _stream && !!(_procMode & FileProcMode::Write) );
+	ASSUME( len == 0 || source );
 	uiw writeEnd = _offset + len;
 	if( writeEnd < _offset )  //  overflow
 	{
@@ -135,7 +135,7 @@ bln FileMemoryStream::IsBufferingSupported() const
 	return false;
 }
 
-bln FileMemoryStream::BufferSet( ui32 size, void *buffer )
+bln FileMemoryStream::BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer )
 {
 	return false;
 }
@@ -155,10 +155,9 @@ bln FileMemoryStream::IsSeekSupported() const
 	return true;
 }
 
-i64 FileMemoryStream::OffsetGet( FileOffsetMode::mode_t offsetMode, CError *error )
+CResult < i64 > FileMemoryStream::OffsetGet( FileOffsetMode offsetMode )
 {
 	ASSUME( _stream );
-	DSA( error, Error::Ok() );
 	if( offsetMode == FileOffsetMode::FromBegin )
 	{
 		return _offset - _startOffset;
@@ -174,11 +173,9 @@ i64 FileMemoryStream::OffsetGet( FileOffsetMode::mode_t offsetMode, CError *erro
 	}
 }
 
-i64 FileMemoryStream::OffsetSet( FileOffsetMode::mode_t offsetMode, i64 offset, CError *error )
+CResult < i64 > FileMemoryStream::OffsetSet( FileOffsetMode offsetMode, i64 offset )
 {
 	ASSUME( _stream );
-
-	DSA( error, Error::Ok() );
 
 	if( offset <= 0 )  //  backward
 	{
@@ -256,36 +253,33 @@ i64 FileMemoryStream::OffsetSet( FileOffsetMode::mode_t offsetMode, i64 offset, 
 	return _offset - _startOffset;
 }
 
-ui64 FileMemoryStream::SizeGet( CError *error ) const
+CResult < ui64 > FileMemoryStream::SizeGet() const
 {
 	ASSUME( _stream );
-	DSA( error, Error::Ok() );
 	return _stream->Size() - _startOffset;
 }
 
-bln FileMemoryStream::SizeSet( ui64 newSize, CError *error )
+CError<> FileMemoryStream::SizeSet( ui64 newSize )
 {
 	ASSUME( _stream );
-	DSA( error, Error::Ok() );
 	newSize += _startOffset;
 	if( newSize > _startOffset )
 	{
 		if( _stream->Resize( newSize ) == newSize )
 		{
-			return true;
+			return Error::Ok();
 		}
 	}
-	DSA( error, Error::OutOfMemory() );
-	return false;
+	return Error::OutOfMemory();
 }
 
-FileProcMode::mode_t FileMemoryStream::ProcModeGet() const
+FileProcMode FileMemoryStream::ProcModeGet() const
 {
 	ASSUME( _stream );
 	return _procMode;
 }
 
-FileCacheMode::mode_t FileMemoryStream::CacheModeGet() const
+FileCacheMode FileMemoryStream::CacheModeGet() const
 {
 	ASSUME( _stream );
 	return FileCacheMode::Default;

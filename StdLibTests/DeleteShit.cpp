@@ -35,7 +35,7 @@ class DeleteShitImpl
             is_continue( false ), thread( 128 * 1024, ThreadFunc, this ), threadFreeEventPointer( 0 ), printfMutexPointer( 0 )
         {}
     };
-    UniquePtr < SThreadInfo > ThreadInfos;
+    std::unique_ptr < SThreadInfo > ThreadInfos;
     ui32 ThreadsCount;
 
 public:
@@ -54,7 +54,7 @@ public:
         }
 
         uiw size = extensions.SizeGet();
-        UniquePtr < char[] > bufMem( new char[ size + 1 ] );
+        std::unique_ptr < char[] > bufMem( new char[ size + 1 ] );
         extensions.Read( bufMem, size, 0 );
         bufMem[ size ] = '\0';
 

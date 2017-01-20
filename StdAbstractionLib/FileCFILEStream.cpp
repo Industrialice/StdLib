@@ -16,37 +16,41 @@ FileCFILEStream::~FileCFILEStream()
 FileCFILEStream::FileCFILEStream() : _file( 0 )
 {}
 
-FileCFILEStream::FileCFILEStream( const FilePath &path, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *error ) : _file( 0 )
+FileCFILEStream::FileCFILEStream( const FilePath &path, FileOpenMode openMode, FileProcMode procMode, FileCacheMode cacheMode, fileError *error ) : _file( 0 )
 {
-	this->Open( path, openMode, procMode, FileCacheMode::Default, error );
+	fileError junkError;
+	if( error == nullptr )
+	{
+		error = &junkError;
+	}
+	*error = this->Open( path, openMode, procMode, FileCacheMode::Default );
 }
 
-bln FileCFILEStream::Open( const FilePath &path, FileOpenMode::mode_t openMode, FileProcMode::mode_t procMode, FileCacheMode::mode_t cacheMode, fileError *error )
+auto FileCFILEStream::Open( const FilePath &path, FileOpenMode openMode, FileProcMode procMode, FileCacheMode cacheMode ) -> fileError
 {
 	this->Close();
 
-	Nullable < bln > is_fileExists = Files::IsExists( path );
-	if( is_fileExists.IsNull() )
+	CResult < bln > is_fileExists = Files::IsExists( path );
+	if( !is_fileExists.Ok() )
 	{
-		DSA( error, fileError( Error::UnknownError(), "failed to check file's existense" ) );
-		return false;
+		return fileError( is_fileExists.UnwrapError(), "failed to check file's existense" );
 	}
+
+	bln fileExistenceResult = is_fileExists.Unwrap();
 
 	if( openMode == FileOpenMode::OpenExisting )
 	{
-		if( !is_fileExists )
+		if( !fileExistenceResult )
 		{
-			DSA( error, Error::DoesNotExist() );
-			return false;
+			return Error::DoesNotExist();
 		}
 	}
 
 	if( openMode == FileOpenMode::CreateNew )
 	{
-		if( is_fileExists )
+		if( fileExistenceResult )
 		{
-			DSA( error, Error::AlreadyExists() );
-			return false;
+			return Error::AlreadyExists();
 		}
 	}
 
@@ -54,24 +58,49 @@ bln FileCFILEStream::Open( const FilePath &path, FileOpenMode::mode_t openMode, 
 	{
 		if( !(procMode & FileProcMode::Write) )
 		{
-			DSA( error, fileError( Error::InvalidArgument(), "FileOpenMode::CreateAlways cannot be used without FileProcMode::Write" ) );
-			return false;
+			return fileError( Error::InvalidArgument(), "FileOpenMode::CreateAlways cannot be used without FileProcMode::Write" );
+		}
+	}
+
+	bln is_disableCache = false;
+
+	if( !!(cacheMode & FileCacheMode::DisableSystemWriteCache) )
+	{
+		if( !!(procMode & FileProcMode::Write) )
+		{
+			is_disableCache = true;
+		}
+		else
+		{
+			return fileError( Error::InvalidArgument(), "FileCacheMode::DisableSystemWriteCache is used without FileProcMode::Write" );
+		}
+	}
+
+	if( !!(cacheMode & FileCacheMode::DisableSystemReadCache) )
+	{
+		if( !!(procMode & FileProcMode::Read) )
+		{
+			is_disableCache = true;
+		}
+		else
+		{
+			return fileError( Error::InvalidArgument(), "FileCacheMode::DisableSystemReadCache is used without FileProcMode::Read" );
 		}
 	}
 
 	TCStr < pathChar > procModeStr;
 
-	if( (procMode & FileProcMode::Read) && (procMode & FileProcMode::Write) )
+	if( !!(procMode & FileProcMode::Read) && !!(procMode & FileProcMode::Write) )
 	{
-		procModeStr += is_fileExists ? PLATFORM_PATH( "r+" ) : PLATFORM_PATH( "w+" );
+		procModeStr += fileExistenceResult ? PLATFORM_PATH( "r+" ) : PLATFORM_PATH( "w+" );
 	}
-	else if( procMode & FileProcMode::Read )
+	else if( !!(procMode & FileProcMode::Read) )
 	{
 		procModeStr += PLATFORM_PATH( "r" );
 	}
 	else
 	{
-		ASSUME( procMode & FileProcMode::Write );
+		ASSUME( !!(procMode & FileProcMode::Write) );
 		procModeStr += PLATFORM_PATH( "w" );
 	}
 
@@ -81,18 +110,16 @@ bln FileCFILEStream::Open( const FilePath &path, FileOpenMode::mode_t openMode, 
 
 	if( !_file )
 	{
-		DSA( error, fileError( Error::UnknownError(), "fopen has failed" ) );
-		return false;
+		return fileError( Error::UnknownError(), "fopen has failed" );
 	}
 
-	if( (cacheMode & FileCacheMode::DisableSystemWriteCache) && (procMode & FileProcMode::Write) )
+	if( is_disableCache )
 	{
 		if( setvbuf( (FILE *)_file, 0, _IONBF, 0 ) != 0 )
 		{
-			DSA( error, fileError( Error::UnknownError(), "setvbuf has failed, cannot disable caching" ) );
 			fclose( (FILE *)_file );
 			_file = 0;
-			return false;
+			return fileError( Error::UnknownError(), "setvbuf has failed, cannot disable caching" );
 		}
 	}
 
@@ -103,18 +130,16 @@ bln FileCFILEStream::Open( const FilePath &path, FileOpenMode::mode_t openMode, 
 	_bufferSize = 0;
 	_customBufferPtr = 0;
 
-	if( FileProcMode::WriteAppend & procMode )
+	if( !!(FileProcMode::WriteAppend & procMode) )
 	{
 		_offsetToStart = ftell( (FILE *)_file );
 		if( _offsetToStart == -1 )
 		{
-			DSA( error, fileError( Error::UnknownError(), "ftell has failed" ) );
-			return false;
+			return fileError( Error::UnknownError(), "ftell has failed" );
 		}
 	}
 
-	DSA( error, Error::Ok() );
-	return true;
+	return Error::Ok();
 }
 
 void FileCFILEStream::Close()
@@ -156,10 +181,13 @@ bln FileCFILEStream::Flush()
 bln FileCFILEStream::IsBufferingSupported() const
 {
 	ASSUME( IsOpened() );
-	return (_cacheMode & FileCacheMode::DisableSystemWriteCache) ? false : true;
+
+	bln is_cachingDisabled = !!(_cacheMode & FileCacheMode::DisableSystemWriteCache) || !!(_cacheMode & FileCacheMode::DisableSystemReadCache);
+
+	return !is_cachingDisabled;
 }
 
-bln FileCFILEStream::BufferSet( ui32 size, void *buffer )
+bln FileCFILEStream::BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer )
 {
 	ASSUME( IsOpened() );
 
@@ -172,13 +200,13 @@ bln FileCFILEStream::BufferSet( ui32 size, void *buffer )
 	{
 		return false;
 	}
-	if( setvbuf( (FILE *)_file, (char *)buffer, _IOFBF, size ) != 0 )
+	if( setvbuf( (FILE *)_file, (char *)buffer.get(), _IOFBF, size ) != 0 )
 	{
 		return false;
 	}
 
 	_bufferSize = size;
-	_customBufferPtr = buffer;
+	_customBufferPtr = std::move( buffer );
 
 	return true;
 }
@@ -192,7 +220,7 @@ ui32 FileCFILEStream::BufferSizeGet() const
 const void *FileCFILEStream::BufferGet() const
 {
 	ASSUME( IsOpened() );
-	return _customBufferPtr;
+	return _customBufferPtr.get();
 }
 
 bln FileCFILEStream::IsSeekSupported() const
@@ -201,27 +229,25 @@ bln FileCFILEStream::IsSeekSupported() const
 	return true;
 }
 
-i64 FileCFILEStream::OffsetGet( FileOffsetMode::mode_t offsetMode, CError *error )
+CResult < i64 > FileCFILEStream::OffsetGet( FileOffsetMode offsetMode )
 {
 	ASSUME( IsOpened() );
 
+	using resultType = CResult < i64 >;
+
 	if( offsetMode == FileOffsetMode::FromCurrent )
 	{
-		DSA( error, Error::Ok() );
 		return 0;
 	}
-
-	DSA( error, Error::UnknownError() );
 
 	i64 currentOffset = ftell( (FILE *)_file );
 	if( currentOffset == -1 )
 	{
-		return 0;
+		return resultType( 0, Error::UnknownError() );
 	}
 
 	if( offsetMode == FileOffsetMode::FromBegin )
 	{
-		DSA( error, Error::Ok() );
 		return currentOffset - _offsetToStart;
 	}
 
@@ -229,30 +255,28 @@ i64 FileCFILEStream::OffsetGet( FileOffsetMode::mode_t offsetMode, CError *error
 
 	if( fseek( (FILE *)_file, 0, SEEK_END ) != 0 )
 	{
-		return 0;
+		return resultType( 0, Error::UnknownError() );
 	}
 
 	i64 fileEnd = ftell( (FILE *)_file );
 	if( fileEnd == -1 )
 	{
-		return 0;
+		return resultType( 0, Error::UnknownError() );
 	}
 
 	i64 offsetDiff = currentOffset - fileEnd;
 
 	if( fseek( (FILE *)_file, currentOffset, SEEK_SET ) != 0 )
 	{
-		return 0;
+		return resultType( 0, Error::UnknownError() );
 	}
 
-	DSA( error, Error::Ok() );
 	return offsetDiff;
 }
 
-i64 FileCFILEStream::OffsetSet( FileOffsetMode::mode_t offsetMode, i64 offset, CError *error )
+CResult < i64 > FileCFILEStream::OffsetSet( FileOffsetMode offsetMode, i64 offset )
 {
 	ASSUME( IsOpened() );
-	DSA( error, Error::UnknownError() );
 
 	offset += _offsetToStart;
 
@@ -260,7 +284,6 @@ i64 FileCFILEStream::OffsetSet( FileOffsetMode::mode_t offsetMode, i64 offset, C
 	{
 		if( fseek( (FILE *)_file, offset, SEEK_SET ) == 0 )
 		{
-			DSA( error, Error::Ok() );
 			return ftell( (FILE *)_file );
 		}
 	}
@@ -269,7 +292,6 @@ i64 FileCFILEStream::OffsetSet( FileOffsetMode::mode_t offsetMode, i64 offset, C
 	{
 		if( fseek( (FILE *)_file, offset, SEEK_CUR ) == 0 )
 		{
-			DSA( error, Error::Ok() );
 			return ftell( (FILE *)_file );
 		}
 	}
@@ -278,92 +300,87 @@ i64 FileCFILEStream::OffsetSet( FileOffsetMode::mode_t offsetMode, i64 offset, C
 	{
 		if( fseek( (FILE *)_file, offset, SEEK_END ) == 0 )
 		{
-			DSA( error, Error::Ok() );
 			return ftell( (FILE *)_file );
 		}
 	}
 
-	return -1;
+	return CResult < i64 >( 0, Error::UnknownError() );
 }
 
-ui64 FileCFILEStream::SizeGet( CError *error ) const
+CResult < ui64 > FileCFILEStream::SizeGet() const
 {
 	ASSUME( IsOpened() );
 
-	DSA( error, Error::UnknownError() );
+	using resultType = CResult < ui64 >;
 
 	i64 currentOffset = ftell( (FILE *)_file );
 	if( currentOffset == -1 )
 	{
-		return 0;
+		return resultType( 0, Error::UnknownError() );
 	}
 
 	if( fseek( (FILE *)_file, 0, SEEK_END ) != 0 )
 	{
-		return 0;
+		return resultType( 0, Error::UnknownError() );
 	}
 
 	i64 endOfFile = ftell( (FILE *)_file );
 	if( endOfFile == -1 )
 	{
-		return 0;
+		return resultType( 0, Error::UnknownError() );
 	}
 
 	if( fseek( (FILE *)_file, currentOffset, SEEK_SET ) != 0 )
 	{
-		return 0;
+		return resultType( 0, Error::UnknownError() );
 	}
 
-	DSA( error, Error::Ok() );
 	return (ui64)(endOfFile - _offsetToStart);
 }
 
-bln FileCFILEStream::SizeSet( ui64 newSize, CError *error )
+CError<> FileCFILEStream::SizeSet( ui64 newSize )
 {
 	ASSUME( IsOpened() );
-	
-	DSA( error, Error::UnknownError() );
 
 	newSize += _offsetToStart;
 
 	i64 currentOffset = ftell( (FILE *)_file );
 	if( currentOffset == -1 )
 	{
-		return false;
+		return Error::UnknownError();
 	}
 
 	if( fseek( (FILE *)_file, newSize, SEEK_SET ) != 0 )
 	{
-		return false;
+		return Error::UnknownError();
 	}
 
 	if( fputc( '\0', (FILE *)_file ) != 0 )
 	{
-		return false;
+		return Error::UnknownError();
 	}
 
 	if( fseek( (FILE *)_file, currentOffset, SEEK_SET ) != 0 )
 	{
-		return false;
+		return Error::UnknownError();
 	}
 
-	DSA( error, Error::Ok() );
-	return true;
+	return Error::Ok();
 }
 
-FileProcMode::mode_t FileCFILEStream::ProcModeGet() const
+FileProcMode FileCFILEStream::ProcModeGet() const
 {
 	ASSUME( IsOpened() );
 	return _procMode;
 }
 
-FileCacheMode::mode_t FileCFILEStream::CacheModeGet() const
+FileCacheMode FileCFILEStream::CacheModeGet() const
 {
 	ASSUME( IsOpened() );
 	return FileCacheMode::Default;
 }
 
-FileOpenMode::mode_t FileCFILEStream::OpenModeGet() const
+FileOpenMode FileCFILEStream::OpenModeGet() const
 {
 	ASSUME( IsOpened() );
 	return _openMode;

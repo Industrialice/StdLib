@@ -4,7 +4,9 @@
 
 #include "VKeys.hpp"
 
-CRefVec < const ui8 > VKeys::GetPlatformMappingStruct()
+using namespace StdLib;
+
+CRefVec < const VKeys::vkey_t > StdLib::VKeys::GetPlatformMappingStruct()
 {
 	static const ui8 VKeysMappingWindows[ 256 ] =
 	{
@@ -266,7 +268,7 @@ CRefVec < const ui8 > VKeys::GetPlatformMappingStruct()
 		/*  255 none  */  VKeys::Undefined
 	};
 
-	return VKeysMappingWindows;
+	return MakeRefVec( (const VKeys::vkey_t *)VKeysMappingWindows, COUNTOF( VKeysMappingWindows ) );
 }
 
 #endif

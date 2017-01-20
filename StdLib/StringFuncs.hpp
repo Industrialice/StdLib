@@ -7,6 +7,7 @@
 
 #include "MemoryStreamInterface.hpp"
 #include "FileInterface.hpp"
+#include "Nullable.hpp"
 
 #define DEBUG_VALIDATE_PRINT_FUNCS
 
@@ -125,12 +126,12 @@ namespace Funcs
     EXTERNALS uiw StrExcludeMaskInplaceAdv( char *p_str, char mask, char symbol, uiw count = uiw_max, char aes = '\0' );
 
     //  *p_value is not changed if no suitable conversion is possible TODO: add cp_str capacity info
-    EXTERNALS bln StrDecToI32Quest( const char *cp_str, i32 *p_value, uiw count = uiw_max, char aes = '\0' );
-    EXTERNALS bln StrDecToUI32Quest( const char *cp_str, ui32 *p_value, uiw count = uiw_max, char aes = '\0' );
-    EXTERNALS bln StrDecToI64Quest( const char *cp_str, i64 *p_value, uiw count = uiw_max, char aes = '\0' );
-    EXTERNALS bln StrDecToUI64Quest( const char *cp_str, ui64 *p_value, uiw count = uiw_max, char aes = '\0' );
-    EXTERNALS bln StrDecToIWQuest( const char *cp_str, iw *p_value, uiw count = uiw_max, char aes = '\0' );
-    EXTERNALS bln StrDecToUIWQuest( const char *cp_str, uiw *p_value, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS Nullable < i32 > StrDecToI32Quest( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS Nullable < ui32 > StrDecToUI32Quest( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS Nullable < i64 > StrDecToI64Quest( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS Nullable < ui64 > StrDecToUI64Quest( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS Nullable < iw > StrDecToIWQuest( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
+    EXTERNALS Nullable < uiw > StrDecToUIWQuest( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
 
     //  TODO: add cp_str capacity info
     EXTERNALS i32  StrDecToI32( const char *cp_str, uiw count = uiw_max, char aes = '\0' );
@@ -187,9 +188,9 @@ namespace Funcs
     EXTERNALD uiw PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_list args );
 	
     //  won't append string null-terminator
-    EXTERNALD uiw PrintToMemoryStreamArgList( MemoryStreamInterface *stream, const char *cp_fmt, va_list args );
+    EXTERNALD uiw PrintToMemoryStreamArgList( MemoryStreamInterface &stream, const char *cp_fmt, va_list args );
 
-	EXTERNALD uiw PrintToFileArgList( FileInterface *file, const char *cp_fmt, va_list args );
+	EXTERNALD uiw PrintToFileArgList( FileInterface &file, const char *cp_fmt, va_list args );
 
     struct _ArgType  //  for debug only
     {
@@ -218,17 +219,17 @@ namespace Funcs
 	}
     
     //  won't append string null-terminator
-	inline uiw PrintToMemoryStream( MemoryStreamInterface *stream, const char *cp_fmt, ... )
+	inline uiw PrintToMemoryStream( MemoryStreamInterface &stream, const char *cp_fmt, ... )
 	{
         va_list variadic;
         va_start( variadic, cp_fmt );
         uiw printed = PrintToMemoryStreamArgList( stream, cp_fmt, variadic );
         va_end( variadic );
 
-        return stream->Resize( printed );  //  removing excessive size( if any )
+        return stream.Resize( printed );  //  removing excessive size( if any )
 	}
     
-	inline uiw PrintToFile( FileInterface *file, const char *cp_fmt, ... )
+	inline uiw PrintToFile( FileInterface &file, const char *cp_fmt, ... )
 	{
         va_list variadic;
         va_start( variadic, cp_fmt );
@@ -256,13 +257,13 @@ namespace Funcs
 		{
 			argType.size = sizeof(uiw); //  when array, size can be off
 			argType.is_pointer = true;
-			if( AreTypesTheSame < underlyingTypeX, char >() )
+			if( std::is_same < underlyingTypeX, char >() )
 			{
 				argType.is_string = true;
 			}
 			return argType;
 		}
-        if( TypeDesc < X >::is_integer || AreTypesTheSame < underlyingTypeX, bln >() || AreTypesTheSame < underlyingTypeX, char >() )
+        if( TypeDesc < X >::is_integer || std::is_same < underlyingTypeX, bln >() || std::is_same < underlyingTypeX, char >() )
         {
 			if( sizeof(X) < sizeof(int) )
 			{
@@ -293,7 +294,7 @@ namespace Funcs
 		return PrintToStr( p_str, maxLen, cp_fmt, args... );
     }
 
-    template < typename... Args > uiw PrintToMemoryStreamDebug( MemoryStreamInterface *stream, const char *cp_fmt, const Args &... args )
+    template < typename... Args > uiw PrintToMemoryStreamDebug( MemoryStreamInterface &stream, const char *cp_fmt, const Args &... args )
     {
 		if( !_AreArgsValid( cp_fmt, args... ) )
 		{
@@ -304,7 +305,7 @@ namespace Funcs
 		return PrintToMemoryStream( stream, cp_fmt, args... );
     }
 
-    template < typename... Args > uiw PrintToFileDebug( FileInterface *file, const char *cp_fmt, const Args &... args )
+    template < typename... Args > uiw PrintToFileDebug( FileInterface &file, const char *cp_fmt, const Args &... args )
     {
 		if( !_AreArgsValid( cp_fmt, args... ) )
 		{
@@ -322,7 +323,6 @@ namespace Funcs
 
     template < ChrTestFunc func > bln IsStrMatchT( const char *cp_str, uiw count = uiw_max )
     {
-        ASSUME( cp_str && func );
         bln is_match = false;
         while( *cp_str && count )
         {
@@ -338,9 +338,8 @@ namespace Funcs
     }
 
     //  without base, *p_value is not changed if no suitable conversion possible, count sets a limit to cp_str len
-    template < typename X > NOINLINE bln StrHexToIntQuest( const char *cp_str, X *p_value, uiw count = uiw_max )
+    template < typename X > NOINLINE Nullable < X > StrHexToIntQuest( const char *cp_str, uiw count = uiw_max )
     {
-        ASSUME( cp_str && p_value );
         X value = 0;
         uiw readed = 0;
         while( *cp_str && readed < count && readed < sizeof(X) * 2 )
@@ -360,28 +359,23 @@ namespace Funcs
             }
             else
             {
-                return false;
+                return nullptr;
             }
             ++readed;
             ++cp_str;
         }
-        *p_value = value;
-        return true;
+		return value;
     }
 
     //  without base, count sets a limit to cp_str len
     template < typename X > X StrHexToInt( const char *cp_str, uiw count = uiw_max )
     {
-        ASSUME( cp_str );
-        X value = 0;
-        StrHexToIntQuest( cp_str, &value, count );
-        return value;
+        return StrHexToIntQuest < X >( cp_str, count ).Get();
     }
 
     //  without base, *p_value is not changed if no suitable conversion possible, count sets a limit to cp_str len
-    template < typename X > NOINLINE bln StrBinToIntQuest( const char *cp_str, X *p_value, uiw count = uiw_max )
+    template < typename X > NOINLINE Nullable < X > StrBinToIntQuest( const char *cp_str, uiw count = uiw_max )
     {
-        ASSUME( cp_str && p_value );
         X value = 0;
         uiw readed = 0;
         while( *cp_str && readed < count && readed < sizeof(X) * 8 )
@@ -399,28 +393,23 @@ namespace Funcs
             }
             else if( *cp_str != '0' )
             {
-                return false;
+                return nullptr;
             }
             ++readed;
             ++cp_str;
         }
-        *p_value = value;
-        return true;
+        return value;
     }
 
     //  without base, count sets a limit to cp_str len
     template < typename X > X StrBinToInt( const char *cp_str, uiw count = uiw_max )
     {
-        ASSUME( cp_str );
-        X value = 0;
-        StrBinToIntQuest( cp_str, &value, count );
-        return value;
+        return StrBinToIntQuest < X >( cp_str, count ).Get();
     }
 
     //  p_buf must be able to contain at least sizeof(X) * 2 + 1 bytes
     template < typename X > NOINLINE uiw IntToStrHex( bln is_upper, bln is_setBase, bln is_dropFrontZeroes, char *p_buf, X val )
     {
-        ASSUME( p_buf );
         const char *cp_set = "0123456789abcdef0123456789ABCDEF" + (is_upper << 4);
         char *p_sourceBuf = p_buf;
         if( is_setBase )
@@ -445,7 +434,6 @@ namespace Funcs
     //  p_buf must be able to contain at least sizeof(X) * 8 + 1 bytes
     template < typename X > NOINLINE uiw IntToStrBin( X val, char *p_buf, bln is_setBase = false, bln is_dropFrontZeroes = false  )
     {
-        ASSUME( p_buf );
         char *p_sourceBuf = p_buf;
         if( is_setBase )
         {
@@ -470,7 +458,6 @@ namespace Funcs
     //  TODO: p_buf must be able to contain at least TypeDesc < X >::decDigits + 2 bytes
     template < typename X > NOINLINE uiw IntToStrDec( X val, char *const p_buf )
     {
-        ASSUME( p_buf );
         char a_buf[ TypeDesc < X >::decDigits + 2 ];
         uiw index = 0;
         char *p_bufNew = p_buf;

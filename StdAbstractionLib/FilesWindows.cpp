@@ -9,7 +9,7 @@
     #pragma optimize( "s", on )  //  TODO: global solution
 #endif
 
-NOINLINE CError StdLib_FileError()
+NOINLINE CError<> StdLib_FileError()
 {
 	DWORD code = ::GetLastError();
 
@@ -34,43 +34,39 @@ NOINLINE CError StdLib_FileError()
 	}
 }
 
-bln Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+CError<> Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
 {
-	CError checkError;
-	if( !Files::IsFile( sourcePnn, &checkError ) )  //  will check the pnn
+	CResult < bln > is_file = Files::IsFile( sourcePnn );  //  will check the pnn
+	if( !is_file.Ok() )
 	{
-		if( checkError == Error::Ok() )
-		{
-			checkError = Error::InvalidArgument();
-		}
-		DSA( error, checkError );
-		return false;
+		return is_file.UnwrapError();
+	}
+	if( !is_file.Unwrap() )
+	{
+		return Error::InvalidArgument();
 	}
 
-	return Files::MoveObjectTo( sourcePnn, targetPnn, is_replace, error );  //  will check the pnn
+	return Files::MoveObjectTo( sourcePnn, targetPnn, is_replace );  //  will check the pnn
 }
 
-bln Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+CError<> Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
 {
-	CError checkError;
-	if( !Files::IsFolder( sourcePnn, &checkError ) )  //  will check the pnn
+	CResult < bln > is_folder = Files::IsFolder( sourcePnn );  //  will check the pnn
+	if( !is_folder.Ok() )
 	{
-		if( checkError == Error::Ok() )
-		{
-			checkError = Error::InvalidArgument();
-		}
-		DSA( error, checkError );
-		return false;
+		return is_folder.UnwrapError();
+	}
+	if( !is_folder.Unwrap() )
+	{
+		return Error::InvalidArgument();
 	}
 
-	return Files::MoveObjectTo( sourcePnn, targetPnn, is_replace, error );  //  will check the pnn
+	return Files::MoveObjectTo( sourcePnn, targetPnn, is_replace );  //  will check the pnn
 }
 
-NOINLINE bln Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+NOINLINE CError<> Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
 {
 	FilePath source = sourcePnn, target = targetPnn;
-	bln result = false;
-	CError retError;
 	BOOL wapiResult;
 	DWORD flags = MOVEFILE_COPY_ALLOWED | MOVEFILE_WRITE_THROUGH;
 	if( is_replace )
@@ -83,140 +79,101 @@ NOINLINE bln Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &tar
 
 	if( !source.IsValid() || !target.IsValid() || source == target )
 	{
-		retError = Error::InvalidArgument();
-		goto toRet;
+		return Error::InvalidArgument();
 	}
 
 	wapiResult = ::MoveFileExW( source.PlatformPath(), target.PlatformPath(), flags );
 	if( wapiResult != TRUE )
 	{
-		retError = Error::UnknownError();
-		goto toRet;
+		return Error::UnknownError();
 	}
 
-	result = true;
-
-toRet:
-	DSA( error, retError );
-	return result;
+	return Error::Ok();
 }
 
-bln Files::CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+CError<> Files::CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
 {
-	CError retError;
-	bln funcResult = false;
-
-	if( Files::IsFile( sourcePnn, &retError ) == false )  //  will check the pnn
+	CResult < bln > is_file = Files::IsFile( sourcePnn );  //  will check the pnn
+	if( !is_file.Ok() )
 	{
-		if( retError == Error::Ok() )
-		{
-			retError = Error::InvalidArgument();
-		}
-		goto toExit;
+		return is_file.UnwrapError();
 	}
-
-	funcResult = CopyObjectTo( sourcePnn, targetPnn, is_replace, &retError );  //  will check the pnn
-
-toExit:
-	DSA( error, retError );
-	return funcResult;
-}
-
-bln Files::CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
-{
-	CError retError;
-	bln funcResult = false;
-
-	if( Files::IsFolder( sourcePnn, &retError ) == false )  //  will check the pnn
+	if( !is_file.Unwrap() )
 	{
-		if( retError == Error::Ok() )
-		{
-			retError = Error::InvalidArgument();
-		}
-		goto toExit;
+		return Error::InvalidArgument();
 	}
 
-	funcResult = CopyObjectTo( sourcePnn, targetPnn, is_replace, &retError );  //  will check the pnn
-
-toExit:
-	DSA( error, retError );
-	return funcResult;
+	return CopyObjectTo( sourcePnn, targetPnn, is_replace );  //  will check the pnn
 }
 
-bln Files::CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+CError<> Files::CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
 {
-	CError retError;
-	BOOL result = FALSE;
+	CResult < bln > is_folder = Files::IsFolder( sourcePnn );  //  will check the pnn
+	if( !is_folder.Ok() )
+	{
+		return is_folder.UnwrapError();
+	}
+	if( !is_folder.Unwrap() )
+	{
+		return Error::InvalidArgument();
+	}
 
+	return CopyObjectTo( sourcePnn, targetPnn, is_replace );  //  will check the pnn
+}
+
+CError<> Files::CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
+{
 	if( !sourcePnn.IsValid() || !targetPnn.IsValid() )
 	{
-		retError = Error::InvalidArgument();
-		goto toExit;
+		return Error::InvalidArgument();
 	}
 
 	//  TODO: Windows 7, Windows Server 2008 R2, Windows Server 2008, Windows Vista, Windows Server 2003, and Windows XP: Security resource properties for the existing file are not copied to the new file until Windows 8 and Windows Server 2012.
-	result = ::CopyFileW( sourcePnn.PlatformPath(), targetPnn.PlatformPath(), is_replace ? FALSE : TRUE );
+	BOOL result = ::CopyFileW( sourcePnn.PlatformPath(), targetPnn.PlatformPath(), is_replace ? FALSE : TRUE );
 	if( result == FALSE )
 	{
-		retError = StdLib_FileError();
+		return StdLib_FileError();
 	}
 
-toExit:
-	DSA( error, retError );
-	return result == TRUE;
+	return Error::Ok();
 }
 
-NOINLINE bln Files::RemoveFile( const FilePath &pnn, CError *error )
+NOINLINE CError<> Files::RemoveFile( const FilePath &pnn )
 {
-	CError retError;
-	bln funcResult = false;
-
-	if( !Files::IsFile( pnn, &retError ) )  //  will check the pnn
+	CResult < bln > is_file = Files::IsFile( pnn );  //  will check the pnn
+	if( !is_file.Ok() )
 	{
-		if( retError == Error::Ok() )
-		{
-			retError = Error::InvalidArgument();
-		}
-		goto toExit;
+		return is_file.UnwrapError();
+	}
+	if( !is_file.Unwrap() )
+	{
+		return Error::InvalidArgument();
 	}
 
-    funcResult = ::DeleteFileW( pnn.PlatformPath() ) != 0;
-    if( funcResult == false )
+    BOOL result = ::DeleteFileW( pnn.PlatformPath() ) != 0;
+    if( result == false )
     {
-		switch( ::GetLastError() )
-		{
-		case ERROR_ACCESS_DENIED:
-			retError = Error::NoAccess();
-			break;
-		case ERROR_FILE_NOT_FOUND:
-			retError = Error::NoAccess();
-			break;
-		default:
-			retError = Error::UnknownError();
-		}
+		return StdLib_FileError();
     }
 
-toExit:
-	DSA( error, retError );
-    return funcResult;
+	return Error::Ok();
 }
 
-NOINLINE bln Files::RemoveFolder( const FilePath &path, CError *error )  //  potentially recursive
+NOINLINE CError<> Files::RemoveFolder( const FilePath &path )  //  potentially recursive
 {
 	uiw len;
 	CWStr buf;
     WIN32_FIND_DATAW o_find;
     HANDLE h_find;
-	CError o_error;
-    bln funcResult = false;
 	
-	if( !Files::IsFolder( path, &o_error ) )  //  will check the pnn
+	CResult < bln > is_folder = Files::IsFolder( path );  //  will check the pnn
+	if( !is_folder.Ok() )
 	{
-		if( o_error == Error::Ok() )
-		{
-			o_error = Error::InvalidArgument();
-		}
-		goto toExit;
+		return is_folder.UnwrapError();
+	}
+	if( !is_folder.Unwrap() )
+	{
+		return Error::InvalidArgument();
 	}
 
 	buf = path.PlatformPath();
@@ -226,7 +183,7 @@ NOINLINE bln Files::RemoveFolder( const FilePath &path, CError *error )  //  pot
     h_find = ::FindFirstFileW( buf.CStr(), &o_find );
     if( h_find == INVALID_HANDLE_VALUE )
     {
-        goto toExit;
+        return Error::UnknownError();
     }
     do
     {
@@ -239,72 +196,81 @@ NOINLINE bln Files::RemoveFolder( const FilePath &path, CError *error )  //  pot
 		buf += o_find.cFileName;
         if( o_find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
         {
-            if( !RemoveFolder( buf.CStr(), error ) )
+			CError<> removeFolderResult = RemoveFolder( buf.CStr() );
+            if( !removeFolderResult.Ok() )
             {
                 ::FindClose( h_find );
-                goto toExit;
+                return removeFolderResult;
             }
         }
-        else if( !RemoveFile( buf.CStr(), error ) )
-        {
-            ::FindClose( h_find );
-            goto toExit;
-        }
+        else
+		{
+			CError<> removeFileResult = RemoveFile( buf.CStr() );
+			if( !removeFileResult.Ok() )
+			{
+				::FindClose( h_find );
+				return removeFileResult;
+			}
+		}
     } while( ::FindNextFileW( h_find, &o_find ) );
 
     ::FindClose( h_find );
 
-    funcResult = ::RemoveDirectoryW( path.PlatformPath() ) != 0;
-    if( !funcResult )
+    BOOL winResult = ::RemoveDirectoryW( path.PlatformPath() ) != 0;
+    if( winResult != TRUE )
     {
-        o_error = Error::UnknownError();
+        return Error::UnknownError();
     }
 
-toExit:
-    DSA( error, o_error );
-    return funcResult;
+	return Error::Ok();
 }
 
-bln Files::RemoveObject( const FilePath &path, CError *error )
+CError<> Files::RemoveObject( const FilePath &path )
 {
-	CError retError;
-	bln funcResult = false;
+	CResult < bln > is_file = Files::IsFile( path );
+	if( is_file.Ok() && is_file.Unwrap() )
+	{
+		return Files::RemoveFile( path );
+	}
 
-	if( Files::IsFile( path, &retError ) )
+	CResult < bln > is_folder = Files::IsFolder( path );
+	if( is_folder.Ok() && is_folder.Unwrap() )
 	{
-		return Files::RemoveFile( path, error );
+		return Files::RemoveFolder( path );
 	}
-	else if( Files::IsFolder( path, &retError ) )
+
+	if( !is_file.Ok() )
 	{
-		return Files::RemoveFolder( path, error );
+		return is_file.UnwrapError();
 	}
-	DSA( error, retError );
-	return false;
+	if( !is_folder.Ok() )
+	{
+		return is_folder.UnwrapError();
+	}
+	return Error::UnknownError();
 }
 
-bln Files::VolumeDriveName( const FilePath &path, char *RSTR output, uiw maxLen )
+CError<> Files::VolumeDriveName( const FilePath &path, char *RSTR output, uiw maxLen )
 {
 	//  TODO:
-	return false;
+	return Error::Unimplemented();
 }
 
-NOINLINE bln Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1, CError *error )
+NOINLINE CResult < bln > Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1 )
 {
+	using returnType = CResult < bln >;
+
 	HANDLE h0 = INVALID_HANDLE_VALUE, h1 = INVALID_HANDLE_VALUE;
-	CError retError;
-	bln result = false;
 	BY_HANDLE_FILE_INFORMATION inf0, inf1;
 
 	if( !pnn0.IsValid() || !pnn1.IsValid() )
 	{
-		retError = Error::InvalidArgument();
-		goto toExit;
+		return returnType( false, Error::InvalidArgument() );
 	}
 
 	if( pnn0 == pnn1 )
 	{
-		result = true;
-		goto toExit;
+		return true;
 	}
 
 	h0 = ::CreateFileW( pnn0.PlatformPath(), GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0 );
@@ -313,8 +279,7 @@ NOINLINE bln Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &
 		h0 = ::CreateFileW( pnn0.PlatformPath(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0 );
 		if( h0 == INVALID_HANDLE_VALUE )
 		{
-			retError = Error::CannotOpenFile();
-			goto toExit;
+			return returnType( false, Error::CannotOpenFile() );
 		}
 	}
 
@@ -324,127 +289,116 @@ NOINLINE bln Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &
 		h1 = ::CreateFileW( pnn1.PlatformPath(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0 );
 		if( h1 == INVALID_HANDLE_VALUE )
 		{
-			retError = Error::CannotOpenFile();
-			goto toExit;
+			return returnType( false, Error::CannotOpenFile() );
 		}
 	}
 
 	if( ::GetFileInformationByHandle( h0, &inf0 ) != TRUE )
 	{
-		retError = Error::UnknownError();
-		goto toExit;
+		return returnType( false, Error::UnknownError() );
 	}
 
 	if( ::GetFileInformationByHandle( h1, &inf1 ) != TRUE )
 	{
-		retError = Error::UnknownError();
-		goto toExit;
+		return returnType( false, Error::UnknownError() );
 	}
 
-	result = inf0.nFileIndexLow == inf1.nFileIndexLow;
+	bln result = inf0.nFileIndexLow == inf1.nFileIndexLow;
 	result &= inf0.nFileIndexHigh == inf1.nFileIndexHigh;
 	result &= inf0.dwVolumeSerialNumber == inf1.dwVolumeSerialNumber;
 
 toExit:
 	::CloseHandle( h0 );
 	::CloseHandle( h1 );
-	DSA( error, retError );
+
 	return result;
 }
 
-NOINLINE Nullable < bln > Files::IsExists( const FilePath &pnn, CError *error )
+NOINLINE CResult < bln > Files::IsExists( const FilePath &pnn )
 {
-	CError retError;
-	Nullable < bln > is_file = Files::IsFile( pnn, &retError );
-	DSA( error, retError );
-	return retError == Error::Ok();
+	if( !pnn.IsValid() )
+	{
+		return CResult < bln >( false, Error::InvalidArgument() );
+	}
+	DWORD attribs = ::GetFileAttributesW( pnn.PlatformPath() );
+	return attribs != INVALID_FILE_ATTRIBUTES;
 }
 
-Nullable < bln > Files::IsFile( const FilePath &pnn, CError *error )
+CResult < bln > Files::IsFile( const FilePath &pnn )
 {
-	CError retError;
-	Nullable < bln > funcResult;
+	using returnType = CResult < bln >;
+
 	DWORD attribs;
 
 	if( !pnn.IsValid() )
 	{
-		retError = Error::InvalidArgument();
-		goto toExit;
+		return returnType( false, Error::InvalidArgument() );
 	}
 
 	attribs = ::GetFileAttributesW( pnn.PlatformPath() );
 	if( attribs == INVALID_FILE_ATTRIBUTES )
 	{
-		retError = StdLib_FileError();
-		goto toExit;
+		return returnType( false, StdLib_FileError() );
 	}
 
-	funcResult = ((attribs & FILE_ATTRIBUTE_DIRECTORY) == 0);
-
-toExit:
-	DSA( error, retError );
-	return funcResult;
+	return ((attribs & FILE_ATTRIBUTE_DIRECTORY) == 0);
 }
 
-Nullable < bln > Files::IsFolder( const FilePath &pnn, CError *error )
+CResult < bln > Files::IsFolder( const FilePath &pnn )
 {
-	CError retError;
-	Nullable < bln > is_file = Files::IsFile( pnn, &retError );
-	DSA( error, retError );
-	if( retError == Error::Ok() )
+	auto is_file = Files::IsFile( pnn );
+	if( !is_file.Ok() )
 	{
-		return is_file.Get() == false;
+		return is_file;
 	}
-	return nullv;
+
+	return is_file.Unwrap() == false;
 }
 
-Nullable < bln > Files::IsEmpty( const FilePath &pnn, CError *error )
+CResult < bln > Files::IsFolderEmpty( const FilePath &pnn )
 {
-	CError retError;
-	Nullable < bln > is_file = Files::IsFile( pnn, error );
-	DSA( error, retError );
-	if( retError != Error::Ok() )
+	auto is_file = Files::IsFile( pnn );
+	if( !is_file.Ok() )
 	{
-		return nullv;
+		return is_file;
 	}
 
-	//  TODO:
-	DSA( error, Error::Unimplemented() );
-	return false;
+	if( is_file.Unwrap() )
+	{
+		return CResult < bln >( false, Error::InvalidArgument() );
+	}
+
+	return CResult < bln >( false, Error::Unimplemented() );
 }
 
-NOINLINE Nullable < bln > Files::IsFileReadOnlyGet( const FilePath &pnn, CError *error )
+NOINLINE CResult < bln > Files::IsFileReadOnlyGet( const FilePath &pnn )
 {
 	if( !pnn.IsValid() )
 	{
-		DSA( error, Error::InvalidArgument() );
-		return nullv;
+		return CResult < bln >( false, Error::InvalidArgument() );
 	}
     
 	DWORD attribs = ::GetFileAttributesW( pnn.PlatformPath() );
     if( attribs == INVALID_FILE_ATTRIBUTES )
     {
-		DSA( error, StdLib_FileError() );
-        return nullv;
+		return CResult < bln >( false, StdLib_FileError() );
     }
-	DSA( error, Error::Ok() );
+
     return (attribs & FILE_ATTRIBUTE_READONLY) != 0;
 }
 
-NOINLINE Nullable < bln > Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *error )
+NOINLINE CError<> Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro )
 {
 	if( !pnn.IsValid() )
 	{
-		DSA( error, Error::InvalidArgument() );
-		return nullv;
+		return Error::InvalidArgument();
 	}
 
     DWORD new_attribs;
     DWORD old_attribs = ::GetFileAttributesW( pnn.PlatformPath() );
     if( old_attribs == INVALID_FILE_ATTRIBUTES )
     {
-		DSA( error, StdLib_FileError() );
-        return nullv;
+		return StdLib_FileError();
     }
 
     if( is_ro )
@@ -460,108 +414,96 @@ NOINLINE Nullable < bln > Files::IsFileReadOnlySet( const FilePath &pnn, bln is_
     {
         if( ::SetFileAttributesW( pnn.PlatformPath(), new_attribs ) != TRUE )
 		{
-			DSA( error, StdLib_FileError() );
-			return nullv;
+			return StdLib_FileError();
 		}
     }
 
-	DSA( error, Error::Ok() );
-    return true;
+	return Error::Ok();
 }
 
-NOINLINE bln Files::CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject, CError *error )
+NOINLINE CError<> Files::CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject )
 {
-	bln funcResult = false;
-	CError o_error;
-	bln is_fileAlreadyExists;
-	FilePath fullPath;
-
 	if( !where.IsValid() || !name.IsValid() )
 	{
-		o_error = Error::InvalidArgument();
-		goto toExit;
+		return Error::InvalidArgument();
 	}
 
-	fullPath = where;
+	FilePath fullPath = where;
 	fullPath.AddLevel();
 	fullPath += name;
 
-	is_fileAlreadyExists = Files::IsFile( fullPath ).ValueOrDefault( false );
-    if( is_fileAlreadyExists )
-    {
+	auto is_exists = Files::IsExists( fullPath );
+	if( !is_exists.Ok() )
+	{
+		return is_exists.UnwrapError();
+	}
+
+	if( is_exists.Unwrap() )
+	{
 		if( is_overrideExistingObject )
 		{
-			if( !Files::RemoveObject( fullPath, &o_error ) )
+			auto removeResult = Files::RemoveObject( fullPath );
+			if( !removeResult.Ok() )
 			{
-				goto toExit;
+				return removeResult;
 			}
 		}
 		else
 		{
-			o_error = Error::AlreadyExists();
-			goto toExit;
+			return Error::AlreadyExists();
 		}
-    }
-
-    funcResult = ::CreateDirectoryW( fullPath.PlatformPath(), 0 ) != 0;
-    if( !funcResult )
-    {
-        o_error = StdLib_FileError();
-    }
-
-toExit:
-    DSA( error, o_error );
-    return funcResult;
-}
-
-NOINLINE bln Files::CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject, CError *error )
-{
-	bln funcResult = false;
-	CError o_error;
-	bln is_fileAlreadyExists;
-	FilePath fullPath;
-	HANDLE file;
-
-	if( !where.IsValid() || !name.IsValid() )
-	{
-		o_error = Error::InvalidArgument();
-		goto toExit;
 	}
 
-	fullPath = where;
+	if( ::CreateDirectoryW( fullPath.PlatformPath(), 0 ) != TRUE )
+	{
+		return StdLib_FileError();
+	}
+
+	return Error::Ok();
+}
+
+NOINLINE CError<> Files::CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject )
+{
+	if( !where.IsValid() || !name.IsValid() )
+	{
+		return Error::InvalidArgument();
+	}
+
+	FilePath fullPath = where;
 	fullPath.AddLevel();
 	fullPath += name;
 
-	is_fileAlreadyExists = Files::IsFile( fullPath ).ValueOrDefault( false );
-	if( is_fileAlreadyExists )
+	auto is_exists = Files::IsExists( fullPath );
+	if( !is_exists.Ok() )
+	{
+		return is_exists.UnwrapError();
+	}
+
+	if( is_exists.Unwrap() )
 	{
 		if( is_overrideExistingObject )
 		{
-			if( !Files::RemoveObject( fullPath, &o_error ) )
+			auto removeResult = Files::RemoveObject( fullPath );
+			if( !removeResult.Ok() )
 			{
-				goto toExit;
+				return removeResult;
 			}
 		}
 		else
 		{
-			o_error = Error::AlreadyExists();
-			goto toExit;
+			return Error::AlreadyExists();
 		}
 	}
 
-	file = ::CreateFileW( fullPath.PlatformPath(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, is_overrideExistingObject ? CREATE_ALWAYS : CREATE_NEW, 0, 0 );
+	HANDLE file = ::CreateFileW( fullPath.PlatformPath(), GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, is_overrideExistingObject ? CREATE_ALWAYS : CREATE_NEW, 0, 0 );
 	if( file == INVALID_HANDLE_VALUE )
 	{
-		o_error = StdLib_FileError();
-		goto toExit;
+		return StdLib_FileError();
 	}
 
 	::CloseHandle( file );
-	funcResult = true;
 
-toExit:
-	DSA( error, o_error );
-	return funcResult;
+	return Error::Ok();
 }
 
 bln Files::IsRelativePathSupported()
@@ -573,28 +515,37 @@ bln Files::IsRelativePathSupported()
 #endif
 }
 
-FilePath Files::CurrentWorkingPathGet()
+CResult < FilePath > Files::CurrentWorkingPathGet()
 {
 	wchar_t tempBuf[ MAX_PATH_LENGTH ];
 
 	DWORD result = ::GetCurrentDirectoryW( MAX_PATH_LENGTH, tempBuf );
-	if( result == 0 || result >= MAX_PATH_LENGTH )  //  if result bigger than MAX_PATH_LENGTH, MAX_PATH_LENGTH wasn't enough
+	if( result > MAX_PATH_LENGTH )  //  if result bigger than MAX_PATH_LENGTH, MAX_PATH_LENGTH wasn't enough
 	{
-		return FilePath();
+		return CResult < FilePath >( FilePath(), Error::OutOfMemory() );
+	}
+	if( result == 0 )
+	{
+		return CResult < FilePath >( FilePath(), Error::UnknownError() );
 	}
 	return FilePath( tempBuf );
 }
 
-bln Files::CurrentWorkingPathSet( const FilePath &path )
+CError<> Files::CurrentWorkingPathSet( const FilePath &path )
 {
 	if( !path.IsValid() )
 	{
-		return false;
+		return Error::InvalidArgument();
 	}
-	return ::SetCurrentDirectoryW( path.PlatformPath() ) != FALSE;
+	BOOL result = ::SetCurrentDirectoryW( path.PlatformPath() );
+	if( result != TRUE )
+	{
+		return Error::UnknownError();
+	}
+	return Error::Ok();
 }
 
-bln Files::CFileEnumInfo::EnumFirstFile( const FilePath &path, const FilePath &mask )
+CError<> Files::CFileEnumInfo::EnumFirstFile( const FilePath &path, const FilePath &mask )
 {
     if( _handle != INVALID_HANDLE_VALUE )
     {
@@ -612,7 +563,7 @@ bln Files::CFileEnumInfo::EnumFirstFile( const FilePath &path, const FilePath &m
     if( _handle == INVALID_HANDLE_VALUE )
     {
         *this = CFileEnumInfo();
-        return false;
+        return Error::UnknownError();
     }
 
     if( !::wcscmp( findData.cFileName, L"." ) )
@@ -620,14 +571,14 @@ bln Files::CFileEnumInfo::EnumFirstFile( const FilePath &path, const FilePath &m
         if( !::FindNextFileW( _handle, &findData ) )
         {
             *this = CFileEnumInfo();
-            return false;
+            return Error::UnknownError();
         }
         if( !::wcscmp( findData.cFileName, L".." ) )
         {
             if( !::FindNextFileW( _handle, &findData ) )
             {
                 *this = CFileEnumInfo();
-                return false;
+                return Error::UnknownError();
             }
         }
     }
@@ -646,10 +597,10 @@ bln Files::CFileEnumInfo::EnumFirstFile( const FilePath &path, const FilePath &m
         _fileSize = large_size.QuadPart;
     }
 
-    return true;
+    return Error::Ok();
 }
 
-bln Files::CFileEnumInfo::EnumNextFile()
+CError<> Files::CFileEnumInfo::EnumNextFile()
 {
     ASSUME( _handle != INVALID_HANDLE_VALUE );
 
@@ -657,7 +608,7 @@ bln Files::CFileEnumInfo::EnumNextFile()
     if( !::FindNextFileW( _handle, &findData ) )
     {
         *this = CFileEnumInfo();
-        return false;
+        return Error::UnknownError();
     }
 
 	_pnn = FilePath( FilePath::pathType( _pnn.PlatformPath(), _pathLen, findData.cFileName, ::wcslen( findData.cFileName ) ) );
@@ -674,15 +625,15 @@ bln Files::CFileEnumInfo::EnumNextFile()
         _fileSize = large_size.QuadPart;
     }
 
-    return true;
+    return Error::Ok();
 }
 
-bln Files::EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask )  //  friend of CFileEnumInfo
+CError<> Files::EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask )  //  friend of CFileEnumInfo
 {
     return info->EnumFirstFile( path, mask );
 }
 
-bln Files::EnumNextFile( CFileEnumInfo *info )  //  friend of CFileEnumInfo
+CError<> Files::EnumNextFile( CFileEnumInfo *info )  //  friend of CFileEnumInfo
 {
     return info->EnumNextFile();
 }

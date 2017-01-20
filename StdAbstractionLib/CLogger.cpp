@@ -28,13 +28,10 @@ namespace
 
 #define dis ((SLogger *)this)
 
-CLogger::CLogger()
-{}
-
 #if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG)
-NOINLINE void CLogger::_Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
+NOINLINE void CLogger::_Message( Tag tag, const char *cp_fmt, ... )
 #else
-NOINLINE void CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
+NOINLINE void CLogger::Message( Tag tag, const char *cp_fmt, ... )
 #endif
 {
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
@@ -51,7 +48,7 @@ NOINLINE void CLogger::Message( Tag::messageTag_t tag, const char *cp_fmt, ... )
 
 	MemoryStreamContainer < CStr > stream( &dis->_buffer );
 
-    uiw printedLen = Funcs::PrintToMemoryStreamArgList( &stream, cp_fmt, args );
+    uiw printedLen = Funcs::PrintToMemoryStreamArgList( stream, cp_fmt, args );
 
     va_end( args );
 

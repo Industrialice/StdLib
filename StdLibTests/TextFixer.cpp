@@ -24,7 +24,7 @@ static void MakeFixes( const wchar_t *pnn, TextFixerMode::mode_t fixMode )
         return;
     }
 
-    uiw size = file.SizeGet();
+    uiw size = file.SizeGet().UnwrapOrGet( 0 );
     if( size == 0 )
     {
         ::printf( "%s is zero sized\n", narrowPnn );
@@ -32,8 +32,8 @@ static void MakeFixes( const wchar_t *pnn, TextFixerMode::mode_t fixMode )
     }
 
     const uiw originalSize = size;
-    UniquePtr < char[] > bufDel( new char[ size ] );
-    char *buf = bufDel;
+    std::unique_ptr < char[] > bufDel( new char[ size ] );
+    char *buf = bufDel.get();
     char *bufEnd = buf + size;
     CStr to;
 
@@ -321,7 +321,7 @@ void Fix( TextFixerMode::mode_t fixMode )
 
     for( uiw index = 0; index < extNum.Size(); ++index )
     {
-        for( bln result = Files::EnumFirstFile( &info, wbuf, extNum[ index ].Data() ); result; result = Files::EnumNextFile( &info ) )
+        for( bln result = Files::EnumFirstFile( &info, wbuf, extNum[ index ].Data() ).Ok(); result; result = Files::EnumNextFile( &info ).Ok() )
         {
             if( !info.IsFolder() )
             {

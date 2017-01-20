@@ -6,8 +6,6 @@
 
 template < typename X > NOINLINE uiw NormalizeMem( X val, char *buf )
 {
-	ASSUME( buf );
-
 	f64 normalizedValue;
 	const char *execStr;
 
@@ -112,7 +110,6 @@ bln Funcs::IsChrEqualWOR( char one, char two )
 
 bln Funcs::IsStrHex( const char *cp_str, uiw maxLen /* = uiw_max */ )
 {
-    ASSUME( cp_str );
     if( maxLen < 3 || !Funcs::IsHexBase( cp_str ) || !cp_str[ 2 ] )
     {
         return false;
@@ -136,7 +133,6 @@ bln Funcs::IsStrHex( const char *cp_str, uiw maxLen /* = uiw_max */ )
 
 bln Funcs::IsStrBin( const char *cp_str, uiw maxLen /* = uiw_max */ )
 {
-    ASSUME( cp_str );
     if( maxLen < 3 || !Funcs::IsBinBase( cp_str ) || !cp_str[ 2 ] )
     {
         return false;
@@ -160,7 +156,6 @@ bln Funcs::IsStrBin( const char *cp_str, uiw maxLen /* = uiw_max */ )
 
 bln Funcs::IsStrFP( const char *cp_str, uiw maxLen /* = uiw_max */ )
 {
-    ASSUME( cp_str );
     if( !maxLen )
     {
         return false;
@@ -219,7 +214,6 @@ bln Funcs::IsStrFP( const char *cp_str, uiw maxLen /* = uiw_max */ )
 
 bln Funcs::IsStrDec( const char *cp_str, uiw maxLen /* = uiw_max */ )
 {
-    ASSUME( cp_str );
     if( !maxLen || !*cp_str )
     {
         return false;
@@ -242,7 +236,6 @@ bln Funcs::IsStrDec( const char *cp_str, uiw maxLen /* = uiw_max */ )
 
 uiw Funcs::StrToLower( char *RSTR p_dest, const char *cp_source )
 {
-    ASSUME( p_dest && cp_source );
     uiw cpy = 0;
     while( *cp_source )
     {
@@ -255,7 +248,6 @@ uiw Funcs::StrToLower( char *RSTR p_dest, const char *cp_source )
 
 uiw Funcs::StrToLowerAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( p_dest && cp_source );
     uiw cpy = 0;
     while( cpy < maxLen && *cp_source && *cp_source != aes )
     {
@@ -268,7 +260,6 @@ uiw Funcs::StrToLowerAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /
 
 uiw Funcs::StrToLowerInplace( char *p_str )
 {
-    ASSUME( p_str );
     uiw cpy = 0;
     while( *p_str )
     {
@@ -281,7 +272,6 @@ uiw Funcs::StrToLowerInplace( char *p_str )
 
 uiw Funcs::StrToLowerInplaceAdv( char *p_str, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( p_str );
     uiw cpy = 0;
     while( cpy < maxLen && *p_str && *p_str != aes )
     {
@@ -294,7 +284,6 @@ uiw Funcs::StrToLowerInplaceAdv( char *p_str, uiw maxLen /* = uiw_max */, char a
 
 uiw Funcs::StrToUpper( char *RSTR p_dest, const char *cp_source )
 {
-    ASSUME( p_dest && cp_source );
     uiw cpy = 0;
     while( *cp_source )
     {
@@ -307,7 +296,6 @@ uiw Funcs::StrToUpper( char *RSTR p_dest, const char *cp_source )
 
 uiw Funcs::StrToUpperAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( p_dest && cp_source );
     uiw cpy = 0;
     while( cpy < maxLen && *cp_source && *cp_source != aes )
     {
@@ -320,7 +308,6 @@ uiw Funcs::StrToUpperAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /
 
 uiw Funcs::StrToUpperInplace( char *p_str )
 {
-    ASSUME( p_str );
     uiw cpy = 0;
     while( *p_str )
     {
@@ -333,7 +320,6 @@ uiw Funcs::StrToUpperInplace( char *p_str )
 
 uiw Funcs::StrToUpperInplaceAdv( char *p_str, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( p_str );
     uiw cpy = 0;
     while( cpy < maxLen && *p_str && *p_str != aes )
     {
@@ -346,7 +332,6 @@ uiw Funcs::StrToUpperInplaceAdv( char *p_str, uiw maxLen /* = uiw_max */, char a
 
 bln Funcs::StrEqual( const char *cp_one, const char *cp_two )
 {
-    ASSUME( cp_one && cp_two );
     uiw cpy = 0;
     while( *cp_one && *cp_two )
     {
@@ -361,7 +346,6 @@ bln Funcs::StrEqual( const char *cp_one, const char *cp_two )
 
 bln Funcs::StrEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_one && cp_two );
     uiw cpy = 0;
     while( cpy < maxLen && cp_one && *cp_two && *cp_one != aes && *cp_two != aes )
     {
@@ -380,7 +364,6 @@ bln Funcs::StrEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen /* = 
 
 bln Funcs::StrNEqual( const char *cp_one, const char *cp_two, uiw count )
 {
-    ASSUME( cp_one && cp_two );
     for( ; count && *cp_two; --count )
     {
         if( *cp_one != *cp_two )
@@ -396,7 +379,6 @@ bln Funcs::StrNEqual( const char *cp_one, const char *cp_two, uiw count )
 
 bln Funcs::StrNEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes /* = '\0' */ )
 {
-    ASSUME( cp_one && cp_two );
     for( ; count && *cp_two && *cp_two != aes; --count )
     {
         if( *cp_one != *cp_two )
@@ -412,7 +394,6 @@ bln Funcs::StrNEqualAdv( const char *cp_one, const char *cp_two, uiw count, char
 
 bln Funcs::StrIEqual( const char *cp_one, const char *cp_two )
 {
-    ASSUME( cp_one && cp_two );
     while( *cp_one && *cp_two )
     {
         if( !Funcs::IsChrEqualWOR( *cp_one, *cp_two ) )
@@ -428,7 +409,6 @@ bln Funcs::StrIEqual( const char *cp_one, const char *cp_two )
 
 bln Funcs::StrIEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes /* = '\0' */ )
 {
-    ASSUME( cp_one && cp_two );
     while( *cp_one && *cp_two && *cp_one != aes && *cp_two != aes )
     {
         if( !Funcs::IsChrEqualWOR( *cp_one, *cp_two ) )
@@ -444,7 +424,6 @@ bln Funcs::StrIEqualAdv( const char *cp_one, const char *cp_two, uiw count, char
 
 bln Funcs::StrINEqual( const char *cp_one, const char *cp_two, uiw count )
 {
-    ASSUME( cp_one && cp_two );
     for( ; count && *cp_two; --count )
     {
         if( !Funcs::IsChrEqualWOR( *cp_one, *cp_two ) )
@@ -460,7 +439,6 @@ bln Funcs::StrINEqual( const char *cp_one, const char *cp_two, uiw count )
 
 bln Funcs::StrINEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes /* = '\0' */ )
 {
-    ASSUME( cp_one && cp_two );
     for( ; count && *cp_two && *cp_two != aes; --count )
     {
         if( !Funcs::IsChrEqualWOR( *cp_one, *cp_two ) )
@@ -476,7 +454,6 @@ bln Funcs::StrINEqualAdv( const char *cp_one, const char *cp_two, uiw count, cha
 
 uiw Funcs::StrLen( const char *cp_str )
 {
-    ASSUME( cp_str );
     uiw len = 0;
     while( *cp_str )
     {
@@ -488,7 +465,6 @@ uiw Funcs::StrLen( const char *cp_str )
 
 uiw Funcs::StrLenAdv( const char *cp_str, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_str );
     uiw len = 0;
     while( len < maxLen && *cp_str && *cp_str != aes )
     {
@@ -500,7 +476,6 @@ uiw Funcs::StrLenAdv( const char *cp_str, uiw maxLen /* = uiw_max */, char aes /
 
 void Funcs::StrCat( char *RSTR p_dest, const char *cp_source )
 {
-    ASSUME( p_dest && cp_source );
     while( *p_dest )
     {
         ++p_dest;
@@ -514,7 +489,6 @@ void Funcs::StrCat( char *RSTR p_dest, const char *cp_source )
 
 uiw Funcs::StrCatAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = uiw_max */, char aesDest /* = '\0' */, char aesSrc /* = '\0' */ )
 {
-    ASSUME( p_dest && cp_source );
     while( *p_dest && *p_dest != aesDest )
     {
         ++p_dest;
@@ -530,7 +504,6 @@ uiw Funcs::StrCatAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = 
 
 void Funcs::StrCpy( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate )
 {
-    ASSUME( p_dest && cp_source );
     while( *cp_source )
     {
         *p_dest++ = *cp_source++;
@@ -543,7 +516,6 @@ void Funcs::StrCpy( char *RSTR p_dest, const char *cp_source, bln is_nullTermina
 
 uiw Funcs::StrCpyAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( p_dest && cp_source );
     uiw cpy = 0;
     while( cpy < maxLen && *cp_source && *cp_source != aes )
     {
@@ -559,7 +531,6 @@ uiw Funcs::StrCpyAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTermi
 
 uiw Funcs::StrCpyAndCount( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate )
 {
-    ASSUME( p_dest && cp_source );
     const char *cp_sourceStore = cp_source;
 
     while( *cp_source )
@@ -575,7 +546,6 @@ uiw Funcs::StrCpyAndCount( char *RSTR p_dest, const char *cp_source, bln is_null
 
 uiw Funcs::StrCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( p_dest && cp_source );
     uiw cpy = 0;
     while( cpy < maxLen && *cp_source && *cp_source != aes )
     {
@@ -591,7 +561,6 @@ uiw Funcs::StrCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, bln is_n
 
 uiw Funcs::StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw maxLen, bln is_nullTerminate )
 {
-    ASSUME( p_dest && cp_source );
     uiw index = 0;
     while( index < maxLen && *cp_source )
     {
@@ -607,7 +576,6 @@ uiw Funcs::StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw max
 
 uiw Funcs::StrSafeCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen, bln is_nullTerminate, char aes /* = '\0' */ )
 {
-    ASSUME( p_dest && cp_source );
     uiw index = 0;
     while( index < maxLen && *cp_source && *cp_source != aes )
     {
@@ -623,7 +591,6 @@ uiw Funcs::StrSafeCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, uiw 
 
 NOINLINE uiw Funcs::StrDelim( char **pp_output, char *p_source, char delim )
 {
-    ASSUME( p_source );
     uiw count = 0;
     char *p_search;
     for( ; ; )
@@ -650,14 +617,12 @@ NOINLINE uiw Funcs::StrDelim( char **pp_output, char *p_source, char delim )
 
 uiw Funcs::StrDelimConst( char **pp_output, const char *cp_source, char delim )
 {
-    ASSUME( cp_source );
 	NOT_IMPLEMENTED;
     return 0;
 }
 
 char *Funcs::StrChr( const char *cp_source, char symbol )
 {
-    ASSUME( cp_source );
     for( ; *cp_source; ++cp_source )
     {
         if( *cp_source == symbol )
@@ -670,7 +635,6 @@ char *Funcs::StrChr( const char *cp_source, char symbol )
 
 char *Funcs::StrChrAdv( const char *cp_source, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source );
     for( ; count && *cp_source && *cp_source != aes; ++cp_source, --count )
     {
         if( *cp_source == symbol )
@@ -683,7 +647,6 @@ char *Funcs::StrChrAdv( const char *cp_source, char symbol, uiw count /* = uiw_m
 
 char *Funcs::StrNotChr( const char *cp_source, char symbol )
 {
-    ASSUME( cp_source );
     for( ; *cp_source; ++cp_source )
     {
         if( *cp_source != symbol )
@@ -696,7 +659,6 @@ char *Funcs::StrNotChr( const char *cp_source, char symbol )
 
 char *Funcs::StrNotChrAdv( const char *cp_source, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source );
     for( ; count && *cp_source && *cp_source != aes; ++cp_source, --count )
     {
         if( *cp_source != symbol )
@@ -709,7 +671,6 @@ char *Funcs::StrNotChrAdv( const char *cp_source, char symbol, uiw count /* = ui
 
 char *Funcs::StrChrs( const char *cp_source, const char *cp_chars )
 {
-    ASSUME( cp_source && cp_chars );
     for( ; *cp_source; ++cp_source )
     {
         const char *cp_charsIt = cp_chars;
@@ -726,7 +687,6 @@ char *Funcs::StrChrs( const char *cp_source, const char *cp_chars )
 
 char *Funcs::StrChrsAdv( const char *cp_source, const char *cp_chars, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source && cp_chars );
     for( ; count && *cp_source && *cp_source != aes; ++cp_source, --count )
     {
         const char *cp_charsIt = cp_chars;
@@ -743,7 +703,6 @@ char *Funcs::StrChrsAdv( const char *cp_source, const char *cp_chars, uiw count 
 
 char *Funcs::StrNotChrs( const char *cp_source, const char *cp_chars )
 {
-    ASSUME( cp_source && cp_chars );
     for( ; *cp_source; ++cp_source )
     {
         const char *cp_charsIt = cp_chars;
@@ -762,7 +721,6 @@ char *Funcs::StrNotChrs( const char *cp_source, const char *cp_chars )
 
 char *Funcs::StrNotChrsAdv( const char *cp_source, const char *cp_chars, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source && cp_chars );
     for( ; count && *cp_source && *cp_source != aes; ++cp_source, --count )
     {
         const char *cp_charsIt = cp_chars;
@@ -781,7 +739,6 @@ char *Funcs::StrNotChrsAdv( const char *cp_source, const char *cp_chars, uiw cou
 
 char *Funcs::StrIChr( const char *cp_source, char symbol )
 {
-    ASSUME( cp_source );
     symbol = ChrToLower( symbol );
     for( ; *cp_source; ++cp_source )
     {
@@ -795,7 +752,6 @@ char *Funcs::StrIChr( const char *cp_source, char symbol )
 
 char *Funcs::StrIChrAdv( const char *cp_source, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source );
     symbol = ChrToLower( symbol );
     for( ; count && *cp_source && *cp_source != aes; --count, ++cp_source )
     {
@@ -809,7 +765,6 @@ char *Funcs::StrIChrAdv( const char *cp_source, char symbol, uiw count /* = uiw_
 
 char *Funcs::StrINotChr( const char *cp_source, char symbol )
 {
-    ASSUME( cp_source );
     symbol = ChrToLower( symbol );
     for( ; *cp_source; ++cp_source )
     {
@@ -823,7 +778,6 @@ char *Funcs::StrINotChr( const char *cp_source, char symbol )
 
 char *Funcs::StrINotChrAdv( const char *cp_source, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source );
     symbol = ChrToLower( symbol );
     for( ; count && *cp_source && *cp_source != aes; --count, ++cp_source )
     {
@@ -837,7 +791,6 @@ char *Funcs::StrINotChrAdv( const char *cp_source, char symbol, uiw count /* = u
 
 char *Funcs::StrIChrs( const char *cp_source, const char *cp_chars )
 {
-    ASSUME( cp_source && cp_chars );
     for( ; *cp_source; ++cp_source )
     {
         const char *cp_charsIt = cp_chars;
@@ -856,7 +809,6 @@ char *Funcs::StrIChrs( const char *cp_source, const char *cp_chars )
 
 char *Funcs::StrIChrsAdv( const char *cp_source, const char *cp_chars, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source && cp_chars );
     for( ; count && *cp_source && *cp_source != aes; --count, ++cp_source )
     {
         const char *cp_charsIt = cp_chars;
@@ -875,7 +827,6 @@ char *Funcs::StrIChrsAdv( const char *cp_source, const char *cp_chars, uiw count
 
 char *Funcs::StrINotChrs( const char *cp_source, const char *cp_chars )
 {
-    ASSUME( cp_source && cp_chars );
     for( ; *cp_source; ++cp_source )
     {
         const char *cp_charsIt = cp_chars;
@@ -896,7 +847,6 @@ char *Funcs::StrINotChrs( const char *cp_source, const char *cp_chars )
 
 char *Funcs::StrINotChrsAdv( const char *cp_source, const char *cp_chars, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source && cp_chars );
     for( ; count && *cp_source && *cp_source != aes; --count, ++cp_source )
     {
         const char *cp_charsIt = cp_chars;
@@ -917,7 +867,6 @@ char *Funcs::StrINotChrsAdv( const char *cp_source, const char *cp_chars, uiw co
 
 char *Funcs::StrChrMask( const char *cp_source, char mask, char symbol )
 {
-    ASSUME( cp_source );
     while( *cp_source )
     {
         if( *cp_source == mask )
@@ -942,7 +891,6 @@ char *Funcs::StrChrMask( const char *cp_source, char mask, char symbol )
 
 char *Funcs::StrChrMaskAdv( const char *cp_source, char mask, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source );
     while( count && *cp_source && *cp_source != aes )
     {
         if( *cp_source == mask )
@@ -969,7 +917,6 @@ char *Funcs::StrChrMaskAdv( const char *cp_source, char mask, char symbol, uiw c
 
 char *Funcs::StrIChrMask( const char *cp_source, char mask, char symbol )
 {
-    ASSUME( cp_source );
     symbol = ChrToLower( symbol );
     while( *cp_source )
     {
@@ -995,7 +942,6 @@ char *Funcs::StrIChrMask( const char *cp_source, char mask, char symbol )
 
 char *Funcs::StrIChrMaskAdv( const char *cp_source, char mask, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source );
     symbol = ChrToLower( symbol );
     while( count && *cp_source && *cp_source != aes )
     {
@@ -1023,13 +969,11 @@ char *Funcs::StrIChrMaskAdv( const char *cp_source, char mask, char symbol, uiw 
 
 char *Funcs::StrStr( const char *cp_source, const char *cp_under )
 {
-    ASSUME( cp_source && cp_under );
     return (char *)::strstr( cp_source, cp_under );
 }
 
 char *Funcs::StrStrAdv( const char *cp_source, const char *cp_under, uiw countSrc /* = uiw_max */, uiw countUnder /* = uiw_max */, char aesSrc /* = '\0' */, char aesUnder /* = '\0' */ )
 {
-    ASSUME( cp_source && cp_under );
     for( ; countSrc; --countSrc, ++cp_source )
     {
         uiw countUnderLeft = countUnder;
@@ -1053,7 +997,6 @@ char *Funcs::StrStrAdv( const char *cp_source, const char *cp_under, uiw countSr
 
 char *Funcs::StrIStr( const char *cp_source, const char *cp_under )
 {
-    ASSUME( cp_source && cp_under );
     for( ; ; ++cp_source )
     {
         for( const char *cp_sourceTest = cp_source, *cp_underTest = cp_under; ; ++cp_sourceTest, ++cp_underTest )
@@ -1077,7 +1020,6 @@ char *Funcs::StrIStr( const char *cp_source, const char *cp_under )
 
 char *Funcs::StrIStrAdv( const char *cp_source, const char *cp_under, uiw countSrc /* = uiw_max */, uiw countUnder /* = uiw_max */, char aesSrc /* = '\0' */, char aesUnder /* = '\0' */ )
 {
-    ASSUME( cp_source && cp_under );
     for( ; countSrc; --countSrc, ++cp_source )
     {
         uiw countUnderLeft = countUnder;
@@ -1101,7 +1043,6 @@ char *Funcs::StrIStrAdv( const char *cp_source, const char *cp_under, uiw countS
 
 NOINLINE bln Funcs::IsStrIsFromThisSymbols( const char *cp_str, const char *cp_symbols )
 {
-    ASSUME( cp_str && cp_symbols );
     if( !*cp_symbols )
     {
         return !*cp_str;
@@ -1126,7 +1067,6 @@ NOINLINE bln Funcs::IsStrIsFromThisSymbols( const char *cp_str, const char *cp_s
 
 NOINLINE bln Funcs::IsStrIsFromThisSymbol( const char *cp_str, char symbol, uiw count /* = uiw_max */ )
 {
-    ASSUME( cp_str );
     bln is_from = false;
     while( count && *cp_str )
     {
@@ -1142,7 +1082,6 @@ NOINLINE bln Funcs::IsStrIsFromThisSymbol( const char *cp_str, char symbol, uiw 
 
 NOINLINE bln Funcs::IsStrMatch( const char *cp_str, ChrTestFunc func )
 {
-    ASSUME( cp_str && func );
     bln is_match = false;
     while( *cp_str )
     {
@@ -1158,7 +1097,6 @@ NOINLINE bln Funcs::IsStrMatch( const char *cp_str, ChrTestFunc func )
 
 NOINLINE bln Funcs::IsStrMatchAdv( const char *cp_str, ChrTestFunc func, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_str && func );
     bln is_match = false;
     while( count && *cp_str && *cp_str != aes )
     {
@@ -1175,7 +1113,6 @@ NOINLINE bln Funcs::IsStrMatchAdv( const char *cp_str, ChrTestFunc func, uiw cou
 
 uiw Funcs::StrExclude( char *RSTR p_target, const char *cp_source, char symbol )
 {
-    ASSUME( cp_source );
     uiw len = 0;
     while( *cp_source )
     {
@@ -1198,7 +1135,6 @@ uiw Funcs::StrExclude( char *RSTR p_target, const char *cp_source, char symbol )
 
 uiw Funcs::StrExcludeAdv( char *RSTR p_target, const char *cp_source, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source );
     uiw len = 0;
     while( count && *cp_source && *cp_source != aes )
     {
@@ -1222,7 +1158,6 @@ uiw Funcs::StrExcludeAdv( char *RSTR p_target, const char *cp_source, char symbo
 
 uiw Funcs::StrExcludeMask( char *RSTR p_target, const char *cp_source, char mask, char symbol )
 {
-    ASSUME( cp_source );
     uiw len = 0;
     bln is_masked = false;
     for( ; *cp_source; ++cp_source )
@@ -1251,7 +1186,6 @@ uiw Funcs::StrExcludeMask( char *RSTR p_target, const char *cp_source, char mask
 
 uiw Funcs::StrExcludeMaskAdv( char *RSTR p_target, const char *cp_source, char mask, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( cp_source );
     uiw len = 0;
     bln is_masked = false;
     for( ; count && *cp_source && *cp_source != aes; ++cp_source, --count )
@@ -1280,7 +1214,6 @@ uiw Funcs::StrExcludeMaskAdv( char *RSTR p_target, const char *cp_source, char m
 
 uiw Funcs::StrExcludeInplace( char *const p_str, char symbol )
 {
-    ASSUME( p_str );
     char *p_target = p_str, *p_source = p_str;
     for( ; *p_source; ++p_source )
     {
@@ -1295,7 +1228,6 @@ uiw Funcs::StrExcludeInplace( char *const p_str, char symbol )
 
 uiw Funcs::StrExcludeInplaceAdv( char *const p_str, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( p_str );
     char *p_target = p_str, *p_source = p_str;
     for( ; count && *p_source && *p_source != aes; ++p_source, --count )
     {
@@ -1310,7 +1242,6 @@ uiw Funcs::StrExcludeInplaceAdv( char *const p_str, char symbol, uiw count /* = 
 
 uiw Funcs::StrExcludeMaskInplace( char *p_str, char mask, char symbol )
 {
-    ASSUME( p_str );
     char *p_target = p_str, *p_source = p_str;
     bln is_masked = false;
     for( ; *p_source; ++p_source )
@@ -1332,7 +1263,6 @@ uiw Funcs::StrExcludeMaskInplace( char *p_str, char mask, char symbol )
 
 uiw Funcs::StrExcludeMaskInplaceAdv( char *p_str, char mask, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    ASSUME( p_str );
     char *p_target = p_str, *p_source = p_str;
     bln is_masked = false;
     for( ; count && *p_source && *p_source != aes; ++p_source, --count )
@@ -1353,9 +1283,9 @@ uiw Funcs::StrExcludeMaskInplaceAdv( char *p_str, char mask, char symbol, uiw co
 }
 
 //  *p_value is not changed if no suitable conversion possible TODO: add cp_str capacity info
-template < typename X > NOINLINE bln StrDecToIntQuest( const char *cp_str, X *p_value, uiw count = uiw_max, char aes = '\0' )
+template < typename X > NOINLINE Nullable < X > StrDecToIntQuest( const char *cp_str, uiw count = uiw_max, char aes = '\0' )
 {
-    ASSUME( cp_str && p_value );
+	X value;
     bln is_minus = *cp_str == '-';
     cp_str += is_minus || *cp_str == '+';
     uiw len = Funcs::StrLenAdv( cp_str, count, aes );
@@ -1371,12 +1301,12 @@ template < typename X > NOINLINE bln StrDecToIntQuest( const char *cp_str, X *p_
             {
                 break;
             }*/
-            return false;
+            return nullptr;
         }
         uval += (cp_str[ count ] - '0') * mult;
         if( uval < uvalLast )
         {
-            return false;
+            return nullptr;
         }
         uvalLast = uval;
         mult *= 10;
@@ -1388,42 +1318,38 @@ template < typename X > NOINLINE bln StrDecToIntQuest( const char *cp_str, X *p_
         {
             if( uval > allowedMax + 1 )
             {
-                return false;
+                return nullptr;
             }
             else
             {
                 --uval;
-                *p_value = (-(X)uval) - 1;
+                value = (-(X)uval) - 1;
             }
         }
         else
         {
-            *p_value = -(X)uval;
+            value = -(X)uval;
         }
     }
     else
     {
         if( uval > allowedMax )
         {
-            return false;
+            return nullptr;
         }
-        *p_value = (X)uval;
+        value = (X)uval;
     }
-    return true;
+    return value;
 }
 
 template < typename X > X StrDecToInt( const char *cp_str, uiw count = uiw_max, char aes = '\0' )
 {
-    ASSUME( cp_str );
-    X value = 0;
-    StrDecToIntQuest( cp_str, &value, count, aes );
-    return value;
+    return StrDecToIntQuest < X >( cp_str, count, aes ).Get();
 }
 
 //  *p_value is not changed if no suitable conversion possible TODO: add cp_str capacity info
-template < typename X > NOINLINE bln StrDecToUIntQuest( const char *cp_str, X *p_value, uiw count = uiw_max, char aes = '\0' )
+template < typename X > NOINLINE Nullable < X > StrDecToUIntQuest( const char *cp_str, uiw count = uiw_max, char aes = '\0' )
 {
-    ASSUME( cp_str && p_value );
     uiw len = Funcs::StrLenAdv( cp_str, count, aes );
     X val = 0;
     X mult = 1;
@@ -1436,51 +1362,47 @@ template < typename X > NOINLINE bln StrDecToUIntQuest( const char *cp_str, X *p
             {
                 break;
             }*/
-            return false;
+            return nullptr;
         }
         val += (cp_str[ count ] - '0') * mult;
         mult *= 10;
     }
-    *p_value = val;
-    return true;
+	return val;
 }
 
 template < typename X > X StrDecToUInt( const char *cp_str, uiw count = uiw_max, char aes = '\0' )
 {
-    ASSUME( cp_str );
-    X value = 0;
-    StrDecToUIntQuest( cp_str, &value, count, aes );
-    return value;
+    return StrDecToUIntQuest < X >( cp_str, count, aes ).Get();
 }
 
-bln Funcs::StrDecToI32Quest( const char *cp_str, i32 *p_value, uiw count /* = uiw_max */, char aes /* = '\0' */ )
+Nullable < i32 > Funcs::StrDecToI32Quest( const char *cp_str, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    return StrDecToIntQuest( cp_str, p_value, count, aes );
+    return StrDecToIntQuest < i32 >( cp_str, count, aes );
 }
 
-bln Funcs::StrDecToUI32Quest( const char *cp_str, ui32 *p_value, uiw count /* = uiw_max */, char aes /* = '\0' */ )
+Nullable < ui32 > Funcs::StrDecToUI32Quest( const char *cp_str, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    return StrDecToUIntQuest( cp_str, p_value, count, aes );
+    return StrDecToUIntQuest < ui32 >( cp_str, count, aes );
 }
 
-bln Funcs::StrDecToI64Quest( const char *cp_str, i64 *p_value, uiw count /* = uiw_max */, char aes /* = '\0' */ )
+Nullable < i64 > Funcs::StrDecToI64Quest( const char *cp_str, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    return StrDecToIntQuest( cp_str, p_value, count, aes );
+    return StrDecToIntQuest < i64 >( cp_str, count, aes );
 }
 
-bln Funcs::StrDecToUI64Quest( const char *cp_str, ui64 *p_value, uiw count /* = uiw_max */, char aes /* = '\0' */ )
+Nullable < ui64 > Funcs::StrDecToUI64Quest( const char *cp_str, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    return StrDecToUIntQuest( cp_str, p_value, count, aes );
+    return StrDecToUIntQuest < ui64 >( cp_str, count, aes );
 }
 
-bln Funcs::StrDecToIWQuest( const char *cp_str, iw *p_value, uiw count /* = uiw_max */, char aes /* = '\0' */ )
+Nullable < iw > Funcs::StrDecToIWQuest( const char *cp_str, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    return StrDecToIntQuest( cp_str, p_value, count, aes );
+    return StrDecToIntQuest < iw >( cp_str, count, aes );
 }
 
-bln Funcs::StrDecToUIWQuest( const char *cp_str, uiw *p_value, uiw count /* = uiw_max */, char aes /* = '\0' */ )
+Nullable < uiw > Funcs::StrDecToUIWQuest( const char *cp_str, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    return StrDecToUIntQuest( cp_str, p_value, count, aes );
+    return StrDecToUIntQuest < uiw >( cp_str, count, aes );
 }
 
 NOINLINE i32 Funcs::StrDecToI32( const char *cp_str, uiw count /* = uiw_max */, char aes /* = '\0' */ )
@@ -1515,37 +1437,31 @@ uiw Funcs::StrDecToUIW( const char *cp_str, uiw count /* = uiw_max */, char aes 
 
 f32 Funcs::StrToF32( const char *cp_str )
 {
-    ASSUME( cp_str );
     return (f32)::atof( cp_str );
 }
 
 f64 Funcs::StrToF64( const char *cp_str )
 {
-    ASSUME( cp_str );
     return ::atof( cp_str );
 }
 
 bln Funcs::IsHexBase( const char *cp_str )
 {
-    ASSUME( cp_str );
     return cp_str[ 0 ] == '0' && (cp_str[ 1 ] == 'x' || cp_str[ 1 ] == 'X');
 }
 
 bln Funcs::IsOctBase( const char *cp_str )
 {
-    ASSUME( cp_str );
     return cp_str[ 0 ] == '0' && (cp_str[ 1 ] == 'z' || cp_str[ 1 ] == 'Z');
 }
 
 bln Funcs::IsBinBase( const char *cp_str )
 {
-    ASSUME( cp_str );
     return cp_str[ 0 ] == '0' && (cp_str[ 1 ] == 'b' || cp_str[ 1 ] == 'B');
 }
 
 template < typename ft > uiw FloatToStr( ft val, char *p_buf, uiw precise, bln is_cutToShortest )  //  TODO: this code is fail
 {
-	ASSUME( p_buf );
 /*#ifdef _MSC_VER
 	char *result = ::_gcvt( val, 31, p_buf );
 	ASSUME( result == p_buf );
@@ -1666,7 +1582,6 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ParserParam 
     ASSUME( cp_fmt && p_ch && param );
 
 	param->SetAbsent();
-	ui32 intParam;
 	*is_extra = false;
 
     if( *cp_fmt == '[' )
@@ -1695,9 +1610,10 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ParserParam 
             if( cp_end - cp_fmt > 2 && Funcs::IsHexBase( cp_fmt ) )
             {
                 cp_fmt += 2;
-                if( Funcs::StrHexToIntQuest( cp_fmt, &intParam, cp_end - cp_fmt ) )
+				auto conversionResult = Funcs::StrHexToIntQuest < ui32 >( cp_fmt, cp_end - cp_fmt );
+                if( false == conversionResult.IsNull() )
 				{
-					param->SetParam( intParam );
+					param->SetParam( conversionResult.Get() );
 				}
 				else
                 {
@@ -1707,9 +1623,10 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ParserParam 
             }
             else
             {
-                if( Funcs::StrDecToUI32Quest( cp_fmt, &intParam, cp_end - cp_fmt ) )
+				auto conversionResult = Funcs::StrDecToUI32Quest( cp_fmt, cp_end - cp_fmt );
+                if( false == conversionResult.IsNull() )
 				{
-					param->SetParam( intParam );
+					param->SetParam( conversionResult.Get() );
 				}
 				else
                 {
@@ -1866,29 +1783,29 @@ template < bln is_validateStep > inline Nullable < uiw > PrintToStrArgListImpl( 
     ALIGNED_PRE( 8 ) ui64 argumentData ALIGNED_POST( 8 );
 
     #define LOAD_ARG( expectedType, target ) \
-        if( is_validateStep && argIndex >= argsCount ) { HARDBREAK; return nullv; } \
+        if( is_validateStep && argIndex >= argsCount ) { HARDBREAK; return nullptr; } \
         if( expectedType.is_fp ) \
         { \
 			ASSUME( sizeof(target) >= 8 ); \
-            if( is_validateStep && (!argTypes[ argIndex ].is_fp || argTypes[ argIndex ].is_pointer) ) { HARDBREAK; return nullv; } \
+            if( is_validateStep && (!argTypes[ argIndex ].is_fp || argTypes[ argIndex ].is_pointer) ) { HARDBREAK; return nullptr; } \
             *(f64 *)&target = va_arg( args, f64 ); \
         } \
         else if( expectedType.size == 4 ) \
         { \
 			ASSUME( sizeof(target) >= 4 ); \
-            if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size) || argTypes[ argIndex ].size > 4) ) { HARDBREAK; return nullv; } \
+            if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size) || argTypes[ argIndex ].size > 4) ) { HARDBREAK; return nullptr; } \
             *(ui32 *)&target = va_arg( args, ui32 ); \
         } \
         else if( expectedType.size == 8 ) \
         { \
 			ASSUME( sizeof(target) >= 8 ); \
-            if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size) || argTypes[ argIndex ].size > 8) ) { HARDBREAK; return nullv; } \
+            if( is_validateStep && ((expectedType.is_string && !argTypes[ argIndex ].is_string) || (expectedType.size > argTypes[ argIndex ].size) || argTypes[ argIndex ].size > 8) ) { HARDBREAK; return nullptr; } \
             *(ui64 *)&target = va_arg( args, ui64 ); \
         } \
         else \
         { \
             HARDBREAK; \
-            return nullv; \
+            return nullptr; \
         } \
         if( is_validateStep ) ++argIndex;
 
@@ -1905,7 +1822,7 @@ template < bln is_validateStep > inline Nullable < uiw > PrintToStrArgListImpl( 
 					if( !file->Write( cp_fmtFlushed, cp_lastFmt - cp_fmtFlushed ) )
 					{
 						SOFTBREAK;
-						return nullv;
+						return nullptr;
 					}
 					appendedLen += cp_lastFmt - cp_fmtFlushed;
 				}
@@ -1939,7 +1856,7 @@ template < bln is_validateStep > inline Nullable < uiw > PrintToStrArgListImpl( 
                         SOFTBREAK;
 						if( is_validateStep )
 						{
-							return nullv;
+							return nullptr;
 						}
 						file->Write( dbgStr, _StrLen( dbgStr ) );
                         return appendedLen + _StrLen( dbgStr );
@@ -1968,7 +1885,7 @@ template < bln is_validateStep > inline Nullable < uiw > PrintToStrArgListImpl( 
     if( is_validateStep && argIndex != argsCount )
     {
         HARDBREAK;
-        return nullv;
+        return nullptr;
     }
 
 	if( is_validateStep == false && cp_fmt > cp_fmtFlushed )
@@ -1976,7 +1893,7 @@ template < bln is_validateStep > inline Nullable < uiw > PrintToStrArgListImpl( 
 		if( !file->Write( cp_fmtFlushed, cp_fmt - cp_fmtFlushed ) )
 		{
 			SOFTBREAK;
-			return nullv;
+			return nullptr;
 		}
 		appendedLen += cp_fmt - cp_fmtFlushed;
 	}
@@ -1996,7 +1913,7 @@ uiw Funcs::PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_li
 
 	MemoryStreamFixedExt stream( p_str, maxLen, 0 );
 
-	FileMemoryStream file( &stream, FileProcMode::Write );
+	FileMemoryStream file( stream, FileProcMode::Write );
 	ASSUME( file.IsOpened() );
 
     Nullable < uiw > written = PrintToStrArgListImpl < false >( 0, 0, cp_fmt, args, &file );
@@ -2013,23 +1930,23 @@ uiw Funcs::PrintToStrArgList( char *p_str, uiw maxLen, const char *cp_fmt, va_li
     return actuallWritten;
 }
 
-uiw Funcs::PrintToMemoryStreamArgList( MemoryStreamInterface *stream, const char *cp_fmt, va_list args )
+uiw Funcs::PrintToMemoryStreamArgList( MemoryStreamInterface &stream, const char *cp_fmt, va_list args )
 {
-    ASSUME( stream && stream->IsWritable() && cp_fmt );
+    ASSUME( stream.IsWritable() && cp_fmt );
 
 	FileMemoryStream file( stream, FileProcMode::WriteAppend );
 	ASSUME( file.IsOpened() );
 
     Nullable < uiw > written = PrintToStrArgListImpl < false >( 0, 0, cp_fmt, args, &file );
 
-    return stream->Resize( written.IsNull() ? 0 : written.Get() );
+    return stream.Resize( written.IsNull() ? 0 : written.Get() );
 }
 
-uiw Funcs::PrintToFileArgList( FileInterface *file, const char *cp_fmt, va_list args )
+uiw Funcs::PrintToFileArgList( FileInterface &file, const char *cp_fmt, va_list args )
 {
-	ASSUME( file && file->IsOpened() && (file->ProcModeGet() & FileProcMode::Write) && cp_fmt );
+	ASSUME( file.IsOpened() && !!(file.ProcModeGet() & FileProcMode::Write) && cp_fmt );
 
-	return PrintToStrArgListImpl < false >( 0, 0, cp_fmt, args, file ).ValueOrDefault( 0 );
+	return PrintToStrArgListImpl < false >( 0, 0, cp_fmt, args, &file ).ValueOrDefault( 0 );
 }
 
 #if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG)

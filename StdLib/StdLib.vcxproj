@@ -295,7 +295,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4554;4172;</DisableSpecificWarnings>
       <TreatSpecificWarningsAsErrors>4715;</TreatSpecificWarningsAsErrors>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
@@ -354,11 +354,12 @@
     <ClInclude Include="PlatformTypes.hpp" />
     <ClInclude Include="PreHeader.hpp" />
     <ClInclude Include="RandomizingFuncs.hpp" />
+    <ClInclude Include="Result.hpp" />
     <ClInclude Include="RoundingFuncs.hpp" />
     <ClInclude Include="StdCoreLib.hpp" />
     <ClInclude Include="StringFuncs.hpp" />
     <ClInclude Include="TypeDesc.hpp" />
-    <ClInclude Include="UniquePtr.hpp" />
+    <ClInclude Include="deprecatedUniquePtr.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CF16.cpp" />

@@ -1,14 +1,23 @@
 #include "PreHeader.hpp"
 #include "StdHelperLib.hpp"
-#include "Misc.hpp"
+#include "VirtualMemory.hpp"
 #include "CMutex.hpp"
 #include "FileIO.hpp"
+#include "TimeMoment.hpp"
 
-struct MutexInitializer : public CMutex
+struct MutexInitializer : private CMutex
 {
 	static void Initialize()
 	{
 		CMutex::Initialize();
+	}
+};
+
+struct TimeMomentInitializer : private TimeMoment
+{
+	static void Initialize()
+	{
+		TimeMoment::Initialize();
 	}
 };
 
@@ -19,10 +28,17 @@ EXTERNALS void StdAbstractionLib_Initialize()
 	{
 		return;
 	}
+
+	void VirtualMemory_Initialize();
+	void FileIO_InitializeFileIOSystem();
+	void SystemInfo_Initialize();
+
     StdHelperLib_Initialize();
 	MutexInitializer::Initialize();
-	FileIO::Private::FileIO_InitializeFileIOSystem();
-    Misc::Private::Initialize();
+	TimeMomentInitializer::Initialize();
+	FileIO_InitializeFileIOSystem();
+    VirtualMemory_Initialize();
+	SystemInfo_Initialize();
 	is_initialized = true;
 }
 
@@ -33,7 +49,7 @@ BOOL WINAPI DllMain( HINSTANCE h_inst, DWORD reason, PVOID )
 	{
 	case DLL_PROCESS_ATTACH:
 	#if defined(_DLL)  //  dynamically linked CRT must define _DLL
-		::DisableThreadLibraryCalls( h_inst );  //  we can't call it if CRT was statically linked
+		::DisableThreadLibraryCalls( h_inst );  //  we can't call it if CRT has been statically linked
 	#endif
 		StdAbstractionLib_Initialize();
 		break;

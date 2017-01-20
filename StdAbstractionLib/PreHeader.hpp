@@ -1,3 +1,4 @@
+#include <memory>
 #include <StdHelperLib.hpp>
 #include "WinCEFuncs.hpp"
 
