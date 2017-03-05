@@ -10,7 +10,7 @@ namespace StdLib
       {
           struct LeftLess
           {
-              template < typename X > bln operator () ( const X &left, const X &right ) const
+              template < typename X > bool operator () ( const X &left, const X &right ) const
               {
                   return left < right;
               }
@@ -18,7 +18,7 @@ namespace StdLib
 
           struct LeftEqual
           {
-              template < typename X > bln operator () ( const X &left, const X &right ) const
+              template < typename X > bool operator () ( const X &left, const X &right ) const
               {
                   return left == right;
               }
@@ -26,7 +26,7 @@ namespace StdLib
 
           struct LeftGreater
           {
-              template < typename X > bln operator () ( const X &left, const X &right ) const
+              template < typename X > bool operator () ( const X &left, const X &right ) const
               {
                   return left > right;
               }
@@ -67,7 +67,7 @@ namespace StdLib
       }
       
       //  TODO: unoptimized
-      template < typename leftIter, typename rightIter, typename comparator > inline bln Equals( leftIter leftBegin, leftIter leftEnd, rightIter rightBegin, rightIter rightEnd, const comparator &cmp )
+      template < typename leftIter, typename rightIter, typename comparator > inline bool Equals( leftIter leftBegin, leftIter leftEnd, rightIter rightBegin, rightIter rightEnd, const comparator &cmp )
       {
           for( ; leftBegin != leftEnd && rightBegin != rightEnd; ++leftBegin, ++rightBegin )
           {
@@ -80,7 +80,7 @@ namespace StdLib
           return (leftBegin == leftEnd) && (rightBegin == rightEnd);
       }
 
-      template < typename leftIter, typename rightIter > inline bln Equals( leftIter leftBegin, leftIter leftEnd, rightIter rightBegin, rightIter rightEnd )
+      template < typename leftIter, typename rightIter > inline bool Equals( leftIter leftBegin, leftIter leftEnd, rightIter rightBegin, rightIter rightEnd )
       {
           return Equals( leftBegin, leftEnd, rightBegin, rightEnd, Comparator::LeftEqual() );
       }

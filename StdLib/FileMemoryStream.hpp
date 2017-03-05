@@ -23,18 +23,18 @@ namespace StdLib
 		fileError Open( MemoryStreamInterface &stream, FileProcMode procMode );
 
 		virtual void Close() override;
-		virtual bln IsOpened() const override;
+		virtual bool IsOpened() const override;
 
-		virtual bln Read( void *target, ui32 len, ui32 *readed = 0 ) override;
-		virtual bln Write( const void *source, ui32 len, ui32 *written = 0 ) override;
+		virtual bool Read( void *target, ui32 len, ui32 *readed = 0 ) override;
+		virtual bool Write( const void *source, ui32 len, ui32 *written = 0 ) override;
 
-		virtual bln Flush() override;
-		virtual bln IsBufferingSupported() const override;
-		virtual bln BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer = std::unique_ptr < byte, void(*)(byte *) >( nullptr, [](byte *){} ) ) override;
+		virtual bool Flush() override;
+		virtual bool IsBufferingSupported() const override;
+		virtual bool BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer = std::unique_ptr < byte, void(*)(byte *) >( nullptr, [](byte *){} ) ) override;
 		virtual ui32 BufferSizeGet() const override;
 		virtual const void *BufferGet() const override;
 
-		virtual bln IsSeekSupported() const override;
+		virtual bool IsSeekSupported() const override;
 		virtual CResult < i64 > OffsetGet( FileOffsetMode offsetMode = FileOffsetMode::FromBegin ) override;
 		virtual CResult < i64 > OffsetSet( FileOffsetMode offsetMode, i64 offset ) override;
 

@@ -6,7 +6,7 @@
 namespace StdLib {
 
 //  passing NaN and +/-inf is undefined behavior
-template < const ui32 c_rangeNumerator, const ui32 c_rangeDenominator, const bln cis_unsigned = false > class cf16
+template < const ui32 c_rangeNumerator, const ui32 c_rangeDenominator, const bool cis_unsigned = false > class cf16
 {
     static const ui32 c_significandSize = cis_unsigned ? 16 : 15;
 

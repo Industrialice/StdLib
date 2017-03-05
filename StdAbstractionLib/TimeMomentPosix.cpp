@@ -4,7 +4,7 @@
 
 #include <time.h>
 
-CTC::CTC( bln is_set )
+CTC::CTC( bool is_set )
 {
     if( is_set )
     {

@@ -40,7 +40,7 @@ protected:
         return static_size;
     }
 
-    bln _IsReservable() const
+    bool _IsReservable() const
     {
         return true;
     }
@@ -114,7 +114,7 @@ protected:
         return _reserved;
     }
 
-    bln _IsReservable() const
+    bool _IsReservable() const
     {
         return true;
     }
@@ -172,7 +172,7 @@ protected:
         return _count;
     }
 
-    bln _IsReservable() const
+    bool _IsReservable() const
     {
         return false;
     }
@@ -198,13 +198,13 @@ protected:
     }
 };
 
-template < typename X, typename reservator, typename allocator, typename count_type, bln tis_selfManaged, count_type static_size > class CBaseVector : public _CBaseVertorBasis < X, reservator, allocator, count_type, static_size >
+template < typename X, typename reservator, typename allocator, typename count_type, bool tis_selfManaged, count_type static_size > class CBaseVector : public _CBaseVertorBasis < X, reservator, allocator, count_type, static_size >
 {
 protected:
     using _CBaseVertorBasis < X, reservator, allocator, count_type, static_size >::_arr;
     using _CBaseVertorBasis < X, reservator, allocator, count_type, static_size >::_count;
 
-    DBGCODE( bln _is_constructed; );
+    DBGCODE( bool _is_constructed; );
 
     typedef CBaseVector < X, reservator, allocator, count_type, tis_selfManaged, static_size > ownType;
 
@@ -317,7 +317,7 @@ public:
         return _arr[ 0 ];
     }
 
-    bln FrontSafe( X &val ) const
+    bool FrontSafe( X &val ) const
     {
         if( _count )
         {
@@ -340,7 +340,7 @@ public:
         return _arr[ _count - 1 ];
     }
 
-    bln BackSafe( X &val ) const
+    bool BackSafe( X &val ) const
     {
         if( _count )
         {
@@ -351,7 +351,7 @@ public:
         return false;
     }
 
-    bln Find( const X &source, count_type *p_index, count_type start = 0 )
+    bool Find( const X &source, count_type *p_index, count_type start = 0 )
     {
         for( count_type index = start; index < _count; ++index )
         {
@@ -376,7 +376,7 @@ public:
         return _arr[ index ];
     }
 
-    const bln GetElemSafe( count_type index, X &val ) const
+    const bool GetElemSafe( count_type index, X &val ) const
     {
         if( index < _count )
         {
@@ -394,7 +394,7 @@ public:
         return _arr[ index ];
     }
 
-    bln SetElemSafe( count_type index, const X &source )
+    bool SetElemSafe( count_type index, const X &source )
     {
         if( index < _count );
         {

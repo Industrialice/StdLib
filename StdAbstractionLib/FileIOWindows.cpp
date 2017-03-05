@@ -13,9 +13,9 @@ namespace StdLib
     {
         namespace Private
         {
-            bln WriteToFile( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written );
-            bln ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
-            bln CancelCachedRead( CFileBasis *file );
+            bool WriteToFile( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written );
+            bool ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
+            bool CancelCachedRead( CFileBasis *file );
         }
     }
 }
@@ -161,7 +161,7 @@ NOINLINE auto FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pn
 	return Error::Ok();
 }
         
-NOINLINE auto FileIO::Private::FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle ) -> fileError
+NOINLINE auto FileIO::Private::FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bool is_shouldCloseFileHandle ) -> fileError
 {
 	return Error::Unimplemented();
 }
@@ -182,7 +182,7 @@ NOINLINE void FileIO::Private::FileIO_Close( CFileBasis *file )
     file->handle = INVALID_HANDLE_VALUE;
 }
 
-bln FileIO::Private::FileIO_IsValid( const CFileBasis *file )
+bool FileIO::Private::FileIO_IsValid( const CFileBasis *file )
 {
     ASSUME( file );
     return file->handle != INVALID_HANDLE_VALUE;
@@ -385,7 +385,7 @@ NOINLINE FilePath FileIO::Private::FileIO_PNNGet( const CFileBasis *file )
 	}
 }
 
-bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written )
+bool FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written )
 {
     ASSUME( FileIO_IsValid( file ) && (cp_source || len == 0) );
     FILEIO_STAT( ++file->stats.writesToFileCount; )
@@ -405,7 +405,7 @@ bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 
     return true;
 }
 
-bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
+bool FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
 {
     ASSUME( FileIO_IsValid( file ) && (p_target || len == 0) );
     DWORD readed = 0;
@@ -425,7 +425,7 @@ bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, u
     return true;
 }
 
-NOINLINE bln FileIO::Private::CancelCachedRead( CFileBasis *file )
+NOINLINE bool FileIO::Private::CancelCachedRead( CFileBasis *file )
 {
     ASSUME( FileIO_IsValid( file ) );
     if( !file->is_reading || file->bufferPos == file->readBufferCurrentSize )

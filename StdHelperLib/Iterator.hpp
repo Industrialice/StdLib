@@ -42,7 +42,7 @@ template < typename X > struct _IterDist < X, Type::Random >
 
 struct _TypeIterator {};
 
-template < typename type, iw step, typename retType, bln is_const > class _IterRandomBasis;
+template < typename type, iw step, typename retType, bool is_const > class _IterRandomBasis;
 
 template < typename type, iw step, typename retType > class _IterRandomBasis < type, step, retType, false > : _TypeIterator, public std::iterator < std::random_access_iterator_tag, type >
 {
@@ -56,7 +56,7 @@ protected:
     const type *_str;
 };
 
-template < typename type, iw step, typename retType, bln is_const > class _IterRandomBase : public _IterRandomBasis < type, step, retType, is_const >
+template < typename type, iw step, typename retType, bool is_const > class _IterRandomBase : public _IterRandomBasis < type, step, retType, is_const >
 {
     typedef _IterRandomBasis < type, step, retType, is_const > baseType;
     typedef _IterRandomBase < type, step, retType, is_const > ownType;
@@ -161,38 +161,38 @@ public:
         return *(retType *)this;
     }
 
-    bln operator != ( const ownType &other ) const
+    bool operator != ( const ownType &other ) const
     {
         return _str != other._str;
     }
 
-    bln operator == ( const ownType &other ) const
+    bool operator == ( const ownType &other ) const
     {
         return _str == other._str;
     }
 
-    bln operator < ( const ownType &other ) const
+    bool operator < ( const ownType &other ) const
     {
         if( step == 1 )
             return _str < other._str;
         return _str > other._str;
     }
 
-    bln operator > ( const ownType &other ) const
+    bool operator > ( const ownType &other ) const
     {
         if( step == 1 )
             return _str > other._str;
         return _str < other._str;
     }
 
-    bln operator <= ( const ownType &other ) const
+    bool operator <= ( const ownType &other ) const
     {
         if( step == 1 )
             return _str <= other._str;
         return _str >= other._str;
     }
 
-    bln operator >= ( const ownType &other ) const
+    bool operator >= ( const ownType &other ) const
     {
         if( step == 1 )
             return _str >= other._str;

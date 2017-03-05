@@ -40,13 +40,13 @@ public:
 		ASSUME( errorClass && description );
 	}
 
-	bln operator == ( const CError &other ) const
+	bool operator == ( const CError &other ) const
 	{
 		ASSUME( other.errorClass );
 		return this->code == other.code && !strcmp( this->errorClass, other.errorClass );
 	}
 
-	bln operator != ( const CError &other ) const
+	bool operator != ( const CError &other ) const
 	{
 		ASSUME( other.errorClass );
 		return this->code != other.code || strcmp( this->errorClass, other.errorClass );
@@ -62,7 +62,7 @@ public:
 		return description;
 	}
 
-	bln Ok() const
+	bool Ok() const
 	{
 		return code == 0;
 	}
@@ -101,10 +101,10 @@ public:
 		return *this;
 	}
 
-	CError &operator = ( const CError & ) = default;
+	/*CError &operator = ( const CError & ) = default;
 	CError( const CError & ) = default;
 	CError &operator = ( CError && ) = default;
-	CError( CError && ) = default;
+	CError( CError && ) = default;*/
 
 	const additionT &Addition() const
 	{

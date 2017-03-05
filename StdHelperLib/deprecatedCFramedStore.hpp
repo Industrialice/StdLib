@@ -7,7 +7,7 @@ namespace StdLib {
 
 template < typename X, typename freeTestType, freeTestType freeTestValue, uiw t_freeTestMemberOffset, uiw t_frameSize = 32, uiw t_initialFrames = 1, typename allocator = Allocator::Simple > class CFramedStore : CharMovable
 {
-    static bln _IsFree( const X *mem )
+    static bool _IsFree( const X *mem )
     {
         return *(freeTestType *)((byte *)mem + t_freeTestMemberOffset) == freeTestValue;
     }
@@ -185,7 +185,7 @@ public:
         }
     }
 
-    bln GetFrameIndexByAddr( const void *cp_addr, uiw *p_frame, uiw *p_index )
+    bool GetFrameIndexByAddr( const void *cp_addr, uiw *p_frame, uiw *p_index )
     {
         ASSUME( p_frame && p_index );
         const byte *cp_byteAddr = (byte *)cp_addr;

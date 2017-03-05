@@ -37,8 +37,8 @@ typedef struct
 {
     pthread_mutex_t lock;
     pthread_cond_t  cond;
-    bln             is_set;
-    bln             is_resetAfterWait;
+    bool             is_set;
+    bool             is_resetAfterWait;
 } eventHandle;
 typedef pthread_mutex_t mutexHandle;
 typedef int fileHandle;

@@ -9,7 +9,7 @@ namespace StdLib {
 template < typename X > class Nullable
 {
     typename AlignmentHelper < X >::type _object;
-    bln _is_null;
+    bool _is_null;
 
     X &ToRef()
     {
@@ -55,7 +55,7 @@ public:
         return *this;
     }
 
-	bln operator == ( const X &source ) const
+	bool operator == ( const X &source ) const
 	{
 		if( this->_is_null )
 		{
@@ -64,12 +64,12 @@ public:
 		return this->ToRef() == source;
 	}
 
-	bln operator != ( const X &source ) const
+	bool operator != ( const X &source ) const
 	{
 		return !this->operator == ( source );
 	}
 
-    bln operator == ( const Nullable &source ) const
+    bool operator == ( const Nullable &source ) const
     {
 		if( _is_null == source._is_null )
 		{
@@ -82,17 +82,17 @@ public:
         return false;
     }
 
-    bln operator != ( const Nullable &source ) const
+    bool operator != ( const Nullable &source ) const
 	{
 		return !this->operator == ( source );
 	}
 
-    bln operator == ( std::nullptr_t ) const
+    bool operator == ( std::nullptr_t ) const
     {
         return _is_null;
     }
 
-    bln operator != ( std::nullptr_t ) const
+    bool operator != ( std::nullptr_t ) const
 	{
 		return !_is_null;
 	}
@@ -189,7 +189,7 @@ public:
 		return *this;
 	}
 
-    bln IsNull() const
+    bool IsNull() const
     {
         return _is_null;
     }

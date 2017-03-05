@@ -1,6 +1,6 @@
 #include "PreHeader.hpp"
 
-static ui16 GetOverflowed( Private::OverflowAction_t action, bln is_negative )
+static ui16 GetOverflowed( Private::OverflowAction_t action, bool is_negative )
 {
 	if( action == Private::Flow_Clamp )
 	{
@@ -183,7 +183,7 @@ NOINLINE ui16 Private::f16_FromI32Clamp( i32 source )
     }
 }
 
-bln Private::f16_IsNaN( ui16 value )
+bool Private::f16_IsNaN( ui16 value )
 {
     if( (value | f16_exp_mask) != value )
     {
@@ -192,7 +192,7 @@ bln Private::f16_IsNaN( ui16 value )
     return value & f16_frac_mask;
 }
 
-bln Private::f16_IsInf( ui16 value )
+bool Private::f16_IsInf( ui16 value )
 {
     if( (value | f16_exp_mask) != value )
     {
@@ -201,7 +201,7 @@ bln Private::f16_IsInf( ui16 value )
     return (value & f16_frac_mask) == 0;
 }
 
-bln Private::f16_IsInfPos( ui16 value )
+bool Private::f16_IsInfPos( ui16 value )
 {
     if( !f16_IsInf( value ) )
     {
@@ -210,7 +210,7 @@ bln Private::f16_IsInfPos( ui16 value )
     return (value & f16_sign_mask) == 0;
 }
 
-bln Private::f16_IsInfNeg( ui16 value )
+bool Private::f16_IsInfNeg( ui16 value )
 {
     if( !f16_IsInf( value ) )
     {

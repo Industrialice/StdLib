@@ -34,8 +34,8 @@ namespace LiceMath
     EXTERNALS void M4x4RotateAxis( m4x4 *po_m, const vec3 *cpo_v, f32 angle );  //  input vector must be normalized
     EXTERNALS void M4x4RotateAxisDoNotIdentity( m4x4 *po_m, const vec3 *cpo_v, f32 angle );  //  input vector must be normalized
     EXTERNALS void M4x4Identity( m4x4 *po_m );
-	EXTERNALS bln M4x4IsIdentity( const m4x4 *cpo_m );  //  without epsilon
-	EXTERNALS bln M4x4IsLastIdentity( const m4x4 *cpo_m );  //  without epsilon
+	EXTERNALS bool M4x4IsIdentity( const m4x4 *cpo_m );  //  without epsilon
+	EXTERNALS bool M4x4IsLastIdentity( const m4x4 *cpo_m );  //  without epsilon
     EXTERNALS void M4x4Transpose( m4x4 *RSTR po_m0, const m4x4 *cpo_m1 );
     EXTERNALS void M4x4TransposeInplace( m4x4 *po_m );
     EXTERNALS void M4x4MultM4x4( m4x4 *RSTR po_m0, const m4x4 *cpo_m1, const m4x4 *cpo_m2 );
@@ -81,7 +81,7 @@ namespace LiceMath
     EXTERNALS void M4x3RotateAxis( m4x3 *po_m, const vec3 *cpo_v, f32 angle );  //  input vector must be normalized
     EXTERNALS void M4x3RotateAxisDoNotIdentity( m4x3 *po_m, const vec3 *cpo_v, f32 angle );  //  input vector must be normalized
     EXTERNALS void M4x3Identity( m4x3 *po_m );
-	EXTERNALS bln M4x3IsIdentity( const m4x3 *cpo_m );  //  without epsilon
+	EXTERNALS bool M4x3IsIdentity( const m4x3 *cpo_m );  //  without epsilon
 	EXTERNALS void M4x3Transpose( m3x4 *po_m0, const m4x3 *cpo_m1 );
 	EXTERNALS m3x4 *M4x3TransposeInplaceAs3x4( m4x3 *po_m0 );  //  m4x3 will become m3x4
     EXTERNALS void M4x3MultM4x3AsM4x4LastIden( m4x3 *RSTR po_m0, const m4x3 *cpo_m1, const m4x3 *cpo_m2 );
@@ -120,7 +120,7 @@ namespace LiceMath
     EXTERNALS void M3x4MultScalarInplace( m3x4 *RSTR po_m, f32 scalar );
 
     EXTERNALS void M3x3Identity( m3x3 *po_m );
-	EXTERNALS bln M3x3IsIdentity( const m3x3 *cpo_m );  //  without epsilon
+	EXTERNALS bool M3x3IsIdentity( const m3x3 *cpo_m );  //  without epsilon
     EXTERNALS void M3x3Transpose( m3x3 *RSTR po_m0, const m3x3 *cpo_m1 );
     EXTERNALS void M3x3TransposeInplace( m3x3 *po_m );
     EXTERNALS void M3x3MultM3x3( m3x3 *RSTR po_m0, const m3x3 *cpo_m1, const m3x3 *cpo_m2 );
@@ -152,7 +152,7 @@ namespace LiceMath
     EXTERNALS void Matrix3DTo2D( m3x2 *po_m0, const m4x3 *cpo_m1 );
 
     EXTERNALS void M2x2Identity( m2x2 *po_m );
-	EXTERNALS bln M2x2IsIdentity( const m2x2 *cpo_m );  //  without epsilon
+	EXTERNALS bool M2x2IsIdentity( const m2x2 *cpo_m );  //  without epsilon
     EXTERNALS void M2x2Rotate( m2x2 *po_m, f32 radians );
     EXTERNALS void M2x2RotateTransform( m2x2 *po_m, f32 radians );
     EXTERNALS void M2x2Scale( m2x2 *po_m, f32 x, f32 y );
@@ -194,8 +194,8 @@ namespace LiceMath
     EXTERNALS void Vec4MinInplace( vec4 *RSTR po_v0, const vec4 *cpo_v1 );
     EXTERNALS void Vec4Neg( vec4 *RSTR po_v0, const vec4 *cpo_v1 );
     EXTERNALS void Vec4NegInplace( vec4 *po_v );
-	EXTERNALS bln  Vec4Equals( const vec4 *cpo_v0, const vec4 *cpo_v1 );
-	EXTERNALS bln  Vec4EqualsByEpsilon( const vec4 *cpo_v0, const vec4 *cpo_v1, f32 epsilon );
+	EXTERNALS bool  Vec4Equals( const vec4 *cpo_v0, const vec4 *cpo_v1 );
+	EXTERNALS bool  Vec4EqualsByEpsilon( const vec4 *cpo_v0, const vec4 *cpo_v1, f32 epsilon );
 
     EXTERNALS void Vec3MultM3x3( vec3 *RSTR po_v0, const vec3 *cpo_v1, const m3x3 *cpo_m );
     EXTERNALS void Vec3MultM3x3Inplace( vec3 *po_v, const m3x3 *cpo_m );
@@ -235,8 +235,8 @@ namespace LiceMath
     EXTERNALS void Vec3MinInplace( vec3 *RSTR po_v0, const vec3 *cpo_v1 );
     EXTERNALS void Vec3Neg( vec3 *RSTR po_v0, const vec3 *cpo_v1 );
     EXTERNALS void Vec3NegInplace( vec3 *po_v );
-	EXTERNALS bln Vec3Equals( const vec3 *cpo_v0, const vec3 *cpo_v1 );
-	EXTERNALS bln Vec3EqualsByEpsilon( const vec3 *cpo_v0, const vec3 *cpo_v1, f32 epsilon );
+	EXTERNALS bool Vec3Equals( const vec3 *cpo_v0, const vec3 *cpo_v1 );
+	EXTERNALS bool Vec3EqualsByEpsilon( const vec3 *cpo_v0, const vec3 *cpo_v1, f32 epsilon );
 
 	EXTERNALS f32 Vec2Length( const vec2 *cpo_v );
 	EXTERNALS f32 Vec2SquareLength( const vec2 *cpo_v );
@@ -259,8 +259,8 @@ namespace LiceMath
     EXTERNALS void Vec2MinInplace( vec2 *RSTR po_v0, const vec2 *cpo_v1 );
     EXTERNALS void Vec2Neg( vec2 *RSTR po_v0, const vec2 *cpo_v1 );
     EXTERNALS void Vec2NegInplace( vec2 *po_v );
-	EXTERNALS bln Vec2Equals( const vec2 *cpo_v0, const vec2 *cpo_v1 );
-	EXTERNALS bln Vec2EqualsByEpsilon( const vec2 *cpo_v0, const vec2 *cpo_v1, f32 epsilon );
+	EXTERNALS bool Vec2Equals( const vec2 *cpo_v0, const vec2 *cpo_v1 );
+	EXTERNALS bool Vec2EqualsByEpsilon( const vec2 *cpo_v0, const vec2 *cpo_v1, f32 epsilon );
 
 	EXTERNALS f32 PlaneDotCoord( const plane *cpo_plane, const vec3 *cpo_coord );
     EXTERNALS void PlaneNormalize( plane *RSTR po_plane0, const plane *cpo_plane1 );
@@ -268,7 +268,7 @@ namespace LiceMath
 
     EXTERNALS void Projection( m4x4 *po_m, f32 fovDegree, f32 nearPlane, f32 farPlane, f32 aspect );
 
-	EXTERNALS bln BSCrossTest3D( const vec3 *cpo_center0, f32 radius0, const vec3 *cpo_center1, f32 radius1 );
+	EXTERNALS bool BSCrossTest3D( const vec3 *cpo_center0, f32 radius0, const vec3 *cpo_center1, f32 radius1 );
 }
 }
 

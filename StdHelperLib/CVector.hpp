@@ -58,7 +58,7 @@ public:
         return this->_Size() - 1;
     }
 
-    bln IsEmpty() const
+    bool IsEmpty() const
     {
         return this->_Size() == 0;
     }
@@ -225,8 +225,8 @@ public:
 
     static const count_type count_type_max = TypeDesc < count_type >::max;
 
-    static const bln _cis_POD = typeSemantic == Sem_POD || TypeDesc < X >::is_pod;
-    static const bln _cis_MoveAsPOD = typeSemantic == Sem_MovableAsPOD || TypeDesc < X >::is_movableAsPOD;
+    static const bool _cis_POD = typeSemantic == Sem_POD || TypeDesc < X >::is_pod;
+    static const bool _cis_MoveAsPOD = typeSemantic == Sem_MovableAsPOD || TypeDesc < X >::is_movableAsPOD;
 
 	NOINLINE void _SizeUpWithReserveIncreasion( count_type sizeToLeave, count_type newCount )  //  will not destroy anything
 	{
@@ -310,7 +310,7 @@ public:
         }
     }
 
-    template < typename Type, bln is_useMoveContructor > struct _MoveTo;
+    template < typename Type, bool is_useMoveContructor > struct _MoveTo;
 
     template < typename Type > struct _MoveTo < Type, true >
     {
@@ -330,7 +330,7 @@ public:
         }
     };
 
-    template < typename Type, bln is_destroySource > struct _CopySelector;
+    template < typename Type, bool is_destroySource > struct _CopySelector;
     template < typename Type > struct _CopySelector < Type, true >
     {
         static void Copy( Type *target, Type *source )
@@ -346,7 +346,7 @@ public:
         }
     };
 
-    template < bln is_destroySource, bln is_canBeOverlapped = false > void _Copy( X *target, X *source, count_type count )
+    template < bool is_destroySource, bool is_canBeOverlapped = false > void _Copy( X *target, X *source, count_type count )
     {
         ASSUME( target != source || count == 0 );
 
@@ -612,7 +612,7 @@ public:
         }
     }
 
-    void Resize( count_type size, bln is_initialize = true )  //  Proto
+    void Resize( count_type size, bool is_initialize = true )  //  Proto
     {
 		if( size != this->_Size() )
 		{
@@ -637,7 +637,7 @@ public:
         }
     }
 
-    X *InsertNum( count_type pos, count_type num = 1, bln is_initialize = true )
+    X *InsertNum( count_type pos, count_type num = 1, bool is_initialize = true )
     {
         X *target = _InsertRaw( pos, num );
 		if( _cis_POD == false && is_initialize )
@@ -652,10 +652,10 @@ public:
 		return target;
     }
 
-    template < bln is_checkOverlap = true > void Insert( count_type pos, const X &source, count_type count = 1 )
+    template < bool is_checkOverlap = true > void Insert( count_type pos, const X &source, count_type count = 1 )
     {
         uiw offset = &source - this->_GetArr();
-        bln is_belongs = offset < this->_Size();
+        bool is_belongs = offset < this->_Size();
         const X *from = &source;
         X *target = _InsertRaw( pos, count );
         if( is_checkOverlap && is_belongs )
@@ -680,7 +680,7 @@ public:
         new (target) X( std::move( source ) );
     }
 
-    template < bln is_checkOverlap = true > void Insert( count_type pos, const X *source, count_type count )
+    template < bool is_checkOverlap = true > void Insert( count_type pos, const X *source, count_type count )
     {
         if( is_checkOverlap )
         {
@@ -701,7 +701,7 @@ public:
         Insert < false >( pos, source, count );
     }
 
-    template < bln is_checkOverlap = true > void Insert( count_type pos, const ownType &source, count_type start = 0, count_type count = count_type_max )
+    template < bool is_checkOverlap = true > void Insert( count_type pos, const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
         ASSUME( pos < this->_Size() && source.Size() > start );
         if( count > source.Size() - start )
@@ -712,7 +712,7 @@ public:
         Insert < is_checkOverlap >( pos, source.Data() + start, count );
     }
 
-    template < typename IterType, bln is_checkOverlap = true, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
+    template < typename IterType, bool is_checkOverlap = true, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Insert( IterConst where, IterType begin, IterType end )
     {
         uiw dist = Algorithm::Distance( begin, end );
@@ -786,7 +786,7 @@ public:
 		new (this->_GetArr() + curCount) X( std::move( source ) );
 	}
 
-	X *AppendNum( count_type num = 1, bln is_initialize = true )
+	X *AppendNum( count_type num = 1, bool is_initialize = true )
 	{
 		count_type curCount = this->_Size();
 		_SizeUp( curCount, curCount + num );
@@ -803,7 +803,7 @@ public:
 		return target;
 	}
 
-    template < bln is_checkOverlap = true > void Append( const X *source, count_type count )
+    template < bool is_checkOverlap = true > void Append( const X *source, count_type count )
     {
         count_type curCount = this->_Size();
         if( this->_IsStatic() || !is_checkOverlap )
@@ -828,7 +828,7 @@ public:
         this->Append < false >( source, count );
     }
 
-    template < bln is_checkOverlap = true > void Append( const ownType &source, count_type start = 0, count_type count = count_type_max )
+    template < bool is_checkOverlap = true > void Append( const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
         ASSUME( start < source._Size() || count == 0 );
         count = Funcs::Min( count, source.Size() - start );
@@ -837,7 +837,7 @@ public:
         _Copy < false, true >( this->_GetArr() + curCount, (X *)source.Data() + start, count );
     }
 
-    template < typename IterType, bln is_checkOverlap = true, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
+    template < typename IterType, bool is_checkOverlap = true, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Append( IterType begin, IterType end )
     {
         uiw dist = Algorithm::Distance( begin, end );
@@ -901,7 +901,7 @@ private:
     }
 
 public:
-    template < bln is_checkOverlap = true > void Assign( const X &source, count_type count = 1 )
+    template < bool is_checkOverlap = true > void Assign( const X &source, count_type count = 1 )
     {
         count_type curCount = this->_Size();
         uiw index = &source - this->_GetArr();
@@ -933,7 +933,7 @@ public:
         }
     }
 
-    template < bln is_checkOverlap = true > void Assign( const X *source, count_type count )
+    template < bool is_checkOverlap = true > void Assign( const X *source, count_type count )
     {
         uiw index = source - this->_GetArr();
         if( is_checkOverlap && index < this->_Size() )
@@ -953,7 +953,7 @@ public:
         this->Assign < false >( source, count );
     }
 
-    template < bln is_checkOverlap = true > void Assign( const ownType &source, count_type start = 0, count_type count = count_type_max )
+    template < bool is_checkOverlap = true > void Assign( const ownType &source, count_type start = 0, count_type count = count_type_max )
     {
         ASSUME( start <= source.Size() || count == 0 );
         count = Funcs::Min( source.Size() - start, count );
@@ -969,7 +969,7 @@ public:
         }
     }
 
-    template < typename IterType, bln is_checkOverlap = true, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
+    template < typename IterType, bool is_checkOverlap = true, typename = typename EnableIf< IsDerivedFrom < IterType, Iterator::_TypeIterator >::value >::type >
     void Assign( IterType begin, IterType end )
     {
         uiw dist = Algorithm::Distance( begin, end );

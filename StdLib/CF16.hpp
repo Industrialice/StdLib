@@ -19,10 +19,10 @@ namespace Private
 	EXTERNALD ui16 f16_FromF64( f64 source, OverflowAction_t action );
 	EXTERNALD ui16 f16_FromUI32Clamp( ui32 source );
 	EXTERNALD ui16 f16_FromI32Clamp( i32 source );
-	EXTERNALS bln f16_IsNaN( ui16 value );
-	EXTERNALS bln f16_IsInf( ui16 value );
-	EXTERNALS bln f16_IsInfPos( ui16 value );
-	EXTERNALS bln f16_IsInfNeg( ui16 value );
+	EXTERNALS bool f16_IsNaN( ui16 value );
+	EXTERNALS bool f16_IsInf( ui16 value );
+	EXTERNALS bool f16_IsInfPos( ui16 value );
+	EXTERNALS bool f16_IsInfNeg( ui16 value );
 }
 
 class f16
@@ -101,22 +101,22 @@ public:
 		return *this;
 	}
 
-    bln IsNaN()
+    bool IsNaN()
 	{
 		return Private::f16_IsNaN( _val );
 	}
     
-	bln IsInf()
+	bool IsInf()
 	{
 		return Private::f16_IsInf( _val );
 	}
     
-	bln IsInfPos()
+	bool IsInfPos()
 	{
 		return Private::f16_IsInfPos( _val );
 	}
     
-	bln IsInfNeg()
+	bool IsInfNeg()
 	{
 		return Private::f16_IsInfNeg( _val );
 	}

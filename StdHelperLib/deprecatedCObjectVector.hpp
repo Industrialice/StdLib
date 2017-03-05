@@ -11,7 +11,7 @@ namespace StdLib {
 
 namespace Private {
 
-template < typename X, typename reservator, typename allocator, typename count_type, bln tis_selfManaged, uiw static_size, bln tis_checkForPod > class _CObjectVectorBasis : public Private::CBaseVector < X, reservator, allocator, count_type, tis_selfManaged, static_size >
+template < typename X, typename reservator, typename allocator, typename count_type, bool tis_selfManaged, uiw static_size, bool tis_checkForPod > class _CObjectVectorBasis : public Private::CBaseVector < X, reservator, allocator, count_type, tis_selfManaged, static_size >
 {
 protected:
     typedef CBaseVector < X, reservator, allocator, count_type, tis_selfManaged, static_size > parentType;
@@ -433,7 +433,7 @@ public:
 
 }  //  namespace Private
 
-template < typename X, uiw static_size, typename count_type = uiw, bln tis_selfManaged = true, bln tis_checkForPod = false > class CObjectVectorStatic : public Private::_CObjectVectorBasis < X, void, void, count_type, tis_selfManaged, static_size, tis_checkForPod >
+template < typename X, uiw static_size, typename count_type = uiw, bool tis_selfManaged = true, bool tis_checkForPod = false > class CObjectVectorStatic : public Private::_CObjectVectorBasis < X, void, void, count_type, tis_selfManaged, static_size, tis_checkForPod >
 {
     typedef Private::_CObjectVectorBasis < X, void, void, count_type, tis_selfManaged, static_size, tis_checkForPod > parentType;
 
@@ -503,7 +503,7 @@ public:
     }
 };
 
-template < typename X, typename reservator = void, typename allocator = Allocator::Simple < X >, typename count_type = uiw, bln tis_selfManaged = true, bln tis_checkForPod = false > class CObjectVector : public Private::_CObjectVectorBasis < X, reservator, allocator, count_type, tis_selfManaged, 0, tis_checkForPod >
+template < typename X, typename reservator = void, typename allocator = Allocator::Simple < X >, typename count_type = uiw, bool tis_selfManaged = true, bool tis_checkForPod = false > class CObjectVector : public Private::_CObjectVectorBasis < X, reservator, allocator, count_type, tis_selfManaged, 0, tis_checkForPod >
 {
     typedef Private::_CObjectVectorBasis < X, reservator, allocator, count_type, tis_selfManaged, 0, tis_checkForPod > parentType;
 

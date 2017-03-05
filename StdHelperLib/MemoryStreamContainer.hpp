@@ -74,12 +74,12 @@ namespace StdLib
 			return MemoryStreamContainer::Memory();
 		}
 
-		virtual bln IsReadable() const override
+		virtual bool IsReadable() const override
 		{
 			return _readableContainer != 0;
 		}
 
-		virtual bln IsWritable() const override
+		virtual bool IsWritable() const override
 		{
 			return _writableContainer != 0;
 		}
@@ -159,12 +159,12 @@ namespace StdLib
 			return MemoryStreamSTL::Memory();
 		}
 
-		virtual bln IsReadable() const override
+		virtual bool IsReadable() const override
 		{
 			return _readableContainer != 0;
 		}
 
-		virtual bln IsWritable() const override
+		virtual bool IsWritable() const override
 		{
 			return _writableContainer != 0;
 		}

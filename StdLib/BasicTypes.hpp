@@ -25,7 +25,6 @@ typedef int64_t i64;
 typedef int32_t i32;
 typedef int16_t i16;
 typedef int8_t i8;
-typedef bool bln;
 
 const ui64 ui64_max = 18446744073709551615ULL;  //  0xFFffFFffFFffFFff
 const ui64 ui64_min = 0;  //  0x0000000000000000
@@ -35,8 +34,8 @@ const ui16 ui16_max = 65535;  //  0xFFff
 const ui16 ui16_min = 0;  //  0x0000
 const ui8 ui8_max = 255;  //  0xFF
 const ui8 ui8_min = 0;  //  0x00
-const bln bln_max = true;
-const bln bln_min = false;
+const bool bln_max = true;
+const bool bln_min = false;
 const byte byte_max = 255;  //  0xFF
 const byte byte_min = 0;  //  0x00
 const f32 f32_max = 3.402823466e+38F;
@@ -114,11 +113,11 @@ const f64 f64_pi2 = 6.283185307179586476926;
 
 public:
     enum { value = sizeof(Func(Converter < Candidate, Of >(), int())) == sizeof(int) };
-	operator bln() const
+	operator bool() const
 	{
 		return value;
 	}
-	bln operator () () const
+	bool operator () () const
 	{
 		return value;
 	}
@@ -127,11 +126,11 @@ public:
 template < typename A, typename B > struct AreTypesTheSame
 {
 	enum { value = false };
-	operator bln() const
+	operator bool() const
 	{
 		return false;
 	}
-	bln operator () () const
+	bool operator () () const
 	{
 		return false;
 	}
@@ -140,11 +139,11 @@ template < typename A, typename B > struct AreTypesTheSame
 template < typename T > struct AreTypesTheSame < T, T >
 {
 	enum { value = true };
-	operator bln() const
+	operator bool() const
 	{
 		return true;
 	}
-	bln operator () () const
+	bool operator () () const
 	{
 		return true;
 	}
@@ -190,7 +189,7 @@ template <> struct IntWithSize < 64 >
     typedef i64 int_t;
 };
 
-template < uiw numBits, bln is_signed > struct IntWithSizeAndSign{};
+template < uiw numBits, bool is_signed > struct IntWithSizeAndSign{};
 template <> struct IntWithSizeAndSign < 8, true >
 {
     typedef i8 type_t;

@@ -2,7 +2,7 @@
 
 EXTERNALS void StdCoreLib_Initialize()
 {
-	static bln is_initialized;
+	static bool is_initialized;
 	if( is_initialized )
 	{
 		return;

@@ -9,7 +9,7 @@ using namespace StdLib;
 namespace
 {
 	ui32 CpuCores;
-	bln is_Initialized;
+	bool is_Initialized;
 }
 
 ui32 SystemInfo::CPUCoresCount()

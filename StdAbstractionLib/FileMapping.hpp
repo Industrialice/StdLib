@@ -16,13 +16,13 @@ namespace FileMapping
 		{
 			void *memory;
 			uiw size;
-			bln is_writable;
+			bool is_writable;
 			#ifdef WINDOWS
 				HANDLE handle;
 			#endif
 		};
 
-		EXTERNALD MappingStruct FileMapping_Create( FileIO::CFile &file, uiw offset, uiw size, bln is_writeCopy, mappingError &error );
+		EXTERNALD MappingStruct FileMapping_Create( FileIO::CFile &file, uiw offset, uiw size, bool is_writeCopy, mappingError &error );
 		EXTERNALD void FileMapping_Destroy( MappingStruct *mapping );
 	}
 
@@ -46,7 +46,7 @@ namespace FileMapping
 			mappingStruct.memory = 0;
 		}
 
-		Mapping( FileIO::CFile &file, uiw offset, uiw size, bln is_writeCopy, mappingError *error = 0 )
+		Mapping( FileIO::CFile &file, uiw offset, uiw size, bool is_writeCopy, mappingError *error = 0 )
 		{
 			mappingError stackedError;
 			if( error == nullptr )
@@ -56,7 +56,7 @@ namespace FileMapping
 			mappingStruct = Private::FileMapping_Create( file, offset, size, is_writeCopy, *error );
 		}
 
-		mappingError Create( FileIO::CFile &file, uiw offset, uiw size, bln is_writeCopy )
+		mappingError Create( FileIO::CFile &file, uiw offset, uiw size, bool is_writeCopy )
 		{
 			mappingError error;
 			Private::FileMapping_Destroy( &mappingStruct );
@@ -64,12 +64,12 @@ namespace FileMapping
 			return error;
 		}
 
-		bln IsOpened() const
+		bool IsOpened() const
 		{
 			return mappingStruct.memory != 0;
 		}
 
-		bln IsWritable() const
+		bool IsWritable() const
 		{
 			ASSUME( IsOpened() );
 			return mappingStruct.is_writable;

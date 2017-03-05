@@ -6,7 +6,7 @@
 
 CError<> StdLib_FileError();  //  from FilesWindows.cpp
 
-FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( FileIO::CFile &file, uiw offset, uiw size, bln is_writeCopy, mappingError &error )
+FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( FileIO::CFile &file, uiw offset, uiw size, bool is_writeCopy, mappingError &error )
 {
 	MappingStruct retStruct = { 0, 0, NULL };
 	HANDLE mapping;

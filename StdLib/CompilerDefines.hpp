@@ -81,6 +81,9 @@
         #define DEFAULT_FUNC_PARAMS_SUPPORTED
         #define NULLPTR_SUPPORTED
         #define RANGE_BASED_FOR_SUPPORTED
+		#define WARN_IF_UNUSED _Check_return_
+	#else
+		#define WARN_IF_UNUSED
     #endif
 
     #if _MSC_VER >= 1800  //  Visual Studio 2013
@@ -160,7 +163,7 @@
     #define FUNCNAME __PRETTY_FUNCTION__
     #define RSTR __restrict__
     #define NOINLINE __attribute__((noinline))
-    #define FORCEINLINE __attribute__((always_inline))
+    #define FORCEINLINE __attribute__((always_inline)) inline
     #define NORETURN __attribute__(noreturn)
     #define UNIQUEPTRRETURN  /*  there is must be something  */
     #define ALLOCA( size ) __builtin_alloca( size )
@@ -183,6 +186,7 @@
 	#define TYPETRAITS_SUPPORTED
 	#define EXPLICIT_CONVERSION_SUPPORTED
 	#define CONSTRUCTORS_DELEGATION_SUPPORTED
+	#define WARN_IF_UNUSED __attribute__((warn_unused_result))
 
 	#ifndef __clang__
 		#define NULLPTR_SUPPORTED

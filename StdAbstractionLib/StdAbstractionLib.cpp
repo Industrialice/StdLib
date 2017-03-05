@@ -23,7 +23,7 @@ struct TimeMomentInitializer : private TimeMoment
 
 EXTERNALS void StdAbstractionLib_Initialize()
 {
-	static bln is_initialized;
+	static bool is_initialized;
 	if( is_initialized )
 	{
 		return;

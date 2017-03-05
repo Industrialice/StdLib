@@ -8,7 +8,7 @@ using namespace StdLib;
 static void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
 {
 	//ASSUME( info->IsFolder() == false );
-	bln is_show = false;
+	bool is_show = false;
 	for( uiw index = 0; info->PlatformPNN()[ index ]; ++index )
 	{
 		if( info->PlatformPNN()[ index ] < 32 || info->PlatformPNN()[ index ] > 126 || info->PlatformPNN()[ index ] == '?' )

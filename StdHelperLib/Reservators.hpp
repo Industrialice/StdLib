@@ -8,7 +8,7 @@ namespace StdLib
     {
         typedef cnt_type count_type;
 
-        static bln Up( count_type newSize, count_type *reserved )
+        static bool Up( count_type newSize, count_type *reserved )
         {
             ASSUME( reserved );
             if( newSize > *reserved )
@@ -19,7 +19,7 @@ namespace StdLib
             return false;
         };
 
-        static bln Down( count_type newSize, count_type *reserved )
+        static bool Down( count_type newSize, count_type *reserved )
         {
             ASSUME( reserved && *reserved >= newSize );
             return false;
@@ -30,7 +30,7 @@ namespace StdLib
     {
         typedef cnt_type count_type;
 
-        static bln Down( count_type newSize, count_type *reserved )
+        static bool Down( count_type newSize, count_type *reserved )
         {
             ASSUME( reserved && *reserved >= newSize );
             if( newSize < *reserved )
@@ -46,7 +46,7 @@ namespace StdLib
     {
         typedef cnt_type count_type;
 
-        static bln Up( count_type newSize, count_type *reserved )
+        static bool Up( count_type newSize, count_type *reserved )
         {
             ASSUME( reserved );
             if( newSize > *reserved )
@@ -57,7 +57,7 @@ namespace StdLib
             return false;
         };
 
-        static bln Down( count_type newSize, count_type *reserved )
+        static bool Down( count_type newSize, count_type *reserved )
         {
             ASSUME( reserved && *reserved >= newSize );
             return false;
@@ -68,7 +68,7 @@ namespace StdLib
     {
         typedef cnt_type count_type;
 
-        static bln Down( count_type newSize, count_type *reserved )
+        static bool Down( count_type newSize, count_type *reserved )
         {
             ASSUME( reserved && *reserved >= newSize );
             if( *reserved / downingDiv > newSize )
@@ -84,7 +84,7 @@ namespace StdLib
     {
         typedef cnt_type count_type;
 
-        static bln Up( count_type newSize, count_type *reserved )
+        static bool Up( count_type newSize, count_type *reserved )
         {
             ASSUME( reserved );
             if( newSize > *reserved )
@@ -95,7 +95,7 @@ namespace StdLib
             return false;
         };
 
-        static bln Down( count_type newSize, count_type *reserved )
+        static bool Down( count_type newSize, count_type *reserved )
         {
             ASSUME( reserved && *reserved >= newSize );
             return false;
@@ -106,7 +106,7 @@ namespace StdLib
     {
         typedef cnt_type count_type;
 
-        static bln Down( count_type newSize, count_type *reserved )
+        static bool Down( count_type newSize, count_type *reserved )
         {
             ASSUME( reserved && *reserved >= newSize );
             if( *reserved - newSize > fixed )

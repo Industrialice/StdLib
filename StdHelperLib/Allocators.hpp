@@ -4,6 +4,7 @@
 namespace StdLib
 { namespace Allocator
   {
+	//  TODO: alignment
     struct Simple
     {
         template < typename X >
@@ -28,7 +29,7 @@ namespace StdLib
         }
 
         template < typename X >
-        static bln ReallocInplaceIfPossible( X *mem, uiw count )
+        static bool ReallocInplaceIfPossible( X *mem, uiw count )
         {
             return false;
         }

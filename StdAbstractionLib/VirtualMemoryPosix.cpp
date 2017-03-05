@@ -18,7 +18,7 @@ namespace
         PROT_EXEC | PROT_WRITE | PROT_READ  //  7 - Execute + Write + Read
     };
 
-    bln is_Initialized;
+    bool is_Initialized;
 
     class __MiscData
     {
@@ -47,7 +47,7 @@ void *VirtualMem::VM_Reserve( uiw size )
     return ::mmap( 0, size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 }
 
-bln VirtualMem::VM_Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
+bool VirtualMem::VM_Commit( void *p_mem, uiw size, PageMode::PageMode_t mode )
 {
     ASSUME( p_mem && size && mode );
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);
@@ -71,10 +71,10 @@ void *VirtualMem::VM_Alloc( uiw size, PageMode::PageMode_t mode )
     return ::mmap( 0, size, prot, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 }
 
-bln VirtualMem::VM_Free( void *p_mem )
+bool VirtualMem::VM_Free( void *p_mem )
 {
     ASSUME( p_mem );
-    return ::munmap( p_mem, 0 ) == 0;
+    return ::munmap( p_mem, 0 ) == 0;  //  TODO: munmap with 0 len isn't correct!
 }
 
 ui32 VirtualMem::VM_PageSize()
@@ -88,7 +88,7 @@ VirtualMem::PageMode::PageMode_t VirtualMem::VM_ProtectGet( const void *p_mem, u
     return PageMode::Error;
 }
 
-bln VirtualMem::VM_ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
+bool VirtualMem::VM_ProtectSet( void *p_mem, uiw size, PageMode::PageMode_t mode )
 {
     ASSUME( p_mem && size && mode );
     int prot = (mode >= COUNTOF( ca_PageProtectMapping )) ? (0) : (ca_PageProtectMapping[ mode ]);

@@ -827,7 +827,7 @@ int __cdecl main()
     //CStr entry = Concat( CStr{ "one" }, CStr{ "two" } );
 
     /*CStr str;
-    bln boolean = true;
+    bool boolean = true;
 	const char testStr[ 64 ] = "apples";
 	char target[ 512 ];
     Funcs::PrintToStr( target, 512, "int %u string %s char %c bool %b ui8 %u pointer %p fp32 %f fp64 %f int64_hex %j int64 %l", 52, testStr, 'c', boolean, ui8( 5 ), &boolean, 15.4f, 152.7, i64( 66 ), i64( 555 ) );
@@ -1059,7 +1059,7 @@ int __cdecl main()
         test[ index ] = what;
         arr.Set( index, what );
     }
-    bln is_errors = false;
+    bool is_errors = false;
     for( ui32 index = 0; index < count; ++index )
     {
         if( test[ index ] != arr.Get( index ) )
@@ -1378,7 +1378,7 @@ int __cdecl main()
     coco = (f96color)o_col;
     o_col = (f128color)coco;
 
-    bln oh;
+    bool oh;
     oh && oh;
 
     i32 val = Funcs::Min( 4.3f, 4.3f );

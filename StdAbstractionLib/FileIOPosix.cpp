@@ -17,14 +17,14 @@ namespace StdLib
     {
         namespace Private
         {
-            NOINLINE bln WriteToFile( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written );
-            NOINLINE bln ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
-            NOINLINE bln CancelCachedRead( CFileBasis *file );
+            NOINLINE bool WriteToFile( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written );
+            NOINLINE bool ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
+            NOINLINE bool CancelCachedRead( CFileBasis *file );
         }
     }
 }
 
-NOINLINE bln FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode procMode, FileCacheMode cacheMode, fileError *po_error )
+NOINLINE bool FileIO::Private::FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode::mode_t openMode, FileProcMode procMode, FileCacheMode cacheMode, fileError *po_error )
 {
     ASSUME( file );
 
@@ -198,7 +198,7 @@ toExit:
     return file->handle != -1;
 }
         
-NOINLINE bln FileIO::Private::FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle, fileError *error )
+NOINLINE bool FileIO::Private::FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bool is_shouldCloseFileHandle, fileError *error )
 {
 	DSA( error, Error::Unimplemented() );
 	return false;
@@ -220,7 +220,7 @@ NOINLINE void FileIO::Private::FileIO_Close( CFileBasis *file )
     file->handle = -1;
 }
 
-bln FileIO::Private::FileIO_IsValid( const CFileBasis *file )
+bool FileIO::Private::FileIO_IsValid( const CFileBasis *file )
 {
     ASSUME( file );
     return file->handle != -1;
@@ -319,7 +319,7 @@ ui64 FileIO::Private::FileIO_SizeGet( const CFileBasis *file, CError *error )
     return o_stat.st_size - file->offsetToStart;
 }
 
-bln FileIO::Private::FileIO_SizeSet( CFileBasis *file, ui64 newSize, CError *error )
+bool FileIO::Private::FileIO_SizeSet( CFileBasis *file, ui64 newSize, CError *error )
 {
     SOFTBREAK;  //  TODO:
 	DSA( error, Error::Unimplemented() );
@@ -340,7 +340,7 @@ NOINLINE FilePath FileIO::Private::FileIO_PNNGet( const CFileBasis *file )
     return FilePath( a_buf );
 }
 
-NOINLINE bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written )
+NOINLINE bool FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written )
 {
     ASSUME( FileIO_IsValid( file ) && (cp_source || len == 0) );
     FILEIO_STAT( ++file->stats.writesToFileCount; )
@@ -360,7 +360,7 @@ NOINLINE bln FileIO::Private::WriteToFile( CFileBasis *file, const void *cp_sour
     return true;
 }
 
-NOINLINE bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
+NOINLINE bool FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed )
 {
     ASSUME( FileIO_IsValid( file ) && (p_target || len == 0) );
     FILEIO_STAT( ++file->stats.readsFromFileCount; )
@@ -377,7 +377,7 @@ NOINLINE bln FileIO::Private::ReadFromFile( CFileBasis *file, void *p_target, ui
     return true;
 }
 
-NOINLINE bln FileIO::Private::CancelCachedRead( CFileBasis *file )
+NOINLINE bool FileIO::Private::CancelCachedRead( CFileBasis *file )
 {
     ASSUME( FileIO_IsValid( file ) );
     if( file->bufferPos == file->readBufferCurrentSize )

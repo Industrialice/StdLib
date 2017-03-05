@@ -22,7 +22,7 @@ namespace
 
 	ui32 Static_PageSize;
 	ui32 Static_LargePageSize;
-	bln is_Initialized;
+	bool is_Initialized;
 }
 
 static DWORD SystemProtectionMode( VirtualMemory::PageMode mode )
@@ -36,7 +36,7 @@ void *VirtualMemory::Reserve( uiw size )
     return ::VirtualAlloc( 0, size, MEM_RESERVE, PAGE_NOACCESS );
 }
 
-bln VirtualMemory::Commit( void *p_mem, uiw size, PageMode mode )
+bool VirtualMemory::Commit( void *p_mem, uiw size, PageMode mode )
 {
     ASSUME( p_mem && size );
 	DWORD protect = SystemProtectionMode( mode );
@@ -60,7 +60,7 @@ void *VirtualMemory::Alloc( uiw size, PageMode mode )
     return ::VirtualAlloc( 0, size, MEM_RESERVE | MEM_COMMIT, protect );
 }
 
-bln VirtualMemory::Free( void *p_mem )
+bool VirtualMemory::Free( void *p_mem )
 {
     ASSUME( p_mem );
     return ::VirtualFree( p_mem, 0, MEM_RELEASE ) != 0;
@@ -113,7 +113,7 @@ toExit:
     return CResult < PageMode >( mode, error );
 }
 
-bln VirtualMemory::ProtectSet( void *p_mem, uiw size, PageMode mode )
+bool VirtualMemory::ProtectSet( void *p_mem, uiw size, PageMode mode )
 {
     ASSUME( p_mem && size );
     DWORD oldProtect;

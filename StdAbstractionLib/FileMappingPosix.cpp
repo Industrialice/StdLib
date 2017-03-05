@@ -6,7 +6,7 @@
 
 #include "FileMapping.hpp"
 
-FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( FileIO::CFile *file, uiw offset, uiw size, bln is_writeCopy, mappingError *error )
+FileMapping::Private::MappingStruct FileMapping::Private::FileMapping_Create( FileIO::CFile *file, uiw offset, uiw size, bool is_writeCopy, mappingError *error )
 {
 	ASSUME( file );
 

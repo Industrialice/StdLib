@@ -34,9 +34,9 @@ NOINLINE CError<> StdLib_FileError()
 	}
 }
 
-CError<> Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
+CError<> Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace )
 {
-	CResult < bln > is_file = Files::IsFile( sourcePnn );  //  will check the pnn
+	CResult < bool > is_file = Files::IsFile( sourcePnn );  //  will check the pnn
 	if( !is_file.Ok() )
 	{
 		return is_file.UnwrapError();
@@ -49,9 +49,9 @@ CError<> Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn
 	return Files::MoveObjectTo( sourcePnn, targetPnn, is_replace );  //  will check the pnn
 }
 
-CError<> Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
+CError<> Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace )
 {
-	CResult < bln > is_folder = Files::IsFolder( sourcePnn );  //  will check the pnn
+	CResult < bool > is_folder = Files::IsFolder( sourcePnn );  //  will check the pnn
 	if( !is_folder.Ok() )
 	{
 		return is_folder.UnwrapError();
@@ -64,7 +64,7 @@ CError<> Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetP
 	return Files::MoveObjectTo( sourcePnn, targetPnn, is_replace );  //  will check the pnn
 }
 
-NOINLINE CError<> Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
+NOINLINE CError<> Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace )
 {
 	FilePath source = sourcePnn, target = targetPnn;
 	BOOL wapiResult;
@@ -91,9 +91,9 @@ NOINLINE CError<> Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath
 	return Error::Ok();
 }
 
-CError<> Files::CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
+CError<> Files::CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace )
 {
-	CResult < bln > is_file = Files::IsFile( sourcePnn );  //  will check the pnn
+	CResult < bool > is_file = Files::IsFile( sourcePnn );  //  will check the pnn
 	if( !is_file.Ok() )
 	{
 		return is_file.UnwrapError();
@@ -106,9 +106,9 @@ CError<> Files::CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn
 	return CopyObjectTo( sourcePnn, targetPnn, is_replace );  //  will check the pnn
 }
 
-CError<> Files::CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
+CError<> Files::CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace )
 {
-	CResult < bln > is_folder = Files::IsFolder( sourcePnn );  //  will check the pnn
+	CResult < bool > is_folder = Files::IsFolder( sourcePnn );  //  will check the pnn
 	if( !is_folder.Ok() )
 	{
 		return is_folder.UnwrapError();
@@ -121,7 +121,7 @@ CError<> Files::CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetP
 	return CopyObjectTo( sourcePnn, targetPnn, is_replace );  //  will check the pnn
 }
 
-CError<> Files::CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace )
+CError<> Files::CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace )
 {
 	if( !sourcePnn.IsValid() || !targetPnn.IsValid() )
 	{
@@ -140,7 +140,7 @@ CError<> Files::CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetP
 
 NOINLINE CError<> Files::RemoveFile( const FilePath &pnn )
 {
-	CResult < bln > is_file = Files::IsFile( pnn );  //  will check the pnn
+	CResult < bool > is_file = Files::IsFile( pnn );  //  will check the pnn
 	if( !is_file.Ok() )
 	{
 		return is_file.UnwrapError();
@@ -166,7 +166,7 @@ NOINLINE CError<> Files::RemoveFolder( const FilePath &path )  //  potentially r
     WIN32_FIND_DATAW o_find;
     HANDLE h_find;
 	
-	CResult < bln > is_folder = Files::IsFolder( path );  //  will check the pnn
+	CResult < bool > is_folder = Files::IsFolder( path );  //  will check the pnn
 	if( !is_folder.Ok() )
 	{
 		return is_folder.UnwrapError();
@@ -227,13 +227,13 @@ NOINLINE CError<> Files::RemoveFolder( const FilePath &path )  //  potentially r
 
 CError<> Files::RemoveObject( const FilePath &path )
 {
-	CResult < bln > is_file = Files::IsFile( path );
+	CResult < bool > is_file = Files::IsFile( path );
 	if( is_file.Ok() && is_file.Unwrap() )
 	{
 		return Files::RemoveFile( path );
 	}
 
-	CResult < bln > is_folder = Files::IsFolder( path );
+	CResult < bool > is_folder = Files::IsFolder( path );
 	if( is_folder.Ok() && is_folder.Unwrap() )
 	{
 		return Files::RemoveFolder( path );
@@ -256,9 +256,9 @@ CError<> Files::VolumeDriveName( const FilePath &path, char *RSTR output, uiw ma
 	return Error::Unimplemented();
 }
 
-NOINLINE CResult < bln > Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1 )
+NOINLINE CResult < bool > Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1 )
 {
-	using returnType = CResult < bln >;
+	using returnType = CResult < bool >;
 
 	HANDLE h0 = INVALID_HANDLE_VALUE, h1 = INVALID_HANDLE_VALUE;
 	BY_HANDLE_FILE_INFORMATION inf0, inf1;
@@ -303,7 +303,7 @@ NOINLINE CResult < bln > Files::IsPointToTheSameFile( const FilePath &pnn0, cons
 		return returnType( false, Error::UnknownError() );
 	}
 
-	bln result = inf0.nFileIndexLow == inf1.nFileIndexLow;
+	bool result = inf0.nFileIndexLow == inf1.nFileIndexLow;
 	result &= inf0.nFileIndexHigh == inf1.nFileIndexHigh;
 	result &= inf0.dwVolumeSerialNumber == inf1.dwVolumeSerialNumber;
 
@@ -314,19 +314,19 @@ toExit:
 	return result;
 }
 
-NOINLINE CResult < bln > Files::IsExists( const FilePath &pnn )
+NOINLINE CResult < bool > Files::IsExists( const FilePath &pnn )
 {
 	if( !pnn.IsValid() )
 	{
-		return CResult < bln >( false, Error::InvalidArgument() );
+		return CResult < bool >( false, Error::InvalidArgument() );
 	}
 	DWORD attribs = ::GetFileAttributesW( pnn.PlatformPath() );
 	return attribs != INVALID_FILE_ATTRIBUTES;
 }
 
-CResult < bln > Files::IsFile( const FilePath &pnn )
+CResult < bool > Files::IsFile( const FilePath &pnn )
 {
-	using returnType = CResult < bln >;
+	using returnType = CResult < bool >;
 
 	DWORD attribs;
 
@@ -344,7 +344,7 @@ CResult < bln > Files::IsFile( const FilePath &pnn )
 	return ((attribs & FILE_ATTRIBUTE_DIRECTORY) == 0);
 }
 
-CResult < bln > Files::IsFolder( const FilePath &pnn )
+CResult < bool > Files::IsFolder( const FilePath &pnn )
 {
 	auto is_file = Files::IsFile( pnn );
 	if( !is_file.Ok() )
@@ -355,7 +355,7 @@ CResult < bln > Files::IsFolder( const FilePath &pnn )
 	return is_file.Unwrap() == false;
 }
 
-CResult < bln > Files::IsFolderEmpty( const FilePath &pnn )
+CResult < bool > Files::IsFolderEmpty( const FilePath &pnn )
 {
 	auto is_file = Files::IsFile( pnn );
 	if( !is_file.Ok() )
@@ -365,29 +365,29 @@ CResult < bln > Files::IsFolderEmpty( const FilePath &pnn )
 
 	if( is_file.Unwrap() )
 	{
-		return CResult < bln >( false, Error::InvalidArgument() );
+		return CResult < bool >( false, Error::InvalidArgument() );
 	}
 
-	return CResult < bln >( false, Error::Unimplemented() );
+	return CResult < bool >( false, Error::Unimplemented() );
 }
 
-NOINLINE CResult < bln > Files::IsFileReadOnlyGet( const FilePath &pnn )
+NOINLINE CResult < bool > Files::IsFileReadOnlyGet( const FilePath &pnn )
 {
 	if( !pnn.IsValid() )
 	{
-		return CResult < bln >( false, Error::InvalidArgument() );
+		return CResult < bool >( false, Error::InvalidArgument() );
 	}
     
 	DWORD attribs = ::GetFileAttributesW( pnn.PlatformPath() );
     if( attribs == INVALID_FILE_ATTRIBUTES )
     {
-		return CResult < bln >( false, StdLib_FileError() );
+		return CResult < bool >( false, StdLib_FileError() );
     }
 
     return (attribs & FILE_ATTRIBUTE_READONLY) != 0;
 }
 
-NOINLINE CError<> Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro )
+NOINLINE CError<> Files::IsFileReadOnlySet( const FilePath &pnn, bool is_ro )
 {
 	if( !pnn.IsValid() )
 	{
@@ -421,7 +421,7 @@ NOINLINE CError<> Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro )
 	return Error::Ok();
 }
 
-NOINLINE CError<> Files::CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject )
+NOINLINE CError<> Files::CreateNewFolder( const FilePath &where, const FilePath &name, bool is_overrideExistingObject )
 {
 	if( !where.IsValid() || !name.IsValid() )
 	{
@@ -462,7 +462,7 @@ NOINLINE CError<> Files::CreateNewFolder( const FilePath &where, const FilePath 
 	return Error::Ok();
 }
 
-NOINLINE CError<> Files::CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject )
+NOINLINE CError<> Files::CreateNewFile( const FilePath &where, const FilePath &name, bool is_overrideExistingObject )
 {
 	if( !where.IsValid() || !name.IsValid() )
 	{
@@ -506,7 +506,7 @@ NOINLINE CError<> Files::CreateNewFile( const FilePath &where, const FilePath &n
 	return Error::Ok();
 }
 
-bln Files::IsRelativePathSupported()
+bool Files::IsRelativePathSupported()
 {
 #ifdef _WIN32_WCE
 	return false;

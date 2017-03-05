@@ -112,7 +112,7 @@ private:
     static void EnumFilesCallback( Files::CFileEnumInfo *info, void *argument )
     {
 		SThreadInfo *ti = (SThreadInfo *)argument;
-        bln result = Files::RemoveFile( info->PNN(), 0 );
+        bool result = Files::RemoveFile( info->PNN(), 0 );
         ti->printfMutexPointer->Lock();
         ::printf( "deleting file %s, result %s\n", info->PNN(), result ? "success" : "fail" );
         ti->printfMutexPointer->Unlock();

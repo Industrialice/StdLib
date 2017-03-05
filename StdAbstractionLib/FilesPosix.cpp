@@ -11,139 +11,139 @@
 #include <errno.h>
 #include <dirent.h>
 
-bln Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+bool Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-bln Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+bool Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-NOINLINE bln Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+NOINLINE bool Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-bln Files::CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+bool Files::CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-bln Files::CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+bool Files::CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-bln Files::CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace, CError *error )
+bool Files::CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-NOINLINE bln Files::RemoveFile( const FilePath &pnn, CError *error )
+NOINLINE bool Files::RemoveFile( const FilePath &pnn, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-NOINLINE bln Files::RemoveFolder( const FilePath &path, CError *error )  //  potentially recursive
+NOINLINE bool Files::RemoveFolder( const FilePath &path, CError *error )  //  potentially recursive
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-bln Files::RemoveObject( const FilePath &path, CError *error )
+bool Files::RemoveObject( const FilePath &path, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-bln Files::VolumeDriveName( const FilePath &path, char *RSTR output, uiw maxLen )
+bool Files::VolumeDriveName( const FilePath &path, char *RSTR output, uiw maxLen )
 {
 	NOT_IMPLEMENTED;
 	return false;
 }
 
-NOINLINE bln Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1, CError *error )
-{
-	NOT_IMPLEMENTED;
-	DSA( error, Error::Unimplemented() );
-	return false;
-}
-
-NOINLINE bln Files::IsExists( const FilePath &pnn, CError *error )
+NOINLINE bool Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-bln Files::IsFile( const FilePath &pnn, CError *error )
+NOINLINE bool Files::IsExists( const FilePath &pnn, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-bln Files::IsFolder( const FilePath &pnn, CError *error )
+bool Files::IsFile( const FilePath &pnn, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-bln Files::IsEmpty( const FilePath &pnn, CError *error )
+bool Files::IsFolder( const FilePath &pnn, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-NOINLINE bln Files::IsFileReadOnlyGet( const FilePath &pnn, CError *error )
+bool Files::IsEmpty( const FilePath &pnn, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-NOINLINE bln Files::IsFileReadOnlySet( const FilePath &pnn, bln is_ro, CError *error )
+NOINLINE bool Files::IsFileReadOnlyGet( const FilePath &pnn, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-NOINLINE bln Files::CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject, CError *error )
+NOINLINE bool Files::IsFileReadOnlySet( const FilePath &pnn, bool is_ro, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-NOINLINE bln Files::CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject, CError *error )
+NOINLINE bool Files::CreateNewFolder( const FilePath &where, const FilePath &name, bool is_overrideExistingObject, CError *error )
 {
 	NOT_IMPLEMENTED;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
-bln Files::IsRelativePathSupported()
+NOINLINE bool Files::CreateNewFile( const FilePath &where, const FilePath &name, bool is_overrideExistingObject, CError *error )
+{
+	NOT_IMPLEMENTED;
+	DSA( error, Error::Unimplemented() );
+	return false;
+}
+
+bool Files::IsRelativePathSupported()
 {
 	return true;
 }
@@ -159,7 +159,7 @@ FilePath Files::CurrentWorkingPathGet()
 	return FilePath( result );
 }
 
-bln Files::CurrentWorkingPathSet( const FilePath &path )
+bool Files::CurrentWorkingPathSet( const FilePath &path )
 {
 	if( !path.IsValid() )
 	{
@@ -170,25 +170,25 @@ bln Files::CurrentWorkingPathSet( const FilePath &path )
 
 struct CFileEnumerator : public Files::CFileEnumInfo
 {
-	NOINLINE bln EnumFirstFile( const FilePath &path, const FilePath &mask )
+	NOINLINE bool EnumFirstFile( const FilePath &path, const FilePath &mask )
 	{
 		NOT_IMPLEMENTED;
 		return false;
 	}
 
-	NOINLINE bln EnumNextFile()
+	NOINLINE bool EnumNextFile()
 	{
 		NOT_IMPLEMENTED;
 		return false;
 	}
 };
 
-bln Files::EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask )
+bool Files::EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask )
 {
 	return ((CFileEnumerator *)info)->EnumFirstFile( path, mask );
 }
 
-bln Files::EnumNextFile( CFileEnumInfo *info )
+bool Files::EnumNextFile( CFileEnumInfo *info )
 {
 	return ((CFileEnumerator *)info)->EnumNextFile();
 }
@@ -199,11 +199,11 @@ void Files::Private::CloseEnumHandle( fileEnumHandle handle )
 }
 
 #if 0
-NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *error )
+NOINLINE bool Files::RemoveFile( const char *cp_pnn, CError *error )
 {
     ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
 
-    bln funcResult = ::unlink( cp_pnn ) == 0;
+    bool funcResult = ::unlink( cp_pnn ) == 0;
     if( error )
     {
         if( !funcResult )
@@ -230,13 +230,13 @@ NOINLINE bln Files::RemoveFile( const char *cp_pnn, CError *error )
     return funcResult;
 }
 
-NOINLINE bln Files::RemoveFolder( const char *cp_path, CError *error )
+NOINLINE bool Files::RemoveFolder( const char *cp_path, CError *error )
 {
     ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH_LENGTH );
     DIR *p_dir;
     struct dirent *po_dir;
     CError o_error = Error::Ok();
-    bln funcResult = false;
+    bool funcResult = false;
     char a_buf[ MAX_PATH_LENGTH ];
     uiw cpyIndex = Funcs::StrCpyAndCountWONull( a_buf, cp_path );
     a_buf[ cpyIndex++ ] = '/';
@@ -306,46 +306,46 @@ toExit:
     return funcResult;
 }
 
-bln Files::IsFileOrFolderExists( const char *cp_papn )
+bool Files::IsFileOrFolderExists( const char *cp_papn )
 {
     ASSUME( cp_papn && _StrLen( cp_papn ) < MAX_PATH_LENGTH );
     struct stat o_stat;
     return ::stat( cp_papn, &o_stat ) == 0 && (S_ISDIR( o_stat.st_mode ) || S_ISREG( o_stat.st_mode ));
 }
 
-bln Files::IsFileExists( const char *cp_pnn )
+bool Files::IsFileExists( const char *cp_pnn )
 {
     ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
     return ::access( cp_pnn, F_OK ) == 0;
 }
 
-bln Files::IsFolderExists( const char *cp_path )
+bool Files::IsFolderExists( const char *cp_path )
 {
     ASSUME( cp_path && _StrLen( cp_path ) < MAX_PATH_LENGTH );
     struct stat o_stat;
     return ::stat( cp_path, &o_stat ) == 0 && S_ISDIR( o_stat.st_mode );
 }
 
-bln Files::IsFileReadOnlyGet( const char *cp_pnn )
+bool Files::IsFileReadOnlyGet( const char *cp_pnn )
 {
     ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
     DBGBREAK;  //  TODO: complete
     return false;
 }
 
-bln Files::IsFileReadOnlySet( const char *cp_pnn, bln is_ro )
+bool Files::IsFileReadOnlySet( const char *cp_pnn, bool is_ro )
 {
     ASSUME( cp_pnn && _StrLen( cp_pnn ) < MAX_PATH_LENGTH );
     DBGBREAK;  //  TODO: complete
     return false;
 }
 
-bln Files::IsRelativePathSupported()
+bool Files::IsRelativePathSupported()
 {
 	return true;
 }
 
-bln Files::IsAbsolutePath( const char *pnn, uiw parseLen )
+bool Files::IsAbsolutePath( const char *pnn, uiw parseLen )
 {
     DBGBREAK;  //  TODO: complete
     return true;
@@ -357,7 +357,7 @@ uiw Files::AbsolutePath( const char *RSTR cp_sourcePath, char *absPath, uiw maxL
 	return 0;
 }
 
-bln Files::CurrentWorkingPathGet( char *buf, uiw maxLen, uiw *copied )
+bool Files::CurrentWorkingPathGet( char *buf, uiw maxLen, uiw *copied )
 {
 	char *result = ::getcwd( buf, maxLen );
 	if( result == NULL )
@@ -376,20 +376,20 @@ bln Files::CurrentWorkingPathGet( char *buf, uiw maxLen, uiw *copied )
 	return true;
 }
 
-bln Files::CurrentWorkingPathSet( const char *path )
+bool Files::CurrentWorkingPathSet( const char *path )
 {
 	ASSUME( path );
 	return chdir( path ) == 0;
 }
 
-NOINLINE bln Files::CreateNewFolder( const char *cp_where, const char *cp_name, CError *error )
+NOINLINE bool Files::CreateNewFolder( const char *cp_where, const char *cp_name, CError *error )
 {
     ASSUME( cp_where && cp_name && (_StrLen( cp_where ) + _StrLen( cp_name ) < MAX_PATH_LENGTH) );
 
     char a_buf[ MAX_PATH_LENGTH ];
     uiw len = Funcs::StrCpyAndCountWONull( a_buf, cp_where );
     _StrCpy( a_buf + len, cp_name );
-    bln funcResult = false;
+    bool funcResult = false;
     CError o_error = Error::Ok();
     mode_t process_mask;
 
@@ -483,19 +483,19 @@ NOINLINE uiw Files::ExtractExtensionFromString( const char *cp_str, char *RSTR p
     return Funcs::StrCpyAndCount( p_buf, cp_str + lastDot + 1 );
 }
 
-bln Files::EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask )  //  friend of CFileEnumInfo
+bool Files::EnumFirstFile( CFileEnumInfo *info, const char *path, const char *mask )  //  friend of CFileEnumInfo
 {
 	DBGBREAK;  //  TODO:
     return false;
 }
 
-bln Files::EnumNextFile( CFileEnumInfo *info )  //  friend of CFileEnumInfo
+bool Files::EnumNextFile( CFileEnumInfo *info )  //  friend of CFileEnumInfo
 {
 	DBGBREAK;  //  TODO:
     return false;
 }
 
-void Files::EnumFilesRecursively( const char *path, const char *mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
+void Files::EnumFilesRecursively( const char *path, const char *mask, bool is_reportFolders, EnumFilesCallback callback, void *argument )
 {
 	DBGBREAK;  //  TODO:
 }

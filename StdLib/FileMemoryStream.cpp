@@ -75,12 +75,12 @@ void FileMemoryStream::Close()
 	_stream = 0;
 }
 
-bln FileMemoryStream::IsOpened() const
+bool FileMemoryStream::IsOpened() const
 {
 	return _stream != 0;
 }
 
-bln FileMemoryStream::Read( void *target, ui32 len, ui32 *readed )
+bool FileMemoryStream::Read( void *target, ui32 len, ui32 *readed )
 {
 	ASSUME( _stream && !!(_procMode & FileProcMode::Read) );
 	ASSUME( len == 0 || target );
@@ -96,7 +96,7 @@ bln FileMemoryStream::Read( void *target, ui32 len, ui32 *readed )
 	return true;
 }
 
-bln FileMemoryStream::Write( const void *source, ui32 len, ui32 *written )
+bool FileMemoryStream::Write( const void *source, ui32 len, ui32 *written )
 {
 	ASSUME( _stream && !!(_procMode & FileProcMode::Write) );
 	ASSUME( len == 0 || source );
@@ -124,18 +124,18 @@ bln FileMemoryStream::Write( const void *source, ui32 len, ui32 *written )
 	return true;
 }
 
-bln FileMemoryStream::Flush()
+bool FileMemoryStream::Flush()
 {
 	ASSUME( _stream );
 	return true;
 }
 
-bln FileMemoryStream::IsBufferingSupported() const
+bool FileMemoryStream::IsBufferingSupported() const
 {
 	return false;
 }
 
-bln FileMemoryStream::BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer )
+bool FileMemoryStream::BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer )
 {
 	return false;
 }
@@ -150,7 +150,7 @@ const void *FileMemoryStream::BufferGet() const
 	return 0;
 }
 
-bln FileMemoryStream::IsSeekSupported() const
+bool FileMemoryStream::IsSeekSupported() const
 {
 	return true;
 }

@@ -44,13 +44,13 @@ public:
     DirectionFunc DirectionGet( uiw index ) const;
 	void DirectionRemove( uiw index );
 	void DirectionToTheTop( uiw index );
-    void IsOnSet( bln is_on );
-    bln IsOnGet() const;
-    bln IsOnToggle();  //  returns new state
-    bln IsMultithreadedGet() const;
-    void IsMitlithreadedSet( bln is_multithreaded );
+    void IsOnSet( bool is_on );
+    bool IsOnGet() const;
+    bool IsOnToggle();  //  returns new state
+    bool IsMultithreadedGet() const;
+    void IsMitlithreadedSet( bool is_multithreaded );
     const char *NameGet() const;
-    static CLogger *Create( const char *cp_name, bln is_on, bln is_multithreaded );  //  isn't thread safe
+    static WARN_IF_UNUSED CLogger *Create( const char *cp_name, bool is_on, bool is_multithreaded );  //  isn't thread safe
     static void Delete( CLogger *po_logger );
 };
 

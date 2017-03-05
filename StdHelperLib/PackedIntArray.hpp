@@ -12,7 +12,7 @@ namespace StdLib {
 
 enum packiarr_OutOfRangeReaction { packiarr_OutOfRangeIgnore, packiarr_OutOfRangeDebugException, packiarr_OutOfRangeClamp, packiarr_OutOfRangeWrap };
 
-template < const uiw pack, bln is_signed, const packiarr_OutOfRangeReaction oorr > class __packiarr_abstract__
+template < const uiw pack, bool is_signed, const packiarr_OutOfRangeReaction oorr > class __packiarr_abstract__
 {
 protected:
     typedef typename IntWithSizeAndSign
@@ -169,7 +169,7 @@ public:
     uiw CellsGet() const;
 };
 
-template < const uiw cells, const uiw pack, bln is_signed, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeDebugException > class packiarr_static : public __packiarr_abstract__ < pack, is_signed, oorr >
+template < const uiw cells, const uiw pack, bool is_signed, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeDebugException > class packiarr_static : public __packiarr_abstract__ < pack, is_signed, oorr >
 {
     typedef __packiarr_abstract__ < pack, is_signed, oorr > parentType;
     typedef typename parentType::native_t native_t;
@@ -222,7 +222,7 @@ public:
     }
 };
 
-template < const uiw pack, bln is_signed, typename reservator = Reservator::Half <>, typename allocator = Allocator::Simple, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeDebugException > class packiarr_dynamic : public __packiarr_abstract__ < pack, is_signed, oorr >
+template < const uiw pack, bool is_signed, typename reservator = Reservator::Half <>, typename allocator = Allocator::Simple, const packiarr_OutOfRangeReaction oorr = packiarr_OutOfRangeDebugException > class packiarr_dynamic : public __packiarr_abstract__ < pack, is_signed, oorr >
 {
     typedef __packiarr_abstract__ < pack, is_signed, oorr > parentType;
     typedef typename parentType::native_t native_t;

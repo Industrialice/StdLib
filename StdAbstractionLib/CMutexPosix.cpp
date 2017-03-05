@@ -41,7 +41,7 @@ void CMutex::Unlock()
     ASSUME( result == 0 );
 }
 
-bln CMutex::TryLock()
+bool CMutex::TryLock()
 {
     return ::pthread_mutex_trylock( &_handle ) == 0;
 }

@@ -16,18 +16,18 @@ namespace StdLib
             AtomicOps::atomic32 flag;
 
         public:
-            explicit FORCEINLINE CAtomicFlag( bln initialState = false )
+            explicit FORCEINLINE CAtomicFlag( bool initialState = false )
             {
                 flag = initialState;
             }
 
-            FORCEINLINE bln IsSet() const
+            FORCEINLINE bool IsSet() const
             {
                 #ifdef LITTLE_ENDIAN
                     union
                     {
                         AtomicOps::atomic32 flag;
-                        bln boolFlag;
+                        bool boolFlag;
                     } u;
                     u.flag = AtomicOps::Acquire_Load( &flag );  //  will return 0 or 1
                     return u.boolFlag;
@@ -46,7 +46,7 @@ namespace StdLib
                 AtomicOps::Set( &flag, 0 );
             }
 
-            FORCEINLINE void SetTo( bln is_set )
+            FORCEINLINE void SetTo( bool is_set )
             {
                 AtomicOps::Set( &flag, is_set );
             }
@@ -56,17 +56,17 @@ namespace StdLib
 
         class CAtomicFlag
         {
-            bln flag;
+            bool flag;
             mutable CMutex mutex;
 
         public:
-            explicit FORCEINLINE CAtomicFlag( bln initialState = false )
+            explicit FORCEINLINE CAtomicFlag( bool initialState = false )
             {
                 CScopeLock <> lock( &mutex );
                 flag = initialState;
             }
 
-            FORCEINLINE bln IsSet() const
+            FORCEINLINE bool IsSet() const
             {
                 CScopeLock <> lock( &mutex );
                 return flag;
@@ -84,7 +84,7 @@ namespace StdLib
                 flag = false;
             }
 
-            FORCEINLINE void SetTo( bln is_set )
+            FORCEINLINE void SetTo( bool is_set )
             {
                 CScopeLock <> lock( &mutex );
                 flag = is_set;

@@ -12,7 +12,7 @@ CEvent::~CEvent()
     ASSUME( result == 0 );
 }
 
-CEvent::CEvent( bln isInitiallySignaling /* = false */, bln isResetAfterWait /* = false */ )
+CEvent::CEvent( bool isInitiallySignaling /* = false */, bool isResetAfterWait /* = false */ )
 {
     _handle.is_resetAfterWait = isResetAfterWait;
     _handle.is_set = isInitiallySignaling;

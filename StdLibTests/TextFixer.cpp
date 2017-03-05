@@ -321,7 +321,7 @@ void Fix( TextFixerMode::mode_t fixMode )
 
     for( uiw index = 0; index < extNum.Size(); ++index )
     {
-        for( bln result = Files::EnumFirstFile( &info, wbuf, extNum[ index ].Data() ).Ok(); result; result = Files::EnumNextFile( &info ).Ok() )
+        for( bool result = Files::EnumFirstFile( &info, wbuf, extNum[ index ].Data() ).Ok(); result; result = Files::EnumNextFile( &info ).Ok() )
         {
             if( !info.IsFolder() )
             {

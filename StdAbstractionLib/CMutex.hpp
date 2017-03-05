@@ -15,13 +15,13 @@ namespace StdLib
 		explicit CMutex( ui32 spinCount = 0 );
 		void Lock();
 		void Unlock();
-		bln TryLock();  //  will return true if lock succeeded
+		bool TryLock();  //  will return true if lock succeeded
 
 	protected:
 		static void Initialize();
 	};
 
-	template < bln is_nullable = false > class CScopeLock
+	template < bool is_nullable = false > class CScopeLock
 	{
 		CMutex *_mutex;
 

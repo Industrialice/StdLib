@@ -25,7 +25,7 @@ FilePath &FilePath::PopLevel()
 	return *this;
 }
 
-bln FilePath::IsEmpty() const
+bool FilePath::IsEmpty() const
 {
 	return _path.IsEmpty();
 }
@@ -46,7 +46,7 @@ void FilePath::Normalize()
 	}
 }
 
-bln FilePath::IsValid() const
+bool FilePath::IsValid() const
 {
 	if( _path.IsEmpty() )
 	{
@@ -74,7 +74,7 @@ void FilePath::MakeAbsolute()
 #endif
 }
 
-bln FilePath::IsAbsolute() const
+bool FilePath::IsAbsolute() const
 {
 #ifndef _WIN32_WCE
 	NOT_IMPLEMENTED;
@@ -84,7 +84,7 @@ bln FilePath::IsAbsolute() const
 #endif
 }
 
-bln FilePath::HasExtension() const
+bool FilePath::HasExtension() const
 {
 	NOT_IMPLEMENTED;
 	return false;

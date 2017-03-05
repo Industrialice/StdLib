@@ -14,8 +14,8 @@ namespace StdLib
 		virtual ui8 *Memory() = 0;
 		virtual const ui8 *Memory() const = 0;
 		virtual const ui8 *CMemory() const = 0;
-		virtual bln IsReadable() const = 0;
-		virtual bln IsWritable() const = 0;
+		virtual bool IsReadable() const = 0;
+		virtual bool IsWritable() const = 0;
 	};
 
 	//  uses a fixed buffer
@@ -58,12 +58,12 @@ namespace StdLib
 			return _buffer;
 		}
 
-		virtual bln IsReadable() const override
+		virtual bool IsReadable() const override
 		{
 			return true;
 		}
 
-		virtual bln IsWritable() const override
+		virtual bool IsWritable() const override
 		{
 			return true;
 		}
@@ -132,12 +132,12 @@ namespace StdLib
 			return _readBuffer;
 		}
 
-		virtual bln IsReadable() const override
+		virtual bool IsReadable() const override
 		{
 			return _readBuffer != 0;
 		}
 
-		virtual bln IsWritable() const override
+		virtual bool IsWritable() const override
 		{
 			return _writeBuffer != 0;
 		}
@@ -189,12 +189,12 @@ namespace StdLib
 			return _buffer;
 		}
 
-		virtual bln IsReadable() const override
+		virtual bool IsReadable() const override
 		{
 			return true;
 		}
 
-		virtual bln IsWritable() const override
+		virtual bool IsWritable() const override
 		{
 			return true;
 		}

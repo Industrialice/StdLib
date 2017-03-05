@@ -29,27 +29,27 @@ namespace Funcs
     EXTERNALS uiw NormalizeMem64( ui64 val, char *p_buf );  //  returns buffer size after normalization
     EXTERNALS uiw NormalizeMemWord( uiw val, char *p_buf );  //  returns buffer size after normalization
 
-    typedef bln (*ChrTestFunc)( char );
+    typedef bool (*ChrTestFunc)( char );
 
-    EXTERNALS bln IsChrUpperAlpha( char source );
-    EXTERNALS bln IsChrLowerAlpha( char source );
-    EXTERNALS bln IsChrAlpha( char source );
-    EXTERNALS bln IsChrDec( char source );
-    EXTERNALS bln IsChrHex( char source );
-    EXTERNALS bln IsChrOct( char source );
-    EXTERNALS bln IsChrBin( char source );
+    EXTERNALS bool IsChrUpperAlpha( char source );
+    EXTERNALS bool IsChrLowerAlpha( char source );
+    EXTERNALS bool IsChrAlpha( char source );
+    EXTERNALS bool IsChrDec( char source );
+    EXTERNALS bool IsChrHex( char source );
+    EXTERNALS bool IsChrOct( char source );
+    EXTERNALS bool IsChrBin( char source );
 
     //  all with bases but without signes, must contain at least one digit
-    EXTERNALD bln IsStrHex( const char *cp_str, uiw maxLen = uiw_max );
-    EXTERNALD bln IsStrBin( const char *cp_str, uiw maxLen = uiw_max );
-    EXTERNALD bln IsStrFP( const char *cp_str, uiw maxLen = uiw_max );
-    EXTERNALD bln IsStrDec( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALD bool IsStrHex( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALD bool IsStrBin( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALD bool IsStrFP( const char *cp_str, uiw maxLen = uiw_max );
+    EXTERNALD bool IsStrDec( const char *cp_str, uiw maxLen = uiw_max );
 
     EXTERNALS char ChrToLower( char source );
     EXTERNALS char ChrToUpper( char source );
 
-    EXTERNALS bln IsChrEqual( char one, char two );  //  compare chars
-    EXTERNALS bln IsChrEqualWOR( char one, char two );  //  compare chars without register
+    EXTERNALS bool IsChrEqual( char one, char two );  //  compare chars
+    EXTERNALS bool IsChrEqualWOR( char one, char two );  //  compare chars without register
 
     //  maxLen without zero symbol
 
@@ -61,29 +61,29 @@ namespace Funcs
     EXTERNALS uiw StrToUpperAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aes = '\0' );
     EXTERNALS uiw StrToUpperInplace( char *p_str );
     EXTERNALS uiw StrToUpperInplaceAdv( char *p_str, uiw maxLen = uiw_max, char aes = '\0' );
-    EXTERNALS bln StrEqual( const char *cp_one, const char *cp_two );  //  true if both strings are zero
-    EXTERNALS bln StrEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen = uiw_max, char aes = '\0' );  //  true if both strings are zero
+    EXTERNALS bool StrEqual( const char *cp_one, const char *cp_two );  //  true if both strings are zero
+    EXTERNALS bool StrEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen = uiw_max, char aes = '\0' );  //  true if both strings are zero
     #define _StrEqual( one, two ) (!::strcmp( one, two ))
-    EXTERNALS bln StrNEqual( const char *cp_one, const char *cp_two, uiw count );  //  true if both strings are zero or count is zero
-    EXTERNALS bln StrNEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes = '\0' );  //  true if both strings are zero or count is zero
+    EXTERNALS bool StrNEqual( const char *cp_one, const char *cp_two, uiw count );  //  true if both strings are zero or count is zero
+    EXTERNALS bool StrNEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes = '\0' );  //  true if both strings are zero or count is zero
     #define _StrNEqual( one, two, count ) (!::strncmp( one, two, count ))
-    EXTERNALS bln StrIEqual( const char *cp_one, const char *cp_two );  //  true if both strings are zero
-    EXTERNALS bln StrIEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen = uiw_max, char aes = '\0' );  //  true if both strings are zero
-    EXTERNALS bln StrINEqual( const char *cp_one, const char *cp_two, uiw count );  //  true if both strings are zero or count is zero
-    EXTERNALS bln StrINEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes = '\0' );  //  true if both strings are zero or count is zero
+    EXTERNALS bool StrIEqual( const char *cp_one, const char *cp_two );  //  true if both strings are zero
+    EXTERNALS bool StrIEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen = uiw_max, char aes = '\0' );  //  true if both strings are zero
+    EXTERNALS bool StrINEqual( const char *cp_one, const char *cp_two, uiw count );  //  true if both strings are zero or count is zero
+    EXTERNALS bool StrINEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes = '\0' );  //  true if both strings are zero or count is zero
     EXTERNALS uiw StrLen( const char *cp_str );
     EXTERNALS uiw StrLenAdv( const char *cp_str, uiw maxLen = uiw_max, char aes = '\0' );
     #define _StrLen( str ) ::strlen( str )
     EXTERNALS void StrCat( char *RSTR p_dest, const char *cp_source );
     EXTERNALS uiw StrCatAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen = uiw_max, char aesDest = '\0', char aesSrc = '\0' );
     #define _StrCat( dest, source ) (void)::strcat( dest, source )
-    EXTERNALS void StrCpy( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true );
-    EXTERNALS uiw StrCpyAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS void StrCpy( char *RSTR p_dest, const char *cp_source, bool is_nullTerminate = true );
+    EXTERNALS uiw StrCpyAdv( char *RSTR p_dest, const char *cp_source, bool is_nullTerminate = true, uiw maxLen = uiw_max, char aes = '\0' );
     #define _StrCpy( dest, source ) (void)::strcpy( dest, source )
-	EXTERNALS uiw StrCpyAndCount( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true );
-	EXTERNALS uiw StrCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate = true, uiw maxLen = uiw_max, char aes = '\0' );
-    EXTERNALS uiw StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw maxLen, bln is_nullTerminate = true );
-	EXTERNALS uiw StrSafeCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen, bln is_nullTerminate = true, char aes = '\0' );
+	EXTERNALS uiw StrCpyAndCount( char *RSTR p_dest, const char *cp_source, bool is_nullTerminate = true );
+	EXTERNALS uiw StrCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, bool is_nullTerminate = true, uiw maxLen = uiw_max, char aes = '\0' );
+    EXTERNALS uiw StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw maxLen, bool is_nullTerminate = true );
+	EXTERNALS uiw StrSafeCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen, bool is_nullTerminate = true, char aes = '\0' );
     EXTERNALS uiw StrDelim( char **pp_output, char *p_source, char delim );  //  you can pass null as pp_output only to get a number of the final strings
     EXTERNALS uiw StrDelimConst( char **pp_output, const char *cp_source, char delim );  //  TODO: incomplete  //  you can pass null as pp_output only to get a number of the final strings
     EXTERNALS char *StrChr( const char *cp_source, char symbol );  //  returning value of the same string - assume it is const if source is const
@@ -112,10 +112,10 @@ namespace Funcs
     #define _StrStr( source, under ) ((char *)::strstr( source, under ))
     EXTERNALS char *StrIStr( const char *cp_source, const char *cp_under );  //  returning value of the same string - assume it is const if source is const
     EXTERNALS char *StrIStrAdv( const char *cp_source, const char *cp_under, uiw countSrc = uiw_max, uiw countUnder = uiw_max, char aesSrc = '\0', char aesUnder = '\0' );  //  returning value of the same string - assume it is const if source is const
-    EXTERNALS bln IsStrIsFromThisSymbols( const char *cp_str, const char *cp_symbols );  //  true if both have zero length, false if only one of them have zero length
-    EXTERNALS bln IsStrIsFromThisSymbol( const char *cp_str, char symbol, uiw count = uiw_max );  //  false on zero length string
-    EXTERNALS bln IsStrMatch( const char *cp_str, ChrTestFunc func );  //  false on zero length string
-    EXTERNALS bln IsStrMatchAdv( const char *cp_str, ChrTestFunc func, uiw count = uiw_max, char aes = '\0' );  //  false on zero length string
+    EXTERNALS bool IsStrIsFromThisSymbols( const char *cp_str, const char *cp_symbols );  //  true if both have zero length, false if only one of them have zero length
+    EXTERNALS bool IsStrIsFromThisSymbol( const char *cp_str, char symbol, uiw count = uiw_max );  //  false on zero length string
+    EXTERNALS bool IsStrMatch( const char *cp_str, ChrTestFunc func );  //  false on zero length string
+    EXTERNALS bool IsStrMatchAdv( const char *cp_str, ChrTestFunc func, uiw count = uiw_max, char aes = '\0' );  //  false on zero length string
     EXTERNALS uiw StrExclude( char *RSTR p_target, const char *cp_source, char symbol );  //  you can pass null as p_target to get only proced len
     EXTERNALS uiw StrExcludeAdv( char *RSTR p_target, const char *cp_source, char symbol, uiw count = uiw_max, char aes = '\0' );  //  you can pass null as p_target to get only proced len
     EXTERNALS uiw StrExcludeMask( char *RSTR p_target, const char *cp_source, char mask, char symbol );  //  you can pass null as p_target to get only proced len
@@ -144,9 +144,9 @@ namespace Funcs
     EXTERNALS f32 StrToF32( const char *cp_str );
     EXTERNALS f64 StrToF64( const char *cp_str );
 
-    EXTERNALS bln IsHexBase( const char *cp_str );
-    EXTERNALS bln IsOctBase( const char *cp_str );
-    EXTERNALS bln IsBinBase( const char *cp_str );
+    EXTERNALS bool IsHexBase( const char *cp_str );
+    EXTERNALS bool IsOctBase( const char *cp_str );
+    EXTERNALS bool IsBinBase( const char *cp_str );
 
     EXTERNALS uiw F32ToStr( f32 val, char *p_buf );
     EXTERNALS uiw F32ToStrWithPrecise( f32 val, ui32 precise, char *p_buf );
@@ -195,11 +195,11 @@ namespace Funcs
     struct _ArgType  //  for debug only
     {
 		uiw size;
-		bln is_pointer;
-		bln is_fp;
-		bln is_string;
+		bool is_pointer;
+		bool is_fp;
+		bool is_string;
 
-		_ArgType( uiw size = 0, bln is_pointer = false, bln is_fp = false, bln is_string = false ) :
+		_ArgType( uiw size = 0, bool is_pointer = false, bool is_fp = false, bool is_string = false ) :
 			size( size ), is_pointer( is_pointer ), is_fp( is_fp ), is_string( is_string )
 		{}
     };
@@ -240,7 +240,7 @@ namespace Funcs
 	}
 	
 #if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG)
-    EXTERNALD bln _PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... );
+    EXTERNALD bool _PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... );
 
     template < typename X > _ArgType _AnalyzeArg( const X &arg )
     {
@@ -263,7 +263,7 @@ namespace Funcs
 			}
 			return argType;
 		}
-        if( TypeDesc < X >::is_integer || std::is_same < underlyingTypeX, bln >() || std::is_same < underlyingTypeX, char >() )
+        if( TypeDesc < X >::is_integer || std::is_same < underlyingTypeX, bool >() || std::is_same < underlyingTypeX, char >() )
         {
 			if( sizeof(X) < sizeof(int) )
 			{
@@ -275,7 +275,7 @@ namespace Funcs
         return _ArgType();
     }
 
-    template < typename... Args > bln _AreArgsValid( const char *cp_fmt, const Args &... args )
+    template < typename... Args > bool _AreArgsValid( const char *cp_fmt, const Args &... args )
     {
         static const _ArgType argTypes[] = { _ArgType(), _AnalyzeArg( args )... };
         return _PrintCheckArgs( argTypes + 1, COUNTOF( argTypes ) - 1, cp_fmt, args... );
@@ -321,9 +321,9 @@ namespace Funcs
 	#define PrintToFile PrintToFileDebug
 #endif
 
-    template < ChrTestFunc func > bln IsStrMatchT( const char *cp_str, uiw count = uiw_max )
+    template < ChrTestFunc func > bool IsStrMatchT( const char *cp_str, uiw count = uiw_max )
     {
-        bln is_match = false;
+        bool is_match = false;
         while( *cp_str && count )
         {
             is_match = func( *cp_str );
@@ -408,7 +408,7 @@ namespace Funcs
     }
 
     //  p_buf must be able to contain at least sizeof(X) * 2 + 1 bytes
-    template < typename X > NOINLINE uiw IntToStrHex( bln is_upper, bln is_setBase, bln is_dropFrontZeroes, char *p_buf, X val )
+    template < typename X > NOINLINE uiw IntToStrHex( bool is_upper, bool is_setBase, bool is_dropFrontZeroes, char *p_buf, X val )
     {
         const char *cp_set = "0123456789abcdef0123456789ABCDEF" + (is_upper << 4);
         char *p_sourceBuf = p_buf;
@@ -432,7 +432,7 @@ namespace Funcs
     }
 
     //  p_buf must be able to contain at least sizeof(X) * 8 + 1 bytes
-    template < typename X > NOINLINE uiw IntToStrBin( X val, char *p_buf, bln is_setBase = false, bln is_dropFrontZeroes = false  )
+    template < typename X > NOINLINE uiw IntToStrBin( X val, char *p_buf, bool is_setBase = false, bool is_dropFrontZeroes = false  )
     {
         char *p_sourceBuf = p_buf;
         if( is_setBase )
@@ -443,7 +443,7 @@ namespace Funcs
         for( typename TypeDesc < X >::uint_variant test = (typename TypeDesc < X >::uint_variant)1 << TypeDesc < X >::bits - 1; test; test >>= 1 )
         {
             X tested = val & test;
-            bln is_nzero = tested != 0;
+            bool is_nzero = tested != 0;
             if( is_dropFrontZeroes && !is_nzero )
             {
                 continue;
@@ -510,7 +510,7 @@ namespace Funcs
 
         if( TypeDesc < X >::is_signed )
         {
-            bln is_lessZero = val < 0;
+            bool is_lessZero = val < 0;
             for( ; ; )
             {
                 *p_end = '0' + abs( (iw)(val % 10) );

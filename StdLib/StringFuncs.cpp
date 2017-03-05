@@ -53,37 +53,37 @@ uiw Funcs::NormalizeMemWord( uiw val, char *p_buf )
 	return NormalizeMem( val, p_buf );
 }
 
-bln Funcs::IsChrUpperAlpha( char source )
+bool Funcs::IsChrUpperAlpha( char source )
 {
     return source >= 'A' && source <= 'Z';
 }
 
-bln Funcs::IsChrLowerAlpha( char source )
+bool Funcs::IsChrLowerAlpha( char source )
 {
     return source >= 'a' && source <= 'z';
 }
 
-bln Funcs::IsChrAlpha( char source )
+bool Funcs::IsChrAlpha( char source )
 {
     return source >= 'a' && source <= 'z' || source >= 'A' && source <= 'Z';
 }
 
-bln Funcs::IsChrDec( char source )
+bool Funcs::IsChrDec( char source )
 {
     return source >= '0' && source <= '9';
 }
 
-bln Funcs::IsChrHex( char source )
+bool Funcs::IsChrHex( char source )
 {
     return source >= '0' && source <= '9' || source >= 'A' && source <= 'F' || source >= 'a' && source <= 'f';
 }
 
-bln Funcs::IsChrOct( char source )
+bool Funcs::IsChrOct( char source )
 {
     return source >= '0' && source <= '7';
 }
 
-bln Funcs::IsChrBin( char source )
+bool Funcs::IsChrBin( char source )
 {
     return source == '0' || source == '1';
 }
@@ -98,17 +98,17 @@ char Funcs::ChrToUpper( char source )
     return source >= 'a' && source <= 'z' ? source & ~32 : source;
 }
 
-bln Funcs::IsChrEqual( char one, char two )
+bool Funcs::IsChrEqual( char one, char two )
 {
     return one == two;
 }
 
-bln Funcs::IsChrEqualWOR( char one, char two )
+bool Funcs::IsChrEqualWOR( char one, char two )
 {
     return ChrToLower( one ) == ChrToLower( two );
 }
 
-bln Funcs::IsStrHex( const char *cp_str, uiw maxLen /* = uiw_max */ )
+bool Funcs::IsStrHex( const char *cp_str, uiw maxLen /* = uiw_max */ )
 {
     if( maxLen < 3 || !Funcs::IsHexBase( cp_str ) || !cp_str[ 2 ] )
     {
@@ -131,7 +131,7 @@ bln Funcs::IsStrHex( const char *cp_str, uiw maxLen /* = uiw_max */ )
     return true;
 }
 
-bln Funcs::IsStrBin( const char *cp_str, uiw maxLen /* = uiw_max */ )
+bool Funcs::IsStrBin( const char *cp_str, uiw maxLen /* = uiw_max */ )
 {
     if( maxLen < 3 || !Funcs::IsBinBase( cp_str ) || !cp_str[ 2 ] )
     {
@@ -154,15 +154,15 @@ bln Funcs::IsStrBin( const char *cp_str, uiw maxLen /* = uiw_max */ )
     return true;
 }
 
-bln Funcs::IsStrFP( const char *cp_str, uiw maxLen /* = uiw_max */ )
+bool Funcs::IsStrFP( const char *cp_str, uiw maxLen /* = uiw_max */ )
 {
     if( !maxLen )
     {
         return false;
     }
-    bln is_digitBeforeE = false;
-    bln is_dotSpotted = false;
-    bln is_digitAfterE = false;
+    bool is_digitBeforeE = false;
+    bool is_dotSpotted = false;
+    bool is_digitAfterE = false;
     for( ; ; )
     {
         char ch = *cp_str++;
@@ -212,7 +212,7 @@ bln Funcs::IsStrFP( const char *cp_str, uiw maxLen /* = uiw_max */ )
     return is_digitAfterE;
 }
 
-bln Funcs::IsStrDec( const char *cp_str, uiw maxLen /* = uiw_max */ )
+bool Funcs::IsStrDec( const char *cp_str, uiw maxLen /* = uiw_max */ )
 {
     if( !maxLen || !*cp_str )
     {
@@ -330,7 +330,7 @@ uiw Funcs::StrToUpperInplaceAdv( char *p_str, uiw maxLen /* = uiw_max */, char a
     return cpy;
 }
 
-bln Funcs::StrEqual( const char *cp_one, const char *cp_two )
+bool Funcs::StrEqual( const char *cp_one, const char *cp_two )
 {
     uiw cpy = 0;
     while( *cp_one && *cp_two )
@@ -344,7 +344,7 @@ bln Funcs::StrEqual( const char *cp_one, const char *cp_two )
     return *cp_one == *cp_two;
 }
 
-bln Funcs::StrEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
+bool Funcs::StrEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
     uiw cpy = 0;
     while( cpy < maxLen && cp_one && *cp_two && *cp_one != aes && *cp_two != aes )
@@ -362,7 +362,7 @@ bln Funcs::StrEqualAdv( const char *cp_one, const char *cp_two, uiw maxLen /* = 
     return *cp_one == *cp_two;
 }
 
-bln Funcs::StrNEqual( const char *cp_one, const char *cp_two, uiw count )
+bool Funcs::StrNEqual( const char *cp_one, const char *cp_two, uiw count )
 {
     for( ; count && *cp_two; --count )
     {
@@ -377,7 +377,7 @@ bln Funcs::StrNEqual( const char *cp_one, const char *cp_two, uiw count )
     return true;
 }
 
-bln Funcs::StrNEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes /* = '\0' */ )
+bool Funcs::StrNEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes /* = '\0' */ )
 {
     for( ; count && *cp_two && *cp_two != aes; --count )
     {
@@ -392,7 +392,7 @@ bln Funcs::StrNEqualAdv( const char *cp_one, const char *cp_two, uiw count, char
     return true;
 }
 
-bln Funcs::StrIEqual( const char *cp_one, const char *cp_two )
+bool Funcs::StrIEqual( const char *cp_one, const char *cp_two )
 {
     while( *cp_one && *cp_two )
     {
@@ -407,7 +407,7 @@ bln Funcs::StrIEqual( const char *cp_one, const char *cp_two )
     return *cp_one == *cp_two;
 }
 
-bln Funcs::StrIEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes /* = '\0' */ )
+bool Funcs::StrIEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes /* = '\0' */ )
 {
     while( *cp_one && *cp_two && *cp_one != aes && *cp_two != aes )
     {
@@ -422,7 +422,7 @@ bln Funcs::StrIEqualAdv( const char *cp_one, const char *cp_two, uiw count, char
     return *cp_one == *cp_two;
 }
 
-bln Funcs::StrINEqual( const char *cp_one, const char *cp_two, uiw count )
+bool Funcs::StrINEqual( const char *cp_one, const char *cp_two, uiw count )
 {
     for( ; count && *cp_two; --count )
     {
@@ -437,7 +437,7 @@ bln Funcs::StrINEqual( const char *cp_one, const char *cp_two, uiw count )
     return true;
 }
 
-bln Funcs::StrINEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes /* = '\0' */ )
+bool Funcs::StrINEqualAdv( const char *cp_one, const char *cp_two, uiw count, char aes /* = '\0' */ )
 {
     for( ; count && *cp_two && *cp_two != aes; --count )
     {
@@ -502,7 +502,7 @@ uiw Funcs::StrCatAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen /* = 
     return cpy;
 }
 
-void Funcs::StrCpy( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate )
+void Funcs::StrCpy( char *RSTR p_dest, const char *cp_source, bool is_nullTerminate )
 {
     while( *cp_source )
     {
@@ -514,7 +514,7 @@ void Funcs::StrCpy( char *RSTR p_dest, const char *cp_source, bln is_nullTermina
 	}
 }
 
-uiw Funcs::StrCpyAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
+uiw Funcs::StrCpyAdv( char *RSTR p_dest, const char *cp_source, bool is_nullTerminate, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
     uiw cpy = 0;
     while( cpy < maxLen && *cp_source && *cp_source != aes )
@@ -529,7 +529,7 @@ uiw Funcs::StrCpyAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTermi
     return cpy;
 }
 
-uiw Funcs::StrCpyAndCount( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate )
+uiw Funcs::StrCpyAndCount( char *RSTR p_dest, const char *cp_source, bool is_nullTerminate )
 {
     const char *cp_sourceStore = cp_source;
 
@@ -544,7 +544,7 @@ uiw Funcs::StrCpyAndCount( char *RSTR p_dest, const char *cp_source, bln is_null
     return cp_source - cp_sourceStore;
 }
 
-uiw Funcs::StrCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, bln is_nullTerminate, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
+uiw Funcs::StrCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, bool is_nullTerminate, uiw maxLen /* = uiw_max */, char aes /* = '\0' */ )
 {
     uiw cpy = 0;
     while( cpy < maxLen && *cp_source && *cp_source != aes )
@@ -559,7 +559,7 @@ uiw Funcs::StrCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, bln is_n
     return cpy;
 }
 
-uiw Funcs::StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw maxLen, bln is_nullTerminate )
+uiw Funcs::StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw maxLen, bool is_nullTerminate )
 {
     uiw index = 0;
     while( index < maxLen && *cp_source )
@@ -574,7 +574,7 @@ uiw Funcs::StrSafeCpyAndCount( char *RSTR p_dest, const char *cp_source, uiw max
     return index;
 }
 
-uiw Funcs::StrSafeCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen, bln is_nullTerminate, char aes /* = '\0' */ )
+uiw Funcs::StrSafeCpyAndCountAdv( char *RSTR p_dest, const char *cp_source, uiw maxLen, bool is_nullTerminate, char aes /* = '\0' */ )
 {
     uiw index = 0;
     while( index < maxLen && *cp_source && *cp_source != aes )
@@ -1041,7 +1041,7 @@ char *Funcs::StrIStrAdv( const char *cp_source, const char *cp_under, uiw countS
     return 0;
 }
 
-NOINLINE bln Funcs::IsStrIsFromThisSymbols( const char *cp_str, const char *cp_symbols )
+NOINLINE bool Funcs::IsStrIsFromThisSymbols( const char *cp_str, const char *cp_symbols )
 {
     if( !*cp_symbols )
     {
@@ -1065,9 +1065,9 @@ NOINLINE bln Funcs::IsStrIsFromThisSymbols( const char *cp_str, const char *cp_s
     return true;
 }
 
-NOINLINE bln Funcs::IsStrIsFromThisSymbol( const char *cp_str, char symbol, uiw count /* = uiw_max */ )
+NOINLINE bool Funcs::IsStrIsFromThisSymbol( const char *cp_str, char symbol, uiw count /* = uiw_max */ )
 {
-    bln is_from = false;
+    bool is_from = false;
     while( count && *cp_str )
     {
         is_from = *cp_str++ == symbol;
@@ -1080,9 +1080,9 @@ NOINLINE bln Funcs::IsStrIsFromThisSymbol( const char *cp_str, char symbol, uiw 
     return is_from;
 }
 
-NOINLINE bln Funcs::IsStrMatch( const char *cp_str, ChrTestFunc func )
+NOINLINE bool Funcs::IsStrMatch( const char *cp_str, ChrTestFunc func )
 {
-    bln is_match = false;
+    bool is_match = false;
     while( *cp_str )
     {
         is_match = func( *cp_str );
@@ -1095,9 +1095,9 @@ NOINLINE bln Funcs::IsStrMatch( const char *cp_str, ChrTestFunc func )
     return is_match;
 }
 
-NOINLINE bln Funcs::IsStrMatchAdv( const char *cp_str, ChrTestFunc func, uiw count /* = uiw_max */, char aes /* = '\0' */ )
+NOINLINE bool Funcs::IsStrMatchAdv( const char *cp_str, ChrTestFunc func, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
-    bln is_match = false;
+    bool is_match = false;
     while( count && *cp_str && *cp_str != aes )
     {
         is_match = func( *cp_str );
@@ -1159,7 +1159,7 @@ uiw Funcs::StrExcludeAdv( char *RSTR p_target, const char *cp_source, char symbo
 uiw Funcs::StrExcludeMask( char *RSTR p_target, const char *cp_source, char mask, char symbol )
 {
     uiw len = 0;
-    bln is_masked = false;
+    bool is_masked = false;
     for( ; *cp_source; ++cp_source )
     {
         if( !is_masked && *cp_source == mask )
@@ -1187,7 +1187,7 @@ uiw Funcs::StrExcludeMask( char *RSTR p_target, const char *cp_source, char mask
 uiw Funcs::StrExcludeMaskAdv( char *RSTR p_target, const char *cp_source, char mask, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
     uiw len = 0;
-    bln is_masked = false;
+    bool is_masked = false;
     for( ; count && *cp_source && *cp_source != aes; ++cp_source, --count )
     {
         if( !is_masked && *cp_source == mask )
@@ -1243,7 +1243,7 @@ uiw Funcs::StrExcludeInplaceAdv( char *const p_str, char symbol, uiw count /* = 
 uiw Funcs::StrExcludeMaskInplace( char *p_str, char mask, char symbol )
 {
     char *p_target = p_str, *p_source = p_str;
-    bln is_masked = false;
+    bool is_masked = false;
     for( ; *p_source; ++p_source )
     {
         if( !is_masked && *p_source == mask )
@@ -1264,7 +1264,7 @@ uiw Funcs::StrExcludeMaskInplace( char *p_str, char mask, char symbol )
 uiw Funcs::StrExcludeMaskInplaceAdv( char *p_str, char mask, char symbol, uiw count /* = uiw_max */, char aes /* = '\0' */ )
 {
     char *p_target = p_str, *p_source = p_str;
-    bln is_masked = false;
+    bool is_masked = false;
     for( ; count && *p_source && *p_source != aes; ++p_source, --count )
     {
         if( !is_masked && *p_source == mask )
@@ -1286,7 +1286,7 @@ uiw Funcs::StrExcludeMaskInplaceAdv( char *p_str, char mask, char symbol, uiw co
 template < typename X > NOINLINE Nullable < X > StrDecToIntQuest( const char *cp_str, uiw count = uiw_max, char aes = '\0' )
 {
 	X value;
-    bln is_minus = *cp_str == '-';
+    bool is_minus = *cp_str == '-';
     cp_str += is_minus || *cp_str == '+';
     uiw len = Funcs::StrLenAdv( cp_str, count, aes );
     typedef typename TypeDesc < X >::uint_variant ux_t;
@@ -1445,29 +1445,29 @@ f64 Funcs::StrToF64( const char *cp_str )
     return ::atof( cp_str );
 }
 
-bln Funcs::IsHexBase( const char *cp_str )
+bool Funcs::IsHexBase( const char *cp_str )
 {
     return cp_str[ 0 ] == '0' && (cp_str[ 1 ] == 'x' || cp_str[ 1 ] == 'X');
 }
 
-bln Funcs::IsOctBase( const char *cp_str )
+bool Funcs::IsOctBase( const char *cp_str )
 {
     return cp_str[ 0 ] == '0' && (cp_str[ 1 ] == 'z' || cp_str[ 1 ] == 'Z');
 }
 
-bln Funcs::IsBinBase( const char *cp_str )
+bool Funcs::IsBinBase( const char *cp_str )
 {
     return cp_str[ 0 ] == '0' && (cp_str[ 1 ] == 'b' || cp_str[ 1 ] == 'B');
 }
 
-template < typename ft > uiw FloatToStr( ft val, char *p_buf, uiw precise, bln is_cutToShortest )  //  TODO: this code is fail
+template < typename ft > uiw FloatToStr( ft val, char *p_buf, uiw precise, bool is_cutToShortest )  //  TODO: this code is fail
 {
 /*#ifdef _MSC_VER
 	char *result = ::_gcvt( val, 31, p_buf );
 	ASSUME( result == p_buf );
 	uiw len = 0;
 	char *dotLocation = 0;
-	bln is_scientific = false;
+	bool is_scientific = false;
 	for( ; p_buf[ len ]; ++len )
 	{
 		if( p_buf[ len ] == '.' )
@@ -1545,7 +1545,7 @@ NOINLINE uiw Funcs::F64ToStrWithPrecise( f64 val, ui32 precise, char *p_buf )
 class ParserParam
 {
 	ui32 _param;
-	bln _is_present;
+	bool _is_present;
 
 public:
 	i32 GetParamI() const
@@ -1571,13 +1571,13 @@ public:
 		_is_present = false;
 	}
 
-	bln IsPresent() const
+	bool IsPresent() const
 	{
 		return _is_present;
 	}
 };
 
-static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ParserParam *param, bln *is_extra )
+static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ParserParam *param, bool *is_extra )
 {
     ASSUME( cp_fmt && p_ch && param );
 
@@ -1642,7 +1642,7 @@ static const char *FmtParserHelper( const char *cp_fmt, char *p_ch, ParserParam 
     return cp_fmt;
 }
 
-bln ArgParserHelper( char type, void *p_source, ParserParam param, uiw *written, FileInterface *file )
+bool ArgParserHelper( char type, void *p_source, ParserParam param, uiw *written, FileInterface *file )
 {
 	char a_buf[ 128 ];
     uiw len;
@@ -1696,10 +1696,10 @@ bln ArgParserHelper( char type, void *p_source, ParserParam param, uiw *written,
 	case 'v':  //  ui64
         len = Funcs::IntToStrDec( *(ui64 *)p_source, a_buf );
 		goto retBuf;
-    case 'b':  //  bln [param]
+    case 'b':  //  bool [param]
 	{
         len = *(ui32 *)p_source ? _StrLen( "true" ) : _StrLen( "false" );
-		bln is_capitalize = param.IsPresent() == false || param.GetParamU() == 0 ? false : true;
+		bool is_capitalize = param.IsPresent() == false || param.GetParamU() == 0 ? false : true;
 		if( !file->Write( *(ui32 *)p_source ? (is_capitalize ? "TRUE" : "true") : (is_capitalize ? "FALSE" : "false"), len ) )
 		{
 			return false;
@@ -1768,12 +1768,12 @@ retLen:
     return true;
 }
 
-template < bln is_validateStep > inline Nullable < uiw > PrintToStrArgListImpl( const Funcs::_ArgType *argTypes, uiw argsCount, const char *cp_fmt, va_list args, FileInterface *file )
+template < bool is_validateStep > inline Nullable < uiw > PrintToStrArgListImpl( const Funcs::_ArgType *argTypes, uiw argsCount, const char *cp_fmt, va_list args, FileInterface *file )
 {
     using namespace Funcs;
 
 	const char *const dbgStr = "#error parsing fmt string#";
-	bln is_extraParam;
+	bool is_extraParam;
 	uiw appendedLen = 0, written;
 	const char *cp_fmtFlushed = cp_fmt;
     uiw argIndex = 0;
@@ -1950,7 +1950,7 @@ uiw Funcs::PrintToFileArgList( FileInterface &file, const char *cp_fmt, va_list 
 }
 
 #if defined(DEBUG_VALIDATE_PRINT_FUNCS) && defined(DEBUG)
-bln Funcs::_PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... )
+bool Funcs::_PrintCheckArgs( const _ArgType *argTypes, uiw argsCount, const char *cp_fmt, ... )
 {
     ASSUME( argTypes );
 

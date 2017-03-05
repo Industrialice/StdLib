@@ -30,13 +30,13 @@ auto FileCFILEStream::Open( const FilePath &path, FileOpenMode openMode, FilePro
 {
 	this->Close();
 
-	CResult < bln > is_fileExists = Files::IsExists( path );
+	CResult < bool > is_fileExists = Files::IsExists( path );
 	if( !is_fileExists.Ok() )
 	{
 		return fileError( is_fileExists.UnwrapError(), "failed to check file's existense" );
 	}
 
-	bln fileExistenceResult = is_fileExists.Unwrap();
+	bool fileExistenceResult = is_fileExists.Unwrap();
 
 	if( openMode == FileOpenMode::OpenExisting )
 	{
@@ -62,7 +62,7 @@ auto FileCFILEStream::Open( const FilePath &path, FileOpenMode openMode, FilePro
 		}
 	}
 
-	bln is_disableCache = false;
+	bool is_disableCache = false;
 
 	if( !!(cacheMode & FileCacheMode::DisableSystemWriteCache) )
 	{
@@ -151,12 +151,12 @@ void FileCFILEStream::Close()
 	_file = 0;
 }
 
-bln FileCFILEStream::IsOpened() const
+bool FileCFILEStream::IsOpened() const
 {
 	return _file != 0;
 }
 
-bln FileCFILEStream::Read( void *target, ui32 len, ui32 *readed )
+bool FileCFILEStream::Read( void *target, ui32 len, ui32 *readed )
 {
 	ASSUME( IsOpened() );
 	ui32 actuallyReaded = fread( target, 1, len, (FILE *)_file );
@@ -164,7 +164,7 @@ bln FileCFILEStream::Read( void *target, ui32 len, ui32 *readed )
 	return true;
 }
 
-bln FileCFILEStream::Write( const void *source, ui32 len, ui32 *written )
+bool FileCFILEStream::Write( const void *source, ui32 len, ui32 *written )
 {
 	ASSUME( IsOpened() );
 	ui32 actuallyWritten = fwrite( source, 1, len, (FILE *)_file );
@@ -172,22 +172,22 @@ bln FileCFILEStream::Write( const void *source, ui32 len, ui32 *written )
 	return true;
 }
 
-bln FileCFILEStream::Flush()
+bool FileCFILEStream::Flush()
 {
 	ASSUME( IsOpened() );
 	return fflush( (FILE *)_file ) == 0;
 }
 
-bln FileCFILEStream::IsBufferingSupported() const
+bool FileCFILEStream::IsBufferingSupported() const
 {
 	ASSUME( IsOpened() );
 
-	bln is_cachingDisabled = !!(_cacheMode & FileCacheMode::DisableSystemWriteCache) || !!(_cacheMode & FileCacheMode::DisableSystemReadCache);
+	bool is_cachingDisabled = !!(_cacheMode & FileCacheMode::DisableSystemWriteCache) || !!(_cacheMode & FileCacheMode::DisableSystemReadCache);
 
 	return !is_cachingDisabled;
 }
 
-bln FileCFILEStream::BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer )
+bool FileCFILEStream::BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer )
 {
 	ASSUME( IsOpened() );
 
@@ -223,7 +223,7 @@ const void *FileCFILEStream::BufferGet() const
 	return _customBufferPtr.get();
 }
 
-bln FileCFILEStream::IsSeekSupported() const
+bool FileCFILEStream::IsSeekSupported() const
 {
 	ASSUME( IsOpened() );
 	return true;
@@ -398,6 +398,7 @@ FileCFILEStream::FileCFILEStream( FileCFILEStream &&source )
 FileCFILEStream &FileCFILEStream::operator = ( FileCFILEStream &&source )
 {
 	ASSUME( this != &source );
+	Close();
 	this->_file = source._file;
 	source._file = 0;
 	this->_offsetToStart = source._offsetToStart;

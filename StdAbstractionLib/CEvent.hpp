@@ -13,7 +13,7 @@ namespace StdLib
     public:
 
         ~CEvent();
-		explicit CEvent( bln isInitiallySignaling = false, bln isResetAfterWait = false );
+		explicit CEvent( bool isInitiallySignaling = false, bool isResetAfterWait = false );
 
         void WaitFor( ui32 timeout = ui32_max );
         void Reset();

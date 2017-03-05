@@ -40,7 +40,7 @@
         left = (name)((uiw)left & (uiw)right); \
         return left; \
     } \
-	inline bln operator !( name value ) \
+	inline bool operator !( name value ) \
 	{ \
 		return value == (name)0; \
 	}

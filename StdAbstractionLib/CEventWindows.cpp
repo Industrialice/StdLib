@@ -10,7 +10,7 @@ CEvent::~CEvent()
     ASSUME( result );
 }
 
-CEvent::CEvent( bln isInitiallySignaling /* = false */, bln isResetAfterWait /* = false */ )
+CEvent::CEvent( bool isInitiallySignaling /* = false */, bool isResetAfterWait /* = false */ )
 {
     _handle = ::CreateEventW( NULL, isResetAfterWait ? FALSE : TRUE, isInitiallySignaling ? TRUE : FALSE, NULL );
     ASSUME( _handle != NULL );

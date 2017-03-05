@@ -1,11 +1,11 @@
 #include "PreHeader.hpp"
 
-bln Funcs::IsF32Equal( f32 first, f32 second, f32 epsilon )
+bool Funcs::IsF32Equal( f32 first, f32 second, f32 epsilon )
 {
     return ::fabsf( first - second ) < epsilon;
 }
 
-bln Funcs::IsF64Equal( f64 first, f64 second, f64 epsilon )
+bool Funcs::IsF64Equal( f64 first, f64 second, f64 epsilon )
 {
     return ::fabs( first - second ) < epsilon;
 }
@@ -130,17 +130,17 @@ f64 Funcs::F64IntegerPart( f64 val )  //  T
 	return std::floor( val );
 }
 
-bln Funcs::IsF32NaN( f32 val )
+bool Funcs::IsF32NaN( f32 val )
 {
     return val != val;
 }
 
-bln Funcs::IsF64NaN( f64 val )
+bool Funcs::IsF64NaN( f64 val )
 {
     return val != val;
 }
 
-bln Funcs::IsF32Inf( f32 val )
+bool Funcs::IsF32Inf( f32 val )
 {
     ui32 ival = *(ui32 *)&val;
     if( (ival | f32_exp_mask) != ival )
@@ -150,7 +150,7 @@ bln Funcs::IsF32Inf( f32 val )
     return (ival & f32_significand_mask) == 0;
 }
 
-bln Funcs::IsF32InfPos( f32 val )
+bool Funcs::IsF32InfPos( f32 val )
 {
     ui32 ival = *(ui32 *)&val;
     if( !Funcs::IsF32Inf( val ) )
@@ -160,7 +160,7 @@ bln Funcs::IsF32InfPos( f32 val )
     return (ival & f32_sign_mask) == 0;
 }
 
-bln Funcs::IsF32InfNeg( f32 val )
+bool Funcs::IsF32InfNeg( f32 val )
 {
     ui32 ival = *(ui32 *)&val;
     if( !Funcs::IsF32Inf( val ) )
@@ -170,7 +170,7 @@ bln Funcs::IsF32InfNeg( f32 val )
     return (ival & f32_sign_mask) != 0;
 }
 
-bln Funcs::IsF64Inf( f64 val )
+bool Funcs::IsF64Inf( f64 val )
 {
     ui64 ival = *(ui64 *)&val;
     if( (ival | f64_exp_mask) != ival )
@@ -180,7 +180,7 @@ bln Funcs::IsF64Inf( f64 val )
     return (ival & f64_significand_mask) == 0;
 }
 
-bln Funcs::IsF64InfPos( f64 val )
+bool Funcs::IsF64InfPos( f64 val )
 {
     ui64 ival = *(ui64 *)&val;
     if( !Funcs::IsF64Inf( val ) )
@@ -190,7 +190,7 @@ bln Funcs::IsF64InfPos( f64 val )
     return (ival & f64_sign_mask) == 0;
 }
 
-bln Funcs::IsF64InfNeg( f64 val )
+bool Funcs::IsF64InfNeg( f64 val )
 {
     ui64 ival = *(ui64 *)&val;
     if( !Funcs::IsF64Inf( val ) )
@@ -291,7 +291,7 @@ uiw Funcs::MemSet( void *p_mem, byte val, uiw size )
     return size;
 }
 
-bln Funcs::MemTest( void *p_mem, byte val, uiw size )
+bool Funcs::MemTest( void *p_mem, byte val, uiw size )
 {
     ASSUME( p_mem || size == 0 );
     byte *p_memByte = (byte *)p_mem;
@@ -307,7 +307,7 @@ bln Funcs::MemTest( void *p_mem, byte val, uiw size )
     return true;
 }
 
-bln Funcs::MemEquals( const void *cp_mem0, const void *cp_mem1, uiw size )
+bool Funcs::MemEquals( const void *cp_mem0, const void *cp_mem1, uiw size )
 {
     ASSUME( cp_mem0 && cp_mem1 || size == 0 );
     return !::memcmp( cp_mem0, cp_mem1, size );

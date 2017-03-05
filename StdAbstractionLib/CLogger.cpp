@@ -11,13 +11,13 @@ namespace
 {
     struct SLogger : public CLogger
     {
-        SLogger( bln is_on, bln is_multithreaded ) : _is_on( is_on ), _is_multithreaded( is_multithreaded )
+        SLogger( bool is_on, bool is_multithreaded ) : _is_on( is_on ), _is_multithreaded( is_multithreaded )
         {}
 
         CVec < CLogger::DirectionFunc, void > _o_dirs;
         CStr _buffer;
-        bln _is_on;
-        bln _is_multithreaded;
+        bool _is_on;
+        bool _is_multithreaded;
         mutable CMutex _mutex;
         char *name()
         {
@@ -97,32 +97,32 @@ void CLogger::DirectionToTheTop( uiw index )
 	dis->_o_dirs.Insert( 0, func );
 }
 
-void CLogger::IsOnSet( bln is_on )
+void CLogger::IsOnSet( bool is_on )
 {
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     dis->_is_on = is_on;
 }
 
-bln CLogger::IsOnGet() const
+bool CLogger::IsOnGet() const
 {
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     return dis->_is_on;
 }
 
-bln CLogger::IsOnToggle()
+bool CLogger::IsOnToggle()
 {
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     dis->_is_on = !dis->_is_on;
     return dis->_is_on;
 }
 
-bln CLogger::IsMultithreadedGet() const
+bool CLogger::IsMultithreadedGet() const
 {
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     return dis->_is_multithreaded;
 }
 
-void CLogger::IsMitlithreadedSet( bln is_multithreaded )
+void CLogger::IsMitlithreadedSet( bool is_multithreaded )
 {
     CScopeLock < true > lock( dis->_is_multithreaded ? &dis->_mutex : 0 );
     dis->_is_multithreaded = is_multithreaded;
@@ -135,7 +135,7 @@ const char *CLogger::NameGet() const
     return dis->name();
 }
 
-NOINLINE CLogger *CLogger::Create( const char *cp_name, bln is_on, bln is_multithreaded )
+NOINLINE CLogger *CLogger::Create( const char *cp_name, bool is_on, bool is_multithreaded )
 {
     ASSUME( cp_name );
     uiw len = _StrLen( cp_name ) + 1;

@@ -44,7 +44,7 @@ public:
         return (const X *)&_arr;
     }
 
-	bln _IncSizeIfHasEnoughReserve( count_type newCount )
+	bool _IncSizeIfHasEnoughReserve( count_type newCount )
 	{
         ASSUME( newCount <= static_size && newCount >= _count );
         _count = newCount;
@@ -111,7 +111,7 @@ public:
         return _count;
     }
     
-    bln _IsStatic() const
+    bool _IsStatic() const
     {
         return true;
     }
@@ -170,7 +170,7 @@ public:
         return _arr;
     }
 
-	bln _IncSizeIfHasEnoughReserve( count_type newCount )
+	bool _IncSizeIfHasEnoughReserve( count_type newCount )
 	{
         ASSUME( newCount >= _count );
 		if( newCount <= _reserved )
@@ -262,7 +262,7 @@ public:
 			newReserve = _count;
 		}
 
-		bln is_changed = false;
+		bool is_changed = false;
 
 		if( newReserve > _reserved )
 		{
@@ -311,7 +311,7 @@ public:
         return _count;
     }
 
-    bln _IsStatic() const
+    bool _IsStatic() const
     {
         return false;
     }
@@ -365,7 +365,7 @@ public:
         return _arr;
     }
 
-	bln _IncSizeIfHasEnoughReserve( count_type newCount )
+	bool _IncSizeIfHasEnoughReserve( count_type newCount )
 	{
         ASSUME( newCount >= _count );
 		return false;
@@ -462,7 +462,7 @@ public:
         return _count;
     }
 
-    bln _IsStatic() const
+    bool _IsStatic() const
     {
         return false;
     }
@@ -530,7 +530,7 @@ public:
         return _count > static_size ? _dynamicArr : (X *)&_preallocatedArr;
     }
 
-	bln _IncSizeIfHasEnoughReserve( count_type newCount )
+	bool _IncSizeIfHasEnoughReserve( count_type newCount )
 	{
 		ASSUME( newCount >= _count && newCount <= static_size );
 		_count = newCount;
@@ -671,7 +671,7 @@ public:
         return _count;
     }
 
-    bln _IsStatic() const
+    bool _IsStatic() const
     {
         return _count <= static_size;
     }
@@ -738,7 +738,7 @@ public:
 		DBGCODE( _reserve = reserve; )
 	}
 
-	bln _IncSizeIfHasEnoughReserve( count_type newCount )
+	bool _IncSizeIfHasEnoughReserve( count_type newCount )
 	{
 		DBGCODE( ASSUME( newCount <= _reserve ); )
 		_count = newCount;
@@ -806,7 +806,7 @@ public:
 		return _count;
 	}
 
-	bln _IsStatic() const
+	bool _IsStatic() const
 	{
 		return true;
 	}

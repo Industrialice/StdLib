@@ -41,7 +41,7 @@ void CMutex::Unlock()
     ::LeaveCriticalSection( &_handle );
 }
 
-bln CMutex::TryLock()
+bool CMutex::TryLock()
 {
     return ::TryEnterCriticalSection( &_handle ) == TRUE;
 }

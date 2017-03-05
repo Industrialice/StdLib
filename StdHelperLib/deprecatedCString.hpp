@@ -281,12 +281,12 @@ public:
         return _count + 1;
     }
 
-    bln IsStatic() const
+    bool IsStatic() const
     {
         return _static_str[ static_last ] == '\0';
     }
 
-    bln IsDynamic() const
+    bool IsDynamic() const
     {
         return _static_str[ static_last ] != '\0';
     }

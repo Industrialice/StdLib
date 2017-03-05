@@ -226,12 +226,12 @@ void LiceMath::M4x4Identity( m4x4 *m )
     m->e30 = 0; m->e31 = 0; m->e32 = 0; m->e33 = 1;
 }
 
-bln LiceMath::M4x4IsIdentity( const m4x4 *m )
+bool LiceMath::M4x4IsIdentity( const m4x4 *m )
 {
     return Funcs::MemEquals( m, &co_Iden4x4, sizeof(m4x4) );
 }
 
-bln LiceMath::M4x4IsLastIdentity( const m4x4 *m )
+bool LiceMath::M4x4IsLastIdentity( const m4x4 *m )
 {
     return m->e03 == 0.f && m->e13 == 0.f && m->e23 == 0.f && m->e33 == 1.f;
 }
@@ -682,7 +682,7 @@ void LiceMath::M4x3Identity( m4x3 *m )
     m->e30 = 0; m->e31 = 0; m->e32 = 0;
 }
 
-bln LiceMath::M4x3IsIdentity( const m4x3 *m )
+bool LiceMath::M4x3IsIdentity( const m4x3 *m )
 {
     return Funcs::MemEquals( m, &co_Iden4x3, sizeof(m4x3) );
 }
@@ -1057,7 +1057,7 @@ void LiceMath::M3x3Identity( m3x3 *m )
     m->e20 = 0; m->e21 = 0; m->e22 = 1;
 }
 
-bln LiceMath::M3x3IsIdentity( const m3x3 *m )
+bool LiceMath::M3x3IsIdentity( const m3x3 *m )
 {
     return Funcs::MemEquals( m, &co_Iden3x3, sizeof(m3x3) );
 }
@@ -1354,7 +1354,7 @@ void LiceMath::M2x2Identity( m2x2 *m )
     m->e10 = 0; m->e11 = 1;
 }
 
-bln LiceMath::M2x2IsIdentity( const m2x2 *m )
+bool LiceMath::M2x2IsIdentity( const m2x2 *m )
 {
     return Funcs::MemEquals( m, &co_Iden2x2, sizeof(m2x2) );
 }
@@ -1689,12 +1689,12 @@ void LiceMath::Vec4NegInplace( vec4 *v )
     v->w = -v->w;
 }
 
-bln LiceMath::Vec4Equals( const vec4 *v0, const vec4 *v1 )
+bool LiceMath::Vec4Equals( const vec4 *v0, const vec4 *v1 )
 {
     return v0->x == v1->x && v0->y == v1->y && v0->z == v1->z && v0->w == v1->w;
 }
 
-bln LiceMath::Vec4EqualsByEpsilon( const vec4 *v0, const vec4 *v1, f32 epsilon )
+bool LiceMath::Vec4EqualsByEpsilon( const vec4 *v0, const vec4 *v1, f32 epsilon )
 {
     return _IsF32Equal( v0->x, v1->x, epsilon ) &&
            _IsF32Equal( v0->y, v1->y, epsilon ) &&
@@ -1998,12 +1998,12 @@ void LiceMath::Vec3NegInplace( vec3 *v )
     v->z = -v->z;
 }
 
-bln LiceMath::Vec3Equals( const vec3 *v0, const vec3 *v1 )
+bool LiceMath::Vec3Equals( const vec3 *v0, const vec3 *v1 )
 {
     return v0->x == v1->x && v0->y == v1->y && v0->z == v1->z;
 }
 
-bln LiceMath::Vec3EqualsByEpsilon( const vec3 *v0, const vec3 *v1, f32 epsilon )
+bool LiceMath::Vec3EqualsByEpsilon( const vec3 *v0, const vec3 *v1, f32 epsilon )
 {
     return _IsF32Equal( v0->x, v1->x, epsilon ) &&
            _IsF32Equal( v0->y, v1->y, epsilon ) &&
@@ -2140,12 +2140,12 @@ void LiceMath::Vec2NegInplace( vec2 *v )
     v->y = -v->y;
 }
 
-bln LiceMath::Vec2Equals( const vec2 *v0, const vec2 *v1 )
+bool LiceMath::Vec2Equals( const vec2 *v0, const vec2 *v1 )
 {
     return v0->x == v1->x && v0->y == v1->y;
 }
 
-bln LiceMath::Vec2EqualsByEpsilon( const vec2 *v0, const vec2 *v1, f32 epsilon )
+bool LiceMath::Vec2EqualsByEpsilon( const vec2 *v0, const vec2 *v1, f32 epsilon )
 {
     return _IsF32Equal( v0->x, v1->x, epsilon ) &&
            _IsF32Equal( v0->y, v1->y, epsilon ) ;
@@ -2196,7 +2196,7 @@ void LiceMath::Projection( m4x4 *m, f32 fovDegree, f32 nearPlane, f32 farPlane, 
     m->e30 = 0; m->e31 = 0; m->e32 = l; m->e33 = 0;
 }
 
-bln LiceMath::BSCrossTest3D( const vec3 *cpo_center0, f32 radius0, const vec3 *cpo_center1, f32 radius1 )
+bool LiceMath::BSCrossTest3D( const vec3 *cpo_center0, f32 radius0, const vec3 *cpo_center1, f32 radius1 )
 {
     vec3 o_dir;
     Vec3Subtract( &o_dir, cpo_center0, cpo_center1 );

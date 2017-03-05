@@ -55,18 +55,18 @@ namespace StdLib
 		virtual ~FileInterface() {}
 
 		virtual void Close() = 0;
-		virtual bln IsOpened() const = 0;
+		virtual bool IsOpened() const = 0;
 
-		virtual bln Read( void *target, ui32 len, ui32 *readed = 0 ) = 0;
-		virtual bln Write( const void *source, ui32 len, ui32 *written = 0 ) = 0;
+		virtual bool Read( void *target, ui32 len, ui32 *readed = 0 ) = 0;
+		virtual bool Write( const void *source, ui32 len, ui32 *written = 0 ) = 0;
 
-		virtual bln Flush() = 0;
-		virtual bln IsBufferingSupported() const = 0;
-		virtual bln BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer = std::unique_ptr < byte, void(*)(byte *) >( nullptr, [](byte *){} ) ) = 0;  //  will reject this call if buffering isn't supported, pass null as a buffer to use an auto allocated buffer, pass 0 as a size to disable buffering
+		virtual bool Flush() = 0;
+		virtual bool IsBufferingSupported() const = 0;
+		virtual bool BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer = std::unique_ptr < byte, void(*)(byte *) >( nullptr, [](byte *){} ) ) = 0;  //  will reject this call if buffering isn't supported, pass null as a buffer to use an auto allocated buffer, pass 0 as a size to disable buffering
 		virtual ui32 BufferSizeGet() const = 0;
 		virtual const void *BufferGet() const = 0;  //  will return 0 if there's no buffer
 
-		virtual bln IsSeekSupported() const = 0;
+		virtual bool IsSeekSupported() const = 0;
 		virtual CResult < i64 > OffsetGet( FileOffsetMode offsetMode = FileOffsetMode::FromBegin ) = 0;
 		virtual CResult < i64 > OffsetSet( FileOffsetMode offsetMode, i64 offset ) = 0;
 

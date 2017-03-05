@@ -51,9 +51,9 @@ namespace FileIO
 			ui32 bufferSize;
 			ui32 bufferPos;
 			ui32 readBufferCurrentSize;  //  can be lower than bufferSize if, for example, EOF is reached
-            bln is_reading;
+            bool is_reading;
 
-			bln is_shouldCloseFileHandle;
+			bool is_shouldCloseFileHandle;
 
 			FileOpenMode openMode;
 			FileProcMode procMode;
@@ -68,17 +68,17 @@ namespace FileIO
         EXTERNALD void FileIO_Initialize( CFileBasis *file );
         EXTERNALD void FileIO_Destroy( CFileBasis *file );
         EXTERNALD fileError FileIO_Open( CFileBasis *file, const FilePath &pnn, FileOpenMode openMode, FileProcMode procMode, FileCacheMode cacheMode );
-        EXTERNALD fileError FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle );
+        EXTERNALD fileError FileIO_OpenFromDescriptor( fileHandle osFileDescriptor, bool is_shouldCloseFileHandle );
         EXTERNALD void FileIO_Close( CFileBasis *file );
-		EXTERNALD bln FileIO_IsValid( const CFileBasis *file );
-        EXTERNALD bln FileIO_Write( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written );
-        EXTERNALD bln FileIO_Read( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
-        EXTERNALD bln FileIO_BufferSet( CFileBasis *file, ui32 size, decltype(CFileBasis::internalBuffer) buffer );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
+		EXTERNALD bool FileIO_IsValid( const CFileBasis *file );
+        EXTERNALD bool FileIO_Write( CFileBasis *file, const void *cp_source, ui32 len, ui32 *written );
+        EXTERNALD bool FileIO_Read( CFileBasis *file, void *p_target, ui32 len, ui32 *p_readed );
+        EXTERNALD bool FileIO_BufferSet( CFileBasis *file, ui32 size, decltype(CFileBasis::internalBuffer) buffer );  //  pass null as buffer to use auto allocated buffer, pass 0 as size to disable buffering
 		EXTERNALD ui32 FileIO_BufferSizeGet( const CFileBasis *file );
 		EXTERNALD const void *FileIO_BufferGet( const CFileBasis *file );
         FILEIO_STAT( EXTERNALD void FileIO_StatsGet( const CFileBasis *file, SStats *po_stats ); )
         FILEIO_STAT( EXTERNALD void FileIO_StatsReset( CFileBasis *file ); )
-        EXTERNALD bln FileIO_Flush( CFileBasis *file );  //  false if writing to file failed to complete
+        EXTERNALD bool FileIO_Flush( CFileBasis *file );  //  false if writing to file failed to complete
         EXTERNALD CResult < i64 > FileIO_OffsetGet( CFileBasis *file, FileOffsetMode mode );
         EXTERNALD CResult < i64 > FileIO_OffsetSet( CFileBasis *file, FileOffsetMode mode, i64 offset );
 		EXTERNALD CResult < ui64 > FileIO_SizeGet( const CFileBasis *file );  //  returns 0 on error
@@ -117,7 +117,7 @@ namespace FileIO
             *error = Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode );
         }
 
-        CFile( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle, fileError *error = 0 )
+        CFile( fileHandle osFileDescriptor, bool is_shouldCloseFileHandle, fileError *error = 0 )
         {
 			fileError junkError;
 			if( error == nullptr )
@@ -146,7 +146,7 @@ namespace FileIO
             return Private::FileIO_Open( this, pnn, openMode, procMode, cacheMode );
         }
 
-        fileError Open( fileHandle osFileDescriptor, bln is_shouldCloseFileHandle )
+        fileError Open( fileHandle osFileDescriptor, bool is_shouldCloseFileHandle )
         {
             Close();
             return Private::FileIO_OpenFromDescriptor( osFileDescriptor, is_shouldCloseFileHandle );
@@ -179,7 +179,7 @@ namespace FileIO
 			return Private::FileIO_FileHandle( this );
 		}
 
-		fileHandle CloseAndGetFileHandle()
+		WARN_IF_UNUSED fileHandle CloseAndGetFileHandle()
 		{
 			this->is_shouldCloseFileHandle = false;
 			fileHandle handle = Private::FileIO_FileHandle( this );
@@ -192,27 +192,27 @@ namespace FileIO
             Private::FileIO_Close( this );
         }
 
-        virtual bln IsOpened() const override
+        virtual bool IsOpened() const override
         {
             return Private::FileIO_IsValid( this );
         }
 
-        virtual bln Write( const void *cp_source, ui32 len, ui32 *written = 0 ) override
+        virtual bool Write( const void *cp_source, ui32 len, ui32 *written = 0 ) override
         {
             return Private::FileIO_Write( this, cp_source, len, written );
         }
 
-        virtual bln Read( void *p_target, ui32 len, ui32 *p_readed = 0 ) override
+        virtual bool Read( void *p_target, ui32 len, ui32 *p_readed = 0 ) override
         {
             return Private::FileIO_Read( this, p_target, len, p_readed );
         }
 
-		virtual bln IsBufferingSupported() const override
+		virtual bool IsBufferingSupported() const override
 		{
 			return true;
 		}
 
-        virtual bln BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer = std::unique_ptr < byte, void(*)(byte *) >( nullptr, [](byte *){} ) ) override
+        virtual bool BufferSet( ui32 size, std::unique_ptr < byte, void(*)(byte *) > &&buffer = std::unique_ptr < byte, void(*)(byte *) >( nullptr, [](byte *){} ) ) override
         {
             return Private::FileIO_BufferSet( this, size, std::move( buffer ) );
         }
@@ -227,12 +227,12 @@ namespace FileIO
 			return Private::FileIO_BufferGet( this );
 		}
 
-        virtual bln Flush() override  //  false if writing to the file has failed to complete
+        virtual bool Flush() override  //  false if writing to the file has failed to complete
         {
             return Private::FileIO_Flush( this );
         }
 
-		virtual bln IsSeekSupported() const override
+		virtual bool IsSeekSupported() const override
 		{
 			return true;
 		}

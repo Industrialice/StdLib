@@ -74,7 +74,7 @@ i8 CThread::PriorityGet() const
 	return _currentPriority;
 }
 
-bln CThread::PrioritySet( i8 priority )
+bool CThread::PrioritySet( i8 priority )
 {
     if( priority != _currentPriority )
     {

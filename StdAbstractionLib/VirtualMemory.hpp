@@ -12,13 +12,13 @@ namespace StdLib
 			Execute = BIT( 2 )
 		}; CONSTS_OPS( PageMode );
 
-		//  TODO: resize, realloc
-		EXTERNALD void *Reserve( uiw size );
-		EXTERNALD bln Commit( void *p_mem, uiw size, PageMode mode );
-		EXTERNALD void *Alloc( uiw size, PageMode mode );
-		EXTERNALD bln Free( void *p_mem );
+		//  TODO: resize, realloc, POSIX has mremap
+		EXTERNALD WARN_IF_UNUSED void *Reserve( uiw size );
+		EXTERNALD bool Commit( void *p_mem, uiw size, PageMode mode );
+		EXTERNALD WARN_IF_UNUSED void *Alloc( uiw size, PageMode mode );
+		EXTERNALD bool Free( void *p_mem );
 		EXTERNALD CResult < PageMode > ProtectGet( const void *p_mem, uiw size );  //  PageMode::Error if pages have different protection, always PageMode::Error on POSIX
-		EXTERNALD bln ProtectSet( void *p_mem, uiw size, PageMode mode );  //  can commit uncommited memory
+		EXTERNALD bool ProtectSet( void *p_mem, uiw size, PageMode mode );  //  can commit uncommited memory
 		EXTERNALS ui32 PageSize();
 		EXTERNALS CResult < ui32 > LargePageSize();
 

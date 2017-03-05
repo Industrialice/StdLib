@@ -13,32 +13,32 @@ namespace Files
     typedef void (*EnumFilesCallback)( CFileEnumInfo *info, void *argument );
 
 	//  use move functions to rename
-	EXTERNALD CError<> MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false );  //  if moving across volumes, source removing is not guaranteed
-	EXTERNALD CError<> MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false );  //  if moving across volumes, source removing is not guaranteed
-	EXTERNALD CError<> MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false );  //  if moving across volumes, source removing is not guaranteed
-	EXTERNALD CError<> CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false );
-	EXTERNALD CError<> CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false );
-	EXTERNALD CError<> CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bln is_replace = false );
+	EXTERNALD CError<> MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace = false );  //  if moving across volumes, source removing is not guaranteed
+	EXTERNALD CError<> MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace = false );  //  if moving across volumes, source removing is not guaranteed
+	EXTERNALD CError<> MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace = false );  //  if moving across volumes, source removing is not guaranteed
+	EXTERNALD CError<> CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace = false );
+	EXTERNALD CError<> CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace = false );
+	EXTERNALD CError<> CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace = false );
     EXTERNALD CError<> RemoveFile( const FilePath &pnn );
     EXTERNALD CError<> RemoveFolder( const FilePath &path );
 	EXTERNALD CError<> RemoveObject( const FilePath &path );
 	EXTERNALD CError<> VolumeDriveName( const FilePath &path, char *RSTR output, uiw maxLen );  //  maxLen include null-symbol, if buffer was too small, returns a zero
-	EXTERNALD CResult < bln > IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1 );  //  the function may fail if it cannot open one of the files
-	EXTERNALD CResult < bln > IsExists( const FilePath &pnn );
-	EXTERNALD CResult < bln > IsFile( const FilePath &pnn );
-	EXTERNALD CResult < bln > IsFolder( const FilePath &pnn );
-	EXTERNALD CResult < bln > IsFolderEmpty( const FilePath &pnn );
-	EXTERNALD CResult < bln > IsFileReadOnlyGet( const FilePath &pnn );
-	EXTERNALD CError<> IsFileReadOnlySet( const FilePath &pnn, bln is_ro );
-	EXTERNALD CError<> CreateNewFolder( const FilePath &where, const FilePath &name, bln is_overrideExistingObject = false );
-	EXTERNALD CError<> CreateNewFile( const FilePath &where, const FilePath &name, bln is_overrideExistingObject = false );
-	EXTERNALD bln IsRelativePathSupported();
+	EXTERNALD CResult < bool > IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1 );  //  the function may fail if it cannot open one of the files
+	EXTERNALD CResult < bool > IsExists( const FilePath &pnn );
+	EXTERNALD CResult < bool > IsFile( const FilePath &pnn );
+	EXTERNALD CResult < bool > IsFolder( const FilePath &pnn );
+	EXTERNALD CResult < bool > IsFolderEmpty( const FilePath &pnn );
+	EXTERNALD CResult < bool > IsFileReadOnlyGet( const FilePath &pnn );
+	EXTERNALD CError<> IsFileReadOnlySet( const FilePath &pnn, bool is_ro );
+	EXTERNALD CError<> CreateNewFolder( const FilePath &where, const FilePath &name, bool is_overrideExistingObject = false );
+	EXTERNALD CError<> CreateNewFile( const FilePath &where, const FilePath &name, bool is_overrideExistingObject = false );
+	EXTERNALD bool IsRelativePathSupported();
 	EXTERNALD CResult < FilePath > CurrentWorkingPathGet();
 	EXTERNALD CError<> CurrentWorkingPathSet( const FilePath &path );
 	EXTERNALD CError<> EnumFirstFile( CFileEnumInfo *info, const FilePath &path, const FilePath &mask );  //  returns Error::Ok if file info has been extracted
 	EXTERNALD CError<> EnumNextFile( CFileEnumInfo *info );  //  returns Error::Ok if file info has been extracted
-	EXTERNALD uiw EnumFiles( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument );  //  returns the number of enumerated files
-	EXTERNALD uiw EnumFilesRecursively( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument );  //  returns the number of enumerated files
+	EXTERNALD uiw EnumFiles( const FilePath &path, const FilePath &mask, bool is_reportFolders, EnumFilesCallback callback, void *argument );  //  returns the number of enumerated files
+	EXTERNALD uiw EnumFilesRecursively( const FilePath &path, const FilePath &mask, bool is_reportFolders, EnumFilesCallback callback, void *argument );  //  returns the number of enumerated files
 
     namespace Private
     {
@@ -73,7 +73,7 @@ namespace Files
 			return _pnn;
 		}
 
-        bln IsFolder() const
+        bool IsFolder() const
         {
 			return _fileSize == ui64_max;
         }

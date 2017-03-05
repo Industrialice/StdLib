@@ -8,7 +8,7 @@ using namespace StdLib;
 
 namespace
 {
-    bln is_Initialized;
+    bool is_Initialized;
 
     class CMisc
     {
@@ -131,7 +131,7 @@ enum TMPrec
 	Sec, MSec, USec
 };
 
-template < typename Type, bln is_since, TMPrec prec > Type TMDiff( const tcs &_left, const tcs &_right )
+template < typename Type, bool is_since, TMPrec prec > Type TMDiff( const tcs &_left, const tcs &_right )
 {
 	Type mult;
 	if( prec == Sec ) mult = MiscData.FreqMultSec( Type() );
@@ -224,43 +224,43 @@ f64 TimeMoment::BeforeUSec64( const TimeMoment &second ) const
 	return TMDiff < f64, false, USec >( _tc, second._tc );
 }
 
-bln TimeMoment::operator < ( const TimeMoment &other ) const
+bool TimeMoment::operator < ( const TimeMoment &other ) const
 {
 	CHECK( !this->IsEmpty() && !other.IsEmpty() );
 	return _tc.QuadPart < other._tc.QuadPart;
 }
 
-bln TimeMoment::operator <= ( const TimeMoment &other ) const
+bool TimeMoment::operator <= ( const TimeMoment &other ) const
 {
 	CHECK( !this->IsEmpty() && !other.IsEmpty() );
 	return _tc.QuadPart <= other._tc.QuadPart;
 }
 
-bln TimeMoment::operator > ( const TimeMoment &other ) const
+bool TimeMoment::operator > ( const TimeMoment &other ) const
 {
 	CHECK( !this->IsEmpty() && !other.IsEmpty() );
 	return _tc.QuadPart > other._tc.QuadPart;
 }
 
-bln TimeMoment::operator >= ( const TimeMoment &other ) const
+bool TimeMoment::operator >= ( const TimeMoment &other ) const
 {
 	CHECK( !this->IsEmpty() && !other.IsEmpty() );
 	return _tc.QuadPart > other._tc.QuadPart;
 }
 
-bln TimeMoment::operator == ( const TimeMoment &other ) const
+bool TimeMoment::operator == ( const TimeMoment &other ) const
 {
 	CHECK( !this->IsEmpty() && !other.IsEmpty() );
 	return _tc.QuadPart == other._tc.QuadPart;
 }
 
-bln TimeMoment::operator != ( const TimeMoment &other ) const
+bool TimeMoment::operator != ( const TimeMoment &other ) const
 {
 	CHECK( !this->IsEmpty() && !other.IsEmpty() );
 	return _tc.QuadPart > other._tc.QuadPart;
 }
 
-bln TimeMoment::IsEmpty() const
+bool TimeMoment::IsEmpty() const
 {
 	return _tc.QuadPart == 0;
 }

@@ -85,26 +85,26 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         return len;
     }
 
-    static FORCEINLINE bln IsStringEquals( const char *first, const char *second )
+    static FORCEINLINE bool IsStringEquals( const char *first, const char *second )
     {
         ASSUME( first && second );
         return strcmp( first, second ) == 0;
     }
 
-    static FORCEINLINE bln IsStringEquals( const wchar_t *first, const wchar_t *second )
+    static FORCEINLINE bool IsStringEquals( const wchar_t *first, const wchar_t *second )
     {
         ASSUME( first && second );
         return wcscmp( first, second ) == 0;
     }
 
-    template < typename type > static FORCEINLINE bln IsStringEquals( const type *first, const type *second )
+    template < typename type > static FORCEINLINE bool IsStringEquals( const type *first, const type *second )
     {
         ASSUME( first && second );
         for( ; *first == *second && *first; ++first, ++second );
         return *first == *second;
     }
 
-    static FORCEINLINE bln IsStrInRange( const charType *str, const charType *lower, const charType *upper )
+    static FORCEINLINE bool IsStrInRange( const charType *str, const charType *lower, const charType *upper )
     {
         ASSUME( str );
         return !(str < lower || str >= upper);
@@ -133,7 +133,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
     uiw _count;  //  without zero symbol
 
 #ifdef DEBUG
-	bln _is_static;
+	bool _is_static;
 
 	inline void DebugValidate( const TCStr *str )
 	{
@@ -143,7 +143,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
 	inline void DebugValidate( const TCStr *str ) {}
 #endif
 
-	bln FitsStatic( uiw size )
+	bool FitsStatic( uiw size )
 	{
 		return size < static_size;
 	}
@@ -177,7 +177,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         }
     }
 
-    bln _ProcReservationDown( uiw newCount )
+    bool _ProcReservationDown( uiw newCount )
     {
         ASSUME( IsDynamic() );
         if( reservator::Down( newCount, &_reserved ) )
@@ -188,7 +188,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         return false;
     }
 
-    template < bln isCanBeAliased > NOINLINE void AddString( const charType *str, uiw len )
+    template < bool isCanBeAliased > NOINLINE void AddString( const charType *str, uiw len )
     {
         ASSUME( str != 0 || len == 0 );
 		DebugValidate( this );
@@ -198,7 +198,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
 
         if( IsDynamic() )
         {
-            bln isAliased = IsStrInRange( str, _dynamic_str, _dynamic_str + _count );
+            bool isAliased = IsStrInRange( str, _dynamic_str, _dynamic_str + _count );
             const charType *curStr = _dynamic_str;
             _ProcReservationUp( _count + len );
             if( isCanBeAliased && isAliased )
@@ -276,7 +276,7 @@ template < typename charType, uiw basicSize = StringDefReserve / sizeof(charType
         return thisStr;
     }
 
-    template < bln isCanBeAliased > NOINLINE void InsertString( uiw index, const charType *str, uiw len )
+    template < bool isCanBeAliased > NOINLINE void InsertString( uiw index, const charType *str, uiw len )
     {
         ASSUME( str != 0 || len == 0 );
 		DebugValidate( this );
@@ -807,7 +807,7 @@ public:
 		DebugValidate( this );
     }
 
-    void Resize( uiw n, bln = true /* ignored */ )
+    void Resize( uiw n, bool = true /* ignored */ )
     {
         Resize( n, (charType)0 );
     }
@@ -842,7 +842,7 @@ public:
 		DebugValidate( this );
     }
 
-    bln IsEmpty() const
+    bool IsEmpty() const
     {
         return _count == 0;
     }
@@ -852,7 +852,7 @@ public:
         return IsDynamic() ? _reserved : static_last;
     }
 
-    bln IsStatic() const
+    bool IsStatic() const
     {
 	#ifdef DEBUG
 		ASSUME( _is_static == (_static_str[ static_last ] == (charType)0) );
@@ -860,7 +860,7 @@ public:
         return _static_str[ static_last ] == (charType)0;
     }
 
-    bln IsDynamic() const
+    bool IsDynamic() const
     {
 	#ifdef DEBUG
 		ASSUME( _is_static == (_static_str[ static_last ] == (charType)0) );
@@ -993,7 +993,7 @@ public:
         charType *thisStr = Str();
         uiw pos = where.Ptr() - thisStr;
         ASSUME( pos <= _count );
-        bln isOverlapped = thisStr <= first.Ptr() && thisStr + _count > first.Ptr();
+        bool isOverlapped = thisStr <= first.Ptr() && thisStr + _count > first.Ptr();
         if( isOverlapped )
         {
             //  TODO: proto
@@ -1239,7 +1239,7 @@ public:
     template < typename InputIterator > NOINLINE ownType &Append( InputIterator first, InputIterator last )
     {
         const charType *str = CStr();
-        bln isOverlapped = !(first.Ptr() < str || first.Ptr() >= str + _count);
+        bool isOverlapped = !(first.Ptr() < str || first.Ptr() >= str + _count);
         if( isOverlapped )
         {
             /*  TODO: proto  */
@@ -1286,7 +1286,7 @@ public:
         if( (void *)this != (void *)&source )
         {
 			const charType *sourceStr = source.CStr();
-            bln isNeedDynamic = FitsStatic( source.Size() ) == false;
+            bool isNeedDynamic = FitsStatic( source.Size() ) == false;
             if( IsStatic() )
             {
                 if( isNeedDynamic )
@@ -1343,14 +1343,14 @@ public:
             n = GetStringLength( s );
         }
         const charType *curStr = CStr();
-        bln isOverlapped = !(s < curStr || s >= curStr + _count);
+        bool isOverlapped = !(s < curStr || s >= curStr + _count);
         if( isOverlapped )  //  TODO: proto
         {
             *this = ownType( s, n );
             return *this;
         }
 
-        bln isNeedDynamic = FitsStatic( n ) == false;
+        bool isNeedDynamic = FitsStatic( n ) == false;
 
         if( isNeedDynamic )
         {
@@ -1393,7 +1393,7 @@ public:
     template < typename InputIterator > NOINLINE ownType &Assign( InputIterator first, InputIterator last )
     {
         const charType *str = CStr();
-        bln isOverlapped = !(first.Ptr() < str || first.Ptr() >= str + _count);
+        bool isOverlapped = !(first.Ptr() < str || first.Ptr() >= str + _count);
         if( isOverlapped )
         {
             /*  TODO: proto  */
@@ -1596,7 +1596,7 @@ public:
         return *this;
     }
 
-	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bln operator == ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bool operator == ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
     {
         if( _count == source._count )
         {
@@ -1605,7 +1605,7 @@ public:
         return false;
     }
 
-    bln operator == ( const charType *str ) const
+    bool operator == ( const charType *str ) const
     {
         if( str == 0 )
         {
@@ -1614,22 +1614,22 @@ public:
         return IsStringEquals( CStr(), str );
     }
 
-	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bln operator != ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bool operator != ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
     {
         return !this->operator==( source );
     }
 
-    bln operator != ( const charType *str ) const
+    bool operator != ( const charType *str ) const
     {
         return !this->operator==( str );
     }
 
-	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bln operator < ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bool operator < ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
     {
         return StringCompare( CStr(), source.CStr() ) < 0;
     }
 
-    bln operator < ( const charType *str ) const
+    bool operator < ( const charType *str ) const
     {
         if( str == 0 )
         {
@@ -1638,12 +1638,12 @@ public:
         return StringCompare( CStr(), str ) < 0;
     }
 
-	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bln operator > ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
+	template < uiw otherBasicSize, typename otherReservator, typename otherAllocator > bool operator > ( const TCStr < charType, otherBasicSize, otherReservator, otherAllocator > &source ) const
     {
         return StringCompare( CStr(), source.CStr() ) > 0;
     }
 
-    bln operator >( const charType *str ) const
+    bool operator >( const charType *str ) const
     {
         if( str == 0 )
         {

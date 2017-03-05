@@ -9,8 +9,8 @@ namespace StdLib
 	{
 		T _value;  //  TODO: should be possible to make this nullable( optional )
 		CError < errorAddition > _error;
-		DBGCODE( bln _is_unwrappedValue = false );
-		DBGCODE( bln _is_unwrappedError = false );
+		DBGCODE( bool _is_unwrappedValue = false );
+		DBGCODE( bool _is_unwrappedError = false );
 
 	public:
 		CResult( const T &value, const CError < errorAddition > &error = CError < errorAddition >() ) : _value( value ), _error( error )
@@ -44,7 +44,7 @@ namespace StdLib
 			return value;
 		}
 
-		bln Ok() const
+		bool Ok() const
 		{
 			return _error.Ok();
 		}

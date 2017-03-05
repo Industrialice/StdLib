@@ -1,7 +1,7 @@
 #include "PreHeader.hpp"
 #include "Files.hpp"
 
-uiw Files::EnumFiles( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
+uiw Files::EnumFiles( const FilePath &path, const FilePath &mask, bool is_reportFolders, EnumFilesCallback callback, void *argument )
 {
 	uiw enumerated = 0;
 	CFileEnumInfo info;
@@ -22,7 +22,7 @@ uiw Files::EnumFiles( const FilePath &path, const FilePath &mask, bln is_reportF
 	return enumerated;
 }
 
-uiw Files::EnumFilesRecursively( const FilePath &path, const FilePath &mask, bln is_reportFolders, EnumFilesCallback callback, void *argument )
+uiw Files::EnumFilesRecursively( const FilePath &path, const FilePath &mask, bool is_reportFolders, EnumFilesCallback callback, void *argument )
 {
 	uiw enumerated = 0;
 	std::unique_ptr < CFileEnumInfo > info( new CFileEnumInfo );
