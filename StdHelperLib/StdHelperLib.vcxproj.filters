@@ -68,9 +68,6 @@
     <ClInclude Include="_CVectorBase.hpp">
       <Filter>Containers</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryFile.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MemoryStreamContainer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

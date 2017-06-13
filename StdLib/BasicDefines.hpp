@@ -1,7 +1,11 @@
 #ifndef __BASIC_DEFINES_HPP__
 #define __BASIC_DEFINES_HPP__
 
-#define BIT( bit ) (1 << (bit))
+template <typename T, typename R = T> constexpr R BitPos( T pos )
+{
+	return (R)1 << pos;
+}
+
 #define TOSTR( code ) #code
 #define CONCAT( first, second ) first##second
 
@@ -53,7 +57,7 @@
     #define RELCODE( ... ) __VA_ARGS__
 #endif
 
-#define NOT_IMPLEMENTED SOFTBREAK
+#define NOIMPL SOFTBREAK
 
 #if defined(STATIC_ASSERTION_SUPPORTED) && !defined(DISALLOW_NATIVE_STATIC_ASSERTION)
     #define STATIC_CHECK( what, str ) static_assert( what, str )
@@ -69,11 +73,6 @@
         #endif
     #endif
 #endif
-
-/*  if you need more capacity, just use inserted TERSWITCH'es  */
-#define TERSWITCH1( case0check, code0, defaultcode ) ((case0check) ? (code0) : (defaultcode))
-#define TERSWITCH2( case0check, code0, case1check, code1, defaultcode ) ((case0check) ? (code0) : ((case1check) ? (code1) : (defaultcode)))
-#define TERSWITCH3( case0check, code0, case1check, code1, case2check, code2, defaultcode ) ((case0check) ? (code0) : ((case1check) ? (code1) : ((case2check) ? (code2) : (defaultcode))))
 
 #define DSA( pointer, assigning ) if( pointer ) *(pointer) = (assigning)
 

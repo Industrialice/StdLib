@@ -3,6 +3,8 @@
 
 #ifdef _MSC_VER
 
+	#pragma warning(1:4062) /* The enumerate has no associated handler in a switch statement, and there is no default label. */
+
     #define NOMINMAX
 
 	// for features review, visit https://msdn.microsoft.com/en-us/library/hh567368.aspx
@@ -35,9 +37,6 @@
     #define NORETURN __declspec(noreturn)
     #define UNIQUEPTRRETURN __declspec(restrict)
     #define ALLOCA( size ) _alloca( size )
-    #define INT16_CHANGE_ENDIANNESS( val ) _byteswap_ushort( val )
-    #define INT32_CHANGE_ENDIANNESS( val ) _byteswap_ulong( val )
-    #define INT64_CHANGE_ENDIANNESS( val ) _byteswap_uint64( val )
     #if defined(_M_IX86) || defined(_M_AMD64) || _MSC_VER >= 1700
         #define RETURN_ADDRESS _ReturnAddress()
     #else
@@ -140,15 +139,21 @@
         #endif
 
         #if defined(_M_IX86) || defined(_M_AMD64) || _MSC_VER >= 1700
-            #define MSNZB32( tosearch, result ) do { ASSUME( tosearch != 0 ); unsigned long r; _BitScanReverse( &r, tosearch ); *result = r; } while( 0 )
-            #define LSNZB32( tosearch, result ) do { ASSUME( tosearch != 0 ); unsigned long r; _BitScanForward( &r, tosearch ); *result = r; } while( 0 )
+            #define MSNZB32( tosearch, result ) do { ASSUME( unsigned long(tosearch) != 0 ); unsigned long r; _BitScanReverse( &r, unsigned long(tosearch) ); *result = r; } while( 0 )
+            #define LSNZB32( tosearch, result ) do { ASSUME( unsigned long(tosearch) != 0 ); unsigned long r; _BitScanForward( &r, unsigned long(tosearch) ); *result = r; } while( 0 )
 
-            #define MSNZB64( tosearch, result ) do { ASSUME( tosearch != 0 ); unsigned long r; _BitScanReverse64( &r, tosearch ); *result = r; } while( 0 )
-            #define LSNZB64( tosearch, result ) do { ASSUME( tosearch != 0 ); unsigned long r; _BitScanForward64( &r, tosearch ); *result = r; } while( 0 )
+            #define MSNZB64( tosearch, result ) do { ASSUME( unsigned long long(tosearch) != 0 ); unsigned long r; _BitScanReverse64( &r, unsigned long long(tosearch) ); *result = r; } while( 0 )
+            #define LSNZB64( tosearch, result ) do { ASSUME( unsigned long long(tosearch) != 0 ); unsigned long r; _BitScanForward64( &r, unsigned long long(tosearch) ); *result = r; } while( 0 )
         #endif
     #endif
 
+    #define BYTESWAP16( value ) _byteswap_ushort( value )
+    #define BYTESWAP32( value ) _byteswap_ulong( value )
+    #define BYTESWAP64( value ) _byteswap_uint64( value )
+
 #elif defined(__GNUC__)
+
+	#pragma GCC diagnostic error "-Wswitch" /* won't work with clang? */
 
     //#define REMOVE_COMMA ##
     #define ALIGNED_PRE( al )
@@ -167,9 +172,6 @@
     #define NORETURN __attribute__(noreturn)
     #define UNIQUEPTRRETURN  /*  there is must be something  */
     #define ALLOCA( size ) __builtin_alloca( size )
-    #define INT16_CHANGE_ENDIANNESS( val ) __builtin_bswap16( val )
-    #define INT32_CHANGE_ENDIANNESS( val ) __builtin_bswap32( val )
-    #define INT64_CHANGE_ENDIANNESS( val ) __builtin_bswap64( val )
     #define RETURN_ADDRESS __builtin_extract_return_addr( __builtin_return_address() )
 
 	/*  TODO: actual checks  */
@@ -277,11 +279,15 @@
 
     /*  not sure about minimal versions  */
     /*  most significant non-zero bit and least significant  */
-    #define MSNZB32( tosearch, result ) ASSUME( tosearch != 0 ); *result = (31 - __builtin_clz( tosearch ))
-    #define LSNZB32( tosearch, result ) ASSUME( tosearch != 0 ); *result = __builtin_ctz( tosearch )
+    #define MSNZB32( tosearch, result ) do { ASSUME( unsigned int(tosearch) != 0 ); *result = (31 - __builtin_clz( unsigned int(tosearch) )); } while(0)
+    #define LSNZB32( tosearch, result ) do { ASSUME( unsigned int(tosearch) != 0 ); *result = __builtin_ctz( unsigned int(tosearch) ); } while(0)
 
-    #define MSNZB64( tosearch, result ) ASSUME( tosearch != 0 ); *result = (63 - __builtin_clzll( tosearch ))
-    #define LSNZB64( tosearch, result ) ASSUME( tosearch != 0 ); *result = __builtin_clzll( tosearch )
+    #define MSNZB64( tosearch, result ) do { ASSUME( unsigned long long(tosearch) != 0 ); *result = (63 - __builtin_clzll( unsigned long long(tosearch) )); } while(0)
+    #define LSNZB64( tosearch, result ) do { ASSUME( unsigned long long(tosearch) != 0 ); *result = __builtin_clzll( unsigned long long(tosearch) ); } while(0)
+
+    #define BYTESWAP16( value ) __builtin_bswap16( value )
+    #define BYTESWAP32( value ) __builtin_bswap32( value )
+    #define BYTESWAP64( value ) __builtin_bswap64( value )
 
 #else
 

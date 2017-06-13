@@ -178,8 +178,8 @@ namespace LiceMath
     EXTERNALS void Vec4Scale( vec4 *RSTR po_v0, const vec4 *cpo_v1, f32 koef );
     EXTERNALS void Vec4ScaleInplace( vec4 *po_v, f32 koef );
 	EXTERNALS f32 Vec4Dot( const vec4 *cpo_v0, const vec4 *cpo_v1 );
-    EXTERNALS void Vec4Cross( vec4 *RSTR po_v0, const vec4 *cpo_v1, const vec4 *cpo_v2, const vec4 *cpo_v3 );  //  TODO: does not complete
-    EXTERNALS void Vec4CrossInplace( vec4 *RSTR po_v0, const vec4 *cpo_v1, const vec4 *cpo_v2 );  //  TODO: does not complete
+    EXTERNALS void Vec4Cross( vec4 *RSTR po_v0, const vec4 *cpo_v1, const vec4 *cpo_v2, const vec4 *cpo_v3 );  //  TODO: is not complete
+    EXTERNALS void Vec4CrossInplace( vec4 *RSTR po_v0, const vec4 *cpo_v1, const vec4 *cpo_v2 );  //  TODO: is not complete
     EXTERNALS void Vec4TransformByM4x4( vec4 *RSTR po_v0, const vec4 *cpo_v1, const m4x4 *cpo_m );
     EXTERNALS void Vec4TransformByM4x4Inplace( vec4 *po_v, const m4x4 *cpo_m );
     EXTERNALS void Vec4TransformByM4x3( vec4 *RSTR po_v0, const vec4 *cpo_v1, const m4x3 *cpo_m );

@@ -7,9 +7,9 @@ namespace StdLib
 	{
 		enum class PageMode : ui8
 		{
-			Write = BIT( 0 ),
-			Read = BIT( 1 ),
-			Execute = BIT( 2 )
+			Write = BitPos( 0 ),
+			Read = BitPos( 1 ),
+			Execute = BitPos( 2 )
 		}; CONSTS_OPS( PageMode );
 
 		//  TODO: resize, realloc, POSIX has mremap

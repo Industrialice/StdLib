@@ -98,18 +98,18 @@ uiw Funcs::RoundUIToNearestStep( uiw val, uiw step )
 
 iw Funcs::RoundIDownToStep( iw val, iw step )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
     return 0;
 }
 
 iw Funcs::RoundIUpToStep( iw val, iw step )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
     return 0;
 }
 
 iw Funcs::RoundIToNearestStep( iw val, iw step )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
     return 0;
 }

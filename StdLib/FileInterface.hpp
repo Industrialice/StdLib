@@ -7,9 +7,9 @@ namespace StdLib
 {
 	enum class FileProcMode : ui8
 	{
-		Read = BIT( 1 ),
-		Write = BIT( 2 ),
-		WriteAppend = BIT( 3 ) | BIT( 2 )  //  makes existing part of the file virtually invisible( isn't reported with Size calls, isn't accessible through offset sets )
+		Read = BitPos( 1 ),
+		Write = BitPos( 2 ),
+		WriteAppend = BitPos( 3 ) | BitPos( 2 )  //  makes existing part of the file virtually invisible( isn't reported with Size calls, isn't accessible through offset sets )
 	}; CONSTS_OPS( FileProcMode );
 
 	//  mode                   already exists        doesn't exist
@@ -30,10 +30,10 @@ namespace StdLib
 	enum class FileCacheMode : ui8
 	{
 		Default = 0,
-		LinearRead = BIT( 1 ),  //  requires ProcMode::Read, can't be used with RandomRead
-		RandomRead = BIT( 2 ),  //  requires ProcMode::Read, can't be used with LinearRead
-		DisableSystemWriteCache = BIT( 3 ),  //  requires ProcMode::Write
-		DisableSystemReadCache = BIT( 4 )  //  requires ProcMode::Read
+		LinearRead = BitPos( 1 ),  //  requires ProcMode::Read, can't be used with RandomRead
+		RandomRead = BitPos( 2 ),  //  requires ProcMode::Read, can't be used with LinearRead
+		DisableSystemWriteCache = BitPos( 3 ),  //  requires ProcMode::Write
+		DisableSystemReadCache = BitPos( 4 )  //  requires ProcMode::Read
 	}; CONSTS_OPS( FileCacheMode );
 		//  be aware: sometimes disabling write cache you'll also disable read cache and vise versa
 

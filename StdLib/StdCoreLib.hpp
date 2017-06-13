@@ -2,7 +2,7 @@
 #define __STD_LIB_HEADER_HPP__
 
 #if !defined(WINDOWS) && !defined(POSIX)
-    #if defined(_WIN32)
+    #if defined(_WIN32) || defined(_WIN64)
         #define WINDOWS
     #else
         #error you must define platform: WINDOWS or POSIX
@@ -64,6 +64,7 @@
 #include "Nullable.hpp"
 #include "Funcs.hpp"
 #include "StringFuncs.hpp"
+#include "FormattedPrint.hpp"
 #include "CF16.hpp"
 #include "CCustomF16.hpp"
 #include "Result.hpp"

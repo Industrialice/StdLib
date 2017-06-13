@@ -137,15 +137,15 @@ namespace Funcs
         STATIC_CHECK( TypeDesc < X >::is_pod, "val is not a POD type in ChangeEndianness" );
         if( sizeof(val) == 8 )
         {
-            return INT64_CHANGE_ENDIANNESS( val );
+            return BYTESWAP64( val );
         }
         if( sizeof(val) == 4 )
         {
-            return INT32_CHANGE_ENDIANNESS( val );
+            return BYTESWAP32( val );
         }
         if( sizeof(val) == 2 )
         {
-            return INT16_CHANGE_ENDIANNESS( val );
+            return BYTESWAP16( val );
         }
         STATIC_CHECK( sizeof(val) == 1, "incorrect size of val in ChangeEndianness" );
         return val;

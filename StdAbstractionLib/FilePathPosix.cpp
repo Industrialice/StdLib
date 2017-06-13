@@ -56,30 +56,30 @@ bool FilePath::IsValid() const
 
 void FilePath::MakeAbsolute()
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 }
 
 bool FilePath::IsAbsolute() const
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	return false;
 }
 
 bool FilePath::HasExtension() const
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	return false;
 }
 
 FilePath FilePath::FileName() const
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	return FilePath();
 }
 
 FilePath FilePath::Extension() const
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	return FilePath();
 }
 

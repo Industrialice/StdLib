@@ -13,132 +13,132 @@
 
 bool Files::MoveFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 bool Files::MoveFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 NOINLINE bool Files::MoveObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 bool Files::CopyFileTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 bool Files::CopyFolderTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 bool Files::CopyObjectTo( const FilePath &sourcePnn, const FilePath &targetPnn, bool is_replace, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 NOINLINE bool Files::RemoveFile( const FilePath &pnn, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 NOINLINE bool Files::RemoveFolder( const FilePath &path, CError *error )  //  potentially recursive
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 bool Files::RemoveObject( const FilePath &path, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 bool Files::VolumeDriveName( const FilePath &path, char *RSTR output, uiw maxLen )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	return false;
 }
 
 NOINLINE bool Files::IsPointToTheSameFile( const FilePath &pnn0, const FilePath &pnn1, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 NOINLINE bool Files::IsExists( const FilePath &pnn, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 bool Files::IsFile( const FilePath &pnn, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 bool Files::IsFolder( const FilePath &pnn, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 bool Files::IsEmpty( const FilePath &pnn, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 NOINLINE bool Files::IsFileReadOnlyGet( const FilePath &pnn, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 NOINLINE bool Files::IsFileReadOnlySet( const FilePath &pnn, bool is_ro, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 NOINLINE bool Files::CreateNewFolder( const FilePath &where, const FilePath &name, bool is_overrideExistingObject, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
 
 NOINLINE bool Files::CreateNewFile( const FilePath &where, const FilePath &name, bool is_overrideExistingObject, CError *error )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	DSA( error, Error::Unimplemented() );
 	return false;
 }
@@ -172,13 +172,13 @@ struct CFileEnumerator : public Files::CFileEnumInfo
 {
 	NOINLINE bool EnumFirstFile( const FilePath &path, const FilePath &mask )
 	{
-		NOT_IMPLEMENTED;
+		NOIMPL;
 		return false;
 	}
 
 	NOINLINE bool EnumNextFile()
 	{
-		NOT_IMPLEMENTED;
+		NOIMPL;
 		return false;
 	}
 };
@@ -195,7 +195,7 @@ bool Files::EnumNextFile( CFileEnumInfo *info )
 
 void Files::Private::CloseEnumHandle( fileEnumHandle handle )
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 }
 
 #if 0

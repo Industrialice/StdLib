@@ -33,15 +33,15 @@ namespace StdLib
 			return std::move( _value );
 		}
 
-		T UnwrapOrGet( const T &value )
+		template <typename E> T UnwrapOrGet( E &&value )
 		{
 			DBGCODE( ASSUME( _is_unwrappedValue == false ) );
 			DBGCODE( _is_unwrappedValue = true );
 			if( _error.Ok() )
 			{
-				return _value;
+				return std::move( _value );
 			}
-			return value;
+			return std::move( value );
 		}
 
 		bool Ok() const

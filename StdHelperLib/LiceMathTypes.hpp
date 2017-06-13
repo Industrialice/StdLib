@@ -436,7 +436,7 @@ template < ui32 rbits, ui32 gbits, ui32 bbits, ui32 abits = 0 > struct TColorRGB
         }
         else
         {
-            NOT_IMPLEMENTED;
+            NOIMPL;
         }
     }
 
@@ -459,12 +459,12 @@ template < ui32 rbits, ui32 gbits, ui32 bbits, ui32 abits = 0 > struct TColorRGB
 
     TColorRGBA( const F96Color &o_col )
     {
-        NOT_IMPLEMENTED;
+        NOIMPL;
     }
 
     TColorRGBA( const F128Color &o_col )
     {
-        NOT_IMPLEMENTED;
+        NOIMPL;
     }
 
     ui8 R( ui8 bits = rbits ) const
@@ -473,7 +473,7 @@ template < ui32 rbits, ui32 gbits, ui32 bbits, ui32 abits = 0 > struct TColorRGB
         {
             return color >> (bitsSum - rbits);
         }
-        NOT_IMPLEMENTED;
+        NOIMPL;
     }
 
     ui8 G( ui8 bits = gbits ) const
@@ -482,7 +482,7 @@ template < ui32 rbits, ui32 gbits, ui32 bbits, ui32 abits = 0 > struct TColorRGB
         {
             return color >> (bbits + abits) & Funcs::MaxValue < ui8 >( gbits );
         }
-        NOT_IMPLEMENTED;
+        NOIMPL;
     }
 
     ui8 B( ui8 bits = bbits ) const
@@ -491,7 +491,7 @@ template < ui32 rbits, ui32 gbits, ui32 bbits, ui32 abits = 0 > struct TColorRGB
         {
             return color >> abits & Funcs::MaxValue < ui8 >( bbits );
         }
-        NOT_IMPLEMENTED;
+        NOIMPL;
     }
 
     ui8 A( ui8 bits = abits ) const
@@ -500,7 +500,7 @@ template < ui32 rbits, ui32 gbits, ui32 bbits, ui32 abits = 0 > struct TColorRGB
         {
             return color & Funcs::MaxValue < ui8 >( abits );
         }
-        NOT_IMPLEMENTED;
+        NOIMPL;
     }
 
 private:

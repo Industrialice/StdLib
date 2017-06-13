@@ -1,5 +1,8 @@
 ﻿#include <StdAbstractionLib.hpp>
 
+#include <assert.h>
+#include <array>
+
 #pragma comment( lib, "StdCoreLib_Static.lib" )
 #pragma comment( lib, "StdHelperLib_Static.lib" )
 #pragma comment( lib, "StdAbstractionLib_Static.lib" )
@@ -14,6 +17,8 @@
 #include <PackedIntArray.hpp>
 #include "DeleteShit.hpp"
 #include <FileCFILEStream.hpp>
+
+#include "RingBuffer.h"
 
 using namespace StdLib;
 
@@ -579,10 +584,25 @@ int __cdecl main()
 {
     StdAbstractionLib_Initialize();
 
+	RingBuffer<int, 255> rb;
+
+	for (int i = 0; i < rb.MaxElements * 4; ++i)
 	{
-		std::unique_ptr < int, MallocDeleter > shit( new int );
-		printf( "sizeof %i\n", sizeof(shit) );
+		if (i % 5 == 0 && rb.size()) rb.pop_back();
+		rb.push_back(i);
+
+		uiw size = rb.size();
+		//assert(size == std::min<uiw>(rb.MaxElements, i + 1));
 	}
+
+	if (rb.size()) rb.pop_back();
+
+	for (const auto &v : rb)
+	{
+		printf("%i\n", v);
+	}
+
+	printf("size %i\n", rb.size());
 
 	//ReadBenchmark( 25 );
 

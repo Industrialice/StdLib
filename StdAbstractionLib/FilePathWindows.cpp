@@ -77,7 +77,7 @@ void FilePath::MakeAbsolute()
 bool FilePath::IsAbsolute() const
 {
 #ifndef _WIN32_WCE
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	return false;
 #else
 	return true;
@@ -86,7 +86,7 @@ bool FilePath::IsAbsolute() const
 
 bool FilePath::HasExtension() const
 {
-	NOT_IMPLEMENTED;
+	NOIMPL;
 	return false;
 }
 

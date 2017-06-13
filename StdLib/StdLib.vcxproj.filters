@@ -72,6 +72,9 @@
     <ClInclude Include="Result.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="FormattedPrint.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CF16.cpp">
@@ -96,6 +99,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="RandomizingFuncs.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="FormattedPrint.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
